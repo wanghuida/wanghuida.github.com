@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>$huida =~ s/blog/site/g</title>
+  <title>进程间通信【IPC】 - $huida =~ s/blog/site/g</title>
   <meta name="author" content="huida">
 
   
@@ -70,7 +70,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://wanghuida.github.com/">
+  <link rel="canonical" href="http://wanghuida.github.com/blog/2012/07/06/perl-ipc/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -114,15 +114,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/07/06/perl-ipc/">进程间通信【IPC】</a></h1>
+      <h1 class="entry-title">进程间通信【IPC】</h1>
     
     
       <p class="meta">
@@ -145,7 +142,7 @@
   </header>
 
 
-  <div class="entry-content"><figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<div class="entry-content"><figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -292,185 +289,16 @@
 </span></code></pre></td></tr></table></div></figure>
 
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/07/03/perl-epoll/">Perl使用Epoll优化</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
   
 
+<span class="byline author vcard">Posted by <span class="fn">huida</span></span>
 
-<time datetime="2011-07-03T05:59:00+08:00" pubdate data-updated="true">Jul 3<span>rd</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><blockquote><p>优势：当有事件时才会增加到@events，无需遍历</p>
-
-<p>注意：EPOLLERR，不增加该事件，无法执行到退出</p></blockquote>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="c1">#!/usr/bin/perl</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">use</span> <span class="n">warnings</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="nn">Data::</span><span class="n">Dumper</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">strict</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="nn">IO::</span><span class="n">Socket</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">POSIX</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">Socket</span> <span class="sx">qw(SO_KEEPALIVE)</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">bytes</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="nn">IO::</span><span class="n">Poll</span><span class="p">;</span>
-</span><span class='line'><span class="c1">#/Developer/SDKs/MacOSX10.6.sdk/usr/include/sys/errno.h</span>
-</span><span class='line'><span class="c1">#死活没找到，find / -name errno.h -print了下</span>
-</span><span class='line'><span class="k">use</span> <span class="n">Errno</span>  <span class="sx">qw(EINPROGRESS EWOULDBLOCK EISCONN ENOTSOCK</span>
-</span><span class='line'><span class="sx">              EPIPE EAGAIN EBADF ECONNRESET ENOPROTOOPT)</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">use</span> <span class="nn">Sys::</span><span class="n">Syscall</span> <span class="sx">qw(:epoll)</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">use</span> <span class="n">constant</span> <span class="n">POLLIN</span>        <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">constant</span> <span class="n">POLLOUT</span>       <span class="o">=&gt;</span> <span class="mi">4</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">constant</span> <span class="n">POLLERR</span>       <span class="o">=&gt;</span> <span class="mi">8</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">constant</span> <span class="n">POLLHUP</span>       <span class="o">=&gt;</span> <span class="mi">16</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">constant</span> <span class="n">POLLNVAL</span>      <span class="o">=&gt;</span> <span class="mi">32</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="k">my</span> <span class="nv">$server</span> <span class="o">=</span> <span class="nn">IO::Socket::</span><span class="n">INET</span><span class="o">-&gt;</span><span class="k">new</span><span class="p">(</span>
-</span><span class='line'>    <span class="n">LocalAddr</span> <span class="o">=&gt;</span> <span class="s">&#39;192.168.10.200:8888&#39;</span><span class="p">,</span>
-</span><span class='line'>    <span class="n">Type</span>      <span class="o">=&gt;</span> <span class="n">SOCK_STREAM</span><span class="p">,</span>
-</span><span class='line'>    <span class="n">Proto</span>     <span class="o">=&gt;</span> <span class="s">&#39;tcp&#39;</span><span class="p">,</span>
-</span><span class='line'>    <span class="n">Blocking</span>  <span class="o">=&gt;</span> <span class="mi">0</span><span class="p">,</span>
-</span><span class='line'>    <span class="n">Reuse</span>     <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span>
-</span><span class='line'>    <span class="n">Listen</span>    <span class="o">=&gt;</span> <span class="mi">1024</span><span class="p">,</span>
-</span><span class='line'><span class="p">)</span> <span class="ow">or</span> <span class="nb">die</span><span class="p">(</span><span class="s">&quot;error create socket:$! and $@\n&quot;</span><span class="p">)</span> <span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">$server</span><span class="o">-&gt;</span><span class="n">sockopt</span><span class="p">(</span><span class="n">SO_KEEPALIVE</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">my</span> <span class="nv">$epoll_test</span> <span class="o">=</span> <span class="nn">Sys::Syscall::</span><span class="n">epoll_defined</span><span class="p">();</span>
-</span><span class='line'><span class="k">my</span> <span class="nv">$epoll</span> <span class="o">=</span> <span class="n">epoll_create</span><span class="p">(</span><span class="mi">1024</span><span class="p">);</span>
-</span><span class='line'><span class="k">my</span> <span class="nv">@events</span><span class="p">;</span>
-</span><span class='line'><span class="k">my</span> <span class="nv">%des</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">while</span><span class="p">(</span><span class="mi">1</span><span class="p">){</span>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="k">my</span> <span class="nv">$csock</span> <span class="o">=</span> <span class="nv">$server</span><span class="o">-&gt;</span><span class="nb">accept</span><span class="p">){</span>
-</span><span class='line'>        <span class="k">my</span> <span class="nv">$fn</span> <span class="o">=</span> <span class="nb">fileno</span><span class="p">(</span><span class="nv">$csock</span><span class="p">);</span>
-</span><span class='line'>        <span class="n">epoll_ctl</span><span class="p">(</span><span class="nv">$epoll</span><span class="p">,</span><span class="n">EPOLL_CTL_ADD</span><span class="p">,</span><span class="nv">$fn</span><span class="p">,</span><span class="n">EPOLLIN</span><span class="o">|</span><span class="n">EPOLLERR</span><span class="p">);</span>
-</span><span class='line'>        <span class="nv">$des</span><span class="p">{</span><span class="nv">$fn</span><span class="p">}</span> <span class="o">=</span> <span class="nv">$csock</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$evcount</span> <span class="o">=</span> <span class="n">epoll_wait</span><span class="p">(</span><span class="nv">$epoll</span><span class="p">,</span><span class="mi">1000</span><span class="p">,</span><span class="mf">0.25</span><span class="p">,</span><span class="o">\</span><span class="nv">@events</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$i</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">for</span><span class="p">(</span><span class="nv">$i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">&lt;</span> <span class="nv">$evcount</span><span class="p">;</span> <span class="nv">$i</span><span class="o">++</span><span class="p">){</span>
-</span><span class='line'>        <span class="k">my</span> <span class="nv">$ev</span> <span class="o">=</span> <span class="nv">$events</span><span class="p">[</span><span class="nv">$i</span><span class="p">];</span>
-</span><span class='line'>        <span class="k">my</span> <span class="nv">$len</span> <span class="o">=</span> <span class="nb">sysread</span><span class="p">(</span><span class="nv">$des</span><span class="p">{</span><span class="nv">$ev</span><span class="o">-&gt;</span><span class="p">[</span><span class="mi">0</span><span class="p">]},</span><span class="k">my</span> <span class="nv">$data</span><span class="p">,</span><span class="mi">1024</span><span class="p">);</span>
-</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nv">$len</span> <span class="o">&amp;&amp;</span> <span class="vg">$!</span> <span class="o">!=</span> <span class="n">EWOULDBLOCK</span> <span class="p">){</span>
-</span><span class='line'>            <span class="n">epoll_ctl</span><span class="p">(</span><span class="nv">$epoll</span><span class="p">,</span><span class="n">EPOLL_CTL_DEL</span><span class="p">,</span><span class="nv">$ev</span><span class="o">-&gt;</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">EPOLLIN</span><span class="p">);</span>
-</span><span class='line'>            <span class="nb">delete</span> <span class="nv">$des</span><span class="p">{</span><span class="nv">$ev</span><span class="o">-&gt;</span><span class="p">[</span><span class="mi">0</span><span class="p">]};</span>
-</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>            <span class="k">print</span> <span class="nv">$data</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="c1">#print Dumper(\%des);</span>
-</span><span class='line'>    <span class="c1">#sleep(1);</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/07/03/Mogilefs-ReadFile/">MogileFS读取文件的过程</a></h1>
-    
-    
-      <p class="meta">
-        
 
 
 
@@ -482,133 +310,32 @@
   
 
 
-<time datetime="2011-07-03T05:59:00+08:00" pubdate data-updated="true">Jul 3<span>rd</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>客户端读取文件代码</h2>
-
-<blockquote><p>定义好domain和key就能获取文件内容</p></blockquote>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>#!/usr/bin/perl
-</span><span class='line'>
-</span><span class='line'>use strict;
-</span><span class='line'>use warnings;
-</span><span class='line'>use MogileFS::Client;
-</span><span class='line'>
-</span><span class='line'>my %new_opt = ( 
-</span><span class='line'>    hosts =&gt; ["127.0.0.1:7001"],
-</span><span class='line'>    domain =&gt; "127.0.0.1::test",
-</span><span class='line'>); 
-</span><span class='line'>my $mogc = MogileFS::Client-&gt;new(%new_opt);
-</span><span class='line'>
-</span><span class='line'>my $key = "test_key_2";
-</span><span class='line'>my $fd = $mogc-&gt;read_file($key);
-</span><span class='line'>print while&lt;$fd&gt;;</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2011/07/03/Mogilefs-ReadFile/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
+<time datetime="2012-07-06T22:28:00+08:00" pubdate data-updated="true">Jul 6<span>th</span>, 2012</time>
       
-  <header>
+
+
+    </p>
     
-      <h1 class="entry-title"><a href="/blog/2011/07/03/Mogilefs-Init/">MogileFS启动流程</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
+      <div class="sharing">
   
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://wanghuida.github.com/blog/2012/07/06/perl-ipc/" data-via="" data-counturl="http://wanghuida.github.com/blog/2012/07/06/perl-ipc/" >Tweet</a>
+  
+  
+  
+</div>
 
-
-<time datetime="2011-07-03T05:59:00+08:00" pubdate data-updated="true">Jul 3<span>rd</span>, 2011</time>
-        
-      </p>
     
-  </header>
-
-
-  <div class="entry-content"><h2>实例化MogileFS::Server并运行</h2>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>my $server; # server singleton
-</span><span class='line'>sub server {
-</span><span class='line'>    my ($pkg) = @_; 
-</span><span class='line'>    return $server ||= bless {}, $pkg;#空就创建对象，有就返回，单例
-</span><span class='line'>}
-</span><span class='line'>$server-&gt;run();</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>读取配置</h2>
-
-<blockquote><p>优先级，命令行>配置文件>默认配置</p></blockquote>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>MogileFS::Config-&gt;load_config;</span></code></pre></td></tr></table></div></figure>
-
-
-
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2011/07/03/perl-epoll/" title="Previous Post: Perl使用Epoll优化">&laquo; Perl使用Epoll优化</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
 </div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2011/07/03/Mogilefs-Init/">Read on &rarr;</a>
-    </footer>
-  
 
-
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
-</div>
 <aside class="sidebar">
   
     <section>
@@ -654,7 +381,7 @@
 <section>
   <h1>GitHub Repos</h1>
   <ul id="gh_repos">
-    <li class="loading">Status updating&#8230;</li>
+    <li class="loading">Status updating...</li>
   </ul>
   
   <a href="https://github.com/wanghuida">@wanghuida</a> on GitHub
@@ -687,6 +414,7 @@
 
   
 </aside>
+
 
     </div>
   </div>

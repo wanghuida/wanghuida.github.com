@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
+    <url>
+        <loc>http://wanghuida.github.com/blog/2011/07/03/Mogilefs-Init/</loc>
+        <lastmod>2012-07-06T23:04:46+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://wanghuida.github.com/blog/2011/07/03/Mogilefs-ReadFile/</loc>
+        <lastmod>2012-07-06T23:05:05+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://wanghuida.github.com/blog/2011/07/03/perl-epoll/</loc>
+        <lastmod>2012-07-06T22:31:13+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://wanghuida.github.com/blog/2012/07/06/perl-ipc/</loc>
+        <lastmod>2012-07-06T22:30:22+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://wanghuida.github.com/blog/archives/</loc>
+        <lastmod>2012-07-06T23:05:05+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://wanghuida.github.com/</loc>
+        <lastmod>2012-07-06T23:05:05+08:00</lastmod>
+    </url>
+</urlset>
