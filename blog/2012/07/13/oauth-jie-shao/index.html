@@ -5,11 +5,13 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Category: Mogilefs - $huida =~ s/blog/site/g</title>
+  <title>OAuth 介绍 - $huida =~ s/blog/site/g</title>
   <meta name="author" content="huida">
 
   
-  <meta name="description" content="Category: Mogilefs">
+  <meta name="description" content="在认证和授权的过程中涉及的三方包括： 服务提供方 (Service Provider)，用户使用服务提供方来存储受保护的资源，如照片，视频，联系人列表。
+用户 (User)，存放在服务提供方的受保护的资源的拥有者。
+客户端 (Client)，要访问服务提供方资源的第三方应用，通常是网站， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +20,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://wanghuida.github.comblog/categories/mogilefs/">
+  <link rel="canonical" href="http://wanghuida.github.com/blog/2012/07/13/oauth-jie-shao/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -63,63 +65,110 @@
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Category: Mogilefs</h1>
+    
+      <h1 class="entry-title">OAuth 介绍</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-13T13:01:00+08:00" pubdate data-updated="true">Jul 13<span>th</span>, 2012</time>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives" class="category">
 
 
+<div class="entry-content"><h3>在认证和授权的过程中涉及的三方包括：</h3>
 
-  
-  <h2>2011</h2>
-
-<article>
-  
-<h1><a href="/blog/2011/07/03/perl-epoll/">Perl使用Epoll优化</a></h1>
-<time datetime="2011-07-03T05:59:00+08:00" pubdate><span class='month'>Jul</span> <span class='day'>03</span> <span class='year'>2011</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/mogilefs/'>Mogilefs</a>, <a class='category' href='/blog/categories/perl/'>Perl</a></span>
-</footer>
+<ul>
+<li>服务提供方 (Service Provider)，用户使用服务提供方来存储受保护的资源，如照片，视频，联系人列表。</li>
+<li>用户 (User)，存放在服务提供方的受保护的资源的拥有者。</li>
+<li>客户端 (Client)，要访问服务提供方资源的第三方应用，通常是网站，如提供照片打印服务的网站。在认证过程之前，客户端要向服务提供者申请客户端标识。</li>
+</ul>
 
 
-</article>
+<h3>使用OAuth进行认证和授权的过程如下所示:</h3>
+
+<ol>
+<li>用户访问客户端的网站，想操作用户存放在服务提供方的资源。</li>
+<li>客户端向服务提供方请求一个临时令牌 (Request Token)。</li>
+<li>服务提供方验证客户端的身份后，授予一个临时令牌。</li>
+<li>客户端获得临时令牌后，将用户引导至服务提供方的授权页面请求用户授权。在这个过程中将临时令牌和客户端的回调连接发送给服务提供方。</li>
+<li>用户在服务提供方的网页上输入用户名和密码，然后授权该客户端访问所请求的资源。</li>
+<li>授权成功后，服务提供方引导用户返回客户端的网页。</li>
+<li>客户端根据临时令牌从服务提供方那里获取访问令牌 (Access Token)。</li>
+<li>服务提供方根据临时令牌和用户的授权情况授予客户端访问令牌。</li>
+<li>客户端使用获取的访问令牌访问存放在服务提供方上的受保护的资源。</li>
+</ol>
 
 
+<h3>图例说明</h3>
 
-<article>
-  
-<h1><a href="/blog/2011/07/03/Mogilefs-ReadFile/">MogileFS读取文件的过程</a></h1>
-<time datetime="2011-07-03T05:59:00+08:00" pubdate><span class='month'>Jul</span> <span class='day'>03</span> <span class='year'>2011</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/mogilefs/'>Mogilefs</a>, <a class='category' href='/blog/categories/perl/'>Perl</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2011/07/03/Mogilefs-Init/">MogileFS启动流程</a></h1>
-<time datetime="2011-07-03T05:59:00+08:00" pubdate><span class='month'>Jul</span> <span class='day'>03</span> <span class='year'>2011</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/mogilefs/'>Mogilefs</a>, <a class='category' href='/blog/categories/perl/'>Perl</a></span>
-</footer>
-
-
-</article>
-
+<p><img src="images/post/oauth_flow.png" alt="OAuth" /></p>
 </div>
 
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">huida</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-13T13:01:00+08:00" pubdate data-updated="true">Jul 13<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/share/'>Share</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://wanghuida.github.com/blog/2012/07/13/oauth-jie-shao/" data-via="" data-counturl="http://wanghuida.github.com/blog/2012/07/13/oauth-jie-shao/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/07/07/octopress-introduce/" title="Previous Post: octopress 介绍">&laquo; octopress 介绍</a>
+      
+      
+    </p>
+  </footer>
 </article>
 
 </div>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: octopress | $huida =~ s/blog/site/g]]></title>
+  <link href="http://wanghuida.github.com/blog/categories/octopress/atom.xml" rel="self"/>
+  <link href="http://wanghuida.github.com/"/>
+  <updated>2012-07-13T13:11:17+08:00</updated>
+  <id>http://wanghuida.github.com/</id>
+  <author>
+    <name><![CDATA[huida]]></name>
+    <email><![CDATA[wanghuida258@126.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[octopress 介绍]]></title>
+    <link href="http://wanghuida.github.com/blog/2012/07/07/octopress-introduce/"/>
+    <updated>2012-07-07T03:10:00+08:00</updated>
+    <id>http://wanghuida.github.com/blog/2012/07/07/octopress-introduce</id>
+    <content type="html"><![CDATA[<h2>安装octopress</h2>
+
+<blockquote><p>安装一下ruby和rvm</p>
+
+<p>获取源代码</p></blockquote>
+
+<p><code>bash
+rvm install 1.9.2 &amp;&amp; rvm use 1.9.2
+git clone git://github.com/imathis/octopress.git octopress
+gem install bundler
+bundle install
+rake install
+</code></p>
+]]></content>
+  </entry>
+  
+</feed>

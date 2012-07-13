@@ -2,7 +2,7 @@
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
         <loc>http://wanghuida.github.com/blog/2011/07/03/Mogilefs-Init/</loc>
-        <lastmod>2012-07-06T23:04:46+08:00</lastmod>
+        <lastmod>2012-07-07T02:22:45+08:00</lastmod>
     </url>
     <url>
         <loc>http://wanghuida.github.com/blog/2011/07/03/Mogilefs-ReadFile/</loc>
@@ -14,14 +14,22 @@
     </url>
     <url>
         <loc>http://wanghuida.github.com/blog/2012/07/06/perl-ipc/</loc>
-        <lastmod>2012-07-06T22:30:22+08:00</lastmod>
+        <lastmod>2012-07-07T02:40:21+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://wanghuida.github.com/blog/2012/07/07/octopress-introduce/</loc>
+        <lastmod>2012-07-07T03:22:53+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://wanghuida.github.com/blog/2012/07/13/oauth-jie-shao/</loc>
+        <lastmod>2012-07-13T13:09:58+08:00</lastmod>
     </url>
     <url>
         <loc>http://wanghuida.github.com/blog/archives/</loc>
-        <lastmod>2012-07-06T23:05:05+08:00</lastmod>
+        <lastmod>2012-07-13T13:09:58+08:00</lastmod>
     </url>
     <url>
         <loc>http://wanghuida.github.com/</loc>
-        <lastmod>2012-07-06T23:05:05+08:00</lastmod>
+        <lastmod>2012-07-13T13:09:58+08:00</lastmod>
     </url>
 </urlset>
