@@ -5,9 +5,9 @@
 url: http://wanghuida.github.com
 title: "$huida =~ s/blog/site/g"
 subtitle: "A love-vim engineer." 
-author: huida 
+author: 王惠达 huida wanghuida 
 simple_search: http://google.com/search
-description: huida blog
+description: 王惠达博客 IT技术 php perl python java c ruby wanghuida blog
 
 # Default date format is "ordinal" (resulting in "July 22nd 2007")
 # You can customize the format as defined in

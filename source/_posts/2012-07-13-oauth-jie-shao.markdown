@@ -29,7 +29,7 @@ categories: [Share]
 1. 客户端使用获取的访问令牌访问存放在服务提供方上的受保护的资源。
 
 ###图例说明
-![OAuth](images/post/oauth_flow.png "OAuth 图例说明")
+![OAuth](/images/post/oauth_flow.png "OAuth 图例说明")
 
 
 
