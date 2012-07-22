@@ -1,35 +1,39 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
-        <loc>http://wanghuida.github.com/blog/2011/07/03/Mogilefs-Init/</loc>
+        <loc>http://www.wanghd.com/blog/2011/07/03/Mogilefs-Init/</loc>
+        <lastmod>2012-07-22T11:19:30+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://www.wanghd.com/blog/2011/07/03/Mogilefs-ReadFile/</loc>
         <lastmod>2012-07-14T01:22:25+08:00</lastmod>
     </url>
     <url>
-        <loc>http://wanghuida.github.com/blog/2011/07/03/Mogilefs-ReadFile/</loc>
+        <loc>http://www.wanghd.com/blog/2011/07/03/perl-epoll/</loc>
         <lastmod>2012-07-14T01:22:25+08:00</lastmod>
     </url>
     <url>
-        <loc>http://wanghuida.github.com/blog/2011/07/03/perl-epoll/</loc>
+        <loc>http://www.wanghd.com/blog/2012/07/06/perl-ipc/</loc>
         <lastmod>2012-07-14T01:22:25+08:00</lastmod>
     </url>
     <url>
-        <loc>http://wanghuida.github.com/blog/2012/07/06/perl-ipc/</loc>
+        <loc>http://www.wanghd.com/blog/2012/07/07/octopress-introduce/</loc>
         <lastmod>2012-07-14T01:22:25+08:00</lastmod>
     </url>
     <url>
-        <loc>http://wanghuida.github.com/blog/2012/07/07/octopress-introduce/</loc>
+        <loc>http://www.wanghd.com/blog/2012/07/13/oauth-jie-shao/</loc>
         <lastmod>2012-07-14T01:22:25+08:00</lastmod>
     </url>
     <url>
-        <loc>http://wanghuida.github.com/blog/2012/07/13/oauth-jie-shao/</loc>
-        <lastmod>2012-07-14T01:22:25+08:00</lastmod>
+        <loc>http://www.wanghd.com/blog/2012/07/22/python-zhou-ti-yan-ji/</loc>
+        <lastmod>2012-07-22T11:24:54+08:00</lastmod>
     </url>
     <url>
-        <loc>http://wanghuida.github.com/blog/archives/</loc>
-        <lastmod>2012-07-14T01:22:25+08:00</lastmod>
+        <loc>http://www.wanghd.com/blog/archives/</loc>
+        <lastmod>2012-07-22T11:24:54+08:00</lastmod>
     </url>
     <url>
-        <loc>http://wanghuida.github.com/</loc>
-        <lastmod>2012-07-14T01:22:25+08:00</lastmod>
+        <loc>http://www.wanghd.com/</loc>
+        <lastmod>2012-07-22T11:24:54+08:00</lastmod>
     </url>
 </urlset>

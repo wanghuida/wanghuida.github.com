@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Python | $huida =~ s/blog/site/g]]></title>
+  <link href="http://www.wanghd.com/blog/categories/python/atom.xml" rel="self"/>
+  <link href="http://www.wanghd.com/"/>
+  <updated>2012-07-22T11:25:15+08:00</updated>
+  <id>http://www.wanghd.com/</id>
+  <author>
+    <name><![CDATA[王惠达 huida wanghuida]]></name>
+    <email><![CDATA[wanghuida258@126.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[python 一周体验记]]></title>
+    <link href="http://www.wanghd.com/blog/2012/07/22/python-zhou-ti-yan-ji/"/>
+    <updated>2012-07-22T10:27:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/07/22/python-zhou-ti-yan-ji</id>
+    <content type="html"><![CDATA[<h3>python可以快速上手</h3>
+
+<blockquote><p>推荐官方的新手教程 <a href="http://docs.python.org/tutorial/">http://docs.python.org/tutorial/</a></p></blockquote>
+
+<!-- more -->
+
+
+<h3>python强制空白</h3>
+
+<blockquote><p>这是python特有的，代码可维护性大大提高了</p></blockquote>
+
+<h3>python语法糖</h3>
+
+<blockquote><p>很甜很甜</p></blockquote>
+
+<h3>列表推导,列表范围</h3>
+
+<blockquote><p>虽然列表的处理还不如perl那么灵活，但已经有那么点意思了</p>
+
+<p>但是学习成本上python要优于perl</p></blockquote>
+
+<h3>PyPI</h3>
+
+<blockquote><p>类似于CPAN是一样的</p></blockquote>
+
+<h3>python在web上的应用</h3>
+
+<blockquote><p>python的框架有很多，可以在这个地址上找到绝大部分 <a href="http://www.wsgi.org/en/latest/frameworks.html">http://www.wsgi.org/en/latest/frameworks.html</a></p>
+
+<p>我选择了flask，同事的建议是比较小巧，好用</p>
+
+<p>可以深入了解一下Werkzeug,flask是基于它开发的</p>
+
+<blockquote><p>之前一直有个疑惑，每个框架都有内置的http server，这个http server到底是python提供的还是框架提供的? 看了一些Werkzeug的源码才清楚。Werkzeug里的serving.py使用了python的BaseHTTPServer库，Werkzeug对http进行分析和封装。So 我觉得Werkzeug是可以深入研究的。</p></blockquote></blockquote>
+]]></content>
+  </entry>
+  
+</feed>

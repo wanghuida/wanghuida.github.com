@@ -9,9 +9,7 @@
   <meta name="author" content="王惠达 huida wanghuida">
 
   
-  <meta name="description" content="在认证和授权的过程中涉及的三方包括： 服务提供方 (Service Provider)，用户使用服务提供方来存储受保护的资源，如照片，视频，联系人列表。
-用户 (User)，存放在服务提供方的受保护的资源的拥有者。
-客户端 (Client)，要访问服务提供方资源的第三方应用，通常是网站， &hellip;">
+  <meta name="description" content="python可以快速上手 推荐官方的新手教程 http://docs.python.org/tutorial/ ">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -20,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://wanghuida.github.com/">
+  <link rel="canonical" href="http://www.wanghd.com/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -51,7 +49,7 @@
   
 <form action="http://google.com/search" method="get">
   <fieldset role="search">
-    <input type="hidden" name="q" value="site:wanghuida.github.com" />
+    <input type="hidden" name="q" value="site:www.wanghd.com" />
     <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
@@ -66,6 +64,49 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/07/22/python-zhou-ti-yan-ji/">Python 一周体验记</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-22T10:27:00+08:00" pubdate data-updated="true">Jul 22<span>nd</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>python可以快速上手</h3>
+
+<blockquote><p>推荐官方的新手教程 <a href="http://docs.python.org/tutorial/">http://docs.python.org/tutorial/</a></p></blockquote>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/07/22/python-zhou-ti-yan-ji/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -528,83 +569,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/07/03/Mogilefs-ReadFile/">MogileFS读取文件的过程</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-07-03T05:59:00+08:00" pubdate data-updated="true">Jul 3<span>rd</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>客户端读取文件代码</h2>
-
-<blockquote><p>定义好domain和key就能获取文件内容</p></blockquote>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>#!/usr/bin/perl
-</span><span class='line'>
-</span><span class='line'>use strict;
-</span><span class='line'>use warnings;
-</span><span class='line'>use MogileFS::Client;
-</span><span class='line'>
-</span><span class='line'>my %new_opt = ( 
-</span><span class='line'>    hosts =&gt; ["127.0.0.1:7001"],
-</span><span class='line'>    domain =&gt; "127.0.0.1::test",
-</span><span class='line'>); 
-</span><span class='line'>my $mogc = MogileFS::Client-&gt;new(%new_opt);
-</span><span class='line'>
-</span><span class='line'>my $key = "test_key_2";
-</span><span class='line'>my $fd = $mogc-&gt;read_file($key);
-</span><span class='line'>print while&lt;$fd&gt;;</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2011/07/03/Mogilefs-ReadFile/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -620,6 +584,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/07/22/python-zhou-ti-yan-ji/">python 一周体验记</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/07/13/oauth-jie-shao/">OAuth 介绍</a>
       </li>
     
@@ -633,10 +601,6 @@
     
       <li class="post">
         <a href="/blog/2011/07/03/perl-epoll/">Perl使用Epoll优化</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/07/03/Mogilefs-ReadFile/">MogileFS读取文件的过程</a>
       </li>
     
   </ul>

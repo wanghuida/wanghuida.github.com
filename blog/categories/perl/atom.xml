@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Perl | $huida =~ s/blog/site/g]]></title>
-  <link href="http://wanghuida.github.com/blog/categories/perl/atom.xml" rel="self"/>
-  <link href="http://wanghuida.github.com/"/>
-  <updated>2012-07-14T01:37:07+08:00</updated>
-  <id>http://wanghuida.github.com/</id>
+  <link href="http://www.wanghd.com/blog/categories/perl/atom.xml" rel="self"/>
+  <link href="http://www.wanghd.com/"/>
+  <updated>2012-07-22T11:25:15+08:00</updated>
+  <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
     <email><![CDATA[wanghuida258@126.com]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Perl使用Epoll优化]]></title>
-    <link href="http://wanghuida.github.com/blog/2011/07/03/perl-epoll/"/>
+    <link href="http://www.wanghd.com/blog/2011/07/03/perl-epoll/"/>
     <updated>2011-07-03T05:59:00+08:00</updated>
-    <id>http://wanghuida.github.com/blog/2011/07/03/perl-epoll</id>
+    <id>http://www.wanghd.com/blog/2011/07/03/perl-epoll</id>
     <content type="html"><![CDATA[<blockquote><p>优势：当有事件时才会增加到@events，无需遍历</p>
 
 <p>注意：EPOLLERR，不增加该事件，无法执行到退出</p></blockquote>
@@ -101,9 +101,9 @@ for($i = 0; $i &lt; $evcount; $i++){
   
   <entry>
     <title type="html"><![CDATA[MogileFS读取文件的过程]]></title>
-    <link href="http://wanghuida.github.com/blog/2011/07/03/Mogilefs-ReadFile/"/>
+    <link href="http://www.wanghd.com/blog/2011/07/03/Mogilefs-ReadFile/"/>
     <updated>2011-07-03T05:59:00+08:00</updated>
-    <id>http://wanghuida.github.com/blog/2011/07/03/Mogilefs-ReadFile</id>
+    <id>http://www.wanghd.com/blog/2011/07/03/Mogilefs-ReadFile</id>
     <content type="html"><![CDATA[<h2>客户端读取文件代码</h2>
 
 <blockquote><p>定义好domain和key就能获取文件内容</p></blockquote>
@@ -733,9 +733,9 @@ return $args;
   
   <entry>
     <title type="html"><![CDATA[MogileFS启动流程]]></title>
-    <link href="http://wanghuida.github.com/blog/2011/07/03/Mogilefs-Init/"/>
+    <link href="http://www.wanghd.com/blog/2011/07/03/Mogilefs-Init/"/>
     <updated>2011-07-03T05:59:00+08:00</updated>
-    <id>http://wanghuida.github.com/blog/2011/07/03/Mogilefs-Init</id>
+    <id>http://www.wanghd.com/blog/2011/07/03/Mogilefs-Init</id>
     <content type="html"><![CDATA[<h2>实例化MogileFS::Server并运行</h2>
 
 <p>```

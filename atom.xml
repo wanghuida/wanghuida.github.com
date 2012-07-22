@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[$huida =~ s/blog/site/g]]></title>
-  <link href="http://wanghuida.github.com/atom.xml" rel="self"/>
-  <link href="http://wanghuida.github.com/"/>
-  <updated>2012-07-14T01:37:07+08:00</updated>
-  <id>http://wanghuida.github.com/</id>
+  <link href="http://www.wanghd.com/atom.xml" rel="self"/>
+  <link href="http://www.wanghd.com/"/>
+  <updated>2012-07-22T11:25:15+08:00</updated>
+  <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
     <email><![CDATA[wanghuida258@126.com]]></email>
@@ -14,10 +14,52 @@
 
   
   <entry>
+    <title type="html"><![CDATA[python 一周体验记]]></title>
+    <link href="http://www.wanghd.com/blog/2012/07/22/python-zhou-ti-yan-ji/"/>
+    <updated>2012-07-22T10:27:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/07/22/python-zhou-ti-yan-ji</id>
+    <content type="html"><![CDATA[<h3>python可以快速上手</h3>
+
+<blockquote><p>推荐官方的新手教程 <a href="http://docs.python.org/tutorial/">http://docs.python.org/tutorial/</a></p></blockquote>
+
+<!-- more -->
+
+
+<h3>python强制空白</h3>
+
+<blockquote><p>这是python特有的，代码可维护性大大提高了</p></blockquote>
+
+<h3>python语法糖</h3>
+
+<blockquote><p>很甜很甜</p></blockquote>
+
+<h3>列表推导,列表范围</h3>
+
+<blockquote><p>虽然列表的处理还不如perl那么灵活，但已经有那么点意思了</p>
+
+<p>但是学习成本上python要优于perl</p></blockquote>
+
+<h3>PyPI</h3>
+
+<blockquote><p>类似于CPAN是一样的</p></blockquote>
+
+<h3>python在web上的应用</h3>
+
+<blockquote><p>python的框架有很多，可以在这个地址上找到绝大部分 <a href="http://www.wsgi.org/en/latest/frameworks.html">http://www.wsgi.org/en/latest/frameworks.html</a></p>
+
+<p>我选择了flask，同事的建议是比较小巧，好用</p>
+
+<p>可以深入了解一下Werkzeug,flask是基于它开发的</p>
+
+<blockquote><p>之前一直有个疑惑，每个框架都有内置的http server，这个http server到底是python提供的还是框架提供的? 看了一些Werkzeug的源码才清楚。Werkzeug里的serving.py使用了python的BaseHTTPServer库，Werkzeug对http进行分析和封装。So 我觉得Werkzeug是可以深入研究的。</p></blockquote></blockquote>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[OAuth 介绍]]></title>
-    <link href="http://wanghuida.github.com/blog/2012/07/13/oauth-jie-shao/"/>
+    <link href="http://www.wanghd.com/blog/2012/07/13/oauth-jie-shao/"/>
     <updated>2012-07-13T13:01:00+08:00</updated>
-    <id>http://wanghuida.github.com/blog/2012/07/13/oauth-jie-shao</id>
+    <id>http://www.wanghd.com/blog/2012/07/13/oauth-jie-shao</id>
     <content type="html"><![CDATA[<h3>在认证和授权的过程中涉及的三方包括：</h3>
 
 <ul>
@@ -44,15 +86,15 @@
 
 <h3>图例说明</h3>
 
-<p><img src="http://wanghuida.github.com/images/post/oauth_flow.png" title="OAuth 图例说明" alt="OAuth" /></p>
+<p><img src="http://www.wanghd.com/images/post/oauth_flow.png" title="OAuth 图例说明" alt="OAuth" /></p>
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[octopress 介绍]]></title>
-    <link href="http://wanghuida.github.com/blog/2012/07/07/octopress-introduce/"/>
+    <link href="http://www.wanghd.com/blog/2012/07/07/octopress-introduce/"/>
     <updated>2012-07-07T03:10:00+08:00</updated>
-    <id>http://wanghuida.github.com/blog/2012/07/07/octopress-introduce</id>
+    <id>http://www.wanghd.com/blog/2012/07/07/octopress-introduce</id>
     <content type="html"><![CDATA[<h2>安装octopress</h2>
 
 <blockquote><p>安装一下ruby和rvm</p>
@@ -78,9 +120,9 @@
   
   <entry>
     <title type="html"><![CDATA[进程间通信【IPC】]]></title>
-    <link href="http://wanghuida.github.com/blog/2012/07/06/perl-ipc/"/>
+    <link href="http://www.wanghd.com/blog/2012/07/06/perl-ipc/"/>
     <updated>2012-07-06T22:28:00+08:00</updated>
-    <id>http://wanghuida.github.com/blog/2012/07/06/perl-ipc</id>
+    <id>http://www.wanghd.com/blog/2012/07/06/perl-ipc</id>
     <content type="html"><![CDATA[<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -232,9 +274,9 @@
   
   <entry>
     <title type="html"><![CDATA[Perl使用Epoll优化]]></title>
-    <link href="http://wanghuida.github.com/blog/2011/07/03/perl-epoll/"/>
+    <link href="http://www.wanghd.com/blog/2011/07/03/perl-epoll/"/>
     <updated>2011-07-03T05:59:00+08:00</updated>
-    <id>http://wanghuida.github.com/blog/2011/07/03/perl-epoll</id>
+    <id>http://www.wanghd.com/blog/2011/07/03/perl-epoll</id>
     <content type="html"><![CDATA[<blockquote><p>优势：当有事件时才会增加到@events，无需遍历</p>
 
 <p>注意：EPOLLERR，不增加该事件，无法执行到退出</p></blockquote>
@@ -368,9 +410,9 @@
   
   <entry>
     <title type="html"><![CDATA[MogileFS读取文件的过程]]></title>
-    <link href="http://wanghuida.github.com/blog/2011/07/03/Mogilefs-ReadFile/"/>
+    <link href="http://www.wanghd.com/blog/2011/07/03/Mogilefs-ReadFile/"/>
     <updated>2011-07-03T05:59:00+08:00</updated>
-    <id>http://wanghuida.github.com/blog/2011/07/03/Mogilefs-ReadFile</id>
+    <id>http://www.wanghd.com/blog/2011/07/03/Mogilefs-ReadFile</id>
     <content type="html"><![CDATA[<h2>客户端读取文件代码</h2>
 
 <blockquote><p>定义好domain和key就能获取文件内容</p></blockquote>
@@ -1341,9 +1383,9 @@
   
   <entry>
     <title type="html"><![CDATA[MogileFS启动流程]]></title>
-    <link href="http://wanghuida.github.com/blog/2011/07/03/Mogilefs-Init/"/>
+    <link href="http://www.wanghd.com/blog/2011/07/03/Mogilefs-Init/"/>
     <updated>2011-07-03T05:59:00+08:00</updated>
-    <id>http://wanghuida.github.com/blog/2011/07/03/Mogilefs-Init</id>
+    <id>http://www.wanghd.com/blog/2011/07/03/Mogilefs-Init</id>
     <content type="html"><![CDATA[<h2>实例化MogileFS::Server并运行</h2>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
