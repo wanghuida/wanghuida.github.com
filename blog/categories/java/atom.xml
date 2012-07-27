@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Java | $huida =~ s/blog/site/g]]></title>
+  <link href="http://www.wanghd.com/blog/categories/java/atom.xml" rel="self"/>
+  <link href="http://www.wanghd.com/"/>
+  <updated>2012-07-27T22:08:44+08:00</updated>
+  <id>http://www.wanghd.com/</id>
+  <author>
+    <name><![CDATA[王惠达 huida wanghuida]]></name>
+    <email><![CDATA[wanghuida258@126.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[java volatile理解]]></title>
+    <link href="http://www.wanghd.com/blog/2012/07/27/java-volatileli-jie/"/>
+    <updated>2012-07-27T21:55:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/07/27/java-volatileli-jie</id>
+    <content type="html"><![CDATA[<h3>volatile的含义其实很好理解，希望配合图可以更加清晰的解释</h3>
+
+<p><img src="/images/post/volatile.png" title="volatile 图例说明" alt="volatile" /></p>
+
+<ul>
+<li>多个线程加载同一个对象时，会从主内存复制一个副本到线程工作内存</li>
+<li>如果对象没有volatile属性，只有write操作才会让主内存的对象得到修改（其他线程这时才有可能拿到最新的结果）</li>
+<li>如果对象有volatile属性，load,use,asign,store都会拿到实时的结果（因为会一直同步更新结果）</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>

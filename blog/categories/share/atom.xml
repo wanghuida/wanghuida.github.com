@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Share | $huida =~ s/blog/site/g]]></title>
   <link href="http://www.wanghd.com/blog/categories/share/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2012-07-22T11:25:15+08:00</updated>
+  <updated>2012-07-27T22:08:44+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,19 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[xdebug:500错误显示200成功的bug]]></title>
+    <link href="http://www.wanghd.com/blog/2012/07/26/xdebug-500cuo-wu-xian-shi-200cheng-gong-de-bug/"/>
+    <updated>2012-07-26T16:15:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/07/26/xdebug-500cuo-wu-xian-shi-200cheng-gong-de-bug</id>
+    <content type="html"><![CDATA[<h3>今天同事遇见一个诡异的问题</h3>
+
+<blockquote><p>明显php错误，但是HTTP返回200</p></blockquote>
+
+<h3>最总关闭加载xdebug一切正常了</h3>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[OAuth 介绍]]></title>
