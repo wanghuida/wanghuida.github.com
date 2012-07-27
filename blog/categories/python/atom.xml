@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Python | $huida =~ s/blog/site/g]]></title>
   <link href="http://www.wanghd.com/blog/categories/python/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2012-07-27T22:12:05+08:00</updated>
+  <updated>2012-07-27T22:19:15+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -20,38 +20,52 @@
     <id>http://www.wanghd.com/blog/2012/07/22/python-zhou-ti-yan-ji</id>
     <content type="html"><![CDATA[<h3>python可以快速上手</h3>
 
-<blockquote><p>推荐官方的新手教程 <a href="http://docs.python.org/tutorial/">http://docs.python.org/tutorial/</a></p></blockquote>
+<ul>
+<li>推荐官方的新手教程 <a href="http://docs.python.org/tutorial/">http://docs.python.org/tutorial/</a></li>
+</ul>
+
 
 <!-- more -->
 
 
 <h3>python强制空白</h3>
 
-<blockquote><p>这是python特有的，代码可维护性大大提高了</p></blockquote>
+<ul>
+<li>这是python特有的，代码可维护性大大提高了</li>
+</ul>
+
 
 <h3>python语法糖</h3>
 
-<blockquote><p>很甜很甜</p></blockquote>
+<ul>
+<li>很甜很甜</li>
+</ul>
+
 
 <h3>列表推导,列表范围</h3>
 
-<blockquote><p>虽然列表的处理还不如perl那么灵活，但已经有那么点意思了</p>
+<ul>
+<li><p>虽然列表的处理还不如perl那么灵活，但已经有那么点意思了</p></li>
+<li><p>但是学习成本上python要优于perl</p></li>
+</ul>
 
-<p>但是学习成本上python要优于perl</p></blockquote>
 
 <h3>PyPI</h3>
 
-<blockquote><p>类似于CPAN是一样的</p></blockquote>
+<ul>
+<li>类似于CPAN是一样的</li>
+</ul>
+
 
 <h3>python在web上的应用</h3>
 
-<blockquote><p>python的框架有很多，可以在这个地址上找到绝大部分 <a href="http://www.wsgi.org/en/latest/frameworks.html">http://www.wsgi.org/en/latest/frameworks.html</a></p>
+<ul>
+<li><p>python的框架有很多，可以在这个地址上找到绝大部分 <a href="http://www.wsgi.org/en/latest/frameworks.html">http://www.wsgi.org/en/latest/frameworks.html</a></p></li>
+<li><p>我选择了flask，同事的建议是比较小巧，好用</p></li>
+<li><p>可以深入了解一下Werkzeug,flask是基于它开发的</p></li>
+<li><p>之前一直有个疑惑，每个框架都有内置的http server，这个http server到底是python提供的还是框架提供的? 看了一些Werkzeug的源码才清楚。Werkzeug里的serving.py使用了python的BaseHTTPServer库，Werkzeug对http进行分析和封装。So 我觉得Werkzeug是可以深入研究的。</p></li>
+</ul>
 
-<p>我选择了flask，同事的建议是比较小巧，好用</p>
-
-<p>可以深入了解一下Werkzeug,flask是基于它开发的</p>
-
-<blockquote><p>之前一直有个疑惑，每个框架都有内置的http server，这个http server到底是python提供的还是框架提供的? 看了一些Werkzeug的源码才清楚。Werkzeug里的serving.py使用了python的BaseHTTPServer库，Werkzeug对http进行分析和封装。So 我觉得Werkzeug是可以深入研究的。</p></blockquote></blockquote>
 ]]></content>
   </entry>
   
