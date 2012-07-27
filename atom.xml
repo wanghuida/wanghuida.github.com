@@ -4,7 +4,7 @@
   <title><![CDATA[$huida =~ s/blog/site/g]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2012-07-27T22:08:44+08:00</updated>
+  <updated>2012-07-27T22:12:05+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -20,7 +20,7 @@
     <id>http://www.wanghd.com/blog/2012/07/27/java-volatileli-jie</id>
     <content type="html"><![CDATA[<h3>volatile的含义其实很好理解，希望配合图可以更加清晰的解释</h3>
 
-<p><img src="http://www.wanghd.com/images/post/volatile.png" title="volatile 图例说明" alt="volatile" /></p>
+<p><img src="http://www.wanghd.com/images/post/volatile.jpg" title="volatile 图例说明" alt="volatile" /></p>
 
 <ul>
 <li>多个线程加载同一个对象时，会从主内存复制一个副本到线程工作内存</li>
