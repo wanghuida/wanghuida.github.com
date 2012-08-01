@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Java | $huida =~ s/blog/site/g]]></title>
   <link href="http://www.wanghd.com/blog/categories/java/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2012-07-27T22:21:04+08:00</updated>
+  <updated>2012-08-01T22:38:43+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,196 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[WeakHashMap作用和实例]]></title>
+    <link href="http://www.wanghd.com/blog/2012/08/01/weakhashmapzuo-yong-he-shi-li/"/>
+    <updated>2012-08-01T21:48:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/08/01/weakhashmapzuo-yong-he-shi-li</id>
+    <content type="html"><![CDATA[<h3>在这里先预想了解一下WeakHashMap，结合后面的例子应该会更好理解</h3>
+
+<ul>
+<li>当存放在WeakHashMap里的对象，没有其他引用和使用，那么在GC时会自动释放。</li>
+</ul>
+
+
+<h3>下面用实例来更好的理解</h3>
+
+<ul>
+<li>测试一下保持引用会不会被自动释放</li>
+</ul>
+
+
+<p>```java
+package wanghuida.test;</p>
+
+<p>import java.util.WeakHashMap;
+import java.util.Map;</p>
+
+<p>import java.util.List;
+import java.util.ArrayList;</p>
+
+<p>public class Entry {</p>
+
+<pre><code>/**
+ * @param args
+ */
+public static void main(String[] args) {
+    // TODO Auto-generated method stub
+    List&lt;String[]&gt; templist = new ArrayList&lt;String[]&gt;();  
+    //设的多一点，可以让GC真实发挥
+    for(int i=0; i &lt; 1000000; i++){
+        String[] tempstr = new String[2];
+        templist.add(tempstr);
+    }
+
+    Map&lt;String[], String[]&gt; map = new WeakHashMap&lt;String[], String[]&gt;();
+    for(int i=0; i &lt; 100; i++){
+        map.put(templist.get(i), new String[2]);
+        System.gc();
+        System.out.println(map.size());
+    }
+
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<!-- more -->
+
+
+<ul>
+<li>输出1，2，3，4。。。递增，OK没有问题，有一个引用，就不会释放</li>
+<li>再测试一下删除引用后的总数</li>
+</ul>
+
+
+<p>```java
+package wanghuida.test;</p>
+
+<p>import java.util.WeakHashMap;
+import java.util.Map;</p>
+
+<p>import java.util.List;
+import java.util.ArrayList;</p>
+
+<p>public class Entry {</p>
+
+<pre><code>public static void main(String[] args) {
+    List&lt;String[]&gt; templist = new ArrayList&lt;String[]&gt;();  
+    //设的多一点，可以让GC真实发挥
+    for(int i=0; i &lt; 1000; i++){
+        String[] tempstr = new String[2];
+        templist.add(tempstr);
+    }
+
+    Map&lt;String[], String[]&gt; map = new WeakHashMap&lt;String[], String[]&gt;();
+    for(int i=0; i &lt; 100; i++){
+        map.put(templist.get(i), new String[2]);
+        templist.set(i, null); //删除掉引用 
+        System.gc();
+        System.out.println(map.size());
+    }
+
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<ul>
+<li>输出0，1，0，1，1，1。。。保持下去，OK也没问题，删除引用后就会释放</li>
+<li>再测试一下有引用但没有使用的情况</li>
+</ul>
+
+
+<p>```java
+package wanghuida.test;</p>
+
+<p>import java.util.WeakHashMap;
+import java.util.Map;</p>
+
+<p>import java.util.List;
+import java.util.ArrayList;</p>
+
+<p>public class Entry {</p>
+
+<pre><code>public static void main(String[] args) {
+    List&lt;String[]&gt; templist = new ArrayList&lt;String[]&gt;();  
+    //新增一个引用
+    List&lt;String[]&gt; list = new ArrayList&lt;String[]&gt;();  
+    //设的多一点，可以让GC真实发挥
+    for(int i=0; i &lt; 1000000; i++){
+        String[] tempstr = new String[2];
+        templist.add(tempstr);
+        list.add(tempstr);
+    }
+
+    Map&lt;String[], String[]&gt; map = new WeakHashMap&lt;String[], String[]&gt;();
+    for(int i=0; i &lt; 100; i++){
+        map.put(templist.get(i), new String[2]);
+        templist.set(i, null); //删除掉引用 
+        System.gc();
+        System.out.println(map.size());
+    }
+
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<ul>
+<li>输出0，1，0，1，1，1。。。保持下去，OK也没问题，有引用但不使用也就会释放</li>
+<li>最后对比一下有使用的情况</li>
+</ul>
+
+
+<p>```java
+package wanghuida.test;</p>
+
+<p>import java.util.WeakHashMap;
+import java.util.Map;</p>
+
+<p>import java.util.List;
+import java.util.ArrayList;</p>
+
+<p>public class Entry {</p>
+
+<pre><code>public static void main(String[] args) {
+    List&lt;String[]&gt; templist = new ArrayList&lt;String[]&gt;();  
+    //新增一个引用
+    List&lt;String[]&gt; list = new ArrayList&lt;String[]&gt;();  
+    //设的多一点，可以让GC真实发挥
+    for(int i=0; i &lt; 1000000; i++){
+        String[] tempstr = new String[2];
+        templist.add(tempstr);
+        list.add(tempstr);
+    }
+
+    Map&lt;String[], String[]&gt; map = new WeakHashMap&lt;String[], String[]&gt;();
+    for(int i=0; i &lt; 100; i++){
+        map.put(templist.get(i), new String[2]);
+        templist.set(i, null); //删除掉引用 
+        System.gc();
+        System.out.println(map.size());
+    }
+
+    System.out.println(list.size());
+
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<ul>
+<li>输出1，2，3，4。。。递增，OK了，希望对大家会有帮助</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[java volatile理解]]></title>
