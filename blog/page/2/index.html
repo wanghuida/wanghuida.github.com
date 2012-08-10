@@ -9,14 +9,9 @@
   <meta name="author" content="王惠达 huida wanghuida">
 
   
-  <meta name="description" content="安装octopress 安装一下ruby和rvm 获取源代码 1
-2
-3
-4
-5
-rvm install 1.9.2 &amp;&amp; rvm use 1.9.2
-git clone git://github.com/imathis/octopress.git octopress
-gem &hellip;">
+  <meta name="description" content="在认证和授权的过程中涉及的三方包括： 服务提供方 (Service Provider)，用户使用服务提供方来存储受保护的资源，如照片，视频，联系人列表。
+用户 (User)，存放在服务提供方的受保护的资源的拥有者。
+客户端 (Client)，要访问服务提供方资源的第三方应用，通常是网站， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -71,6 +66,68 @@ gem &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/07/13/oauth-jie-shao/">OAuth 介绍</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-13T13:01:00+08:00" pubdate data-updated="true">Jul 13<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>在认证和授权的过程中涉及的三方包括：</h3>
+
+<ul>
+<li>服务提供方 (Service Provider)，用户使用服务提供方来存储受保护的资源，如照片，视频，联系人列表。</li>
+<li>用户 (User)，存放在服务提供方的受保护的资源的拥有者。</li>
+<li>客户端 (Client)，要访问服务提供方资源的第三方应用，通常是网站，如提供照片打印服务的网站。在认证过程之前，客户端要向服务提供者申请客户端标识。</li>
+</ul>
+
+
+<h3>使用OAuth进行认证和授权的过程如下所示:</h3>
+
+<ol>
+<li>用户访问客户端的网站，想操作用户存放在服务提供方的资源。</li>
+<li>客户端向服务提供方请求一个临时令牌 (Request Token)。</li>
+<li>服务提供方验证客户端的身份后，授予一个临时令牌。</li>
+<li>客户端获得临时令牌后，将用户引导至服务提供方的授权页面请求用户授权。在这个过程中将临时令牌和客户端的回调连接发送给服务提供方。</li>
+<li>用户在服务提供方的网页上输入用户名和密码，然后授权该客户端访问所请求的资源。</li>
+<li>授权成功后，服务提供方引导用户返回客户端的网页。</li>
+<li>客户端根据临时令牌从服务提供方那里获取访问令牌 (Access Token)。</li>
+<li>服务提供方根据临时令牌和用户的授权情况授予客户端访问令牌。</li>
+<li>客户端使用获取的访问令牌访问存放在服务提供方上的受保护的资源。</li>
+</ol>
+
+
+<h3>图例说明</h3>
+
+<p><img src="/images/post/oauth_flow.png" title="OAuth 图例说明" alt="OAuth" /></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -548,72 +605,9 @@ gem &hellip;">
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/07/03/Mogilefs-Init/">MogileFS启动流程</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-07-03T05:59:00+08:00" pubdate data-updated="true">Jul 3<span>rd</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>实例化MogileFS::Server并运行</h2>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>my $server; # server singleton
-</span><span class='line'>sub server {
-</span><span class='line'>    my ($pkg) = @_; 
-</span><span class='line'>    return $server ||= bless {}, $pkg;#空就创建对象，有就返回，单例
-</span><span class='line'>}
-</span><span class='line'>$server-&gt;run();</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>读取配置</h2>
-
-<blockquote><p>优先级，命令行>配置文件>默认配置</p></blockquote>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>MogileFS::Config-&gt;load_config;</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2011/07/03/Mogilefs-Init/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
+    
+      <a class="prev" href="/blog/page/3/">&larr; Older</a>
     
     <a href="/blog/archives">Blog Archives</a>
     
@@ -626,6 +620,10 @@ gem &hellip;">
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/08/vimsu-ji-biao/">vim速记表</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2012/08/01/weakhashmapzuo-yong-he-shi-li/">WeakHashMap作用和实例</a>
@@ -641,10 +639,6 @@ gem &hellip;">
     
       <li class="post">
         <a href="/blog/2012/07/22/python-zhou-ti-yan-ji/">python 一周体验记</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/07/13/oauth-jie-shao/">OAuth 介绍</a>
       </li>
     
   </ul>

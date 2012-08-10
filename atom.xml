@@ -4,7 +4,7 @@
   <title><![CDATA[$huida =~ s/blog/site/g]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2012-08-01T22:38:43+08:00</updated>
+  <updated>2012-08-10T21:51:40+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,15 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[vim速记表]]></title>
+    <link href="http://www.wanghd.com/blog/2012/08/08/vimsu-ji-biao/"/>
+    <updated>2012-08-08T08:46:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/08/08/vimsu-ji-biao</id>
+    <content type="html"><![CDATA[<p><img src="http://www.wanghd.com/images/post/vi-vim-cheat-sheet.gif" title="vim cheat" alt="VIM" /></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[WeakHashMap作用和实例]]></title>
