@@ -9,8 +9,11 @@
   <meta name="author" content="王惠达 huida wanghuida">
 
   
-  <meta name="description" content="
-">
+  <meta name="description" content="为什么要使用线程池 为大量而短小的任务创建线程和销毁线程开销过大
+线程池可以重复使用线程，避免额外的创建和销毁开销
+通过队列和意外处理避免资源不足
+灵活调整线程池内线程的数量 线程池基本配置 corePoolSize: 池中的核心线程数
+maximumPoolSize: 池中的最大线程数（ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -65,6 +68,114 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/08/16/xian-cheng-chi/">线程池</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-16T18:05:00+08:00" pubdate data-updated="true">Aug 16<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>为什么要使用线程池</h3>
+
+<ul>
+<li>为大量而短小的任务创建线程和销毁线程开销过大</li>
+<li>线程池可以重复使用线程，避免额外的创建和销毁开销</li>
+<li>通过队列和意外处理避免资源不足</li>
+<li>灵活调整线程池内线程的数量</li>
+</ul>
+
+
+<h3>线程池基本配置</h3>
+
+<ul>
+<li>corePoolSize: 池中的核心线程数</li>
+<li>maximumPoolSize: 池中的最大线程数（当核心线程用尽，工作队列已满时，开始创建线程）</li>
+<li>keepAliveTime: 大于核心线程数时，干掉空闲线程的最长等待时间</li>
+<li>unit: keepAliveTime的单位，例如秒，毫秒</li>
+<li>workQueue: 工作队列，线程根据工作队列来创建新线程去完成任务</li>
+<li>threadFactory: 用来定义线程中的属性、名称、守护程序状态、ThreadGroup 等等</li>
+<li>handler: 由于超出线程范围和队列容量而使执行被阻塞时所使用的处理程序</li>
+</ul>
+
+
+<h3>线程池基本逻辑</h3>
+
+<ul>
+<li>当池小于corePoolSize就新建线程，并处理任务</li>
+<li>当池等于corePoolSize，把请求放入workQueue中，池里的空闲线程就去从workQueue中取任务并处理</li>
+<li>当workQueue放不下新入的任务时，新建线程处理任务，如果池撑到了maximumPoolSize就用handler来做拒绝处理</li>
+<li>当池中线程数大于corePoolSize的时候，多余的线程会等待keepAliveTime长的时间，如果无请求可处理就自行销毁</li>
+</ul>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/08/16/xian-cheng-chi/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/08/15/jun-fang-gen/">均方根</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-15T16:46:00+08:00" pubdate data-updated="true">Aug 15<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>未完待续</h3>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -269,110 +380,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/07/26/xdebug-500cuo-wu-xian-shi-200cheng-gong-de-bug/">Xdebug:500错误显示200成功的bug</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-07-26T16:15:00+08:00" pubdate data-updated="true">Jul 26<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>今天同事遇见一个诡异的问题</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">ini_set</span><span class="p">(</span><span class="s1">&#39;display_errors&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">#随便调用一个什么方法来产生错误</span>
-</span><span class='line'><span class="nx">abcd</span><span class="p">();</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>明显php错误，但是HTTP返回200</li>
-</ul>
-
-
-<h3>最终关闭加载xdebug一切正常了,返回500错误了</h3>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/07/22/python-zhou-ti-yan-ji/">Python 一周体验记</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-07-22T10:27:00+08:00" pubdate data-updated="true">Jul 22<span>nd</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>python可以快速上手</h3>
-
-<ul>
-<li>推荐官方的新手教程 <a href="http://docs.python.org/tutorial/">http://docs.python.org/tutorial/</a></li>
-</ul>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/07/22/python-zhou-ti-yan-ji/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -388,6 +395,14 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/08/16/xian-cheng-chi/">线程池</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/15/jun-fang-gen/">均方根</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/08/08/vimsu-ji-biao/">vim速记表</a>
       </li>
     
@@ -397,14 +412,6 @@
     
       <li class="post">
         <a href="/blog/2012/07/27/java-volatileli-jie/">java volatile理解</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/07/26/xdebug-500cuo-wu-xian-shi-200cheng-gong-de-bug/">xdebug:500错误显示200成功的bug</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/07/22/python-zhou-ti-yan-ji/">python 一周体验记</a>
       </li>
     
   </ul>

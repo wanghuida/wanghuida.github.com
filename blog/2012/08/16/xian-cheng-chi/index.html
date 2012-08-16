@@ -1,0 +1,619 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>线程池 - $huida =~ s/blog/site/g</title>
+  <meta name="author" content="王惠达 huida wanghuida">
+
+  
+  <meta name="description" content="为什么要使用线程池 为大量而短小的任务创建线程和销毁线程开销过大
+线程池可以重复使用线程，避免额外的创建和销毁开销
+通过队列和意外处理避免资源不足
+灵活调整线程池内线程的数量 线程池基本配置 corePoolSize: 池中的核心线程数
+maximumPoolSize: 池中的最大线程数（ &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.wanghd.com/blog/2012/08/16/xian-cheng-chi/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="$huida =~ s/blog/site/g" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">$huida =~ s/blog/site/g</a></h1>
+  
+    <h2>A love-vim engineer.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.wanghd.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">线程池</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-16T18:05:00+08:00" pubdate data-updated="true">Aug 16<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h3>为什么要使用线程池</h3>
+
+<ul>
+<li>为大量而短小的任务创建线程和销毁线程开销过大</li>
+<li>线程池可以重复使用线程，避免额外的创建和销毁开销</li>
+<li>通过队列和意外处理避免资源不足</li>
+<li>灵活调整线程池内线程的数量</li>
+</ul>
+
+
+<h3>线程池基本配置</h3>
+
+<ul>
+<li>corePoolSize: 池中的核心线程数</li>
+<li>maximumPoolSize: 池中的最大线程数（当核心线程用尽，工作队列已满时，开始创建线程）</li>
+<li>keepAliveTime: 大于核心线程数时，干掉空闲线程的最长等待时间</li>
+<li>unit: keepAliveTime的单位，例如秒，毫秒</li>
+<li>workQueue: 工作队列，线程根据工作队列来创建新线程去完成任务</li>
+<li>threadFactory: 用来定义线程中的属性、名称、守护程序状态、ThreadGroup 等等</li>
+<li>handler: 由于超出线程范围和队列容量而使执行被阻塞时所使用的处理程序</li>
+</ul>
+
+
+<h3>线程池基本逻辑</h3>
+
+<ul>
+<li>当池小于corePoolSize就新建线程，并处理任务</li>
+<li>当池等于corePoolSize，把请求放入workQueue中，池里的空闲线程就去从workQueue中取任务并处理</li>
+<li>当workQueue放不下新入的任务时，新建线程处理任务，如果池撑到了maximumPoolSize就用handler来做拒绝处理</li>
+<li>当池中线程数大于corePoolSize的时候，多余的线程会等待keepAliveTime长的时间，如果无请求可处理就自行销毁</li>
+</ul>
+
+
+<!-- More -->
+
+
+<h3>线程池实例</h3>
+
+<ul>
+<li>线程处理的任务，我这里为取得随机数</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">wanghuida</span><span class="o">.</span><span class="na">test</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyThread</span> <span class="kd">implements</span> <span class="n">Runnable</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">String</span> <span class="n">name</span> <span class="o">=</span> <span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">getName</span><span class="o">();</span>
+</span><span class='line'>        <span class="kt">int</span> <span class="n">number</span> <span class="o">=</span> <span class="o">(</span><span class="kt">int</span><span class="o">)(</span><span class="n">Math</span><span class="o">.</span><span class="na">random</span><span class="o">()</span> <span class="o">*</span> <span class="mi">1000</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;[&quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&quot;] random number is &quot;</span> <span class="o">+</span> <span class="n">number</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>线程工厂类，用来为线程赋予属性，我这里主要是定义线程名称</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">wanghuida</span><span class="o">.</span><span class="na">test</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">java.util.concurrent.ThreadFactory</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyThreadFactory</span> <span class="kd">implements</span> <span class="n">ThreadFactory</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">private</span> <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="nf">MyThreadFactory</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">this</span><span class="o">.</span><span class="na">n</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="n">Thread</span> <span class="nf">newThread</span><span class="o">(</span><span class="n">Runnable</span> <span class="n">r</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">n</span><span class="o">++;</span>
+</span><span class='line'>        <span class="n">Thread</span> <span class="n">t</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Thread</span><span class="o">(</span><span class="n">r</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">t</span><span class="o">.</span><span class="na">setName</span><span class="o">(</span><span class="s">&quot;thread-&quot;</span> <span class="o">+</span> <span class="n">n</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">t</span><span class="o">.</span><span class="na">setDaemon</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">t</span><span class="o">.</span><span class="na">setPriority</span><span class="o">(</span><span class="n">Thread</span><span class="o">.</span><span class="na">NORM_PRIORITY</span><span class="o">);</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">t</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>构造线程池并处理任务</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">wanghuida</span><span class="o">.</span><span class="na">test</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">java.util.concurrent.ArrayBlockingQueue</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">java.util.concurrent.ThreadPoolExecutor</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">java.util.concurrent.TimeUnit</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ThreadPoolTest</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">ThreadPoolExecutor</span> <span class="n">pool</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="nf">ThreadPoolTest</span><span class="o">(</span><span class="kt">int</span> <span class="n">core</span><span class="o">,</span><span class="kt">int</span> <span class="n">max</span><span class="o">,</span><span class="kt">int</span> <span class="n">queue</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">this</span><span class="o">.</span><span class="na">pool</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ThreadPoolExecutor</span><span class="o">(</span>
+</span><span class='line'>                <span class="n">core</span><span class="o">,</span> <span class="c1">//核心线程数</span>
+</span><span class='line'>                <span class="n">max</span><span class="o">,</span> <span class="c1">//最大线程数</span>
+</span><span class='line'>                <span class="mi">5</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">,</span> <span class="c1">//超过核心线程数，等多少时间释放 </span>
+</span><span class='line'>                <span class="k">new</span> <span class="n">ArrayBlockingQueue</span><span class="o">&lt;</span><span class="n">Runnable</span><span class="o">&gt;(</span><span class="n">queue</span><span class="o">),</span> <span class="c1">//任务队列</span>
+</span><span class='line'>                <span class="k">new</span> <span class="nf">MyThreadFactory</span><span class="o">(),</span> <span class="c1">//线程构造器</span>
+</span><span class='line'>                <span class="k">new</span> <span class="n">ThreadPoolExecutor</span><span class="o">.</span><span class="na">AbortPolicy</span><span class="o">()</span> <span class="c1">//超出池的策略  </span>
+</span><span class='line'>        <span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">test</span><span class="o">(</span><span class="kt">int</span> <span class="n">times</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">times</span><span class="o">;</span> <span class="n">i</span><span class="o">++</span> <span class="o">){</span>
+</span><span class='line'>            <span class="n">MyThread</span> <span class="n">t</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MyThread</span><span class="o">();</span>
+</span><span class='line'>            <span class="k">this</span><span class="o">.</span><span class="na">pool</span><span class="o">.</span><span class="na">execute</span><span class="o">(</span><span class="n">t</span><span class="o">);</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">this</span><span class="o">.</span><span class="na">pool</span><span class="o">.</span><span class="na">shutdown</span><span class="o">();</span>
+</span><span class='line'>        <span class="kt">boolean</span> <span class="n">loop</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+</span><span class='line'>        <span class="k">do</span> <span class="o">{</span><span class="c1">//等待所有任务完成     </span>
+</span><span class='line'>            <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;core pollsize is &quot;</span> <span class="o">+</span> <span class="n">pool</span><span class="o">.</span><span class="na">getCorePoolSize</span><span class="o">()</span> <span class="o">+</span> <span class="s">&quot;,poolsize is &quot;</span> <span class="o">+</span> <span class="n">pool</span><span class="o">.</span><span class="na">getPoolSize</span><span class="o">());</span>
+</span><span class='line'>                <span class="n">loop</span> <span class="o">=</span> <span class="o">!</span><span class="k">this</span><span class="o">.</span><span class="na">pool</span><span class="o">.</span><span class="na">awaitTermination</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">);</span>
+</span><span class='line'>            <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>                <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span><span class='line'>            <span class="o">}</span>
+</span><span class='line'>        <span class="o">}</span> <span class="k">while</span><span class="o">(</span><span class="n">loop</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">test</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">this</span><span class="o">.</span><span class="na">test</span><span class="o">(</span><span class="mi">10</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>main主函数</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">wanghuida</span><span class="o">.</span><span class="na">test</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Entry</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">testThreadPool</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">testThreadPool</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">ThreadPoolTest</span> <span class="n">test1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ThreadPoolTest</span><span class="o">(</span><span class="mi">5</span><span class="o">,</span><span class="mi">10</span><span class="o">,</span><span class="mi">3</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">test1</span><span class="o">.</span><span class="na">test</span><span class="o">();</span>
+</span><span class='line'>        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;\n&quot;</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">ThreadPoolTest</span> <span class="n">test2</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ThreadPoolTest</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span><span class="mi">4</span><span class="o">,</span><span class="mi">3</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">test2</span><span class="o">.</span><span class="na">test</span><span class="o">();</span>
+</span><span class='line'>        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;\n&quot;</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">ThreadPoolTest</span> <span class="n">test3</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ThreadPoolTest</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span><span class="mi">1</span><span class="o">,</span><span class="mi">1</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">test3</span><span class="o">.</span><span class="na">test</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>输出结果和意图相符合</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">[</span><span class="n">thread</span><span class="o">-</span><span class="mi">1</span><span class="o">]</span> <span class="n">random</span> <span class="n">number</span> <span class="n">is</span> <span class="mi">52</span>
+</span><span class='line'><span class="o">[</span><span class="n">thread</span><span class="o">-</span><span class="mi">2</span><span class="o">]</span> <span class="n">random</span> <span class="n">number</span> <span class="n">is</span> <span class="mi">6</span>
+</span><span class='line'><span class="o">[</span><span class="n">thread</span><span class="o">-</span><span class="mi">3</span><span class="o">]</span> <span class="n">random</span> <span class="n">number</span> <span class="n">is</span> <span class="mi">477</span>
+</span><span class='line'><span class="o">[</span><span class="n">thread</span><span class="o">-</span><span class="mi">4</span><span class="o">]</span> <span class="n">random</span> <span class="n">number</span> <span class="n">is</span> <span class="mi">446</span>
+</span><span class='line'><span class="o">[</span><span class="n">thread</span><span class="o">-</span><span class="mi">5</span><span class="o">]</span> <span class="n">random</span> <span class="n">number</span> <span class="n">is</span> <span class="mi">845</span>
+</span><span class='line'><span class="o">[</span><span class="n">thread</span><span class="o">-</span><span class="mi">5</span><span class="o">]</span> <span class="n">random</span> <span class="n">number</span> <span class="n">is</span> <span class="mi">175</span>
+</span><span class='line'><span class="o">[</span><span class="n">thread</span><span class="o">-</span><span class="mi">5</span><span class="o">]</span> <span class="n">random</span> <span class="n">number</span> <span class="n">is</span> <span class="mi">920</span>
+</span><span class='line'><span class="o">[</span><span class="n">thread</span><span class="o">-</span><span class="mi">5</span><span class="o">]</span> <span class="n">random</span> <span class="n">number</span> <span class="n">is</span> <span class="mi">125</span>
+</span><span class='line'><span class="o">[</span><span class="n">thread</span><span class="o">-</span><span class="mi">6</span><span class="o">]</span> <span class="n">random</span> <span class="n">number</span> <span class="n">is</span> <span class="mi">580</span>
+</span><span class='line'><span class="o">[</span><span class="n">thread</span><span class="o">-</span><span class="mi">6</span><span class="o">]</span> <span class="n">random</span> <span class="n">number</span> <span class="n">is</span> <span class="mi">936</span>
+</span><span class='line'><span class="n">core</span> <span class="n">pollsize</span> <span class="n">is</span> <span class="mi">5</span><span class="o">,</span><span class="n">poolsize</span> <span class="n">is</span> <span class="mi">6</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span><span class="n">thread</span><span class="o">-</span><span class="mi">1</span><span class="o">]</span> <span class="n">random</span> <span class="n">number</span> <span class="n">is</span> <span class="mi">433</span>
+</span><span class='line'><span class="o">[</span><span class="n">thread</span><span class="o">-</span><span class="mi">2</span><span class="o">]</span> <span class="n">random</span> <span class="n">number</span> <span class="n">is</span> <span class="mi">442</span>
+</span><span class='line'><span class="o">[</span><span class="n">thread</span><span class="o">-</span><span class="mi">1</span><span class="o">]</span> <span class="n">random</span> <span class="n">number</span> <span class="n">is</span> <span class="mi">957</span>
+</span><span class='line'><span class="o">[</span><span class="n">thread</span><span class="o">-</span><span class="mi">1</span><span class="o">]</span> <span class="n">random</span> <span class="n">number</span> <span class="n">is</span> <span class="mi">536</span>
+</span><span class='line'><span class="o">[</span><span class="n">thread</span><span class="o">-</span><span class="mi">3</span><span class="o">]</span> <span class="n">random</span> <span class="n">number</span> <span class="n">is</span> <span class="mi">337</span>
+</span><span class='line'><span class="n">core</span> <span class="n">pollsize</span> <span class="n">is</span> <span class="mi">2</span><span class="o">,</span><span class="n">poolsize</span> <span class="n">is</span> <span class="mi">4</span>
+</span><span class='line'><span class="o">[</span><span class="n">thread</span><span class="o">-</span><span class="mi">2</span><span class="o">]</span> <span class="n">random</span> <span class="n">number</span> <span class="n">is</span> <span class="mi">118</span>
+</span><span class='line'><span class="o">[</span><span class="n">thread</span><span class="o">-</span><span class="mi">2</span><span class="o">]</span> <span class="n">random</span> <span class="n">number</span> <span class="n">is</span> <span class="mi">819</span>
+</span><span class='line'><span class="o">[</span><span class="n">thread</span><span class="o">-</span><span class="mi">4</span><span class="o">]</span> <span class="n">random</span> <span class="n">number</span> <span class="n">is</span> <span class="mi">681</span>
+</span><span class='line'><span class="o">[</span><span class="n">thread</span><span class="o">-</span><span class="mi">3</span><span class="o">]</span> <span class="n">random</span> <span class="n">number</span> <span class="n">is</span> <span class="mi">480</span>
+</span><span class='line'><span class="o">[</span><span class="n">thread</span><span class="o">-</span><span class="mi">1</span><span class="o">]</span> <span class="n">random</span> <span class="n">number</span> <span class="n">is</span> <span class="mi">469</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span><span class="n">thread</span><span class="o">-</span><span class="mi">1</span><span class="o">]</span> <span class="n">random</span> <span class="n">number</span> <span class="n">is</span> <span class="mi">287</span>
+</span><span class='line'><span class="o">[</span><span class="n">thread</span><span class="o">-</span><span class="mi">1</span><span class="o">]</span> <span class="n">random</span> <span class="n">number</span> <span class="n">is</span> <span class="mi">710</span>
+</span><span class='line'><span class="n">Exception</span> <span class="n">in</span> <span class="n">thread</span> <span class="s">&quot;main&quot;</span> <span class="n">java</span><span class="o">.</span><span class="na">util</span><span class="o">.</span><span class="na">concurrent</span><span class="o">.</span><span class="na">RejectedExecutionException</span>
+</span><span class='line'>    <span class="n">at</span> <span class="n">java</span><span class="o">.</span><span class="na">util</span><span class="o">.</span><span class="na">concurrent</span><span class="o">.</span><span class="na">ThreadPoolExecutor</span><span class="n">$AbortPolicy</span><span class="o">.</span><span class="na">rejectedExecution</span><span class="o">(</span><span class="n">ThreadPoolExecutor</span><span class="o">.</span><span class="na">java</span><span class="o">:</span><span class="mi">1768</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">at</span> <span class="n">java</span><span class="o">.</span><span class="na">util</span><span class="o">.</span><span class="na">concurrent</span><span class="o">.</span><span class="na">ThreadPoolExecutor</span><span class="o">.</span><span class="na">reject</span><span class="o">(</span><span class="n">ThreadPoolExecutor</span><span class="o">.</span><span class="na">java</span><span class="o">:</span><span class="mi">767</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">at</span> <span class="n">java</span><span class="o">.</span><span class="na">util</span><span class="o">.</span><span class="na">concurrent</span><span class="o">.</span><span class="na">ThreadPoolExecutor</span><span class="o">.</span><span class="na">execute</span><span class="o">(</span><span class="n">ThreadPoolExecutor</span><span class="o">.</span><span class="na">java</span><span class="o">:</span><span class="mi">658</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">at</span> <span class="n">wanghuida</span><span class="o">.</span><span class="na">test</span><span class="o">.</span><span class="na">ThreadPoolTest</span><span class="o">.</span><span class="na">test</span><span class="o">(</span><span class="n">ThreadPoolTest</span><span class="o">.</span><span class="na">java</span><span class="o">:</span><span class="mi">25</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">at</span> <span class="n">wanghuida</span><span class="o">.</span><span class="na">test</span><span class="o">.</span><span class="na">ThreadPoolTest</span><span class="o">.</span><span class="na">test</span><span class="o">(</span><span class="n">ThreadPoolTest</span><span class="o">.</span><span class="na">java</span><span class="o">:</span><span class="mi">44</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">at</span> <span class="n">wanghuida</span><span class="o">.</span><span class="na">test</span><span class="o">.</span><span class="na">Entry</span><span class="o">.</span><span class="na">testThreadPool</span><span class="o">(</span><span class="n">Entry</span><span class="o">.</span><span class="na">java</span><span class="o">:</span><span class="mi">56</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">at</span> <span class="n">wanghuida</span><span class="o">.</span><span class="na">test</span><span class="o">.</span><span class="na">Entry</span><span class="o">.</span><span class="na">main</span><span class="o">(</span><span class="n">Entry</span><span class="o">.</span><span class="na">java</span><span class="o">:</span><span class="mi">22</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">王惠达 huida wanghuida</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-16T18:05:00+08:00" pubdate data-updated="true">Aug 16<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/java/'>Java</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2012/08/16/xian-cheng-chi/" data-via="" data-counturl="http://www.wanghd.com/blog/2012/08/16/xian-cheng-chi/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/08/15/jun-fang-gen/" title="Previous Post: 均方根">&laquo; 均方根</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/16/xian-cheng-chi/">线程池</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/15/jun-fang-gen/">均方根</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/08/vimsu-ji-biao/">vim速记表</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/01/weakhashmapzuo-yong-he-shi-li/">WeakHashMap作用和实例</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/07/27/java-volatileli-jie/">java volatile理解</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>新浪微博</h1>
+  <ul id="weibo">
+    <li>
+      <iframe
+        width="100%"
+        height="550"
+        class="share_self"
+        frameborder="0"
+        scrolling="no"
+        src="http://widget.weibo.com/weiboshow/index.php?width=0&height=550&ptype=1&speed=0&skin=&isTitle=0&noborder=1&isWeibo=1&isFans=&uid=2248382321&verifier=149f357d">
+      </iframe>
+    </li>
+  </ul>
+</section>
+
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/wanghuida">@wanghuida</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'wanghuida',
+            count: 5,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - 王惠达 huida wanghuida -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
