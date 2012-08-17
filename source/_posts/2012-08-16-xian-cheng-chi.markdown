@@ -24,6 +24,12 @@ categories: [Java]
 + threadFactory: 用来定义线程中的属性、名称、守护程序状态、ThreadGroup 等等
 + handler: 由于超出线程范围和队列容量而使执行被阻塞时所使用的处理程序
 
+####默认的handler
++ ThreadPoolExecutor.AbortPolicy: 直接抛出RejectedExecutionException
++ ThreadPoolExecutor.CallerRunsPolicy: 再次尝试
++ ThreadPoolExecutor.DiscardOldestPolicy: 放弃最旧的未处理任务
++ ThreadPoolExecutor.DiscardPolicy: 直接丢弃
+
 ###线程池基本逻辑
 + 当池小于corePoolSize就新建线程，并处理任务
 + 当池等于corePoolSize，把请求放入workQueue中，池里的空闲线程就去从workQueue中取任务并处理
