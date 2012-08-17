@@ -4,7 +4,7 @@
   <title><![CDATA[$huida =~ s/blog/site/g]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2012-08-16T23:31:11+08:00</updated>
+  <updated>2012-08-17T16:50:37+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -38,6 +38,16 @@
 <li>workQueue: 工作队列，线程根据工作队列来创建新线程去完成任务</li>
 <li>threadFactory: 用来定义线程中的属性、名称、守护程序状态、ThreadGroup 等等</li>
 <li>handler: 由于超出线程范围和队列容量而使执行被阻塞时所使用的处理程序</li>
+</ul>
+
+
+<h4>默认的handler</h4>
+
+<ul>
+<li>ThreadPoolExecutor.AbortPolicy: 直接抛出RejectedExecutionException</li>
+<li>ThreadPoolExecutor.CallerRunsPolicy: 再次尝试</li>
+<li>ThreadPoolExecutor.DiscardOldestPolicy: 放弃最旧的未处理任务</li>
+<li>ThreadPoolExecutor.DiscardPolicy: 直接丢弃</li>
 </ul>
 
 

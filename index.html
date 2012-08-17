@@ -120,6 +120,16 @@ maximumPoolSize: 池中的最大线程数（ &hellip;">
 </ul>
 
 
+<h4>默认的handler</h4>
+
+<ul>
+<li>ThreadPoolExecutor.AbortPolicy: 直接抛出RejectedExecutionException</li>
+<li>ThreadPoolExecutor.CallerRunsPolicy: 再次尝试</li>
+<li>ThreadPoolExecutor.DiscardOldestPolicy: 放弃最旧的未处理任务</li>
+<li>ThreadPoolExecutor.DiscardPolicy: 直接丢弃</li>
+</ul>
+
+
 <h3>线程池基本逻辑</h3>
 
 <ul>
