@@ -9,15 +9,9 @@
   <meta name="author" content="王惠达 huida wanghuida">
 
   
-  <meta name="description" content="今天同事遇见一个诡异的问题 1
-2
-3
-4
-5
-6
-&lt;?php ini_set(&#39;display_errors&#39;,0); #随便调用一个什么方法来产生错误
-abcd(); 明显php错误，但是HTTP返回200 最终关闭加载xdebug一切正常了,返回500错误了
-">
+  <meta name="description" content="volatile的含义其实很好理解，希望配合图可以更加清晰的解释 多个线程加载同一个对象时，会从主内存复制一个副本到线程工作内存
+如果对象没有volatile属性，只有write操作才会让主内存的对象得到修改（其他线程这时才有可能拿到最新的结果）
+如果对象有volatile属性，load,use, &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +66,51 @@ abcd(); 明显php错误，但是HTTP返回200 最终关闭加载xdebug一切正�
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/07/27/java-volatileli-jie/">Java Volatile理解</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-27T21:55:00+08:00" pubdate data-updated="true">Jul 27<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>volatile的含义其实很好理解，希望配合图可以更加清晰的解释</h3>
+
+<p><img src="/images/post/volatile.jpg" title="volatile 图例说明" alt="volatile" /></p>
+
+<ul>
+<li>多个线程加载同一个对象时，会从主内存复制一个副本到线程工作内存</li>
+<li>如果对象没有volatile属性，只有write操作才会让主内存的对象得到修改（其他线程这时才有可能拿到最新的结果）</li>
+<li>如果对象有volatile属性，load,use,asign,store都会拿到实时的结果（因为会一直同步更新结果）</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -294,187 +333,6 @@ abcd(); 明显php错误，但是HTTP返回200 最终关闭加载xdebug一切正�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/07/06/perl-ipc/">进程间通信【IPC】</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-07-06T22:28:00+08:00" pubdate data-updated="true">Jul 6<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="c1">#!/usr/bin/perl</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">use</span> <span class="n">warnings</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">strict</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">bytes</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">Socket</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="nn">Data::</span><span class="n">Dumper</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">Carp</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="nn">IO::</span><span class="n">Socket</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">Errno</span>  <span class="sx">qw(EINPROGRESS EWOULDBLOCK EISCONN ENOTSOCK</span>
-</span><span class='line'><span class="sx">              EPIPE EAGAIN EBADF ECONNRESET ENOPROTOOPT)</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">constant</span> <span class="n">POLLIN</span>        <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">constant</span> <span class="n">POLLOUT</span>       <span class="o">=&gt;</span> <span class="mi">4</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">constant</span> <span class="n">POLLERR</span>       <span class="o">=&gt;</span> <span class="mi">8</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">constant</span> <span class="n">POLLHUP</span>       <span class="o">=&gt;</span> <span class="mi">16</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">constant</span> <span class="n">POLLNVAL</span>      <span class="o">=&gt;</span> <span class="mi">32</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">POSIX</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="nb">socketpair</span><span class="p">(</span><span class="k">my</span> <span class="nv">$ps</span><span class="p">,</span><span class="k">my</span> <span class="nv">$cs</span><span class="p">,</span><span class="n">AF_UNIX</span><span class="p">,</span><span class="n">SOCK_STREAM</span><span class="p">,</span><span class="n">PF_UNSPEC</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">die</span> <span class="p">(</span><span class="s">&quot;socketpair fail&quot;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">my</span> <span class="nv">$pid</span><span class="p">;</span>
-</span><span class='line'><span class="nb">die</span> <span class="p">(</span><span class="s">&quot;fork fail&quot;</span><span class="p">)</span> <span class="k">unless</span> <span class="nb">defined</span> <span class="p">(</span><span class="nv">$pid</span> <span class="o">=</span> <span class="nb">fork</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">select</span><span class="p">(</span> <span class="p">(</span><span class="nb">select</span><span class="p">(</span><span class="nv">$ps</span><span class="p">),</span><span class="vg">$|</span><span class="o">++</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="p">);</span>
-</span><span class='line'><span class="nb">select</span><span class="p">(</span> <span class="p">(</span><span class="nb">select</span><span class="p">(</span><span class="nv">$cs</span><span class="p">),</span><span class="vg">$|</span><span class="o">++</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">#组长进程</span>
-</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nv">$pid</span><span class="p">){</span>
-</span><span class='line'>    <span class="nb">close</span> <span class="nv">$cs</span><span class="p">;</span>
-</span><span class='line'>    <span class="nb">undef</span> <span class="nv">$cs</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">our</span> <span class="nv">%des</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$fn</span> <span class="o">=</span> <span class="nb">fileno</span><span class="p">(</span><span class="nv">$ps</span><span class="p">);</span>
-</span><span class='line'>    <span class="nv">$des</span><span class="p">{</span><span class="nv">$fn</span><span class="p">}</span> <span class="o">=</span> <span class="nv">$ps</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nn">IO::Handle::</span><span class="n">blocking</span><span class="p">(</span><span class="nv">$ps</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">while</span><span class="p">(</span><span class="mi">1</span><span class="p">){</span>
-</span><span class='line'>        <span class="k">my</span> <span class="nv">@poll</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">while</span><span class="p">(</span> <span class="k">my</span><span class="p">(</span><span class="nv">$f</span><span class="p">,</span><span class="nv">$s</span><span class="p">)</span> <span class="o">=</span> <span class="nb">each</span> <span class="nv">%des</span> <span class="p">){</span>
-</span><span class='line'>            <span class="nb">push</span> <span class="nv">@poll</span><span class="p">,</span><span class="nv">$f</span><span class="p">,</span><span class="n">POLLIN</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="k">my</span> <span class="nv">$count</span> <span class="o">=</span> <span class="nn">IO::Poll::</span><span class="n">_poll</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="nv">@poll</span><span class="p">);</span>
-</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="nv">$count</span><span class="p">){</span>
-</span><span class='line'>            <span class="k">while</span> <span class="p">(</span><span class="nv">@poll</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="k">my</span> <span class="p">(</span><span class="nv">$fd</span><span class="p">,</span> <span class="nv">$state</span><span class="p">)</span> <span class="o">=</span> <span class="nb">splice</span><span class="p">(</span><span class="nv">@poll</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-</span><span class='line'>                <span class="k">my</span> <span class="nv">$len</span> <span class="o">=</span> <span class="nb">sysread</span><span class="p">(</span><span class="nv">$des</span><span class="p">{</span><span class="nv">$fd</span><span class="p">},</span><span class="k">my</span> <span class="nv">$data</span><span class="p">,</span><span class="mi">8</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">warn</span><span class="p">(</span><span class="s">&quot;warn:$!\n&quot;</span><span class="p">);</span>
-</span><span class='line'>                <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nv">$len</span> <span class="o">&amp;&amp;</span> <span class="vg">$!</span> <span class="o">!=</span> <span class="n">EWOULDBLOCK</span> <span class="p">){</span>
-</span><span class='line'>                    <span class="nb">delete</span> <span class="nv">$des</span><span class="p">{</span><span class="nv">$fd</span><span class="p">};</span>
-</span><span class='line'>                <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>                    <span class="k">print</span> <span class="s">&quot;reply:&quot;</span><span class="o">.</span><span class="nv">$data</span><span class="p">;</span>
-</span><span class='line'>                <span class="p">}</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="c1">#print Dumper(\%des);</span>
-</span><span class='line'>        <span class="c1">#sleep(1);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>    <span class="c1">#sleep(5);</span>
-</span><span class='line'>    <span class="nb">close</span> <span class="nv">$ps</span><span class="p">;</span>
-</span><span class='line'>    <span class="nb">undef</span> <span class="nv">$ps</span><span class="p">;</span>
-</span><span class='line'>    <span class="c1">#print &quot;$$\n&quot;;</span>
-</span><span class='line'>    <span class="k">while</span><span class="p">(</span><span class="mi">1</span><span class="p">){</span>
-</span><span class='line'>        <span class="k">my</span> <span class="nv">$str</span> <span class="o">=</span> <span class="s">&quot;cs msg!\n&quot;</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">my</span> <span class="nv">$len</span> <span class="o">=</span> <span class="nb">length</span> <span class="nv">$str</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">my</span> <span class="nv">$rv</span> <span class="o">=</span> <span class="nb">syswrite</span><span class="p">(</span><span class="nv">$cs</span><span class="p">,</span><span class="nv">$str</span><span class="p">);</span>
-</span><span class='line'>        <span class="c1">#如果不sleep 服务器端瞬间拿到N多次的结果。。。 不sleep就得控制长度</span>
-</span><span class='line'>        <span class="c1">#sleep 1 if defined $rv &amp;&amp; $rv == $len;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="nb">exit</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -492,6 +350,10 @@ abcd(); 明显php错误，但是HTTP返回200 最终关闭加载xdebug一切正�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/08/24/jsmian-xiang-dui-xiang-shi-li/">js面向对象实例</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/08/16/xian-cheng-chi/">线程池</a>
       </li>
     
@@ -505,10 +367,6 @@ abcd(); 明显php错误，但是HTTP返回200 最终关闭加载xdebug一切正�
     
       <li class="post">
         <a href="/blog/2012/08/01/weakhashmapzuo-yong-he-shi-li/">WeakHashMap作用和实例</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/07/27/java-volatileli-jie/">java volatile理解</a>
       </li>
     
   </ul>
