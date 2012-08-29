@@ -4,7 +4,7 @@
   <title><![CDATA[$huida =~ s/blog/site/g]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2012-08-24T18:00:58+08:00</updated>
+  <updated>2012-08-29T12:44:16+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,56 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[solr启动分析]]></title>
+    <link href="http://www.wanghd.com/blog/2012/08/28/solrqi-dong-fen-xi/"/>
+    <updated>2012-08-28T08:34:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/08/28/solrqi-dong-fen-xi</id>
+    <content type="html"><![CDATA[<h3>solr启动分析</h3>
+
+<p><img src="http://www.wanghd.com/images/post/solrstart.png" title="solr 启动分析" alt="solr 启动分析" /></p>
+
+<ol>
+<li>CoreContainer通过xpath加载solr.xml</li>
+<li>实例化CoreAdminHandler管理CoreContainer，提供reload,status等命令(status可以看到index-size)</li>
+<li>初始化CoreDescriptor，设置核心的配置文件、目录、属性文件</li>
+<li>读取solrconfig.xml，分析后设置到SolrConfig</li>
+<li>读取schema.xml，设置fieldTypes @FieldTypePluginLoader,fields @SchemaField,过滤器,分词器,主键</li>
+<li>构造SolrCore,设置数据目录和各种资源的初始化</li>
+<li>QuerySenderListener，默认2个事件firstSearcher和newSearcher</li>
+<li>IndexDeletionPolicy</li>
+<li>DefaultCodecFactory，4.0的功能，字段的编码器和解码器</li>
+<li>StandardDirectoryFactory，指向data/index/的Directory，用来生成Reader读取索引</li>
+<li>QueryResponseWriter，各种返回结果，例如json,xml</li>
+<li>QParserPlugin，请求分析插件,用以生成QParser，例如BoostQParserPlugin和DisMaxQParserPlugin等</li>
+<li>ValueSourceParser，初始化内置的函数，比如boost,abs,sin..等等</li>
+<li>SearchComponent，例如query,facet,mlt,stat,debug,get</li>
+<li>RequestHandlers，是根据url对应RequestHandler的映射</li>
+<li>DirectUpdateHandler2，commit数据的handler</li>
+<li>最后执行firstSearcher事件预热，注册第一个SolrIndexSearcher</li>
+</ol>
+
+
+<h3>solr package</h3>
+
+<ul>
+<li>org.apache.solr.analysis; 过滤器，分词器</li>
+<li>org.apache.solr.core; solr的核心包,例如CoreContainer,Config,SolrCore,SolrConfig,CachingDirectoryFactory,CoreDescriptor</li>
+<li>org.apache.solr.servlet; 与servlet有关,例如SolrDispatchFilter就属于该包</li>
+<li>org.apache.solr.handler; org.apache.solr.handler.component; 请求处理</li>
+<li>org.apache.solr.handler.admin; 处理用来管理的请求，例如CoreAdminHandler</li>
+<li>org.apache.solr.search; 与查询有关的类，例如缓存，查询分析，返回字段 SolrIndexSearcher</li>
+<li>org.apache.solr.schema; 字段类型，schema通知</li>
+<li>org.apache.solr.util.plugin; 为插件提供的一些工具，抽象和接口，例如AbstractPluginLoader</li>
+<li>org.apache.solr.util; 一些工具，例如FileUtils</li>
+<li>org.apache.solr.update; org.apache.solr.update.processor; 用来更新数据的，例如默认的DirectUpdateHandler2</li>
+<li>org.apache.solr.response;org.apache.solr.response.transform;用来返回数据(序列化,json,xml等数据)</li>
+<li>org.apache.solr.request; 请求相关的信息，例如SolrRequestInfo</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[js面向对象实例]]></title>
