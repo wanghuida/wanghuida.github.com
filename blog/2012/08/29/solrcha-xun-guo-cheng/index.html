@@ -5,11 +5,13 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Category: Javascript - $huida =~ s/blog/site/g</title>
+  <title>solr查询过程 - $huida =~ s/blog/site/g</title>
   <meta name="author" content="王惠达 huida wanghuida">
 
   
-  <meta name="description" content="Category: Javascript">
+  <meta name="description" content="solr查询分析 设置SolrQueryRequest,SolrQueryResponse
+在SolrRequestInfo里设置一个ThreadLocal,set solrreq,solrresp
+通过url取得handler，例如/select就是使用SearchHandler &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +20,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.wanghd.comblog/categories/javascript/">
+  <link rel="canonical" href="http://www.wanghd.com/blog/2012/08/29/solrcha-xun-guo-cheng/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -63,35 +65,99 @@
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Category: Javascript</h1>
+    
+      <h1 class="entry-title">Solr查询过程</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-29T16:25:00+08:00" pubdate data-updated="true">Aug 29<span>th</span>, 2012</time>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives" class="category">
 
 
+<div class="entry-content"><h3>solr查询分析</h3>
 
-  
-  <h2>2012</h2>
+<p><img src="/images/post/solrsearch.png" title="solr 查询分析" alt="solr 查询分析" /></p>
 
-<article>
-  
-<h1><a href="/blog/2012/08/24/jsmian-xiang-dui-xiang-shi-li/">js面向对象实例</a></h1>
-<time datetime="2012-08-24T17:57:00+08:00" pubdate><span class='month'>Aug</span> <span class='day'>24</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/javascript/'>Javascript</a></span>
-</footer>
-
-
-</article>
+<ol>
+<li>设置SolrQueryRequest,SolrQueryResponse</li>
+<li>在SolrRequestInfo里设置一个ThreadLocal<SolrRequestInfo>,set solrreq,solrresp</li>
+<li>通过url取得handler，例如/select就是使用SearchHandler</li>
+<li>handler抽象类里的handleRequest</li>
+<li>handler调用handleRequestBody开始处理请求，建立responseBuilder</li>
+<li>QueryComponent.prepare，设置returnFields，没有fl的情况下wantsAllFields，设置默认的LuceneQParser分析器，实例化SolrQueryParser</li>
+<li>QueryComponet.execute，取得关联的文档id，保存到resultCache</li>
+<li>writeResponse，如果id在DocumentCache里有就直接拿，否则通过reader去获得，再保存到DocumentCache</li>
+<li>输出结果到游览器</li>
+</ol>
 
 </div>
 
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">王惠达 huida wanghuida</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-29T16:25:00+08:00" pubdate data-updated="true">Aug 29<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/java/'>Java</a>, <a class='category' href='/blog/categories/solr/'>Solr</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2012/08/29/solrcha-xun-guo-cheng/" data-via="" data-counturl="http://www.wanghd.com/blog/2012/08/29/solrcha-xun-guo-cheng/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/08/28/solrqi-dong-fen-xi/" title="Previous Post: solr启动分析">&laquo; solr启动分析</a>
+      
+      
+    </p>
+  </footer>
 </article>
 
 </div>

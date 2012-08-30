@@ -9,9 +9,9 @@
   <meta name="author" content="王惠达 huida wanghuida">
 
   
-  <meta name="description" content="solr启动分析 CoreContainer通过xpath加载solr.xml
-实例化CoreAdminHandler管理CoreContainer，提供reload,status等命令(status可以看到index-size)
-初始化CoreDescriptor，设置核心的配置文件、目录、 &hellip;">
+  <meta name="description" content="solr查询分析 设置SolrQueryRequest,SolrQueryResponse
+在SolrRequestInfo里设置一个ThreadLocal,set solrreq,solrresp
+通过url取得handler，例如/select就是使用SearchHandler &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -66,6 +66,57 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/08/29/solrcha-xun-guo-cheng/">Solr查询过程</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-29T16:25:00+08:00" pubdate data-updated="true">Aug 29<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>solr查询分析</h3>
+
+<p><img src="/images/post/solrsearch.png" title="solr 查询分析" alt="solr 查询分析" /></p>
+
+<ol>
+<li>设置SolrQueryRequest,SolrQueryResponse</li>
+<li>在SolrRequestInfo里设置一个ThreadLocal<SolrRequestInfo>,set solrreq,solrresp</li>
+<li>通过url取得handler，例如/select就是使用SearchHandler</li>
+<li>handler抽象类里的handleRequest</li>
+<li>handler调用handleRequestBody开始处理请求，建立responseBuilder</li>
+<li>QueryComponent.prepare，设置returnFields，没有fl的情况下wantsAllFields，设置默认的LuceneQParser分析器，实例化SolrQueryParser</li>
+<li>QueryComponet.execute，取得关联的文档id，保存到resultCache</li>
+<li>writeResponse，如果id在DocumentCache里有就直接拿，否则通过reader去获得，再保存到DocumentCache</li>
+<li>输出结果到游览器</li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -421,42 +472,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/08/08/vimsu-ji-biao/">Vim速记表</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-08-08T08:46:00+08:00" pubdate data-updated="true">Aug 8<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="/images/post/vi-vim-cheat-sheet.gif" title="vim cheat" alt="VIM" /></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -472,6 +487,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/08/29/solrcha-xun-guo-cheng/">solr查询过程</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/08/28/solrqi-dong-fen-xi/">solr启动分析</a>
       </li>
     
@@ -485,10 +504,6 @@
     
       <li class="post">
         <a href="/blog/2012/08/15/jun-fang-gen/">均方根</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/08/08/vimsu-ji-biao/">vim速记表</a>
       </li>
     
   </ul>
