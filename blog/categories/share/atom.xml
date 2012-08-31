@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Share | $huida =~ s/blog/site/g]]></title>
   <link href="http://www.wanghd.com/blog/categories/share/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2012-08-30T10:22:55+08:00</updated>
+  <updated>2012-08-31T16:08:59+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,25 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[常用命令]]></title>
+    <link href="http://www.wanghd.com/blog/2012/08/30/chang-yong-ming-ling/"/>
+    <updated>2012-08-30T13:14:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/08/30/chang-yong-ming-ling</id>
+    <content type="html"><![CDATA[<h3>过滤记录</h3>
+
+<ul>
+<li>-l自动chomp，结果加$/</li>
+<li>-a自动分割</li>
+</ul>
+
+
+<p><code>shell
+tail -f access-2012-08-30.log | grep -v '*' | perl -w -lane '$a = $F[@F-1];print if $a &gt; 50000 '
+</code></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[均方根]]></title>
