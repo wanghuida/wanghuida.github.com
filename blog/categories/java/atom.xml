@@ -1,0 +1,538 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Java | $huida =~ s/blog/site/g]]></title>
+  <link href="http://www.wanghd.com/blog/categories/java/atom.xml" rel="self"/>
+  <link href="http://www.wanghd.com/"/>
+  <updated>2012-08-31T16:08:59+08:00</updated>
+  <id>http://www.wanghd.com/</id>
+  <author>
+    <name><![CDATA[王惠达 huida wanghuida]]></name>
+    <email><![CDATA[wanghuida258@126.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[solr查询过程]]></title>
+    <link href="http://www.wanghd.com/blog/2012/08/29/solrcha-xun-guo-cheng/"/>
+    <updated>2012-08-29T16:25:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/08/29/solrcha-xun-guo-cheng</id>
+    <content type="html"><![CDATA[<h3>solr查询分析</h3>
+
+<p><img src="/images/post/solrsearch.png" title="solr 查询分析" alt="solr 查询分析" /></p>
+
+<ol>
+<li>设置SolrQueryRequest,SolrQueryResponse</li>
+<li>在SolrRequestInfo里设置一个ThreadLocal<SolrRequestInfo>,set solrreq,solrresp</li>
+<li>通过url取得handler，例如/select就是使用SearchHandler</li>
+<li>handler抽象类里的handleRequest</li>
+<li>handler调用handleRequestBody开始处理请求，建立responseBuilder</li>
+<li>QueryComponent.prepare，设置returnFields，没有fl的情况下wantsAllFields，设置默认的LuceneQParser分析器，实例化SolrQueryParser</li>
+<li>QueryComponet.execute，取得关联的文档id，保存到resultCache</li>
+<li>writeResponse，如果id在DocumentCache里有就直接拿，否则通过reader去获得，再保存到DocumentCache</li>
+<li>输出结果到游览器</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[solr启动分析]]></title>
+    <link href="http://www.wanghd.com/blog/2012/08/28/solrqi-dong-fen-xi/"/>
+    <updated>2012-08-28T08:34:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/08/28/solrqi-dong-fen-xi</id>
+    <content type="html"><![CDATA[<h3>solr启动分析</h3>
+
+<p><img src="/images/post/solrstart.png" title="solr 启动分析" alt="solr 启动分析" /></p>
+
+<ol>
+<li>CoreContainer通过xpath加载solr.xml</li>
+<li>实例化CoreAdminHandler管理CoreContainer，提供reload,status等命令(status可以看到index-size)</li>
+<li>初始化CoreDescriptor，设置核心的配置文件、目录、属性文件</li>
+<li>读取solrconfig.xml，分析后设置到SolrConfig</li>
+<li>读取schema.xml，设置fieldTypes @FieldTypePluginLoader,fields @SchemaField,过滤器,分词器,主键</li>
+<li>构造SolrCore,设置数据目录和各种资源的初始化</li>
+<li>QuerySenderListener，默认2个事件firstSearcher和newSearcher</li>
+<li>IndexDeletionPolicy</li>
+<li>DefaultCodecFactory，4.0的功能，字段的编码器和解码器</li>
+<li>StandardDirectoryFactory，指向data/index/的Directory，用来生成Reader读取索引</li>
+<li>QueryResponseWriter，各种返回结果，例如json,xml</li>
+<li>QParserPlugin，请求分析插件,用以生成QParser，例如BoostQParserPlugin和DisMaxQParserPlugin等</li>
+<li>ValueSourceParser，初始化内置的函数，比如boost,abs,sin..等等</li>
+<li>SearchComponent，例如query,facet,mlt,stat,debug,get</li>
+<li>RequestHandlers，是根据url对应RequestHandler的映射</li>
+<li>DirectUpdateHandler2，commit数据的handler</li>
+<li>最后执行firstSearcher事件预热，注册第一个SolrIndexSearcher</li>
+</ol>
+
+
+<h3>solr package</h3>
+
+<ul>
+<li>org.apache.solr.analysis; 过滤器，分词器</li>
+<li>org.apache.solr.core; solr的核心包,例如CoreContainer,Config,SolrCore,SolrConfig,CachingDirectoryFactory,CoreDescriptor</li>
+<li>org.apache.solr.servlet; 与servlet有关,例如SolrDispatchFilter就属于该包</li>
+<li>org.apache.solr.handler; org.apache.solr.handler.component; 请求处理</li>
+<li>org.apache.solr.handler.admin; 处理用来管理的请求，例如CoreAdminHandler</li>
+<li>org.apache.solr.search; 与查询有关的类，例如缓存，查询分析，返回字段 SolrIndexSearcher</li>
+<li>org.apache.solr.schema; 字段类型，schema通知</li>
+<li>org.apache.solr.util.plugin; 为插件提供的一些工具，抽象和接口，例如AbstractPluginLoader</li>
+<li>org.apache.solr.util; 一些工具，例如FileUtils</li>
+<li>org.apache.solr.update; org.apache.solr.update.processor; 用来更新数据的，例如默认的DirectUpdateHandler2</li>
+<li>org.apache.solr.response;org.apache.solr.response.transform;用来返回数据(序列化,json,xml等数据)</li>
+<li>org.apache.solr.request; 请求相关的信息，例如SolrRequestInfo</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[线程池]]></title>
+    <link href="http://www.wanghd.com/blog/2012/08/16/xian-cheng-chi/"/>
+    <updated>2012-08-16T18:05:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/08/16/xian-cheng-chi</id>
+    <content type="html"><![CDATA[<h3>为什么要使用线程池</h3>
+
+<ul>
+<li>为大量而短小的任务创建线程和销毁线程开销过大</li>
+<li>线程池可以重复使用线程，避免额外的创建和销毁开销</li>
+<li>通过队列和意外处理避免资源不足</li>
+<li>灵活调整线程池内线程的数量</li>
+</ul>
+
+
+<h3>线程池基本配置</h3>
+
+<ul>
+<li>corePoolSize: 池中的核心线程数</li>
+<li>maximumPoolSize: 池中的最大线程数（当核心线程用尽，工作队列已满时，开始创建线程）</li>
+<li>keepAliveTime: 大于核心线程数时，干掉空闲线程的最长等待时间</li>
+<li>unit: keepAliveTime的单位，例如秒，毫秒</li>
+<li>workQueue: 工作队列，线程根据工作队列来创建新线程去完成任务</li>
+<li>threadFactory: 用来定义线程中的属性、名称、守护程序状态、ThreadGroup 等等</li>
+<li>handler: 由于超出线程范围和队列容量而使执行被阻塞时所使用的处理程序</li>
+</ul>
+
+
+<h4>默认的handler</h4>
+
+<ul>
+<li>ThreadPoolExecutor.AbortPolicy: 直接抛出RejectedExecutionException</li>
+<li>ThreadPoolExecutor.CallerRunsPolicy: 再次尝试</li>
+<li>ThreadPoolExecutor.DiscardOldestPolicy: 放弃最旧的未处理任务</li>
+<li>ThreadPoolExecutor.DiscardPolicy: 直接丢弃</li>
+</ul>
+
+
+<h3>线程池基本逻辑</h3>
+
+<ul>
+<li>当池小于corePoolSize就新建线程，并处理任务</li>
+<li>当池等于corePoolSize，把请求放入workQueue中，池里的空闲线程就去从workQueue中取任务并处理</li>
+<li>当workQueue放不下新入的任务时，新建线程处理任务，如果池撑到了maximumPoolSize就用handler来做拒绝处理</li>
+<li>当池中线程数大于corePoolSize的时候，多余的线程会等待keepAliveTime长的时间，如果无请求可处理就自行销毁</li>
+</ul>
+
+
+<!-- More -->
+
+
+<h3>线程池实例</h3>
+
+<ul>
+<li>线程处理的任务，我这里为取得随机数</li>
+</ul>
+
+
+<p>```java
+package wanghuida.test;</p>
+
+<p>public class MyThread implements Runnable {</p>
+
+<pre><code>@Override
+public void run() {
+    String name = Thread.currentThread().getName();
+    int number = (int)(Math.random() * 1000);
+    System.out.println("[" + name + "] random number is " + number);
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<ul>
+<li>线程工厂类，用来为线程赋予属性，我这里主要是定义线程名称</li>
+</ul>
+
+
+<p>```java
+package wanghuida.test;</p>
+
+<p>import java.util.concurrent.ThreadFactory;</p>
+
+<p>public class MyThreadFactory implements ThreadFactory {</p>
+
+<pre><code>private int n = 0;
+
+public MyThreadFactory() {
+    this.n = 0;
+}
+
+@Override
+public Thread newThread(Runnable r) {
+    n++;
+    Thread t = new Thread(r);
+    t.setName("thread-" + n);
+    t.setDaemon(false);
+    t.setPriority(Thread.NORM_PRIORITY);
+    return t;
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<ul>
+<li>构造线程池并处理任务</li>
+</ul>
+
+
+<p>```java
+package wanghuida.test;</p>
+
+<p>import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;</p>
+
+<p>public class ThreadPoolTest {</p>
+
+<pre><code>private ThreadPoolExecutor pool;
+
+public ThreadPoolTest(int core,int max,int queue) {
+    this.pool = new ThreadPoolExecutor(
+            core, //核心线程数
+            max, //最大线程数
+            5, TimeUnit.SECONDS, //超过核心线程数，等多少时间释放 
+            new ArrayBlockingQueue&lt;Runnable&gt;(queue), //任务队列
+            new MyThreadFactory(), //线程构造器
+            new ThreadPoolExecutor.AbortPolicy() //超出池的策略  
+    );
+}
+
+public void test(int times) {
+    for(int i = 0; i &lt; times; i++ ){
+        MyThread t = new MyThread();
+        this.pool.execute(t);
+    }
+
+    this.pool.shutdown();
+    boolean loop = true;
+    do {//等待所有任务完成     
+        try {
+            System.out.println("core pollsize is " + pool.getCorePoolSize() + ",poolsize is " + pool.getPoolSize());
+            loop = !this.pool.awaitTermination(2, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }  
+    } while(loop);  
+
+
+
+}
+
+public void test() {
+    this.test(10);
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<ul>
+<li>main主函数</li>
+</ul>
+
+
+<p>```java
+package wanghuida.test;</p>
+
+<p>public class Entry {</p>
+
+<pre><code>public static void main(String[] args) {
+    testThreadPool();
+}
+
+public static void testThreadPool() {
+    ThreadPoolTest test1 = new ThreadPoolTest(5,10,3);
+    test1.test();
+    System.out.println("\n");
+
+    ThreadPoolTest test2 = new ThreadPoolTest(2,4,3);
+    test2.test();
+    System.out.println("\n");
+
+    ThreadPoolTest test3 = new ThreadPoolTest(1,1,1);
+    test3.test();
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<ul>
+<li>输出结果和意图相符合</li>
+</ul>
+
+
+<p>```java
+[thread-1] random number is 52
+[thread-2] random number is 6
+[thread-3] random number is 477
+[thread-4] random number is 446
+[thread-5] random number is 845
+[thread-5] random number is 175
+[thread-5] random number is 920
+[thread-5] random number is 125
+[thread-6] random number is 580
+[thread-6] random number is 936
+core pollsize is 5,poolsize is 6</p>
+
+<p>[thread-1] random number is 433
+[thread-2] random number is 442
+[thread-1] random number is 957
+[thread-1] random number is 536
+[thread-3] random number is 337
+core pollsize is 2,poolsize is 4
+[thread-2] random number is 118
+[thread-2] random number is 819
+[thread-4] random number is 681
+[thread-3] random number is 480
+[thread-1] random number is 469</p>
+
+<p>[thread-1] random number is 287
+[thread-1] random number is 710
+Exception in thread "main" java.util.concurrent.RejectedExecutionException</p>
+
+<pre><code>at java.util.concurrent.ThreadPoolExecutor$AbortPolicy.rejectedExecution(ThreadPoolExecutor.java:1768)
+at java.util.concurrent.ThreadPoolExecutor.reject(ThreadPoolExecutor.java:767)
+at java.util.concurrent.ThreadPoolExecutor.execute(ThreadPoolExecutor.java:658)
+at wanghuida.test.ThreadPoolTest.test(ThreadPoolTest.java:25)
+at wanghuida.test.ThreadPoolTest.test(ThreadPoolTest.java:44)
+at wanghuida.test.Entry.testThreadPool(Entry.java:56)
+at wanghuida.test.Entry.main(Entry.java:22)
+</code></pre>
+
+<p>```</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[WeakHashMap作用和实例]]></title>
+    <link href="http://www.wanghd.com/blog/2012/08/01/weakhashmapzuo-yong-he-shi-li/"/>
+    <updated>2012-08-01T21:48:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/08/01/weakhashmapzuo-yong-he-shi-li</id>
+    <content type="html"><![CDATA[<h3>在这里先预想了解一下WeakHashMap，结合后面的例子应该会更好理解</h3>
+
+<ul>
+<li>当存放在WeakHashMap里的对象，没有其他引用和使用，那么在GC时会自动释放。</li>
+</ul>
+
+
+<h3>下面用实例来更好的理解</h3>
+
+<ul>
+<li>测试一下保持引用会不会被自动释放</li>
+</ul>
+
+
+<p>```java
+package wanghuida.test;</p>
+
+<p>import java.util.WeakHashMap;
+import java.util.Map;</p>
+
+<p>import java.util.List;
+import java.util.ArrayList;</p>
+
+<p>public class Entry {</p>
+
+<pre><code>/**
+ * @param args
+ */
+public static void main(String[] args) {
+    // TODO Auto-generated method stub
+    List&lt;String[]&gt; templist = new ArrayList&lt;String[]&gt;();  
+    //设的多一点，可以让GC真实发挥
+    for(int i=0; i &lt; 1000000; i++){
+        String[] tempstr = new String[2];
+        templist.add(tempstr);
+    }
+
+    Map&lt;String[], String[]&gt; map = new WeakHashMap&lt;String[], String[]&gt;();
+    for(int i=0; i &lt; 100; i++){
+        map.put(templist.get(i), new String[2]);
+        System.gc();
+        System.out.println(map.size());
+    }
+
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<!-- more -->
+
+
+<ul>
+<li>输出1，2，3，4。。。递增，OK没有问题，有一个引用，就不会释放</li>
+<li>再测试一下删除引用后的总数</li>
+</ul>
+
+
+<p>```java
+package wanghuida.test;</p>
+
+<p>import java.util.WeakHashMap;
+import java.util.Map;</p>
+
+<p>import java.util.List;
+import java.util.ArrayList;</p>
+
+<p>public class Entry {</p>
+
+<pre><code>public static void main(String[] args) {
+    List&lt;String[]&gt; templist = new ArrayList&lt;String[]&gt;();  
+    //设的多一点，可以让GC真实发挥
+    for(int i=0; i &lt; 1000; i++){
+        String[] tempstr = new String[2];
+        templist.add(tempstr);
+    }
+
+    Map&lt;String[], String[]&gt; map = new WeakHashMap&lt;String[], String[]&gt;();
+    for(int i=0; i &lt; 100; i++){
+        map.put(templist.get(i), new String[2]);
+        templist.set(i, null); //删除掉引用 
+        System.gc();
+        System.out.println(map.size());
+    }
+
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<ul>
+<li>输出0，1，0，1，1，1。。。保持下去，OK也没问题，删除引用后就会释放</li>
+<li>再测试一下有引用但没有使用的情况</li>
+</ul>
+
+
+<p>```java
+package wanghuida.test;</p>
+
+<p>import java.util.WeakHashMap;
+import java.util.Map;</p>
+
+<p>import java.util.List;
+import java.util.ArrayList;</p>
+
+<p>public class Entry {</p>
+
+<pre><code>public static void main(String[] args) {
+    List&lt;String[]&gt; templist = new ArrayList&lt;String[]&gt;();  
+    //新增一个引用
+    List&lt;String[]&gt; list = new ArrayList&lt;String[]&gt;();  
+    //设的多一点，可以让GC真实发挥
+    for(int i=0; i &lt; 1000000; i++){
+        String[] tempstr = new String[2];
+        templist.add(tempstr);
+        list.add(tempstr);
+    }
+
+    Map&lt;String[], String[]&gt; map = new WeakHashMap&lt;String[], String[]&gt;();
+    for(int i=0; i &lt; 100; i++){
+        map.put(templist.get(i), new String[2]);
+        templist.set(i, null); //删除掉引用 
+        System.gc();
+        System.out.println(map.size());
+    }
+
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<ul>
+<li>输出0，1，0，1，1，1。。。保持下去，OK也没问题，有引用但不使用也就会释放</li>
+<li>最后对比一下有使用的情况</li>
+</ul>
+
+
+<p>```java
+package wanghuida.test;</p>
+
+<p>import java.util.WeakHashMap;
+import java.util.Map;</p>
+
+<p>import java.util.List;
+import java.util.ArrayList;</p>
+
+<p>public class Entry {</p>
+
+<pre><code>public static void main(String[] args) {
+    List&lt;String[]&gt; templist = new ArrayList&lt;String[]&gt;();  
+    //新增一个引用
+    List&lt;String[]&gt; list = new ArrayList&lt;String[]&gt;();  
+    //设的多一点，可以让GC真实发挥
+    for(int i=0; i &lt; 1000000; i++){
+        String[] tempstr = new String[2];
+        templist.add(tempstr);
+        list.add(tempstr);
+    }
+
+    Map&lt;String[], String[]&gt; map = new WeakHashMap&lt;String[], String[]&gt;();
+    for(int i=0; i &lt; 100; i++){
+        map.put(templist.get(i), new String[2]);
+        templist.set(i, null); //删除掉引用 
+        System.gc();
+        System.out.println(map.size());
+    }
+
+    System.out.println(list.size());
+
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<ul>
+<li>输出1，2，3，4。。。递增，OK了，希望对大家会有帮助</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[java volatile理解]]></title>
+    <link href="http://www.wanghd.com/blog/2012/07/27/java-volatileli-jie/"/>
+    <updated>2012-07-27T21:55:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/07/27/java-volatileli-jie</id>
+    <content type="html"><![CDATA[<h3>volatile的含义其实很好理解，希望配合图可以更加清晰的解释</h3>
+
+<p><img src="/images/post/volatile.jpg" title="volatile 图例说明" alt="volatile" /></p>
+
+<ul>
+<li>多个线程加载同一个对象时，会从主内存复制一个副本到线程工作内存</li>
+<li>如果对象没有volatile属性，只有write操作才会让主内存的对象得到修改（其他线程这时才有可能拿到最新的结果）</li>
+<li>如果对象有volatile属性，load,use,asign,store都会拿到实时的结果（因为会一直同步更新结果）</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>

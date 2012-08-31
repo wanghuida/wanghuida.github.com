@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Javascript | $huida =~ s/blog/site/g]]></title>
+  <link href="http://www.wanghd.com/blog/categories/javascript/atom.xml" rel="self"/>
+  <link href="http://www.wanghd.com/"/>
+  <updated>2012-08-31T16:08:59+08:00</updated>
+  <id>http://www.wanghd.com/</id>
+  <author>
+    <name><![CDATA[王惠达 huida wanghuida]]></name>
+    <email><![CDATA[wanghuida258@126.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[js面向对象实例]]></title>
+    <link href="http://www.wanghd.com/blog/2012/08/24/jsmian-xiang-dui-xiang-shi-li/"/>
+    <updated>2012-08-24T17:57:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/08/24/jsmian-xiang-dui-xiang-shi-li</id>
+    <content type="html"><![CDATA[<p>```javascript
+(function(window){</p>
+
+<p>var staff = function(name,phone){</p>
+
+<pre><code>return new staff.fn.init(name,phone);
+</code></pre>
+
+<p>};
+staff.fn = staff.prototype = {</p>
+
+<pre><code>//静态变量
+company: '安居客',
+//构造函数
+init: function(name,phone){
+    //私有变量
+    var cellphone = phone;
+    //公共变量
+    this.username = name;
+    //公共方法
+    this.getPhone = function() { 
+        return cellphone; 
+    }
+    this.setPhone = function(phone) {
+        cellphone = phone;
+        _test_private_function();
+        return this;
+    }
+    //私有方法
+    var _test_private_function = function() {
+        console.log('private function:' + cellphone);
+    }
+},
+//公共方法
+setName: function(name){
+    this.username = name;
+    return this;
+},
+setCompany: function(c_name){
+    staff.fn.company = c_name;
+    return this;
+}
+</code></pre>
+
+<p>};
+staff.fn.init.prototype = staff.fn;
+//公共方法
+staff.fn.getName = function() {</p>
+
+<pre><code>return this.username;
+</code></pre>
+
+<p>}
+staff.fn.getCompany = function() {</p>
+
+<pre><code>return staff.fn.company;
+</code></pre>
+
+<p>}
+window.s = staff;
+})(window);</p>
+
+<p>var staff1 = s('王惠达1','11111111');
+var staff2 = s('王惠达2','22222222');
+//test static argument
+console.log('s1:' + staff1.setCompany('瑞庭').getCompany());
+console.log('s2:' + staff2.getCompany());
+//test public argument
+console.log('s1:' + staff1.setName('王惠达').getName());
+console.log('s2:' + staff2.getName());
+//test private argument
+console.log('s1:' + staff1.setPhone('13712345678').getPhone());
+console.log('s2:' + staff2.getPhone());
+//报错：console.log('s2:' + staff2.cellphone);
+```</p>
+]]></content>
+  </entry>
+  
+</feed>
