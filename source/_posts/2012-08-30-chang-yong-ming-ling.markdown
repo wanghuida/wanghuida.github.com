@@ -13,8 +13,9 @@ categories: [Share]
 + -l自动chomp，结果加$/
 + -a自动分割
 
-```shell
-tail -f access-2012-08-30.log | grep -v '*' | perl -w -lane '$a = $F[@F-1];print if $a > 50000 '
+```bash
+tail -f access-2012-08-30.log | grep -v '*' \ 
+    | perl -w -lane '$a = $F[@F-1];print if $a > 50000 '
 ```
 
 
