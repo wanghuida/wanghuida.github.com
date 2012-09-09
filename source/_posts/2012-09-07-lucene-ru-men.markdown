@@ -8,6 +8,11 @@ footer: true
 categories: [Solr, Java]
 ---
 
+###官方DEMO
+
++ [IndexFiles](http://lucene.apache.org/core/4_0_0-BETA/demo/src-html/org/apache/lucene/demo/IndexFiles.html)
++ [SearchFiles](http://lucene.apache.org/core/4_0_0-BETA/demo/src-html/org/apache/lucene/demo/SearchFiles.html) 
+
 ###IndexFiles
 
 + 在main()方法里分析命令行，然后初始化IndexWriter,打开Directory,初始化StandaryAnalyzer和IndexWriterConfig
