@@ -3,7 +3,7 @@ layout: post
 title: "octopress 介绍"
 date: 2012-07-07 03:10
 comments: true
-categories: [octopress]
+categories: [Share]
 ---
 
 
