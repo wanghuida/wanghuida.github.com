@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "MogileFS启动流程"
-date: 2011-07-03 5:59
+title: "solr慢查询分析"
+date: 2012-09-14 13:35
 comments: true
 sharing: true
 footer: true
@@ -33,7 +33,7 @@ INFO: [] webapp=/solr path=/select params={mm=2&fl=score,*&sort=score+desc,queti
 ```
 ###解决方案
 + dismax的mm=2间接使用了OR，建议用AND提高性能【实验中:我想用docfreq来做判断用AND还是OR】
-+ 【StopWord】通过solr/admin/luke?fl=normalanswerstr&numTerms=100分析term,过滤掉没有意义的term,例如
++ StopWord:通过solr/admin/luke?fl=normalanswerstr&numTerms=100分析term,过滤掉没有意义的term,例如
 
 ```
 <int name="的">965396</int>
@@ -55,4 +55,4 @@ INFO: [] webapp=/solr path=/select params={mm=2&fl=score,*&sort=score+desc,queti
 <int name="能">233510</int>
 ```
 
-+ title\^5+tags\^1+bestanswerstr\^2+description\^1+normalanswerstr\^1，权重相同的放入同一个字段，也可以用CopyField，可以多加个系数
++ 权重相同的放入同一个字段，也可以用CopyField，可以多加个系数
