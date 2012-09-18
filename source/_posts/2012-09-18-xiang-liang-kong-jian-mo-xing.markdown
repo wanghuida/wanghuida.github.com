@@ -27,7 +27,7 @@ categories: [Java, Solr, Share]
 ![vsm公式](/images/post/vsm.png "vsm公式")
 
 ```
-sim(d1,d2) = ∑(ai*b1) / √(∑a1^2 * ∑a2^2)
+sim(d1,d2) = ∑(ai*bi) / √(∑ai^2 * ∑bi^2)
            = 1*2+0*3+1*2+0*1 / √((1^2+0^2+1^2+0^2)*(2^2+3^2+2^2+1^2))
            = 4 / √(36)
            = 4 / 6
