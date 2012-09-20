@@ -3,11 +3,11 @@
 # ----------------------- #
 
 url: http://www.wanghd.com
-title: "$huida =~ s/blog/site/g"
+title: "惠达的小宅"
 subtitle: "A love-vim engineer." 
 author: 王惠达 huida wanghuida 
 simple_search: http://google.com/search
-description: 王惠达博客 IT技术 php perl python java c ruby wanghuida blog
+description: 王惠达博客 IT技术 php perl python java c ruby wanghuida blog lucene mogilefs
 
 # Default date format is "ordinal" (resulting in "July 22nd 2007")
 # You can customize the format as defined in
@@ -47,7 +47,7 @@ titlecase: true       # Converts page and post titles to titlecase
 # list each of the sidebar modules you want to include, in the order you want them to appear.
 # To add custom asides, create files in /source/_includes/custom/asides/ and add them to the list like 'custom/asides/custom_aside_name.html'
 #default_asides: [asides/recent_posts.html,asides/weibo.html, asides/github.html, asides/twitter.html, asides/delicious.html, asides/pinboard.html, asides/googleplus.html]
-default_asides: [asides/taobo_rank.html,asides/category_list.html,asides/recent_posts.html,asides/weibo.html]
+default_asides: [asides/taobo_rank.html,asides/category_list.html,asides/recent_posts.html,asides/weibo.html,asides/links.html]
 
 # Each layout uses the default asides, but they can have their own asides instead. Simply uncomment the lines below
 # and add an array with the asides you want to use.
