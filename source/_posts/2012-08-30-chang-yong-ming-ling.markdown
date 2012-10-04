@@ -37,3 +37,11 @@ find /dev/shm/ -type f -mtime +1 | xargs rm
 su -
 netstat -lant | wc -l
 ```
+
+
+###增加网关
++ mac版
+
+```
+sudo route add -net 10.0.0.0/8 -interface ppp0
+```
