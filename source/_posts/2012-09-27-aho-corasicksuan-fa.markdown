@@ -58,7 +58,7 @@ print Dumper(\%total); #打印结果
 + 设置其余的不匹配转移节点
 + 初始化状态到根节点
 
-```
+```perl
 sub _build_tree {
     my $self = shift;
 
@@ -136,7 +136,7 @@ sub _build_tree {
 
 ###查找过程
 
-```
+```perl
 sub feed {
     my ($self, $text, $callback) = @_;
 
