@@ -19,6 +19,8 @@ categories: [Java, Solr]
 + 重启solr，设置启动参数
 + 扩展选项请参考[官方文档](http://www.oracle.com/technetwork/java/javase/tech/vmoptions-jsp-140102.html)
 
+<!-- more -->
+
 ```
 java -Xmx256M -Xms256M -XX:PermSize=64M -XX:MaxPermSize=64M 
 -XX:+UseParallelGC 
@@ -35,7 +37,7 @@ java -Xmx256M -Xms256M -XX:PermSize=64M -XX:MaxPermSize=64M
 jconsole 127.0.0.1:3000 （jconsole在jdk的bin目录里）
 ```
 
-###实时java堆使用情况
+###实时java堆内存使用情况
 
 ![heap](/images/post/heap.png "heap")
 
@@ -43,5 +45,5 @@ jconsole 127.0.0.1:3000 （jconsole在jdk的bin目录里）
 
 ![cpu](/images/post/cpu.png "cpu")
 
-###MBean分析
-####documentCache文档缓存
+###MBean分析缓存命中率
+![documentcache](/images/post/documentcache.png "documentcache")
