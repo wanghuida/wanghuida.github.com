@@ -2,6 +2,7 @@
 layout: post
 title: "IRC:irssi使用教程"
 date: 2012-10-13 23:39
+comments: true
 sharing: true
 footer: true
 categories: [Share]
