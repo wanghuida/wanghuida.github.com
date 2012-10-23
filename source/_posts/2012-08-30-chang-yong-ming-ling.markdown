@@ -56,6 +56,7 @@ sudo route add -net 10.0.0.0/8 -interface ppp0
 /sbin/mkfs.xfs /dev/sdb
 mount –t xfs /dev/sdb /data1
 vim /etc/fstab
+umount -l /tmp/
 ```
 
 ###导出数据
@@ -67,4 +68,13 @@ vim /etc/fstab
 
 ```bash
 mysql -h -u -p -Ns -Ddatabase -e "select * from ~~~ where ~~~" > /tmp/fid
+```
+
+
+###取得数据
+
+```bash
+sftp
+scp
+rsync
 ```
