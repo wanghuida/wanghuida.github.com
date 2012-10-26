@@ -12,7 +12,7 @@ categories: [Mogilefs, Perl]
 
 实例化MogileFS::Server并运行
 ---------------
-```
+```perl
 my $server; # server singleton
 sub server {
     my ($pkg) = @_; 
@@ -25,7 +25,7 @@ $server->run();
 ---------------
 >优先级，命令行>配置文件>默认配置
 
-```
+```perl
 MogileFS::Config->load_config;
 ```
 

@@ -12,7 +12,7 @@ categories: [Mogilefs, Perl]
 --------------------
 >定义好domain和key就能获取文件内容
 
-```
+```perl
 #!/usr/bin/perl
 
 use strict;

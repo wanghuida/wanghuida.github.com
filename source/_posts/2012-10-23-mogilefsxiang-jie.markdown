@@ -11,8 +11,10 @@ categories: [Mogilefs, Perl]
 + 经过一个月的实际应用，我想是时候应该总结一下mogilefs的使用了，如果想和作者交流参考[IRC教程](/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/)
 
 ###MogileFS简介
-#####MogileFS是一个开源的分布式文件系统，配合cdn和squid，性能非常好(15亿文件没问题，其他数据不方便透露)
-#####他由下面几个部分组成:
+
+> MogileFS是一个`开源`的`分布式文件系统`，配合cdn和squid，性能非常好(`15亿`文件没问题，其他数据不方便透露)
+
+> 他由下面几个部分组成:
 
 ![mogilefs-summary](/images/post/mogilefs-summary.jpg "mogilefs-summary")
 
@@ -27,10 +29,13 @@ categories: [Mogilefs, Perl]
 <!-- more -->
 
 
-###mogstored
-#####监控磁盘状态和文件的实际存储,启动mogstored会发现包含2个端口，默认的7501和7500
-#####7501用来监控磁盘状态
-#####7500用来处理实际的文件存储
+###Mogstored
+
+> 监控磁盘状态和文件的实际存储,启动mogstored会发现包含2个端口，默认的7501和7500
+
+>> 7501用来监控磁盘状态
+
+>> 7500用来处理实际的文件存储
 
 ![mogilefs-mogstored](/images/post/mogilefs-mogstored.jpg "mogilefs-mogstored")
 
@@ -44,10 +49,10 @@ categories: [Mogilefs, Perl]
 
 
 
-###mogilefsd
-#####主进程负责接受请求，分配任务给query执行,下面详细介绍一下他的子进程
+###Mogilefsd
 
-![mogilefs-mogilefsd](/images/post/mogilefs-mogilefsd.jpg "mogilefs-mogilefsd")
+> 主进程负责接受请求，分配任务给query执行,下面详细介绍一下他的子进程
+
 
 1. query：处理主进程分配的请求，包括util和tool的指令 
 1. delete：根据删除队列对文件进行删除操作
@@ -66,8 +71,9 @@ categories: [Mogilefs, Perl]
 
 
 
-###memcache
-#####用来缓存查询结果，降低db压力，query内部存放*key对应的fid*和*fid对应的设备*
+###Memcache
+
+> 用来缓存查询结果，降低db压力，query内部存放`key对应的fid`和`fid对应的设备`
 
 ####问题总结
 + db压力下不来的原因是客户端取得文件时没有设置noverify参数，如果确定要使用memcache就一定要设置noverify，否则不使用memcache
@@ -76,8 +82,9 @@ categories: [Mogilefs, Perl]
 
 
 
-###mysql
-#####用来存储记录，当然也可以使用其他数据库
+###Mysql
+
+> 用来存储记录，当然也可以使用其他数据库
 
 1. host表：存储主机信息
 1. device表：存储设备，一般单个device对应一块磁盘，也可以不这样
@@ -107,7 +114,7 @@ select * from file_on where devid = ? and fid > ? order by fid asc limit 100
 
 
 
-###utilities
+###Utilities
 
 1. mogadm：该工具直接管理mogilefs的主机、设备、域、类、从数据库、配置、fsck、rebalance
 1. mogstat：观察fsck,rebalance,replication,delete运行状况
@@ -122,15 +129,15 @@ select * from file_on where devid = ? and fid > ? order by fid asc limit 100
 
 
 
-###telnet
+###Telnet
 
 1. !version：显示mogilefs版本
 1. !recent：显示当前query执行时间（可做监控）
 1. !queue：显示等待执行的查询（可做监控）
 1. !stats：从tracker启动开始就记录的一些累加信息和实时信息，比如处理请求的总数、job队列当前记录数、当前等待执行的请求的个数等
-1. !watch：显示警告和错误信息（可做监控）
+1. !watch：显示`警告`和`错误`信息（可做监控）
 1. !jobs：显示当前各个job的个数
-1. !want：动态调整job个数
+1. !want：`动态调整`job个数
 1. !to：不常用，向子进程发送消息，用来调试的
 1. !shutdown：关闭所有mogilefsd进程
 
