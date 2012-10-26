@@ -1,0 +1,1408 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>惠达的小宅</title>
+  <meta name="author" content="王惠达 huida wanghuida">
+
+  
+  <meta name="description" content="问题：solr查询q=date:[1348233109 TO *]，QTime=300-500毫秒，范围越大越耗时 要点：lucene内部不存储数值，而用多个字符串代替 我的疑问：为什么不用数值呀，存储空间少，效率又高? 琢磨了下应该有如下原因吧 lucene索引的倒排表都是根据字符串排序的， &hellip;">
+  
+
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name='AD51_verify' content='37c113da1db8f547501c3ab9d5a33c41'>
+
+  
+  <link rel="canonical" href="http://www.wanghd.com/blog/page/2/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="惠达的小宅" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-35556528-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">惠达的小宅</a></h1>
+  
+    <h2>A love-vim engineer.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.wanghd.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a target="_blank" href="http://www.taobao.com/go/chn/tbk_channel/channelcode.php?pid=mm_32662861_3310667_10778125&eventid=101329">Market</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/09/21/solrde-shu-zhi-cun-chu-he-fan-wei-cha-xun/">Solr的数值存储和范围查询</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-09-21T20:49:00+08:00" pubdate data-updated="true">Sep 21<span>st</span>, 2012</time>
+        
+         | <a href="/blog/2012/09/21/solrde-shu-zhi-cun-chu-he-fan-wei-cha-xun/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>问题：solr查询q=date:[1348233109 TO *]，QTime=300-500毫秒，范围越大越耗时</h3>
+
+<h3>要点：lucene内部不存储数值，而用多个字符串代替</h3>
+
+<h4>我的疑问：为什么不用数值呀，存储空间少，效率又高? 琢磨了下应该有如下原因吧</h4>
+
+<ul>
+<li>lucene索引的倒排表都是根据字符串排序的，要存储数值看来得另起一套索引</li>
+<li>如果存储数值，查询的排序也不能正常运作了，比如10比2排在前面</li>
+<li>查询12,是准确匹配12能还是能匹配123</li>
+<li>数字问题越来越复杂，基本上串模式在数字上根本行不通，如果数值也是串，那问题就简单多了,和一般的词没两样</li>
+</ul>
+
+
+<h3>lucene测试程序</h3>
+
+<ul>
+<li>添加id为695和705的两个文档，搜索id区域698到2054</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">,</span> <span class="n">ParseException</span><span class="o">{</span>
+</span><span class='line'>    <span class="n">Directory</span> <span class="n">dir</span> <span class="o">=</span> <span class="n">FSDirectory</span><span class="o">.</span><span class="na">open</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="s">&quot;/tmp/tempindex&quot;</span><span class="o">));</span>
+</span><span class='line'>    <span class="n">Analyzer</span> <span class="n">analyzer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StandardAnalyzer</span><span class="o">(</span><span class="n">Version</span><span class="o">.</span><span class="na">LUCENE_40</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">IndexWriterConfig</span> <span class="n">iwc</span> <span class="o">=</span> <span class="k">new</span> <span class="n">IndexWriterConfig</span><span class="o">(</span><span class="n">Version</span><span class="o">.</span><span class="na">LUCENE_40</span><span class="o">,</span> <span class="n">analyzer</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">iwc</span><span class="o">.</span><span class="na">setOpenMode</span><span class="o">(</span><span class="n">OpenMode</span><span class="o">.</span><span class="na">CREATE</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">IndexWriter</span> <span class="n">writer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">IndexWriter</span><span class="o">(</span><span class="n">dir</span><span class="o">,</span> <span class="n">iwc</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">Document</span> <span class="n">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Document</span><span class="o">();</span>
+</span><span class='line'>    <span class="n">doc</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">LongField</span><span class="o">(</span><span class="s">&quot;id&quot;</span><span class="o">,</span><span class="mi">695</span><span class="o">,</span><span class="n">Store</span><span class="o">.</span><span class="na">YES</span><span class="o">));</span>
+</span><span class='line'>    <span class="n">writer</span><span class="o">.</span><span class="na">addDocument</span><span class="o">(</span><span class="n">doc</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Document</span><span class="o">();</span>
+</span><span class='line'>    <span class="n">doc</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">LongField</span><span class="o">(</span><span class="s">&quot;id&quot;</span><span class="o">,</span><span class="mi">705</span><span class="o">,</span><span class="n">Store</span><span class="o">.</span><span class="na">YES</span><span class="o">));</span>
+</span><span class='line'>    <span class="n">writer</span><span class="o">.</span><span class="na">addDocument</span><span class="o">(</span><span class="n">doc</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">writer</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">DirectoryReader</span> <span class="n">reader</span> <span class="o">=</span> <span class="n">DirectoryReader</span><span class="o">.</span><span class="na">open</span><span class="o">(</span><span class="n">dir</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">IndexSearcher</span> <span class="n">searcher</span> <span class="o">=</span> <span class="k">new</span> <span class="n">IndexSearcher</span><span class="o">(</span><span class="n">reader</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">Query</span> <span class="n">q</span> <span class="o">=</span> <span class="n">NumericRangeQuery</span><span class="o">.</span><span class="na">newLongRange</span><span class="o">(</span><span class="s">&quot;id&quot;</span><span class="o">,</span> <span class="mi">698L</span><span class="o">,</span> <span class="mi">2054L</span><span class="o">,</span> <span class="kc">true</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">ScoreDoc</span><span class="o">[]</span> <span class="n">hits</span> <span class="o">=</span> <span class="n">searcher</span><span class="o">.</span><span class="na">search</span><span class="o">(</span><span class="n">q</span><span class="o">,</span> <span class="mi">200</span><span class="o">).</span><span class="na">scoreDocs</span><span class="o">;</span>
+</span><span class='line'>    <span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">hits</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++){</span>
+</span><span class='line'>      <span class="n">Document</span> <span class="n">result</span> <span class="o">=</span> <span class="n">searcher</span><span class="o">.</span><span class="na">doc</span><span class="o">(</span><span class="n">hits</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">doc</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">IndexableField</span> <span class="n">id</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="na">getField</span><span class="o">(</span><span class="s">&quot;id&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">&quot;doc:%s,id:%s&quot;</span><span class="o">,</span> <span class="n">hits</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">doc</span><span class="o">,</span> <span class="n">id</span><span class="o">.</span><span class="na">numericValue</span><span class="o">().</span><span class="na">longValue</span><span class="o">()));</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="n">reader</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+</span><span class='line'>    <span class="n">dir</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>调试监测建立索引时，695和705生成的多个字符串</h3>
+
+<ul>
+<li>断点设在NumericUtils.java的longToPrefixCoded方法内</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'>      <span class="mi">695</span>                         <span class="mi">705</span>
+</span><span class='line'><span class="o">[</span><span class="mi">20</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">5</span> <span class="mi">37</span><span class="o">]</span>   <span class="o">[</span><span class="mi">20</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">5</span> <span class="mi">41</span><span class="o">]</span> <span class="mh">0x20</span><span class="err">代表</span><span class="kt">long</span><span class="o">,</span><span class="err">低字节放到</span><span class="n">bytes</span><span class="err">高索引位</span>
+</span><span class='line'><span class="o">[</span><span class="mi">24</span> <span class="mi">8</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">2</span><span class="n">b</span><span class="o">]</span>     <span class="o">[</span><span class="mi">24</span> <span class="mi">8</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">2</span><span class="n">c</span><span class="o">]</span>   <span class="err">每</span><span class="mi">7</span><span class="err">位代表一个字符</span>
+</span><span class='line'><span class="o">[</span><span class="mi">28</span> <span class="mi">40</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">2</span><span class="o">]</span>       <span class="o">[</span><span class="mi">28</span> <span class="mi">40</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">2</span><span class="o">]</span>     <span class="err">每次循环右移</span><span class="n">precisionStep</span><span class="o">=</span><span class="mi">4</span>
+</span><span class='line'><span class="o">[</span><span class="mi">2</span><span class="n">c</span> <span class="mi">4</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>        <span class="o">[</span><span class="mi">2</span><span class="n">c</span> <span class="mi">4</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>
+</span><span class='line'><span class="o">[</span><span class="mi">30</span> <span class="mi">20</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>         <span class="o">[</span><span class="mi">30</span> <span class="mi">20</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>
+</span><span class='line'><span class="o">[</span><span class="mi">34</span> <span class="mi">2</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>          <span class="o">[</span><span class="mi">34</span> <span class="mi">2</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>
+</span><span class='line'><span class="o">[</span><span class="mi">38</span> <span class="mi">10</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>           <span class="o">[</span><span class="mi">38</span> <span class="mi">10</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>
+</span><span class='line'><span class="o">[</span><span class="mi">3</span><span class="n">c</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>            <span class="o">[</span><span class="mi">3</span><span class="n">c</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>
+</span><span class='line'><span class="o">[</span><span class="mi">40</span> <span class="mi">8</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>              <span class="o">[</span><span class="mi">40</span> <span class="mi">8</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>
+</span><span class='line'><span class="o">[</span><span class="mi">44</span> <span class="mi">40</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>               <span class="o">[</span><span class="mi">44</span> <span class="mi">40</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>
+</span><span class='line'><span class="o">[</span><span class="mi">48</span> <span class="mi">4</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>                <span class="o">[</span><span class="mi">48</span> <span class="mi">4</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>
+</span><span class='line'><span class="o">[</span><span class="mi">4</span><span class="n">c</span> <span class="mi">20</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>                 <span class="o">[</span><span class="mi">4</span><span class="n">c</span> <span class="mi">20</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>
+</span><span class='line'><span class="o">[</span><span class="mi">50</span> <span class="mi">2</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>                  <span class="o">[</span><span class="mi">50</span> <span class="mi">2</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>
+</span><span class='line'><span class="o">[</span><span class="mi">54</span> <span class="mi">10</span> <span class="mi">0</span><span class="o">]</span>                   <span class="o">[</span><span class="mi">54</span> <span class="mi">10</span> <span class="mi">0</span><span class="o">]</span>
+</span><span class='line'><span class="o">[</span><span class="mi">58</span> <span class="mi">1</span> <span class="mi">0</span><span class="o">]</span>                    <span class="o">[</span><span class="mi">58</span> <span class="mi">1</span> <span class="mi">0</span><span class="o">]</span>
+</span><span class='line'><span class="o">[</span><span class="mi">5</span><span class="n">c</span> <span class="mi">8</span><span class="o">]</span>                      <span class="o">[</span><span class="mi">5</span><span class="n">c</span> <span class="mi">8</span><span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>698-2057的区域转化</h3>
+
+<ul>
+<li>断点设在NumericUtils.java的longToPrefixCoded方法内</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="mi">698</span><span class="o">:</span> <span class="o">[</span><span class="mi">20</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">5</span> <span class="mi">3</span><span class="n">a</span><span class="o">]</span>  <span class="mi">703</span><span class="o">:</span> <span class="o">[</span><span class="mi">20</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">5</span> <span class="mi">3</span><span class="n">f</span><span class="o">]</span>
+</span><span class='line'><span class="mi">704</span><span class="o">:</span> <span class="o">[</span><span class="mi">24</span> <span class="mi">8</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">2</span><span class="n">c</span><span class="o">]</span>    <span class="mi">767</span><span class="o">:</span> <span class="o">[</span><span class="mi">24</span> <span class="mi">8</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">2</span><span class="n">f</span><span class="o">]</span>
+</span><span class='line'><span class="mi">768</span><span class="o">:</span> <span class="o">[</span><span class="mi">28</span> <span class="mi">40</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">3</span><span class="o">]</span>      <span class="mi">2047</span><span class="o">:[</span><span class="mi">28</span> <span class="mi">40</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">7</span><span class="o">]</span>
+</span><span class='line'><span class="mi">2048</span><span class="o">:[</span><span class="mi">20</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">10</span> <span class="mi">0</span><span class="o">]</span>  <span class="mi">2054</span><span class="o">:[</span><span class="mi">20</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">10</span> <span class="mi">6</span><span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>precisionStep使用默认的4</li>
+<li>703的生成方法是对698的右边4位和二进制“1111”做或运算</li>
+<li>704的生成方法是在703的基础上加1,那么右边四位全0，右移4位</li>
+<li>767的生成方法是对704的右边4位和二进制“1111”做或运算（其实只要前缀匹配，后面已经无所谓了）</li>
+<li>后面的数字生成方法一样</li>
+</ul>
+
+
+<h3>查询索引比较</h3>
+
+<ul>
+<li>大于等于698,小于等于703的没有</li>
+<li>大于等于704,小于等于767的有，705的第二条记录</li>
+<li>大于等于768,小于等于2047的没有</li>
+<li>大于等于2048,小于等于2054的没有</li>
+</ul>
+
+
+<h3>结论：要提高效率的方法</h3>
+
+<ul>
+<li>调整precisionStep,默认为4，调大索引小性能差，调小索引大性能理论上的好,精度高，见下图</li>
+</ul>
+
+
+<p><img src="/images/post/rangequery.gif" title="rangequery" alt="rangequery" /></p>
+
+<ul>
+<li>如果int够用，可以不用Long用Int</li>
+<li>缩小范围，这是最直接最管用的方法，（优化业务需求）</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/09/20/shi-yong-jmxfen-xi-solrzhuang-tai/">使用JMX分析solr状态</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-09-20T14:25:00+08:00" pubdate data-updated="true">Sep 20<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/09/20/shi-yong-jmxfen-xi-solrzhuang-tai/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>开启JMX</h3>
+
+<ul>
+<li>在solrconfig.xml中添加,默认包含</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;jmx /&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>重启solr，设置启动参数</li>
+<li>扩展选项请参考<a href="http://www.oracle.com/technetwork/java/javase/tech/vmoptions-jsp-140102.html">官方文档</a></li>
+</ul>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/09/20/shi-yong-jmxfen-xi-solrzhuang-tai/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/09/18/xiang-liang-kong-jian-mo-xing/">向量空间模型</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-09-18T08:28:00+08:00" pubdate data-updated="true">Sep 18<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/09/18/xiang-liang-kong-jian-mo-xing/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>向量空间模型广泛使用在文档相似度（算score等等），下面举例描述这个模型：</h3>
+
+<ul>
+<li>假设有两个文档（可以把一个query想象成一个文档）,分别为d1,d2</li>
+<li>假设w1,w2,w3,w4为term</li>
+<li>下图为词频（词频就是在单个文档中出现的次数）,词频为ai,bi</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>-----------------------------------
+</span><span class='line'>      |  w1  |  w2  |  w3  |  w4  |
+</span><span class='line'>  d1  |  1   |      |  1   |      |
+</span><span class='line'>  d2  |  2   |  3   |  2   |  1   |
+</span><span class='line'>-----------------------------------</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>比较夹角公式，越接近越相似,(还需要向量的模公式,|x| = √x<sup>2)</sup></li>
+</ul>
+
+
+<p><img src="/images/post/vsm.png" title="vsm公式" alt="vsm公式" /></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sim(d1,d2) = ∑(ai*bi) / √(∑ai^2 * ∑bi^2)
+</span><span class='line'>           = 1*2+0*3+1*2+0*1 / √((1^2+0^2+1^2+0^2)*(2^2+3^2+2^2+1^2))
+</span><span class='line'>           = 4 / √(36)
+</span><span class='line'>           = 4 / 6
+</span><span class='line'>           = 2 / 3
+</span><span class='line'>           = 0.66666...</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>假设文章只有两维的话，那么空间图就可以画在一个平面直角坐标系当中，读者可以假想两篇只有两个词的文章画图进行理解。</li>
+<li>由公式可以看出计算量是很大的，要提高效率最好的方法就是减少term，俗称降纬</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/09/14/solrman-cha-xun-fen-xi/">Solr慢查询分析</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-09-14T13:35:00+08:00" pubdate data-updated="true">Sep 14<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/09/14/solrman-cha-xun-fen-xi/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>solr慢请求分析,第一种</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=560950&q=*:*&wt=json&rows=50} hits=863948 status=0 QTime=2752
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=756250&q=*:*&wt=json&rows=50} hits=863935 status=0 QTime=2472 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=315450&q=*:*&wt=json&rows=50} hits=863935 status=0 QTime=1183 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=557400&q=*:*&wt=json&rows=50} hits=863935 status=0 QTime=2020 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=315550&q=*:*&wt=json&rows=50} hits=863935 status=0 QTime=1061 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=756400&q=*:*&wt=json&rows=50} hits=863935 status=0 QTime=2252 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=315650&q=*:*&wt=json&rows=50} hits=863938 status=0 QTime=1068 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=557500&q=*:*&wt=json&rows=50} hits=863938 status=0 QTime=2012 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=557550&q=*:*&wt=json&rows=50} hits=863938 status=0 QTime=2248 </span></code></pre></td></tr></table></div></figure>
+
+
+<h3>解决方案</h3>
+
+<ul>
+<li>请排除以上查询语句【或限制start】</li>
+</ul>
+
+
+<h3>solr慢请求分析,第二种</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>INFO: [] webapp=/solr path=/select params={mm=2&fl=score,*&sort=score+desc,quetime+desc&start=0&q=贷款+房子+能+不+买&bf=linear(rankscore,29.3246184,0)&qf=title^5+tags^1+bestanswerstr^2+description^1+normalanswerstr^1&wt=json&qt=dismax&fq=-cityid:14&fq=questatus:1+OR+questatus:2+OR+questatus:3+OR+questatus:6&rows=1} hits=317500 status=0 QTime=520 
+</span><span class='line'>INFO: [] webapp=/solr path=/select params={mm=2&fl=score,*&sort=score+desc,quetime+desc&start=0&q=集体+户口+好+好+不&qf=title^5+tags^1+bestanswerstr^2+description^1+normalanswerstr^1&wt=json&qt=dismax&fq=-cityid:12&fq=questatus:1+OR+questatus:2+OR+questatus:3+OR+questatus:6&rows=1} hits=287285 status=0 QTime=622 </span></code></pre></td></tr></table></div></figure>
+
+
+<h3>解决方案</h3>
+
+<ul>
+<li>dismax的mm=2间接使用了OR，建议用AND提高性能【实验中:我想用docfreq来做判断用AND还是OR】</li>
+<li>StopWord:通过solr/admin/luke?fl=normalanswerstr&amp;numTerms=100分析term,过滤掉没有意义的term,例如</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;int name="的"&gt;965396&lt;/int&gt;
+</span><span class='line'>&lt;int name="，"&gt;947429&lt;/int&gt;
+</span><span class='line'>&lt;int name="是"&gt;729063&lt;/int&gt;
+</span><span class='line'>&lt;int name="。"&gt;707417&lt;/int&gt;
+</span><span class='line'>&lt;int name="不"&gt;571925&lt;/int&gt;
+</span><span class='line'>&lt;int name="你"&gt;534142&lt;/int&gt;
+</span><span class='line'>&lt;int name="可以"&gt;525645&lt;/int&gt;
+</span><span class='line'>&lt;int name="就"&gt;460975&lt;/int&gt;
+</span><span class='line'>&lt;int name="有"&gt;443743&lt;/int&gt;
+</span><span class='line'>&lt;int name="了"&gt;437630&lt;/int&gt;
+</span><span class='line'>&lt;int name="要"&gt;372936&lt;/int&gt;
+</span><span class='line'>&lt;int name="！"&gt;342369&lt;/int&gt;
+</span><span class='line'>&lt;int name="好"&gt;331646&lt;/int&gt;
+</span><span class='line'>&lt;int name="在"&gt;324636&lt;/int&gt;
+</span><span class='line'>&lt;int name="一"&gt;279765&lt;/int&gt;
+</span><span class='line'>&lt;int name="个"&gt;269726&lt;/int&gt;
+</span><span class='line'>&lt;int name="能"&gt;233510&lt;/int&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>权重相同的放入同一个字段，也可以用CopyField，可以多加个系数</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/09/07/lucene-ru-men/">Lucene 入门</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-09-07T22:10:00+08:00" pubdate data-updated="true">Sep 7<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/09/07/lucene-ru-men/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>官方DEMO</h3>
+
+<ul>
+<li><a href="http://lucene.apache.org/core/4_0_0-BETA/demo/src-html/org/apache/lucene/demo/IndexFiles.html">IndexFiles</a></li>
+<li><a href="http://lucene.apache.org/core/4_0_0-BETA/demo/src-html/org/apache/lucene/demo/SearchFiles.html">SearchFiles</a></li>
+</ul>
+
+
+<h3>IndexFiles</h3>
+
+<ul>
+<li>在main()方法里分析命令行，然后初始化IndexWriter,打开Directory,初始化StandaryAnalyzer和IndexWriterConfig</li>
+<li>-index参数设置索引存放的地方，默认存放在index目录下</li>
+<li>-docs参数指定哪个目录下的文件被索引</li>
+<li>-update参数如果被设置，将不删除已经存在的索引，否则清楚后重新建立索引</li>
+<li>IndexWriter使用Directory存储索引信息,这里使用的是FSDirectory实现,其他的子类可以写入RAM,DB</li>
+<li>Analyzer用来分词(indexed tokens)也称为terms,也包括一些其他的处理，例如统一转换，同义词插入，过滤不需要的词等.现在用的StandaryAnalyzer的分词逻辑是Unicode Text Segmentation algorithm,统一转换成小写，过滤掉不要的词，例如a,an等很少被搜索的词语.不同的语言应该用不同的分析器，lucene已经提供了很多语言的分析器了</li>
+<li>IndexWriterConfig用来控制IndexWriter,例如设置OpenMode</li>
+<li>在IndexWriter初始化后，就来到了indexDocs()方法，这个递归函数爬取-docs下的所有文件来建立Document对象.Document包含3个域分别是文件内容，路径和创建时间.如果-update指定，那么就更新文档，否则删除索引目录后添加文档</li>
+</ul>
+
+
+<h3>SearchFiles</h3>
+
+<ul>
+<li>下面是一个简易版的文件查询,利用IndexSearcher,StandaryAnalyzer和QueryParser进行查找,QueryParser也需要StandaryAnalyzer对输入的内容进行分析，例如转换小写，过滤词等.QueryParser通过lucene解析语法生成的Query传递给IndexSearcher</li>
+<li>SearchFiles 用IndexSearcher.search(query,n) 返回得分最高的N条记录.</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">CustomSearch</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="nf">CustomSearch</span><span class="o">()</span> <span class="o">{}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="cm">/**</span>
+</span><span class='line'><span class="cm">   * @param args</span>
+</span><span class='line'><span class="cm">   */</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">String</span> <span class="n">index</span> <span class="o">=</span> <span class="s">&quot;index&quot;</span><span class="o">;</span>
+</span><span class='line'>    <span class="n">String</span> <span class="n">field</span> <span class="o">=</span> <span class="s">&quot;contents&quot;</span><span class="o">;</span>
+</span><span class='line'>    <span class="n">String</span> <span class="n">queryString</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">limit</span> <span class="o">=</span> <span class="mi">10</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">try</span><span class="o">{</span>
+</span><span class='line'>      <span class="n">IndexReader</span> <span class="n">reader</span> <span class="o">=</span> <span class="n">DirectoryReader</span><span class="o">.</span><span class="na">open</span><span class="o">(</span><span class="n">FSDirectory</span><span class="o">.</span><span class="na">open</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">index</span><span class="o">)));</span>
+</span><span class='line'>      <span class="n">IndexSearcher</span> <span class="n">searcher</span> <span class="o">=</span> <span class="k">new</span> <span class="n">IndexSearcher</span><span class="o">(</span><span class="n">reader</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">Analyzer</span> <span class="n">analyzer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StandardAnalyzer</span><span class="o">(</span><span class="n">Version</span><span class="o">.</span><span class="na">LUCENE_40</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">QueryParser</span> <span class="n">parser</span> <span class="o">=</span> <span class="k">new</span> <span class="n">QueryParser</span><span class="o">(</span><span class="n">Version</span><span class="o">.</span><span class="na">LUCENE_40</span><span class="o">,</span> <span class="n">field</span><span class="o">,</span> <span class="n">analyzer</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">BufferedReader</span> <span class="n">in</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BufferedReader</span><span class="o">(</span><span class="k">new</span> <span class="n">InputStreamReader</span><span class="o">(</span><span class="n">System</span><span class="o">.</span><span class="na">in</span><span class="o">,</span><span class="s">&quot;UTF-8&quot;</span><span class="o">));</span>
+</span><span class='line'>      <span class="k">if</span><span class="o">(</span><span class="n">queryString</span> <span class="o">==</span> <span class="kc">null</span><span class="o">){</span>
+</span><span class='line'>        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Enter query:&quot;</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">queryString</span> <span class="o">=</span> <span class="n">in</span><span class="o">.</span><span class="na">readLine</span><span class="o">();</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>      <span class="n">Query</span> <span class="n">query</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="n">queryString</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">printResult</span><span class="o">(</span><span class="n">in</span><span class="o">,</span> <span class="n">searcher</span><span class="o">,</span> <span class="n">query</span><span class="o">,</span> <span class="n">limit</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span><span class="k">catch</span><span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">){</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;can not open index directory!&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">exit</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">ParseException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;can not open index directory!&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">exit</span><span class="o">(</span><span class="mi">2</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">printResult</span><span class="o">(</span><span class="n">BufferedReader</span> <span class="n">in</span><span class="o">,</span><span class="n">IndexSearcher</span> <span class="n">searcher</span><span class="o">,</span><span class="n">Query</span> <span class="n">query</span><span class="o">,</span><span class="kt">int</span> <span class="n">limit</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">TopDocs</span> <span class="n">results</span> <span class="o">=</span> <span class="n">searcher</span><span class="o">.</span><span class="na">search</span><span class="o">(</span><span class="n">query</span><span class="o">,</span> <span class="n">limit</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">ScoreDoc</span><span class="o">[]</span> <span class="n">hits</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="na">scoreDocs</span><span class="o">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">totalHits</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="na">totalHits</span><span class="o">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">printHits</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">while</span><span class="o">(</span><span class="n">printHits</span> <span class="o">&lt;</span> <span class="n">totalHits</span><span class="o">){</span>
+</span><span class='line'>      <span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">hits</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++,</span><span class="n">printHits</span><span class="o">++){</span>
+</span><span class='line'>        <span class="n">Document</span> <span class="n">doc</span> <span class="o">=</span> <span class="n">searcher</span><span class="o">.</span><span class="na">doc</span><span class="o">(</span><span class="n">hits</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">doc</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">&quot;score=%s,id=%s,doc=%s,path=%s&quot;</span><span class="o">,</span><span class="n">hits</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">score</span><span class="o">,</span> <span class="n">printHits</span> <span class="o">+</span> <span class="mi">1</span><span class="o">,</span> <span class="n">hits</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">doc</span><span class="o">,</span> <span class="n">doc</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">&quot;path&quot;</span><span class="o">)</span> <span class="o">));</span>
+</span><span class='line'>        <span class="k">if</span><span class="o">(</span> <span class="o">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="o">)</span> <span class="o">==</span> <span class="n">limit</span> <span class="o">){</span>
+</span><span class='line'>          <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">();</span>
+</span><span class='line'>          <span class="n">results</span> <span class="o">=</span> <span class="n">searcher</span><span class="o">.</span><span class="na">searchAfter</span><span class="o">(</span><span class="n">hits</span><span class="o">[</span><span class="n">i</span><span class="o">],</span> <span class="n">query</span><span class="o">,</span> <span class="n">limit</span><span class="o">);</span>
+</span><span class='line'>          <span class="n">hits</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="na">scoreDocs</span><span class="o">;</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/08/30/chang-yong-ming-ling/">常用命令</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-30T13:14:00+08:00" pubdate data-updated="true">Aug 30<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/08/30/chang-yong-ming-ling/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>过滤记录</h3>
+
+<ul>
+<li>-l自动chomp，结果加$/</li>
+<li>-a自动分割</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>tail -f access-2012-08-30.log | grep -v <span class="s1">&#39;*&#39;</span> <span class="se">\ </span>
+</span><span class='line'>    | perl -w -lane <span class="s1">&#39;$a = $F[@F-1];print if $a &gt; 50000 &#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>获取URL内容</h3>
+
+<ul>
+<li>-I 获取头信息</li>
+<li>-x 通过哪台服务器</li>
+<li>-A 设置user agent,可以让log过滤更方便</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>curl -I -x 127.0.0.1  <span class="s2">&quot;http://test/abc.jpg&quot;</span> -A <span class="s2">&quot;huida&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>批量删除一天以前的文件</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>find /dev/shm/ -type f -mtime +1 | xargs rm
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>计算tcp连接数</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>su -
+</span><span class='line'>netstat -lant | wc -l
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>增加网关</h3>
+
+<ul>
+<li>mac版</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo route add -net 10.0.0.0/8 -interface ppp0
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>格式化和mount磁盘</h3>
+
+<ul>
+<li>xfs系统</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>/sbin/mkfs.xfs /dev/sdb
+</span><span class='line'>mount –t xfs /dev/sdb /data1
+</span><span class='line'>vim /etc/fstab
+</span><span class='line'>umount -l /tmp/
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>导出数据</h3>
+
+<ul>
+<li>-h -u -p表示主机，用户，密码</li>
+<li>-D表示数据库</li>
+<li>-e表示执行语句</li>
+<li>-N表示跳过列名, &#8211;skip-column-names</li>
+<li>-s表示用tab分割字段, &#8211;silent,Be more silent. Print results with a tab as separator, each row on new line.</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>mysql -h -u -p -Ns -Ddatabase -e <span class="s2">&quot;select * from ~~~ where ~~~&quot;</span> &gt; /tmp/fid
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>远程取得数据</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sftp
+</span><span class='line'>scp
+</span><span class='line'>rsync
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>查看系统状况</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>iostat -x 1
+</span><span class='line'>free -m
+</span><span class='line'>w
+</span><span class='line'>top
+</span><span class='line'>ping
+</span><span class='line'>lsof -i4TCP -P
+</span><span class='line'>netstat -lnp
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/08/29/solrcha-xun-guo-cheng/">Solr查询过程</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-29T16:25:00+08:00" pubdate data-updated="true">Aug 29<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/08/29/solrcha-xun-guo-cheng/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>solr查询分析</h3>
+
+<p><img src="/images/post/solrsearch.png" title="solr 查询分析" alt="solr 查询分析" /></p>
+
+<ol>
+<li>设置SolrQueryRequest,SolrQueryResponse</li>
+<li>在SolrRequestInfo里设置一个ThreadLocal<SolrRequestInfo>,set solrreq,solrresp</li>
+<li>通过url取得handler，例如/select就是使用SearchHandler</li>
+<li>handler抽象类里的handleRequest</li>
+<li>handler调用handleRequestBody开始处理请求，建立responseBuilder</li>
+<li>QueryComponent.prepare，设置returnFields，没有fl的情况下wantsAllFields，设置默认的LuceneQParser分析器，实例化SolrQueryParser</li>
+<li>QueryComponet.execute，取得关联的文档id，保存到resultCache</li>
+<li>writeResponse，如果id在DocumentCache里有就直接拿，否则通过reader去获得，再保存到DocumentCache</li>
+<li>输出结果到游览器</li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/08/28/solrqi-dong-fen-xi/">Solr启动分析</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-28T08:34:00+08:00" pubdate data-updated="true">Aug 28<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/08/28/solrqi-dong-fen-xi/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>solr启动分析</h3>
+
+<p><img src="/images/post/solrstart.png" title="solr 启动分析" alt="solr 启动分析" /></p>
+
+<ol>
+<li>CoreContainer通过xpath加载solr.xml</li>
+<li>实例化CoreAdminHandler管理CoreContainer，提供reload,status等命令(status可以看到index-size)</li>
+<li>初始化CoreDescriptor，设置核心的配置文件、目录、属性文件</li>
+<li>读取solrconfig.xml，分析后设置到SolrConfig</li>
+<li>读取schema.xml，设置fieldTypes @FieldTypePluginLoader,fields @SchemaField,过滤器,分词器,主键</li>
+<li>构造SolrCore,设置数据目录和各种资源的初始化</li>
+<li>QuerySenderListener，默认2个事件firstSearcher和newSearcher</li>
+<li>IndexDeletionPolicy</li>
+<li>DefaultCodecFactory，4.0的功能，字段的编码器和解码器</li>
+<li>StandardDirectoryFactory，指向data/index/的Directory，用来生成Reader读取索引</li>
+<li>QueryResponseWriter，各种返回结果，例如json,xml</li>
+<li>QParserPlugin，请求分析插件,用以生成QParser，例如BoostQParserPlugin和DisMaxQParserPlugin等</li>
+<li>ValueSourceParser，初始化内置的函数，比如boost,abs,sin..等等</li>
+<li>SearchComponent，例如query,facet,mlt,stat,debug,get</li>
+<li>RequestHandlers，是根据url对应RequestHandler的映射</li>
+<li>DirectUpdateHandler2，commit数据的handler</li>
+<li>最后执行firstSearcher事件预热，注册第一个SolrIndexSearcher</li>
+</ol>
+
+
+<h3>solr package</h3>
+
+<ul>
+<li>org.apache.solr.analysis; 过滤器，分词器</li>
+<li>org.apache.solr.core; solr的核心包,例如CoreContainer,Config,SolrCore,SolrConfig,CachingDirectoryFactory,CoreDescriptor</li>
+<li>org.apache.solr.servlet; 与servlet有关,例如SolrDispatchFilter就属于该包</li>
+<li>org.apache.solr.handler; org.apache.solr.handler.component; 请求处理</li>
+<li>org.apache.solr.handler.admin; 处理用来管理的请求，例如CoreAdminHandler</li>
+<li>org.apache.solr.search; 与查询有关的类，例如缓存，查询分析，返回字段 SolrIndexSearcher</li>
+<li>org.apache.solr.schema; 字段类型，schema通知</li>
+<li>org.apache.solr.util.plugin; 为插件提供的一些工具，抽象和接口，例如AbstractPluginLoader</li>
+<li>org.apache.solr.util; 一些工具，例如FileUtils</li>
+<li>org.apache.solr.update; org.apache.solr.update.processor; 用来更新数据的，例如默认的DirectUpdateHandler2</li>
+<li>org.apache.solr.response;org.apache.solr.response.transform;用来返回数据(序列化,json,xml等数据)</li>
+<li>org.apache.solr.request; 请求相关的信息，例如SolrRequestInfo</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/08/24/jsmian-xiang-dui-xiang-shi-li/">Js面向对象实例</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-24T17:57:00+08:00" pubdate data-updated="true">Aug 24<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/08/24/jsmian-xiang-dui-xiang-shi-li/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nb">window</span><span class="p">){</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">staff</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span><span class="nx">phone</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">return</span> <span class="k">new</span> <span class="nx">staff</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">init</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span><span class="nx">phone</span><span class="p">);</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'><span class="nx">staff</span><span class="p">.</span><span class="nx">fn</span> <span class="o">=</span> <span class="nx">staff</span><span class="p">.</span><span class="nx">prototype</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="c1">//静态变量</span>
+</span><span class='line'>    <span class="nx">company</span><span class="o">:</span> <span class="s1">&#39;安居客&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="c1">//构造函数</span>
+</span><span class='line'>    <span class="nx">init</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span><span class="nx">phone</span><span class="p">){</span>
+</span><span class='line'>        <span class="c1">//私有变量</span>
+</span><span class='line'>        <span class="kd">var</span> <span class="nx">cellphone</span> <span class="o">=</span> <span class="nx">phone</span><span class="p">;</span>
+</span><span class='line'>        <span class="c1">//公共变量</span>
+</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">username</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
+</span><span class='line'>        <span class="c1">//公共方法</span>
+</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">getPhone</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nx">cellphone</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">setPhone</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">phone</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">cellphone</span> <span class="o">=</span> <span class="nx">phone</span><span class="p">;</span>
+</span><span class='line'>            <span class="nx">_test_private_function</span><span class="p">();</span>
+</span><span class='line'>            <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="c1">//私有方法</span>
+</span><span class='line'>        <span class="kd">var</span> <span class="nx">_test_private_function</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;private function:&#39;</span> <span class="o">+</span> <span class="nx">cellphone</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="c1">//公共方法</span>
+</span><span class='line'>    <span class="nx">setName</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">name</span><span class="p">){</span>
+</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">username</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="nx">setCompany</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">c_name</span><span class="p">){</span>
+</span><span class='line'>        <span class="nx">staff</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">company</span> <span class="o">=</span> <span class="nx">c_name</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'><span class="nx">staff</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">init</span><span class="p">.</span><span class="nx">prototype</span> <span class="o">=</span> <span class="nx">staff</span><span class="p">.</span><span class="nx">fn</span><span class="p">;</span>
+</span><span class='line'><span class="c1">//公共方法</span>
+</span><span class='line'><span class="nx">staff</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">getName</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">username</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nx">staff</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">getCompany</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">staff</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">company</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nb">window</span><span class="p">.</span><span class="nx">s</span> <span class="o">=</span> <span class="nx">staff</span><span class="p">;</span>
+</span><span class='line'><span class="p">})(</span><span class="nb">window</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">staff1</span> <span class="o">=</span> <span class="nx">s</span><span class="p">(</span><span class="s1">&#39;王惠达1&#39;</span><span class="p">,</span><span class="s1">&#39;11111111&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">staff2</span> <span class="o">=</span> <span class="nx">s</span><span class="p">(</span><span class="s1">&#39;王惠达2&#39;</span><span class="p">,</span><span class="s1">&#39;22222222&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="c1">//test static argument</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;s1:&#39;</span> <span class="o">+</span> <span class="nx">staff1</span><span class="p">.</span><span class="nx">setCompany</span><span class="p">(</span><span class="s1">&#39;瑞庭&#39;</span><span class="p">).</span><span class="nx">getCompany</span><span class="p">());</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;s2:&#39;</span> <span class="o">+</span> <span class="nx">staff2</span><span class="p">.</span><span class="nx">getCompany</span><span class="p">());</span>
+</span><span class='line'><span class="c1">//test public argument</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;s1:&#39;</span> <span class="o">+</span> <span class="nx">staff1</span><span class="p">.</span><span class="nx">setName</span><span class="p">(</span><span class="s1">&#39;王惠达&#39;</span><span class="p">).</span><span class="nx">getName</span><span class="p">());</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;s2:&#39;</span> <span class="o">+</span> <span class="nx">staff2</span><span class="p">.</span><span class="nx">getName</span><span class="p">());</span>
+</span><span class='line'><span class="c1">//test private argument</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;s1:&#39;</span> <span class="o">+</span> <span class="nx">staff1</span><span class="p">.</span><span class="nx">setPhone</span><span class="p">(</span><span class="s1">&#39;13712345678&#39;</span><span class="p">).</span><span class="nx">getPhone</span><span class="p">());</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;s2:&#39;</span> <span class="o">+</span> <span class="nx">staff2</span><span class="p">.</span><span class="nx">getPhone</span><span class="p">());</span>
+</span><span class='line'><span class="c1">//报错：console.log(&#39;s2:&#39; + staff2.cellphone);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/08/16/xian-cheng-chi/">线程池</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-16T18:05:00+08:00" pubdate data-updated="true">Aug 16<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/08/16/xian-cheng-chi/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>为什么要使用线程池</h3>
+
+<ul>
+<li>为大量而短小的任务创建线程和销毁线程开销过大</li>
+<li>线程池可以重复使用线程，避免额外的创建和销毁开销</li>
+<li>通过队列和意外处理避免资源不足</li>
+<li>灵活调整线程池内线程的数量</li>
+</ul>
+
+
+<h3>线程池基本配置</h3>
+
+<ul>
+<li>corePoolSize: 池中的核心线程数</li>
+<li>maximumPoolSize: 池中的最大线程数（当核心线程用尽，工作队列已满时，开始创建线程）</li>
+<li>keepAliveTime: 大于核心线程数时，干掉空闲线程的最长等待时间</li>
+<li>unit: keepAliveTime的单位，例如秒，毫秒</li>
+<li>workQueue: 工作队列，线程根据工作队列来创建新线程去完成任务</li>
+<li>threadFactory: 用来定义线程中的属性、名称、守护程序状态、ThreadGroup 等等</li>
+<li>handler: 由于超出线程范围和队列容量而使执行被阻塞时所使用的处理程序</li>
+</ul>
+
+
+<h4>默认的handler</h4>
+
+<ul>
+<li>ThreadPoolExecutor.AbortPolicy: 直接抛出RejectedExecutionException</li>
+<li>ThreadPoolExecutor.CallerRunsPolicy: 再次尝试</li>
+<li>ThreadPoolExecutor.DiscardOldestPolicy: 放弃最旧的未处理任务</li>
+<li>ThreadPoolExecutor.DiscardPolicy: 直接丢弃</li>
+</ul>
+
+
+<h3>线程池基本逻辑</h3>
+
+<ul>
+<li>当池小于corePoolSize就新建线程，并处理任务</li>
+<li>当池等于corePoolSize，把请求放入workQueue中，池里的空闲线程就去从workQueue中取任务并处理</li>
+<li>当workQueue放不下新入的任务时，新建线程处理任务，如果池撑到了maximumPoolSize就用handler来做拒绝处理</li>
+<li>当池中线程数大于corePoolSize的时候，多余的线程会等待keepAliveTime长的时间，如果无请求可处理就自行销毁</li>
+</ul>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/08/16/xian-cheng-chi/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/3/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>工程师的最爱</h1>
+  <ul id="taobao_rank">
+    <li>
+  <iframe name="alimamaifrm" frameborder="0" marginheight="0" marginwidth="0" border="0" scrolling="no" width="100%" height="250" src="http://top.taobao.com/interface_v2.php?pid=mm_32662861_3310667_10777894&type=y&f=html&ie=utf8&from=taoke&unid=&name=%E4%BB%8A%E6%97%A5%E5%85%B3%E6%B3%A8%E9%A3%99%E5%8D%87&trtp=2&up=false&goodsFilter=all&sw=260&sh=250&sn=5&bgc=E8E9EB&bc=DADADA&fc=0A63AA&tc=535353&cat_ids=1101%2CTR_RXSJB%2CTR_SJPJ%2C50019780%2CTR_SBJP" ></iframe>
+    </li>
+  </ul>
+</section>
+<section>
+  <h1>文章分类</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/java/'>Java (11)</a></li>
+<li class='category'><a href='/blog/categories/javascript/'>Javascript (1)</a></li>
+<li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (9)</a></li>
+<li class='category'><a href='/blog/categories/perl/'>Perl (9)</a></li>
+<li class='category'><a href='/blog/categories/python/'>Python (1)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (10)</a></li>
+<li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
+
+  </ul>
+</section>
+
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/10/23/mogilefsxiang-jie/">MogileFS详解</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/16/mogilefsde-replicatefen-xi/">MogileFS的replicate进程分析</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/14/ying-pan-an-zhuang-centos/">硬盘安装CentOS</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/">IRC:irssi使用教程</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/13/mogstoredshi-yong-nginx/">mogstored使用nginx</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/11/mogilefswen-jian-lu-jing-gui-ze/">mogilefs文件路径规则</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/09/mogilefsshe-bei-quan-zhong-suan-fa/">mogilefs设备权重算法</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/09/29/mogilefsde-fscktan-jiu/">mogilefs fsck探究</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/09/27/aho-corasicksuan-fa/">Aho-Corasick算法</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/09/27/solrsheng-lue-ri-zhi/">显示solr省略的日志</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>好友链接</h1>
+  <ul id="links">
+    <li><a href="http://www.zwsun.com">阿文的自留地</a></li>
+    <li><a href="http://www.deepwarm.com/">明兄的私房菜</a></li>
+  </ul>
+</section>
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - 王惠达 huida wanghuida -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'wanghuida';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      //var twitterWidgets = document.createElement('script');
+      //twitterWidgets.type = 'text/javascript';
+      //twitterWidgets.async = true;
+      //twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      //document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

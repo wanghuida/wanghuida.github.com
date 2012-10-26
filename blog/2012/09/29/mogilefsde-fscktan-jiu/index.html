@@ -1,0 +1,909 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>mogilefs fsck探究 - 惠达的小宅</title>
+  <meta name="author" content="王惠达 huida wanghuida">
+
+  
+  <meta name="description" content="fsck的作用 检查mogilefs文件的健康程度，检查的维度有devcount,file_on表,文件长度，校验和（可选）
+如果文件丢失，通过路径尝试全设备扫描去查找该文件【只是通过路径去找】 使用fsck时，碰到的问题:队列保持不变，无法处理后续的文件 1
+2
+3
+4
+5
+6
+//启动fsck &hellip;">
+  
+
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name='AD51_verify' content='37c113da1db8f547501c3ab9d5a33c41'>
+
+  
+  <link rel="canonical" href="http://www.wanghd.com/blog/2012/09/29/mogilefsde-fscktan-jiu/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="惠达的小宅" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-35556528-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">惠达的小宅</a></h1>
+  
+    <h2>A love-vim engineer.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.wanghd.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a target="_blank" href="http://www.taobao.com/go/chn/tbk_channel/channelcode.php?pid=mm_32662861_3310667_10778125&eventid=101329">Market</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Mogilefs Fsck探究</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-09-29T15:13:00+08:00" pubdate data-updated="true">Sep 29<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h3>fsck的作用</h3>
+
+<ul>
+<li>检查mogilefs文件的健康程度，检查的维度有devcount,file_on表,文件长度，校验和（可选）</li>
+<li>如果文件丢失，通过路径尝试全设备扫描去查找该文件【只是通过路径去找】</li>
+</ul>
+
+
+<h3>使用fsck时，碰到的问题:队列保持不变，无法处理后续的文件</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>//启动fsck
+</span><span class='line'>mogadm fsck start  
+</span><span class='line'>//查看fsck状态，问题出现：进度不变,无法进一步检查文件
+</span><span class='line'>mogadm fsck status 
+</span><span class='line'>//查看数据库里的队列，发现队列一直保持，没有被处理
+</span><span class='line'>select count(*) from file_to_queue where type=1 （type=1代表fsck队列，type=2代表rebalance队列）;</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>结论（先给出结论，后面有具体的分析流程）</h3>
+
+<ul>
+<li>随意取得队列中的某一条记录的devcount等于3，过去操作造成的</li>
+<li>mindevcount却等于2，这会让fsck进行修复</li>
+<li>在修复时，发现3个设备中有一个设备是不可达的，状态也不是dead，返回无法处理，fsck不会把该记录从队列中删除，因为他期望你尽快修复该设备或者设置为dead</li>
+<li>解决方法有3个，第一种就是恢复或dead该设备【推荐】，第二种比较山寨,改代码删队列，第三种直接修改数据库,风险较大</li>
+</ul>
+
+
+<h3>mogadm fsck status详情</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>   Running: 运行状态 
+</span><span class='line'>    Status: 完成度
+</span><span class='line'>      Time: 执行时间
+</span><span class='line'>Check Type: 检查的策略【可以通过fsck_opt_policy_only修改】
+</span><span class='line'>
+</span><span class='line'>NOPA: file_on表里一个都没
+</span><span class='line'>POVI: 违反策略
+</span><span class='line'>MISS: 在某个设备上没有找到文件
+</span><span class='line'>BLEN: file表里的length和磁盘上的文件大小不匹配
+</span><span class='line'>GONE: 无法修复了
+</span><span class='line'>SRCH: 开始全设备扫描
+</span><span class='line'>FOND: 全设备扫描后找了该文件
+</span><span class='line'>REPL: 加入复制队列，复制一份文件
+</span><span class='line'>BCNT: file表里的devcount不正确</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!-- more -->
+
+
+<h3>MogileFS::Worker::Fsck的work方法分析</h3>
+
+<ul>
+<li>因为之前有分析过MogileFS启动源码，所以知道fsck子进程启动就调用MogileFS::Worker::Fsck里的work方法</li>
+<li>里面循环调用了最关键的check_fid方法来检查fid对象，返回的结果是已经处理（HANDLED）和没办法处理（STALLED）</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="k">sub </span><span class="nf">work</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$self</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span> <span class="c1">#perl面向对象获取自己的引用</span>
+</span><span class='line'>    <span class="nn">POSIX::</span><span class="n">nice</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>  <span class="c1">#调整进程的优先级</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$sto</span>         <span class="o">=</span> <span class="nn">Mgd::</span><span class="n">get_store</span><span class="p">();</span> <span class="c1">#获取操作数据库的对象</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">#2秒调用一次这个匿名方法</span>
+</span><span class='line'>    <span class="n">every</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="k">sub </span><span class="p">{</span>
+</span><span class='line'>        <span class="k">my</span> <span class="nv">$sleep_set</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span> <span class="c1">#一个调整sleep时间的函数，下面可以看到设置为0不去调整，就用2秒</span>
+</span><span class='line'>        <span class="nv">$nowish</span> <span class="o">=</span> <span class="nb">time</span><span class="p">();</span>      <span class="c1">#当前时间</span>
+</span><span class='line'>        <span class="nb">local</span> <span class="nv">$</span><span class="nn">Mgd::</span><span class="nv">nowish</span> <span class="o">=</span> <span class="nv">$nowish</span><span class="p">;</span> <span class="c1">#零时变量</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">my</span> <span class="nv">$queue_todo</span> <span class="o">=</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">queue_todo</span><span class="p">(</span><span class="s">&#39;fsck&#39;</span><span class="p">);</span>    <span class="c1">#获取fsck队列里的数据</span>
+</span><span class='line'>        <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">send_to_parent</span><span class="p">(</span><span class="s">&#39;worker_bored 50 fsck&#39;</span><span class="p">);</span> <span class="c1">#告诉父进程，我还活着</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">unless</span> <span class="nv">@</span><span class="p">{</span><span class="nv">$queue_todo</span><span class="p">};</span>                  <span class="c1">#没有需要需要处理就返回</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">unless</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">validate_dbh</span><span class="p">;</span>             <span class="c1">#验证db，无法连接就退出</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">my</span> <span class="nv">@fids</span> <span class="o">=</span> <span class="p">();</span>  <span class="c1">#fids数组，用来存放文件的id,也是数据库里文件的唯一标识 </span>
+</span><span class='line'>        <span class="c1">#遍历队列的数据，$todo就是数据库里的信息 type=1</span>
+</span><span class='line'>        <span class="k">while</span> <span class="p">(</span><span class="k">my</span> <span class="nv">$todo</span> <span class="o">=</span> <span class="nb">shift</span> <span class="nv">@</span><span class="p">{</span><span class="nv">$queue_todo</span><span class="p">})</span> <span class="p">{</span>
+</span><span class='line'>            <span class="c1">#new 一个fid对象，只是new，还没有读取fid信息</span>
+</span><span class='line'>            <span class="k">my</span> <span class="nv">$fid</span> <span class="o">=</span> <span class="nn">MogileFS::</span><span class="n">FID</span><span class="o">-&gt;</span><span class="k">new</span><span class="p">(</span><span class="nv">$todo</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">fid</span><span class="p">});</span>
+</span><span class='line'>            <span class="c1">#这里才是通过查file表，判断他是不是存在</span>
+</span><span class='line'>            <span class="k">unless</span> <span class="p">(</span><span class="nv">$fid</span><span class="o">-&gt;</span><span class="nb">exists</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                <span class="c1">#从file_to_queue表里删除</span>
+</span><span class='line'>                <span class="nv">$sto</span><span class="o">-&gt;</span><span class="n">delete_fid_from_file_to_queue</span><span class="p">(</span><span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">,</span> <span class="n">FSCK_QUEUE</span><span class="p">);</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>            <span class="nb">push</span><span class="p">(</span><span class="nv">@fids</span><span class="p">,</span> <span class="nv">$fid</span><span class="p">);</span> <span class="c1">#如果有，那就把fid对象放到数组里</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">unless</span> <span class="nv">@fids</span><span class="p">;</span>   <span class="c1">#如果没有需要处理的就返回了 </span>
+</span><span class='line'>        <span class="c1">#从setting表里读取fsck_opt_policy_only配置</span>
+</span><span class='line'>        <span class="c1">#1代表只检查数据库信息，0代表检查数据信息和文件长度</span>
+</span><span class='line'>        <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">opt_nostat</span><span class="p">}</span> <span class="o">=</span> <span class="nn">MogileFS::</span><span class="n">Config</span><span class="o">-&gt;</span><span class="n">server_setting</span><span class="p">(</span><span class="s">&#39;fsck_opt_policy_only&#39;</span><span class="p">)</span>     <span class="o">||</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>        <span class="c1">#从setting表里读取fsck_checksum配置,代表是否需要检查校验和,可选值为md5,sha-1,off</span>
+</span><span class='line'>        <span class="k">my</span> <span class="nv">$alg</span> <span class="o">=</span> <span class="nn">MogileFS::</span><span class="n">Config</span><span class="o">-&gt;</span><span class="n">server_setting_cached</span><span class="p">(</span><span class="s">&quot;fsck_checksum&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nb">defined</span><span class="p">(</span><span class="nv">$alg</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nv">$alg</span> <span class="ow">eq</span> <span class="s">&quot;off&quot;</span><span class="p">)</span> <span class="p">{</span>   <span class="c1">#如果没有定义或为off</span>
+</span><span class='line'>            <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">opt_checksum</span><span class="p">}</span> <span class="o">=</span> <span class="s">&quot;off&quot;</span><span class="p">;</span>      <span class="c1">#那就设置成off,不检查</span>
+</span><span class='line'>        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>            <span class="c1">#验证一下是否为md5 或 sha-1,如果不是那就设置为0</span>
+</span><span class='line'>            <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">opt_checksum</span><span class="p">}</span> <span class="o">=</span> <span class="nn">MogileFS::</span><span class="n">Checksum</span><span class="o">-&gt;</span><span class="n">valid_alg</span><span class="p">(</span><span class="nv">$alg</span><span class="p">)</span> <span class="p">?</span> <span class="nv">$alg</span> <span class="p">:</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="nn">MogileFS::</span><span class="n">FID</span><span class="o">-&gt;</span><span class="n">mass_load_devids</span><span class="p">(</span><span class="nv">@fids</span><span class="p">);</span> <span class="c1">#通过file_on表获取每个fid存放在哪些device上</span>
+</span><span class='line'>        <span class="nv">$sleep_set</span><span class="o">-&gt;</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span> <span class="c1">#微调sleep时间，写死为0，可能是调试用的</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">foreach</span> <span class="k">my</span> <span class="nv">$fid</span> <span class="p">(</span><span class="nv">@fids</span><span class="p">)</span> <span class="p">{</span>               <span class="c1">#循环每一个fid对象</span>
+</span><span class='line'>            <span class="c1">#这里是关键是亮点，是接下去分析的入口</span>
+</span><span class='line'>            <span class="c1">#返回的结果是已经处理（HANDLED）和没办法处理（STALLED）</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$self</span><span class="o">-&gt;</span><span class="n">check_fid</span><span class="p">(</span><span class="nv">$fid</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>                <span class="c1">#如果运行到了这里，说明跟磁盘有连通性的问题</span>
+</span><span class='line'>                <span class="c1">#最重要的是不会删除队列，放在里面以后再尝试</span>
+</span><span class='line'>                <span class="c1">#其实队列的卡住的问题就出在这里,接下去进入check_fid看看</span>
+</span><span class='line'>                <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">still_alive</span><span class="p">;</span>
+</span><span class='line'>                <span class="k">next</span><span class="p">;</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>            <span class="c1">#已经处理了，就可以删除队列里的数据了</span>
+</span><span class='line'>            <span class="nv">$sto</span><span class="o">-&gt;</span><span class="n">delete_fid_from_file_to_queue</span><span class="p">(</span><span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">,</span> <span class="n">FSCK_QUEUE</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>MogileFS::Worker::Fsck的check_fid方法分析</h3>
+
+<ul>
+<li>传入的参数是$fid是MogileFS::FID对象</li>
+<li>返回0表示磁盘不可达（STALLED）</li>
+<li>返回1代表fid对象已经被处理，不管这个fid是不是有问题，没问题就不处理，有问题就记录日志并修复</li>
+<li>真正去修复一个fid对象的函数是fix_fid,接下去会分析</li>
+<li>问题渐渐浮出水面，坏掉的设备没有被dead，或者直接删除掉设备有可能会让队列卡住</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="c1">#下面是返回值，被定义成常量</span>
+</span><span class='line'><span class="k">use</span> <span class="n">constant</span> <span class="n">STALLED</span> <span class="o">=&gt;</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="n">constant</span> <span class="n">HANDLED</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'><span class="k">sub </span><span class="nf">check_fid</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">my</span> <span class="p">(</span><span class="nv">$self</span><span class="p">,</span> <span class="nv">$fid</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>      <span class="c1">#设置对象自己和fid对象</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$fix</span> <span class="o">=</span> <span class="k">sub </span><span class="p">{</span>             <span class="c1">#定义一个修复的数据的函数,只是定义，真正的调用在下面逻辑</span>
+</span><span class='line'>        <span class="c1">#fix_fid是最重要的函数用来修复fid对象，也是接下去需要分析的入口</span>
+</span><span class='line'>        <span class="c1">#这里使用了eval{}，这样可以捕获错误</span>
+</span><span class='line'>        <span class="k">my</span> <span class="nv">$fixed</span> <span class="o">=</span> <span class="nb">eval</span> <span class="p">{</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">fix_fid</span><span class="p">(</span><span class="nv">$fid</span><span class="p">)</span> <span class="p">};</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="nb">defined</span> <span class="nv">$fixed</span><span class="p">)</span> <span class="p">{</span>                     <span class="c1">#如果产生了错误</span>
+</span><span class='line'>            <span class="c1">#输出异常日志，我们的问题就会运行到这里输出这样的信息</span>
+</span><span class='line'>            <span class="n">error</span><span class="p">(</span><span class="s">&quot;Fsck stalled for fid $fid: $@&quot;</span><span class="p">);</span>
+</span><span class='line'>            <span class="c1">#返回一个不会去删除队列的结果，造成队列积满</span>
+</span><span class='line'>            <span class="c1">#所以直接去fix_fid里查看错误的判断就可以知道为什么了</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">STALLED</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">fsck_log</span><span class="p">(</span><span class="n">EV_CANT_FIX</span><span class="p">)</span> <span class="k">if</span> <span class="o">!</span> <span class="nv">$fixed</span><span class="p">;</span>  <span class="c1">#记录日志，不可以修复,GONE</span>
+</span><span class='line'>        <span class="nv">$nowish</span> <span class="o">=</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">still_alive</span><span class="p">;</span>             <span class="c1">#更新时间</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">HANDLED</span><span class="p">;</span>                           <span class="c1">#返回已经处理</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">unless</span> <span class="p">(</span><span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">devids</span><span class="p">)</span> <span class="p">{</span>         <span class="c1">#一个设备上都没有的话</span>
+</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">fsck_log</span><span class="p">(</span><span class="n">EV_NO_PATHS</span><span class="p">);</span><span class="c1">#记录日志path都没 NOPA</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nv">$fix</span><span class="o">-&gt;</span><span class="p">();</span>            <span class="c1">#搜索所有设备作为最后的努力来定位它</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">#查找数据库file_on数量，要满足mindevcount，如果超过也属于不满足（神奇的too happy）</span>
+</span><span class='line'>    <span class="k">unless</span> <span class="p">(</span><span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">devids_meet_policy</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">fsck_log</span><span class="p">(</span><span class="n">EV_POLICY_VIOLATION</span><span class="p">);</span><span class="c1">#记录日志违反策略 POVI</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nv">$fix</span><span class="o">-&gt;</span><span class="p">();</span>                    <span class="c1">#尝试修复</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">#如果不skip_devcount，同时file_on和file里的devcount对不起来</span>
+</span><span class='line'>    <span class="k">unless</span> <span class="p">(</span><span class="nn">MogileFS::</span><span class="n">Config</span><span class="o">-&gt;</span><span class="n">server_setting_cached</span><span class="p">(</span><span class="s">&#39;skip_devcount&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="nb">scalar</span><span class="p">(</span><span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">devids</span><span class="p">)</span> <span class="o">==</span> <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">devcount</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">fsck_log</span><span class="p">(</span><span class="n">EV_BAD_COUNT</span><span class="p">);</span> <span class="c1">#记录日志file表里devcount不正确</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nv">$fix</span><span class="o">-&gt;</span><span class="p">();</span>              <span class="c1">#尝试修复，其实是调用$fid-&gt;update_devcount();</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">#我们不使用，其实他是判断checksum表里是否有记录</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">class</span><span class="o">-&gt;</span><span class="n">hashtype</span> <span class="o">&amp;&amp;</span> <span class="o">!</span> <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">checksum</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nv">$fix</span><span class="o">-&gt;</span><span class="p">();</span>        <span class="c1">#尝试修复</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">#如果配置了fsck_opt_policy_only那就到此结束了,不会去判断文件长度和校验和了</span>
+</span><span class='line'>    <span class="c1">#如果策略是这样，事故后的fsck就有意义了</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">HANDLED</span> <span class="k">if</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">opt_nostat</span><span class="p">};</span>
+</span><span class='line'>    <span class="c1">#如果配置检查校验和,默认不使用</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">opt_checksum</span><span class="p">}</span> <span class="o">&amp;&amp;</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">opt_checksum</span><span class="p">}</span> <span class="ow">ne</span> <span class="s">&quot;off&quot;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nv">$fix</span><span class="o">-&gt;</span><span class="p">();</span> <span class="c1">#尝试修复</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$err</span><span class="p">;</span> <span class="c1">#记录错误的变量</span>
+</span><span class='line'>    <span class="c1">#parallel_check_sizes会取得磁盘上文件的大小</span>
+</span><span class='line'>    <span class="c1">#匿名的对比函数,第一个参数是设备,第二参数就是磁盘上文件的大小</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$rv</span> <span class="o">=</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">parallel_check_sizes</span><span class="p">([</span> <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">devfids</span> <span class="p">],</span> <span class="k">sub </span><span class="p">{</span>
+</span><span class='line'>        <span class="k">my</span> <span class="p">(</span><span class="nv">$dfid</span><span class="p">,</span> <span class="nv">$disk_size</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>            <span class="c1">#devfid对象，和磁盘上文件的大小</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="nb">defined</span> <span class="nv">$disk_size</span><span class="p">)</span> <span class="p">{</span>             <span class="c1">#如果拿不到磁盘上文件的大小</span>
+</span><span class='line'>            <span class="k">my</span> <span class="nv">$dev</span>  <span class="o">=</span> <span class="nv">$dfid</span><span class="o">-&gt;</span><span class="n">device</span><span class="p">;</span>           <span class="c1">#设备对象</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="nv">$dev</span><span class="o">-&gt;</span><span class="n">dstate</span><span class="o">-&gt;</span><span class="n">is_perm_dead</span><span class="p">)</span> <span class="p">{</span>   <span class="c1">#如果磁盘的状态是dead</span>
+</span><span class='line'>                <span class="nv">$err</span> <span class="o">=</span> <span class="s">&quot;needfix&quot;</span><span class="p">;</span>               <span class="c1">#记录错误为需要修复</span>
+</span><span class='line'>                <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>                       <span class="c1">#返回0</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>            <span class="c1">#输出连通性问题的日志</span>
+</span><span class='line'>            <span class="n">error</span><span class="p">(</span><span class="s">&quot;Connectivity problem reaching device &quot;</span> <span class="o">.</span> <span class="nv">$dev</span><span class="o">-&gt;</span><span class="n">id</span> <span class="o">.</span> <span class="s">&quot; on host &quot;</span> <span class="o">.</span> <span class="nv">$dev</span><span class="o">-&gt;</span><span class="n">host</span><span class="o">-&gt;</span><span class="n">ip</span> <span class="o">.</span> <span class="s">&quot;\n&quot;</span><span class="p">);</span>
+</span><span class='line'>            <span class="nv">$err</span> <span class="o">=</span> <span class="s">&quot;stalled&quot;</span><span class="p">;</span>                   <span class="c1">#记录错误为无法处理</span>
+</span><span class='line'>            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>                           <span class="c1">#返回0</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="k">return</span> <span class="mi">1</span> <span class="k">if</span> <span class="nv">$disk_size</span> <span class="o">==</span> <span class="nv">$fid</span><span class="o">-&gt;</span><span class="nb">length</span><span class="p">;</span> <span class="c1">#file表里的length和磁盘上的大小一样,直接返回1</span>
+</span><span class='line'>        <span class="nv">$err</span> <span class="o">=</span> <span class="s">&quot;needfix&quot;</span><span class="p">;</span>                       <span class="c1">#下面就是大小不一样了，记录错误为需要修复</span>
+</span><span class='line'>        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>                               <span class="c1">#返回0</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$rv</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="p">(</span><span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">class</span><span class="o">-&gt;</span><span class="n">hashtype</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="p">(</span><span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">opt_checksum</span><span class="p">}</span> <span class="o">&amp;&amp;</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">opt_checksum</span><span class="p">}</span> <span class="ow">eq</span> <span class="s">&quot;off&quot;</span><span class="p">))</span>
+</span><span class='line'>            <span class="p">?</span> <span class="nv">$fix</span><span class="o">-&gt;</span><span class="p">()</span> <span class="p">:</span> <span class="n">HANDLED</span><span class="p">;</span>               <span class="c1">#不扯校验和了，直接返回已处理</span>
+</span><span class='line'>    <span class="p">}</span> <span class="k">elsif</span> <span class="p">(</span><span class="nv">$err</span> <span class="ow">eq</span> <span class="s">&quot;stalled&quot;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="c1">#返回无法处理，也会造成队列堆积，因为file_on表里的device没有设置为dead</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">STALLED</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span> <span class="k">elsif</span> <span class="p">(</span><span class="nv">$err</span> <span class="ow">eq</span> <span class="s">&quot;needfix&quot;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="c1">#进行修复</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nv">$fix</span><span class="o">-&gt;</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>        <span class="c1">#这里应该不会执行到</span>
+</span><span class='line'>        <span class="nb">die</span> <span class="s">&quot;Unknown error checking fid sizes in parallel.\n&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>MogileFS::Worker::Fsck的fix_fid方法分析</h3>
+
+<ul>
+<li>该方法有可能会比较慢，因为file_on表上一条记录都没会尝试查找所有设备，【通过path】</li>
+<li>die是由于设备连接性问题造成的，会引起队列堵死</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="k">use</span> <span class="n">constant</span> <span class="n">CANT_FIX</span> <span class="o">=&gt;</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">#不可以被修复</span>
+</span><span class='line'><span class="k">sub </span><span class="nf">fix_fid</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">my</span> <span class="p">(</span><span class="nv">$self</span><span class="p">,</span> <span class="nv">$fid</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>                     <span class="c1">#对象自己，fid对象</span>
+</span><span class='line'>    <span class="n">debug</span><span class="p">(</span><span class="nb">sprintf</span><span class="p">(</span><span class="s">&quot;Fixing FID %d&quot;</span><span class="p">,</span> <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">));</span> <span class="c1">#调试信息，正在修复哪个fid</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">#通过file_on更新一下file表里的devcount; </span>
+</span><span class='line'>    <span class="c1">#这里学习了下mysql的get_lock</span>
+</span><span class='line'>    <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">update_devcount</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">#遍历devids属性生成多个devfid对象放到数组,其实就是file_on表</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">@dfids</span> <span class="o">=</span> <span class="nb">map</span> <span class="p">{</span> <span class="nn">MogileFS::</span><span class="n">DevFID</span><span class="o">-&gt;</span><span class="k">new</span><span class="p">(</span><span class="nv">$_</span><span class="p">,</span> <span class="nv">$fid</span><span class="p">)</span> <span class="p">}</span> <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">devids</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">@good_devs</span><span class="p">;</span>        <span class="c1">#初始化好的设备</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">@bad_devs</span><span class="p">;</span>         <span class="c1">#初始化坏的设备数组</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">%already_checked</span><span class="p">;</span>  <span class="c1">#初始化已经检查过的设备hash</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$check_dfids</span> <span class="o">=</span> <span class="k">sub </span><span class="p">{</span> <span class="c1">#定义一个监测函数</span>
+</span><span class='line'>        <span class="k">my</span> <span class="nv">$is_desperate_mode</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span> <span class="c1">#是否全设备扫描</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">foreach</span> <span class="k">my</span> <span class="nv">$dfid</span> <span class="p">(</span><span class="nv">@dfids</span><span class="p">)</span> <span class="p">{</span> <span class="c1">#遍历fid的devfid对象</span>
+</span><span class='line'>            <span class="k">my</span> <span class="nv">$dev</span> <span class="o">=</span> <span class="nv">$dfid</span><span class="o">-&gt;</span><span class="n">device</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">next</span> <span class="k">if</span> <span class="nv">$already_checked</span><span class="p">{</span><span class="nv">$dev</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">}</span><span class="o">++</span><span class="p">;</span> <span class="c1">#已经检查过就跳过了</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="c1">#磁盘状态为dead，那就放到bad_devs里</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="nv">$dev</span><span class="o">-&gt;</span><span class="n">dstate</span><span class="o">-&gt;</span><span class="n">is_perm_dead</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                <span class="nb">push</span> <span class="nv">@bad_devs</span><span class="p">,</span> <span class="nv">$dev</span><span class="p">;</span>
+</span><span class='line'>                <span class="k">next</span><span class="p">;</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="k">my</span> <span class="nv">$disk_size</span> <span class="o">=</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">size_on_disk</span><span class="p">(</span><span class="nv">$dfid</span><span class="p">);</span>  <span class="c1">#获取磁盘上的文件大小</span>
+</span><span class='line'>            <span class="c1">#这里是我们产生问题的根源。。。设备不可达，也没设置成dead</span>
+</span><span class='line'>            <span class="nb">die</span> <span class="s">&quot;dev &quot;</span> <span class="o">.</span> <span class="nv">$dev</span><span class="o">-&gt;</span><span class="n">id</span> <span class="o">.</span> <span class="s">&quot; unreachable&quot;</span> <span class="k">unless</span> <span class="nb">defined</span> <span class="nv">$disk_size</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="nv">$disk_size</span> <span class="o">==</span> <span class="nv">$fid</span><span class="o">-&gt;</span><span class="nb">length</span><span class="p">)</span> <span class="p">{</span> <span class="c1">#如果长度一样</span>
+</span><span class='line'>                <span class="nb">push</span> <span class="nv">@good_devs</span><span class="p">,</span> <span class="nv">$dfid</span><span class="o">-&gt;</span><span class="n">device</span><span class="p">;</span> <span class="c1">#加到好的设备里</span>
+</span><span class='line'>                <span class="c1">#如果是全设备扫描，那就等于发现了丢失文件，就可以返回了，不用继续查找了</span>
+</span><span class='line'>                <span class="k">return</span> <span class="k">if</span> <span class="nv">$is_desperate_mode</span><span class="p">;</span>
+</span><span class='line'>                <span class="k">next</span><span class="p">;</span> <span class="c1">#下一个,其他编程语言的continue</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="k">unless</span> <span class="p">(</span><span class="nv">$is_desperate_mode</span><span class="p">)</span> <span class="p">{</span> <span class="c1">#如果不是全设备扫描</span>
+</span><span class='line'>                <span class="k">if</span> <span class="p">(</span><span class="nv">$disk_size</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                    <span class="c1">#没有找到文件呀,MISS</span>
+</span><span class='line'>                    <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">fsck_log</span><span class="p">(</span><span class="n">EV_FILE_MISSING</span><span class="p">,</span> <span class="nv">$dev</span><span class="p">);</span>
+</span><span class='line'>                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>                    <span class="c1">#长度不正确呀,BLEN</span>
+</span><span class='line'>                    <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">fsck_log</span><span class="p">(</span><span class="n">EV_BAD_LENGTH</span><span class="p">,</span> <span class="nv">$dev</span><span class="p">);</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="nb">push</span> <span class="nv">@bad_devs</span><span class="p">,</span> <span class="nv">$dfid</span><span class="o">-&gt;</span><span class="n">device</span><span class="p">;</span> <span class="c1">#增加到坏设备里</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nv">$check_dfids</span><span class="o">-&gt;</span><span class="p">();</span> <span class="c1">#调用上面的监测函数</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">unless</span> <span class="p">(</span><span class="nv">@good_devs</span><span class="p">)</span> <span class="p">{</span> <span class="c1"># 如果一个好的都没</span>
+</span><span class='line'>        <span class="c1">#记录日志,全设备扫描 SRCH</span>
+</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">fsck_log</span><span class="p">(</span><span class="n">EV_START_SEARCH</span><span class="p">);</span>
+</span><span class='line'>        <span class="c1">#重新设置@dfids,全部的设备</span>
+</span><span class='line'>        <span class="nv">@dfids</span> <span class="o">=</span> <span class="nn">List::Util::</span><span class="n">shuffle</span><span class="p">(</span>
+</span><span class='line'>                                     <span class="nb">map</span>  <span class="p">{</span> <span class="nn">MogileFS::</span><span class="n">DevFID</span><span class="o">-&gt;</span><span class="k">new</span><span class="p">(</span><span class="nv">$_</span><span class="p">,</span> <span class="nv">$fid</span><span class="p">)</span>  <span class="p">}</span>
+</span><span class='line'>                                     <span class="nb">grep</span> <span class="p">{</span> <span class="nv">$_</span><span class="o">-&gt;</span><span class="n">dstate</span><span class="o">-&gt;</span><span class="n">should_fsck_search_on</span> <span class="p">}</span>
+</span><span class='line'>                                     <span class="nn">Mgd::</span><span class="n">device_factory</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">get_all</span>
+</span><span class='line'>                                     <span class="p">);</span>
+</span><span class='line'>        <span class="c1">#重新再找一次,这次是全盘扫描模式</span>
+</span><span class='line'>        <span class="nv">$check_dfids</span><span class="o">-&gt;</span><span class="p">(</span><span class="s">&quot;desperate&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1"># 不能修复了呀，找不到文件了</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">CANT_FIX</span> <span class="k">unless</span> <span class="nv">@good_devs</span><span class="p">;</span>
+</span><span class='line'>        <span class="c1"># 如果能找到，记录日志,FOND</span>
+</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">fsck_log</span><span class="p">(</span><span class="n">EV_FOUND_FID</span><span class="p">);</span>
+</span><span class='line'>        <span class="c1"># 加到数据库里,就是file_on的表里</span>
+</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">note_on_device</span><span class="p">(</span><span class="nv">$good_devs</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># 循环坏的设备，删除掉file_on里的数据</span>
+</span><span class='line'>    <span class="k">foreach</span> <span class="k">my</span> <span class="nv">$bdev</span> <span class="p">(</span><span class="nv">@bad_devs</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">error</span><span class="p">(</span><span class="s">&quot;removing file_on mapping for fid=&quot;</span> <span class="o">.</span> <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">id</span> <span class="o">.</span> <span class="s">&quot;, dev=&quot;</span> <span class="o">.</span> <span class="nv">$bdev</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">forget_about_device</span><span class="p">(</span><span class="nv">$bdev</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">want_reload</span><span class="p">;</span> <span class="c1">#重新加载fid对象</span>
+</span><span class='line'>    <span class="c1"># 如果还是没能满足策略，就就应该复制一份了呀</span>
+</span><span class='line'>    <span class="k">unless</span> <span class="p">(</span><span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">devids_meet_policy</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="c1">#加入到replacte队列中</span>
+</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">enqueue_for_replication</span><span class="p">(</span><span class="n">in</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>        <span class="c1">#记录日志 REPL</span>
+</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">fsck_log</span><span class="p">(</span><span class="n">EV_RE_REPLICATE</span><span class="p">);</span>
+</span><span class='line'>        <span class="c1">#返回已经处理</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">HANDLED</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># 更新devcount</span>
+</span><span class='line'>    <span class="k">unless</span><span class="p">(</span><span class="nn">MogileFS::</span><span class="n">Config</span><span class="o">-&gt;</span><span class="n">server_setting_cached</span><span class="p">(</span><span class="s">&#39;skip_devcount&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="nb">scalar</span><span class="p">(</span><span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">devids</span><span class="p">)</span> <span class="o">==</span> <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">devcount</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">update_devcount</span><span class="p">();</span>
+</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">fsck_log</span><span class="p">(</span><span class="n">EV_BAD_COUNT</span><span class="p">);</span> <span class="c1">#记录日志BCNT</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="n">HANDLED</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">王惠达 huida wanghuida</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-09-29T15:13:00+08:00" pubdate data-updated="true">Sep 29<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/mogilefs/'>Mogilefs</a>, <a class='category' href='/blog/categories/perl/'>Perl</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2012/09/29/mogilefsde-fscktan-jiu/" data-via="" data-counturl="http://www.wanghd.com/blog/2012/09/29/mogilefsde-fscktan-jiu/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/09/27/aho-corasicksuan-fa/" title="Previous Post: Aho-Corasick算法">&laquo; Aho-Corasick算法</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/10/09/mogilefsshe-bei-quan-zhong-suan-fa/" title="Next Post: mogilefs设备权重算法">mogilefs设备权重算法 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>工程师的最爱</h1>
+  <ul id="taobao_rank">
+    <li>
+  <iframe name="alimamaifrm" frameborder="0" marginheight="0" marginwidth="0" border="0" scrolling="no" width="100%" height="250" src="http://top.taobao.com/interface_v2.php?pid=mm_32662861_3310667_10777894&type=y&f=html&ie=utf8&from=taoke&unid=&name=%E4%BB%8A%E6%97%A5%E5%85%B3%E6%B3%A8%E9%A3%99%E5%8D%87&trtp=2&up=false&goodsFilter=all&sw=260&sh=250&sn=5&bgc=E8E9EB&bc=DADADA&fc=0A63AA&tc=535353&cat_ids=1101%2CTR_RXSJB%2CTR_SJPJ%2C50019780%2CTR_SBJP" ></iframe>
+    </li>
+  </ul>
+</section>
+<section>
+  <h1>文章分类</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/java/'>Java (11)</a></li>
+<li class='category'><a href='/blog/categories/javascript/'>Javascript (1)</a></li>
+<li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (9)</a></li>
+<li class='category'><a href='/blog/categories/perl/'>Perl (9)</a></li>
+<li class='category'><a href='/blog/categories/python/'>Python (1)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (10)</a></li>
+<li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
+
+  </ul>
+</section>
+
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/10/23/mogilefsxiang-jie/">MogileFS详解</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/16/mogilefsde-replicatefen-xi/">MogileFS的replicate进程分析</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/14/ying-pan-an-zhuang-centos/">硬盘安装CentOS</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/">IRC:irssi使用教程</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/13/mogstoredshi-yong-nginx/">mogstored使用nginx</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/11/mogilefswen-jian-lu-jing-gui-ze/">mogilefs文件路径规则</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/09/mogilefsshe-bei-quan-zhong-suan-fa/">mogilefs设备权重算法</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/09/29/mogilefsde-fscktan-jiu/">mogilefs fsck探究</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/09/27/aho-corasicksuan-fa/">Aho-Corasick算法</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/09/27/solrsheng-lue-ri-zhi/">显示solr省略的日志</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>好友链接</h1>
+  <ul id="links">
+    <li><a href="http://www.zwsun.com">阿文的自留地</a></li>
+    <li><a href="http://www.deepwarm.com/">明兄的私房菜</a></li>
+  </ul>
+</section>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - 王惠达 huida wanghuida -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'wanghuida';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.wanghd.com/blog/2012/09/29/mogilefsde-fscktan-jiu/';
+        var disqus_url = 'http://www.wanghd.com/blog/2012/09/29/mogilefsde-fscktan-jiu/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      //var twitterWidgets = document.createElement('script');
+      //twitterWidgets.type = 'text/javascript';
+      //twitterWidgets.async = true;
+      //twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      //document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

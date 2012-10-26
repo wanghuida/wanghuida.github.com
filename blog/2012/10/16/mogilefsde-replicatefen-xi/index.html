@@ -1,0 +1,843 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>MogileFS的replicate进程分析 - 惠达的小宅</title>
+  <meta name="author" content="王惠达 huida wanghuida">
+
+  
+  <meta name="description" content="基本流程 从replicate queue里获取需要处理数据,进行循环
+执行真正的【replicate操作】，操作时会锁住这个fid，然后返回结果【下面会对该操作具体分析】
+返回没问题，删除队列并释放锁
+返回failed_getting_lock说明正在处理了 &hellip;">
+  
+
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name='AD51_verify' content='37c113da1db8f547501c3ab9d5a33c41'>
+
+  
+  <link rel="canonical" href="http://www.wanghd.com/blog/2012/10/16/mogilefsde-replicatefen-xi/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="惠达的小宅" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-35556528-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">惠达的小宅</a></h1>
+  
+    <h2>A love-vim engineer.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.wanghd.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a target="_blank" href="http://www.taobao.com/go/chn/tbk_channel/channelcode.php?pid=mm_32662861_3310667_10778125&eventid=101329">Market</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">MogileFS的replicate进程分析</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-16T15:47:00+08:00" pubdate data-updated="true">Oct 16<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h4>基本流程</h4>
+
+<ol>
+<li>从replicate queue里获取需要处理数据,进行循环</li>
+<li>执行真正的【replicate操作】，操作时会锁住这个fid，然后返回结果【下面会对该操作具体分析】</li>
+<li>返回没问题，删除队列并释放锁</li>
+<li>返回failed_getting_lock说明正在处理了</li>
+<li>返回no_source说明file_on表上没有关于该文件的记录，nexttry设置为最大并释放锁</li>
+<li>返回too_happy说明devcount > mindevcount，会尝试删除多余的并释放锁（前提是文件存在，所以不会修复file_on有，文件丢失的情况）</li>
+<li>如果以上都不满足，nexttry根据规则增加，failcount递增并释放锁</li>
+</ol>
+
+
+<h4>replicate操作分析</h4>
+
+<ul>
+<li>简单说replicate操作就是取得合适的device进行复制，合适的意思是尽量避免同一个host的device，没办法才用同一个host的device，有错误就返回具体信息</li>
+<li>replicate操作才是真正的复制，代码比较多，但是不难理解（难点都会有注释）</li>
+</ul>
+
+
+<!-- more -->
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+<span class='line-number'>103</span>
+<span class='line-number'>104</span>
+<span class='line-number'>105</span>
+<span class='line-number'>106</span>
+<span class='line-number'>107</span>
+<span class='line-number'>108</span>
+<span class='line-number'>109</span>
+<span class='line-number'>110</span>
+<span class='line-number'>111</span>
+<span class='line-number'>112</span>
+<span class='line-number'>113</span>
+<span class='line-number'>114</span>
+<span class='line-number'>115</span>
+<span class='line-number'>116</span>
+<span class='line-number'>117</span>
+<span class='line-number'>118</span>
+<span class='line-number'>119</span>
+<span class='line-number'>120</span>
+<span class='line-number'>121</span>
+<span class='line-number'>122</span>
+<span class='line-number'>123</span>
+<span class='line-number'>124</span>
+<span class='line-number'>125</span>
+<span class='line-number'>126</span>
+<span class='line-number'>127</span>
+<span class='line-number'>128</span>
+<span class='line-number'>129</span>
+<span class='line-number'>130</span>
+<span class='line-number'>131</span>
+<span class='line-number'>132</span>
+<span class='line-number'>133</span>
+<span class='line-number'>134</span>
+<span class='line-number'>135</span>
+<span class='line-number'>136</span>
+<span class='line-number'>137</span>
+<span class='line-number'>138</span>
+<span class='line-number'>139</span>
+<span class='line-number'>140</span>
+<span class='line-number'>141</span>
+<span class='line-number'>142</span>
+<span class='line-number'>143</span>
+<span class='line-number'>144</span>
+<span class='line-number'>145</span>
+<span class='line-number'>146</span>
+<span class='line-number'>147</span>
+<span class='line-number'>148</span>
+<span class='line-number'>149</span>
+<span class='line-number'>150</span>
+<span class='line-number'>151</span>
+<span class='line-number'>152</span>
+<span class='line-number'>153</span>
+<span class='line-number'>154</span>
+<span class='line-number'>155</span>
+<span class='line-number'>156</span>
+<span class='line-number'>157</span>
+<span class='line-number'>158</span>
+<span class='line-number'>159</span>
+<span class='line-number'>160</span>
+<span class='line-number'>161</span>
+<span class='line-number'>162</span>
+<span class='line-number'>163</span>
+<span class='line-number'>164</span>
+<span class='line-number'>165</span>
+<span class='line-number'>166</span>
+<span class='line-number'>167</span>
+<span class='line-number'>168</span>
+<span class='line-number'>169</span>
+<span class='line-number'>170</span>
+<span class='line-number'>171</span>
+<span class='line-number'>172</span>
+<span class='line-number'>173</span>
+<span class='line-number'>174</span>
+<span class='line-number'>175</span>
+<span class='line-number'>176</span>
+<span class='line-number'>177</span>
+<span class='line-number'>178</span>
+<span class='line-number'>179</span>
+<span class='line-number'>180</span>
+<span class='line-number'>181</span>
+<span class='line-number'>182</span>
+<span class='line-number'>183</span>
+<span class='line-number'>184</span>
+<span class='line-number'>185</span>
+<span class='line-number'>186</span>
+<span class='line-number'>187</span>
+<span class='line-number'>188</span>
+<span class='line-number'>189</span>
+<span class='line-number'>190</span>
+<span class='line-number'>191</span>
+<span class='line-number'>192</span>
+<span class='line-number'>193</span>
+<span class='line-number'>194</span>
+<span class='line-number'>195</span>
+<span class='line-number'>196</span>
+<span class='line-number'>197</span>
+<span class='line-number'>198</span>
+<span class='line-number'>199</span>
+<span class='line-number'>200</span>
+<span class='line-number'>201</span>
+<span class='line-number'>202</span>
+<span class='line-number'>203</span>
+<span class='line-number'>204</span>
+<span class='line-number'>205</span>
+<span class='line-number'>206</span>
+<span class='line-number'>207</span>
+<span class='line-number'>208</span>
+<span class='line-number'>209</span>
+<span class='line-number'>210</span>
+<span class='line-number'>211</span>
+<span class='line-number'>212</span>
+<span class='line-number'>213</span>
+<span class='line-number'>214</span>
+<span class='line-number'>215</span>
+<span class='line-number'>216</span>
+<span class='line-number'>217</span>
+<span class='line-number'>218</span>
+<span class='line-number'>219</span>
+<span class='line-number'>220</span>
+<span class='line-number'>221</span>
+<span class='line-number'>222</span>
+<span class='line-number'>223</span>
+<span class='line-number'>224</span>
+<span class='line-number'>225</span>
+<span class='line-number'>226</span>
+<span class='line-number'>227</span>
+<span class='line-number'>228</span>
+<span class='line-number'>229</span>
+<span class='line-number'>230</span>
+<span class='line-number'>231</span>
+<span class='line-number'>232</span>
+<span class='line-number'>233</span>
+<span class='line-number'>234</span>
+<span class='line-number'>235</span>
+<span class='line-number'>236</span>
+<span class='line-number'>237</span>
+<span class='line-number'>238</span>
+<span class='line-number'>239</span>
+<span class='line-number'>240</span>
+<span class='line-number'>241</span>
+<span class='line-number'>242</span>
+<span class='line-number'>243</span>
+<span class='line-number'>244</span>
+<span class='line-number'>245</span>
+<span class='line-number'>246</span>
+<span class='line-number'>247</span>
+<span class='line-number'>248</span>
+<span class='line-number'>249</span>
+<span class='line-number'>250</span>
+<span class='line-number'>251</span>
+<span class='line-number'>252</span>
+<span class='line-number'>253</span>
+<span class='line-number'>254</span>
+</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="k">sub </span><span class="nf">replicate</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">my</span> <span class="p">(</span><span class="nv">$fid</span><span class="p">,</span> <span class="nv">%opts</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>      <span class="c1">#参数赋值</span>
+</span><span class='line'>    <span class="nv">$fid</span> <span class="o">=</span> <span class="nn">MogileFS::</span><span class="n">FID</span><span class="o">-&gt;</span><span class="k">new</span><span class="p">(</span><span class="nv">$fid</span><span class="p">)</span> <span class="k">unless</span> <span class="nb">ref</span> <span class="nv">$fid</span><span class="p">;</span>   <span class="c1">#实例fid对象</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$fidid</span> <span class="o">=</span> <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">;</span> <span class="c1">#fid的id</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">debug</span><span class="p">(</span><span class="s">&quot;Replication for $fidid called, opts=&quot;</span><span class="o">.</span><span class="nb">join</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">,</span><span class="nb">keys</span><span class="p">(</span><span class="nv">%opts</span><span class="p">)))</span> <span class="k">if</span> <span class="nv">$</span><span class="nn">Mgd::</span><span class="nv">DEBUG</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$errref</span>    <span class="o">=</span> <span class="nb">delete</span> <span class="nv">$opts</span><span class="p">{</span><span class="s">&#39;errref&#39;</span><span class="p">};</span>  <span class="c1">#错误消息的引用</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$no_unlock</span> <span class="o">=</span> <span class="nb">delete</span> <span class="nv">$opts</span><span class="p">{</span><span class="s">&#39;no_unlock&#39;</span><span class="p">};</span>  <span class="c1">#上锁,使用Mysql的锁,get_lock和release_lock</span>
+</span><span class='line'>    <span class="c1">#复制源，复制到哪些设备，排除的设备，避免的设备</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$fixed_source</span> <span class="o">=</span> <span class="nb">delete</span> <span class="nv">$opts</span><span class="p">{</span><span class="s">&#39;source_devid&#39;</span><span class="p">};</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$mask_devids</span>  <span class="o">=</span> <span class="nb">delete</span> <span class="nv">$opts</span><span class="p">{</span><span class="s">&#39;mask_devids&#39;</span><span class="p">}</span>  <span class="o">||</span> <span class="p">{};</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$avoid_devids</span> <span class="o">=</span> <span class="nb">delete</span> <span class="nv">$opts</span><span class="p">{</span><span class="s">&#39;avoid_devids&#39;</span><span class="p">}</span> <span class="o">||</span> <span class="p">{};</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$target_devids</span> <span class="o">=</span> <span class="nb">delete</span> <span class="nv">$opts</span><span class="p">{</span><span class="s">&#39;target_devids&#39;</span><span class="p">}</span> <span class="o">||</span> <span class="o">[]</span><span class="p">;</span> <span class="c1"># inverse of avoid_devids.</span>
+</span><span class='line'>    <span class="nb">die</span> <span class="s">&quot;unknown_opts&quot;</span> <span class="k">if</span> <span class="nv">%opts</span><span class="p">;</span>
+</span><span class='line'>    <span class="nb">die</span> <span class="k">unless</span> <span class="nb">ref</span> <span class="nv">$mask_devids</span> <span class="ow">eq</span> <span class="s">&quot;HASH&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$sdevid</span><span class="p">;</span> <span class="c1">#下面会看到，就是复制源</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$sto</span> <span class="o">=</span> <span class="nn">Mgd::</span><span class="n">get_store</span><span class="p">();</span>
+</span><span class='line'>    <span class="c1">#释放锁的函数release_lock(name)</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$unlock</span> <span class="o">=</span> <span class="k">sub </span><span class="p">{</span>
+</span><span class='line'>        <span class="nv">$sto</span><span class="o">-&gt;</span><span class="n">note_done_replicating</span><span class="p">(</span><span class="nv">$fidid</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">#这是一个返回函数，返回结果用的</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$retunlock</span> <span class="o">=</span> <span class="k">sub </span><span class="p">{</span>
+</span><span class='line'>        <span class="k">my</span> <span class="nv">$rv</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">my</span> <span class="p">(</span><span class="nv">$errmsg</span><span class="p">,</span> <span class="nv">$errcode</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nv">@_</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="p">(</span><span class="nv">$errcode</span><span class="p">,</span> <span class="nv">$errmsg</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
+</span><span class='line'>            <span class="nv">$errmsg</span> <span class="o">=</span> <span class="s">&quot;$errcode: $errmsg&quot;</span><span class="p">;</span> <span class="c1"># include code with message</span>
+</span><span class='line'>        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>            <span class="p">(</span><span class="nv">$errmsg</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="nv">$$errref</span> <span class="o">=</span> <span class="nv">$errcode</span> <span class="k">if</span> <span class="nv">$errref</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">my</span> <span class="nv">$ret</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nv">$errcode</span> <span class="o">&amp;&amp;</span> <span class="nv">$errcode</span> <span class="ow">eq</span> <span class="s">&quot;failed_getting_lock&quot;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="c1"># don&#39;t emit a warning with error() on lock failure.  not</span>
+</span><span class='line'>            <span class="c1"># a big deal, don&#39;t scare people.</span>
+</span><span class='line'>            <span class="nv">$ret</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nv">$ret</span> <span class="o">=</span> <span class="nv">$rv</span> <span class="p">?</span> <span class="nv">$rv</span> <span class="p">:</span> <span class="n">error</span><span class="p">(</span><span class="nv">$errmsg</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nv">$no_unlock</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nb">die</span> <span class="s">&quot;ERROR: must be called in list context w/ no_unlock&quot;</span> <span class="k">unless</span> <span class="nb">wantarray</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">return</span> <span class="p">(</span><span class="nv">$ret</span><span class="p">,</span> <span class="nv">$unlock</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nb">die</span> <span class="s">&quot;ERROR: must not be called in list context w/o no_unlock&quot;</span> <span class="k">if</span> <span class="nb">wantarray</span><span class="p">;</span>
+</span><span class='line'>            <span class="nv">$unlock</span><span class="o">-&gt;</span><span class="p">();</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nv">$ret</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># hashref of devid -&gt; MogileFS::Device所有的device</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$devs</span> <span class="o">=</span> <span class="nn">Mgd::</span><span class="n">device_factory</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">map_by_id</span>
+</span><span class='line'>        <span class="ow">or</span> <span class="nb">die</span> <span class="s">&quot;No device map&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">#错误话就调用retunlock </span>
+</span><span class='line'>    <span class="k">return</span> <span class="nv">$retunlock</span><span class="o">-&gt;</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s">&quot;failed_getting_lock&quot;</span><span class="p">,</span> <span class="s">&quot;Unable to obtain lock for fid $fidid&quot;</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">unless</span> <span class="nv">$sto</span><span class="o">-&gt;</span><span class="n">should_begin_replicating_fidid</span><span class="p">(</span><span class="nv">$fidid</span><span class="p">);</span><span class="c1">#这里获取mysql的锁 get_lock(name,timeout),name里fidid</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># if the fid doesn&#39;t even exist, consider our job done!  no point</span>
+</span><span class='line'>    <span class="c1"># replicating file contents of a file no longer in the namespace.</span>
+</span><span class='line'>    <span class="c1">#没有fid返回</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nv">$retunlock</span><span class="o">-&gt;</span><span class="p">(</span><span class="s">&quot;nofid&quot;</span><span class="p">)</span> <span class="k">unless</span> <span class="nv">$fid</span><span class="o">-&gt;</span><span class="nb">exists</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">#Class.pm对象</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$cls</span> <span class="o">=</span> <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">class</span><span class="p">;</span>
+</span><span class='line'>    <span class="c1">#策略对象MogileFS::ReplicationPolicy::MultipleHosts</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$polobj</span> <span class="o">=</span> <span class="nv">$cls</span><span class="o">-&gt;</span><span class="n">repl_policy_obj</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># learn what this devices file is already on</span>
+</span><span class='line'>    <span class="c1">#所有设备</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">@on_devs</span><span class="p">;</span>         <span class="c1"># all devices fid is on, reachable or not.</span>
+</span><span class='line'>    <span class="c1">#排除dead和drain的设备</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">@on_devs_tellpol</span><span class="p">;</span> <span class="c1"># subset of @on_devs, to tell the policy class about</span>
+</span><span class='line'>    <span class="c1">#可读的设备</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">@on_up_devid</span><span class="p">;</span>     <span class="c1"># subset of @on_devs:  just devs that are readable</span>
+</span><span class='line'>    <span class="c1">#设置上面的数组</span>
+</span><span class='line'>    <span class="k">foreach</span> <span class="k">my</span> <span class="nv">$devid</span> <span class="p">(</span><span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">devids</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">my</span> <span class="nv">$d</span> <span class="o">=</span> <span class="nn">Mgd::</span><span class="n">device_factory</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">get_by_id</span><span class="p">(</span><span class="nv">$devid</span><span class="p">)</span>
+</span><span class='line'>            <span class="ow">or</span> <span class="k">next</span><span class="p">;</span>
+</span><span class='line'>        <span class="c1">#fid在哪些dev上</span>
+</span><span class='line'>        <span class="nb">push</span> <span class="nv">@on_devs</span><span class="p">,</span> <span class="nv">$d</span><span class="p">;</span>
+</span><span class='line'>        <span class="c1">#should_hava_files表示状态不为drain或者dead</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nv">$d</span><span class="o">-&gt;</span><span class="n">dstate</span><span class="o">-&gt;</span><span class="n">should_have_files</span> <span class="o">&amp;&amp;</span> <span class="o">!</span> <span class="nv">$mask_devids</span><span class="o">-&gt;</span><span class="p">{</span><span class="nv">$devid</span><span class="p">})</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nb">push</span> <span class="nv">@on_devs_tellpol</span><span class="p">,</span> <span class="nv">$d</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="c1">#有read权限</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nv">$d</span><span class="o">-&gt;</span><span class="n">dstate</span><span class="o">-&gt;</span><span class="n">can_read_from</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nb">push</span> <span class="nv">@on_up_devid</span><span class="p">,</span> <span class="nv">$devid</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">#如果一个设备都没，就返回</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nv">$retunlock</span><span class="o">-&gt;</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s">&quot;no_source&quot;</span><span class="p">,</span>   <span class="s">&quot;Source is no longer available replicating $fidid&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="nv">@on_devs</span> <span class="o">==</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nv">$retunlock</span><span class="o">-&gt;</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s">&quot;source_down&quot;</span><span class="p">,</span> <span class="s">&quot;No alive devices available replicating $fidid&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="nv">@on_up_devid</span> <span class="o">==</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">#fixed_source设置错误，根本就没有</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$fixed_source</span> <span class="o">&amp;&amp;</span> <span class="o">!</span> <span class="nb">grep</span> <span class="p">{</span> <span class="nv">$_</span> <span class="o">==</span> <span class="nv">$fixed_source</span> <span class="p">}</span> <span class="nv">@on_up_devid</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">error</span><span class="p">(</span><span class="s">&quot;Fixed source dev$fixed_source requested for $fidid but not available. Trying other devices&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">#错误的设备记录，下面循环里就不会再使用了</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">%dest_failed</span><span class="p">;</span>    <span class="c1"># devid -&gt; 1 for each devid we were asked to copy to, but failed.</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">%source_failed</span><span class="p">;</span>  <span class="c1"># devid -&gt; 1 for each devid we had problems reading from.</span>
+</span><span class='line'>    <span class="c1">#用来标记真的复制了，下面的循环会使用</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$got_copy_request</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>  <span class="c1"># true once replication policy asks us to move something somewhere</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$copy_err</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">#过滤复制到哪些设备</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$dest_devs</span> <span class="o">=</span> <span class="nv">$devs</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">@$target_devids</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$dest_devs</span> <span class="o">=</span> <span class="p">{</span><span class="nb">map</span> <span class="p">{</span> <span class="nv">$_</span> <span class="o">=&gt;</span> <span class="nv">$devs</span><span class="o">-&gt;</span><span class="p">{</span><span class="nv">$_</span><span class="p">}</span> <span class="p">}</span> <span class="nv">@$target_devids</span><span class="p">};</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$rr</span><span class="p">;</span>  <span class="c1">#MogileFS::ReplicationRequest对象</span>
+</span><span class='line'>    <span class="c1">#开始循环复制，因为会有可能要复制3份的嘛。</span>
+</span><span class='line'>    <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="c1">#MogileFS::ReplicationPolicy::MultipleHosts的replicate_to</span>
+</span><span class='line'>        <span class="c1">#取得ReplicationRequest对象【该对象是通过ReplicationPolicy::MultipleHosts策略生成的】</span>
+</span><span class='line'>        <span class="c1">#该对象会有4种返回值，分别是，1：对象形式，说明需要并可以复制。2：tmp_no_answer，没有可选择的device。</span>
+</span><span class='line'>        <span class="c1">#3：all_good，一切OK。4：too_good，好过头了呀。</span>
+</span><span class='line'>        <span class="nv">$rr</span> <span class="o">=</span> <span class="n">rr_upgrade</span><span class="p">(</span><span class="nv">$polobj</span><span class="o">-&gt;</span><span class="n">replicate_to</span><span class="p">(</span>
+</span><span class='line'>                                               <span class="n">fid</span>       <span class="o">=&gt;</span> <span class="nv">$fidid</span><span class="p">,</span> <span class="c1">#fidid</span>
+</span><span class='line'>                                               <span class="n">on_devs</span>   <span class="o">=&gt;</span> <span class="o">\</span><span class="nv">@on_devs_tellpol</span><span class="p">,</span> <span class="c1"># all device objects fid is on, dead or otherwise</span>
+</span><span class='line'>                                               <span class="n">all_devs</span>  <span class="o">=&gt;</span> <span class="nv">$dest_devs</span><span class="p">,</span> <span class="c1">#所有的dev，如果有target_devids的话那就用target的咯</span>
+</span><span class='line'>                                               <span class="n">failed</span>    <span class="o">=&gt;</span> <span class="o">\</span><span class="nv">%dest_failed</span><span class="p">,</span> <span class="c1">#失败信息</span>
+</span><span class='line'>                                               <span class="n">min</span>       <span class="o">=&gt;</span> <span class="nv">$cls</span><span class="o">-&gt;</span><span class="n">mindevcount</span><span class="p">,</span> <span class="c1">#最小设备</span>
+</span><span class='line'>                                               <span class="p">));</span>
+</span><span class='line'>        <span class="c1">#是happy就跳出，跳出会有后续处理的</span>
+</span><span class='line'>        <span class="k">last</span> <span class="k">if</span> <span class="nv">$rr</span><span class="o">-&gt;</span><span class="n">is_happy</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1">#经过过滤的dev</span>
+</span><span class='line'>        <span class="k">my</span> <span class="nv">@ddevs</span><span class="p">;</span>  <span class="c1"># dest devs, in order of preference</span>
+</span><span class='line'>        <span class="c1">#选择出来的devid</span>
+</span><span class='line'>        <span class="k">my</span> <span class="nv">$ddevid</span><span class="p">;</span> <span class="c1"># dest devid we&#39;ve chosen to copy to</span>
+</span><span class='line'>        <span class="c1">#这里设置ddevs,其实就是host不同的设备</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nv">@ddevs</span> <span class="o">=</span> <span class="nv">$rr</span><span class="o">-&gt;</span><span class="n">copy_to_one_of_ideally</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="c1">#过滤掉不希望的</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="k">my</span> <span class="nv">@not_masked_ids</span> <span class="o">=</span> <span class="p">(</span><span class="nb">grep</span> <span class="p">{</span> <span class="o">!</span> <span class="nv">$mask_devids</span><span class="o">-&gt;</span><span class="p">{</span><span class="nv">$_</span><span class="p">}</span> <span class="o">&amp;&amp;</span>
+</span><span class='line'>                                             <span class="o">!</span> <span class="nv">$avoid_devids</span><span class="o">-&gt;</span><span class="p">{</span><span class="nv">$_</span><span class="p">}</span>
+</span><span class='line'>                                         <span class="p">}</span>
+</span><span class='line'>                                      <span class="nb">map</span> <span class="p">{</span> <span class="nv">$_</span><span class="o">-&gt;</span><span class="n">id</span> <span class="p">}</span> <span class="nv">@ddevs</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>                <span class="nv">$ddevid</span> <span class="o">=</span> <span class="nv">$not_masked_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span> <span class="c1">#拿一个放到ddevid</span>
+</span><span class='line'>            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>                <span class="k">return</span> <span class="nv">$retunlock</span><span class="o">-&gt;</span><span class="p">(</span><span class="s">&quot;would_worsen&quot;</span><span class="p">);</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span> <span class="k">elsif</span> <span class="p">(</span><span class="nv">@ddevs</span> <span class="o">=</span> <span class="nv">$rr</span><span class="o">-&gt;</span><span class="n">copy_to_one_of_desperate</span><span class="p">)</span> <span class="p">{</span> <span class="c1">#没有不同的host，没办法同一个host也行啊</span>
+</span><span class='line'>            <span class="c1"># TODO: reschedule a replication for &#39;n&#39; minutes in future, or</span>
+</span><span class='line'>            <span class="c1"># when new hosts/devices become available or change state</span>
+</span><span class='line'>            <span class="nv">$ddevid</span> <span class="o">=</span> <span class="nv">$ddevs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>            <span class="c1">#跳出了呀，</span>
+</span><span class='line'>            <span class="k">last</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="c1">#标记一下真的复制了</span>
+</span><span class='line'>        <span class="nv">$got_copy_request</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1"># replication policy shouldn&#39;t tell us to put a file on a device</span>
+</span><span class='line'>        <span class="c1"># we&#39;ve already told it that we&#39;ve failed at.  so if we get that response,</span>
+</span><span class='line'>        <span class="c1"># the policy plugin is broken and we should terminate now.</span>
+</span><span class='line'>        <span class="c1">#不在错误数组里</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nv">$dest_failed</span><span class="p">{</span><span class="nv">$ddevid</span><span class="p">})</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nv">$retunlock</span><span class="o">-&gt;</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s">&quot;policy_error_doing_failed&quot;</span><span class="p">,</span>
+</span><span class='line'>                                <span class="s">&quot;replication policy told us to do something we already told it we failed at while replicating fid $fidid&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1"># replication policy shouldn&#39;t tell us to put a file on a</span>
+</span><span class='line'>        <span class="c1"># device that it&#39;s already on.  that&#39;s just stupid.</span>
+</span><span class='line'>        <span class="c1">#已经在这file_on上了么，不行的呀</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nb">grep</span> <span class="p">{</span> <span class="nv">$_</span><span class="o">-&gt;</span><span class="n">id</span> <span class="o">==</span> <span class="nv">$ddevid</span> <span class="p">}</span> <span class="nv">@on_devs</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nv">$retunlock</span><span class="o">-&gt;</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s">&quot;policy_error_already_there&quot;</span><span class="p">,</span>
+</span><span class='line'>                                <span class="s">&quot;replication policy told us to put fid $fidid on dev $ddevid, but it&#39;s already there!&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1"># find where we&#39;re replicating from</span>
+</span><span class='line'>        <span class="c1">#这里开始设置复制源</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="c1"># TODO: use an observed good device+host as source to start.</span>
+</span><span class='line'>            <span class="c1">#排除掉错误源</span>
+</span><span class='line'>            <span class="k">my</span> <span class="nv">@choices</span> <span class="o">=</span> <span class="nb">grep</span> <span class="p">{</span> <span class="o">!</span> <span class="nv">$source_failed</span><span class="p">{</span><span class="nv">$_</span><span class="p">}</span> <span class="p">}</span> <span class="nv">@on_up_devid</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nv">$retunlock</span><span class="o">-&gt;</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s">&quot;source_down&quot;</span><span class="p">,</span> <span class="s">&quot;No devices available replicating $fidid&quot;</span><span class="p">)</span> <span class="k">unless</span> <span class="nv">@choices</span><span class="p">;</span>
+</span><span class='line'>            <span class="c1">#如果有fixed_source那就用，没有么就随即选一个吧</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="nv">$fixed_source</span> <span class="o">&amp;&amp;</span> <span class="nb">grep</span> <span class="p">{</span> <span class="nv">$_</span> <span class="o">==</span> <span class="nv">$fixed_source</span> <span class="p">}</span> <span class="nv">@choices</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                <span class="nv">$sdevid</span> <span class="o">=</span> <span class="nv">$fixed_source</span><span class="p">;</span>
+</span><span class='line'>            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>                <span class="nv">@choices</span> <span class="o">=</span> <span class="nn">List::Util::</span><span class="n">shuffle</span><span class="p">(</span><span class="nv">@choices</span><span class="p">);</span>
+</span><span class='line'>                <span class="nn">MogileFS::</span><span class="n">run_global_hook</span><span class="p">(</span><span class="s">&#39;replicate_order_final_choices&#39;</span><span class="p">,</span> <span class="nv">$devs</span><span class="p">,</span> <span class="o">\</span><span class="nv">@choices</span><span class="p">);</span>
+</span><span class='line'>                <span class="nv">$sdevid</span> <span class="o">=</span> <span class="nb">shift</span> <span class="nv">@choices</span><span class="p">;</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1">#是子进程的判断</span>
+</span><span class='line'>        <span class="k">my</span> <span class="nv">$worker</span> <span class="o">=</span> <span class="nn">MogileFS::</span><span class="n">ProcManager</span><span class="o">-&gt;</span><span class="n">is_child</span> <span class="ow">or</span> <span class="nb">die</span><span class="p">;</span>
+</span><span class='line'>        <span class="c1">#校验和，不用的呀，不考虑</span>
+</span><span class='line'>        <span class="k">my</span> <span class="nv">$digest</span> <span class="o">=</span> <span class="n">Digest</span><span class="o">-&gt;</span><span class="k">new</span><span class="p">(</span><span class="nv">$cls</span><span class="o">-&gt;</span><span class="n">hashname</span><span class="p">)</span> <span class="k">if</span> <span class="nv">$cls</span><span class="o">-&gt;</span><span class="n">hashtype</span><span class="p">;</span>
+</span><span class='line'>        <span class="c1">#真的复制了</span>
+</span><span class='line'>        <span class="k">my</span> <span class="nv">$rv</span> <span class="o">=</span> <span class="n">http_copy</span><span class="p">(</span>
+</span><span class='line'>                           <span class="n">sdevid</span>       <span class="o">=&gt;</span> <span class="nv">$sdevid</span><span class="p">,</span>
+</span><span class='line'>                           <span class="n">ddevid</span>       <span class="o">=&gt;</span> <span class="nv">$ddevid</span><span class="p">,</span>
+</span><span class='line'>                           <span class="n">fid</span>          <span class="o">=&gt;</span> <span class="nv">$fidid</span><span class="p">,</span>
+</span><span class='line'>                           <span class="n">rfid</span>         <span class="o">=&gt;</span> <span class="nv">$fid</span><span class="p">,</span>
+</span><span class='line'>                           <span class="n">expected_len</span> <span class="o">=&gt;</span> <span class="nb">undef</span><span class="p">,</span>  <span class="c1"># FIXME: get this info to pass along</span>
+</span><span class='line'>                           <span class="n">errref</span>       <span class="o">=&gt;</span> <span class="o">\</span><span class="nv">$copy_err</span><span class="p">,</span>
+</span><span class='line'>                           <span class="n">callback</span>     <span class="o">=&gt;</span> <span class="k">sub </span><span class="p">{</span> <span class="nv">$worker</span><span class="o">-&gt;</span><span class="n">still_alive</span><span class="p">;</span> <span class="p">},</span>
+</span><span class='line'>                           <span class="n">digest</span>       <span class="o">=&gt;</span> <span class="nv">$digest</span><span class="p">,</span>
+</span><span class='line'>                           <span class="p">);</span>
+</span><span class='line'>        <span class="nb">die</span> <span class="s">&quot;Bogus error code: $copy_err&quot;</span> <span class="k">if</span> <span class="o">!</span><span class="nv">$rv</span> <span class="o">&amp;&amp;</span> <span class="nv">$copy_err</span> <span class="o">!~</span> <span class="sr">/^(?:src|dest)_error$/</span><span class="p">;</span>
+</span><span class='line'>        <span class="c1">#如果错误了，设置失败数组，next等于其他语言的continue呀，继续找其他的</span>
+</span><span class='line'>        <span class="k">unless</span> <span class="p">(</span><span class="nv">$rv</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">error</span><span class="p">(</span><span class="s">&quot;Failed copying fid $fidid from devid $sdevid to devid $ddevid (error type: $copy_err)&quot;</span><span class="p">);</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="nv">$copy_err</span> <span class="ow">eq</span> <span class="s">&quot;src_error&quot;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                <span class="nv">$source_failed</span><span class="p">{</span><span class="nv">$sdevid</span><span class="p">}</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="k">if</span> <span class="p">(</span><span class="nv">$fixed_source</span> <span class="o">&amp;&amp;</span> <span class="nv">$fixed_source</span> <span class="o">==</span> <span class="nv">$sdevid</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                    <span class="n">error</span><span class="p">(</span><span class="s">&quot;Fixed source dev$fixed_source was requested for $fidid but failed: will try other sources&quot;</span><span class="p">);</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>                <span class="nv">$dest_failed</span><span class="p">{</span><span class="nv">$ddevid</span><span class="p">}</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>            <span class="k">next</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="c1">#复制成功了，开始插入数据了</span>
+</span><span class='line'>        <span class="k">my</span> <span class="nv">$dfid</span> <span class="o">=</span> <span class="nn">MogileFS::</span><span class="n">DevFID</span><span class="o">-&gt;</span><span class="k">new</span><span class="p">(</span><span class="nv">$ddevid</span><span class="p">,</span> <span class="nv">$fid</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$dfid</span><span class="o">-&gt;</span><span class="n">add_to_db</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nv">$digest</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">checksum</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nv">$sto</span><span class="o">-&gt;</span><span class="n">set_checksum</span><span class="p">(</span><span class="nv">$fidid</span><span class="p">,</span> <span class="nv">$cls</span><span class="o">-&gt;</span><span class="n">hashtype</span><span class="p">,</span> <span class="nv">$digest</span><span class="o">-&gt;</span><span class="n">digest</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1">#设置一下变量，加入要复制3分是应该再继续复制的</span>
+</span><span class='line'>        <span class="nb">push</span> <span class="nv">@on_devs</span><span class="p">,</span> <span class="nv">$devs</span><span class="o">-&gt;</span><span class="p">{</span><span class="nv">$ddevid</span><span class="p">};</span>
+</span><span class='line'>        <span class="nb">push</span> <span class="nv">@on_devs_tellpol</span><span class="p">,</span> <span class="nv">$devs</span><span class="o">-&gt;</span><span class="p">{</span><span class="nv">$ddevid</span><span class="p">};</span>
+</span><span class='line'>        <span class="nb">push</span> <span class="nv">@on_up_devid</span><span class="p">,</span> <span class="nv">$ddevid</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># We are over replicated. Let caller decide if it should rebalance.</span>
+</span><span class='line'>    <span class="c1">#好过头了</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$rr</span><span class="o">-&gt;</span><span class="n">too_happy</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nv">$retunlock</span><span class="o">-&gt;</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s">&quot;too_happy&quot;</span><span class="p">,</span> <span class="s">&quot;fid $fidid is on too many devices&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">#这是满足策略的情况</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$rr</span><span class="o">-&gt;</span><span class="n">is_happy</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nv">$retunlock</span><span class="o">-&gt;</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="nv">$got_copy_request</span><span class="p">;</span>
+</span><span class='line'>        <span class="c1">#没有地方去复制了</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nv">$retunlock</span><span class="o">-&gt;</span><span class="p">(</span><span class="s">&quot;lost_race&quot;</span><span class="p">);</span>  <span class="c1"># some other process got to it first.  policy was happy immediately.</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">#应该不会走到这里了</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nv">$retunlock</span><span class="o">-&gt;</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s">&quot;policy_no_suggestions&quot;</span><span class="p">,</span>
+</span><span class='line'>                        <span class="s">&quot;replication policy ran out of suggestions for us replicating fid $fidid&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">王惠达 huida wanghuida</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-16T15:47:00+08:00" pubdate data-updated="true">Oct 16<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/mogilefs/'>Mogilefs</a>, <a class='category' href='/blog/categories/perl/'>Perl</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2012/10/16/mogilefsde-replicatefen-xi/" data-via="" data-counturl="http://www.wanghd.com/blog/2012/10/16/mogilefsde-replicatefen-xi/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/10/14/ying-pan-an-zhuang-centos/" title="Previous Post: 硬盘安装CentOS">&laquo; 硬盘安装CentOS</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/10/23/mogilefsxiang-jie/" title="Next Post: MogileFS详解">MogileFS详解 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>工程师的最爱</h1>
+  <ul id="taobao_rank">
+    <li>
+  <iframe name="alimamaifrm" frameborder="0" marginheight="0" marginwidth="0" border="0" scrolling="no" width="100%" height="250" src="http://top.taobao.com/interface_v2.php?pid=mm_32662861_3310667_10777894&type=y&f=html&ie=utf8&from=taoke&unid=&name=%E4%BB%8A%E6%97%A5%E5%85%B3%E6%B3%A8%E9%A3%99%E5%8D%87&trtp=2&up=false&goodsFilter=all&sw=260&sh=250&sn=5&bgc=E8E9EB&bc=DADADA&fc=0A63AA&tc=535353&cat_ids=1101%2CTR_RXSJB%2CTR_SJPJ%2C50019780%2CTR_SBJP" ></iframe>
+    </li>
+  </ul>
+</section>
+<section>
+  <h1>文章分类</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/java/'>Java (11)</a></li>
+<li class='category'><a href='/blog/categories/javascript/'>Javascript (1)</a></li>
+<li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (9)</a></li>
+<li class='category'><a href='/blog/categories/perl/'>Perl (9)</a></li>
+<li class='category'><a href='/blog/categories/python/'>Python (1)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (10)</a></li>
+<li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
+
+  </ul>
+</section>
+
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/10/23/mogilefsxiang-jie/">MogileFS详解</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/16/mogilefsde-replicatefen-xi/">MogileFS的replicate进程分析</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/14/ying-pan-an-zhuang-centos/">硬盘安装CentOS</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/">IRC:irssi使用教程</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/13/mogstoredshi-yong-nginx/">mogstored使用nginx</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/11/mogilefswen-jian-lu-jing-gui-ze/">mogilefs文件路径规则</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/09/mogilefsshe-bei-quan-zhong-suan-fa/">mogilefs设备权重算法</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/09/29/mogilefsde-fscktan-jiu/">mogilefs fsck探究</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/09/27/aho-corasicksuan-fa/">Aho-Corasick算法</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/09/27/solrsheng-lue-ri-zhi/">显示solr省略的日志</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>好友链接</h1>
+  <ul id="links">
+    <li><a href="http://www.zwsun.com">阿文的自留地</a></li>
+    <li><a href="http://www.deepwarm.com/">明兄的私房菜</a></li>
+  </ul>
+</section>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - 王惠达 huida wanghuida -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'wanghuida';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.wanghd.com/blog/2012/10/16/mogilefsde-replicatefen-xi/';
+        var disqus_url = 'http://www.wanghd.com/blog/2012/10/16/mogilefsde-replicatefen-xi/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      //var twitterWidgets = document.createElement('script');
+      //twitterWidgets.type = 'text/javascript';
+      //twitterWidgets.async = true;
+      //twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      //document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

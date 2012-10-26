@@ -1,0 +1,333 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>OAuth 介绍 - 惠达的小宅</title>
+  <meta name="author" content="王惠达 huida wanghuida">
+
+  
+  <meta name="description" content="在认证和授权的过程中涉及的三方包括： 服务提供方 (Service Provider)，用户使用服务提供方来存储受保护的资源，如照片，视频，联系人列表。
+用户 (User)，存放在服务提供方的受保护的资源的拥有者。
+客户端 (Client)，要访问服务提供方资源的第三方应用，通常是网站， &hellip;">
+  
+
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name='AD51_verify' content='37c113da1db8f547501c3ab9d5a33c41'>
+
+  
+  <link rel="canonical" href="http://www.wanghd.com/blog/2012/07/13/oauth-jie-shao/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="惠达的小宅" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-35556528-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">惠达的小宅</a></h1>
+  
+    <h2>A love-vim engineer.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.wanghd.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a target="_blank" href="http://www.taobao.com/go/chn/tbk_channel/channelcode.php?pid=mm_32662861_3310667_10778125&eventid=101329">Market</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">OAuth 介绍</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-13T13:01:00+08:00" pubdate data-updated="true">Jul 13<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h3>在认证和授权的过程中涉及的三方包括：</h3>
+
+<ul>
+<li>服务提供方 (Service Provider)，用户使用服务提供方来存储受保护的资源，如照片，视频，联系人列表。</li>
+<li>用户 (User)，存放在服务提供方的受保护的资源的拥有者。</li>
+<li>客户端 (Client)，要访问服务提供方资源的第三方应用，通常是网站，如提供照片打印服务的网站。在认证过程之前，客户端要向服务提供者申请客户端标识。</li>
+</ul>
+
+
+<h3>使用OAuth进行认证和授权的过程如下所示:</h3>
+
+<ol>
+<li>用户访问客户端的网站，想操作用户存放在服务提供方的资源。</li>
+<li>客户端向服务提供方请求一个临时令牌 (Request Token)。</li>
+<li>服务提供方验证客户端的身份后，授予一个临时令牌。</li>
+<li>客户端获得临时令牌后，将用户引导至服务提供方的授权页面请求用户授权。在这个过程中将临时令牌和客户端的回调连接发送给服务提供方。</li>
+<li>用户在服务提供方的网页上输入用户名和密码，然后授权该客户端访问所请求的资源。</li>
+<li>授权成功后，服务提供方引导用户返回客户端的网页。</li>
+<li>客户端根据临时令牌从服务提供方那里获取访问令牌 (Access Token)。</li>
+<li>服务提供方根据临时令牌和用户的授权情况授予客户端访问令牌。</li>
+<li>客户端使用获取的访问令牌访问存放在服务提供方上的受保护的资源。</li>
+</ol>
+
+
+<h3>图例说明</h3>
+
+<p><img src="/images/post/oauth_flow.png" title="OAuth 图例说明" alt="OAuth" /></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">王惠达 huida wanghuida</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-13T13:01:00+08:00" pubdate data-updated="true">Jul 13<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/share/'>Share</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2012/07/13/oauth-jie-shao/" data-via="" data-counturl="http://www.wanghd.com/blog/2012/07/13/oauth-jie-shao/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/07/07/octopress-introduce/" title="Previous Post: octopress 介绍">&laquo; octopress 介绍</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/07/22/python-zhou-ti-yan-ji/" title="Next Post: python 一周体验记">python 一周体验记 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>工程师的最爱</h1>
+  <ul id="taobao_rank">
+    <li>
+  <iframe name="alimamaifrm" frameborder="0" marginheight="0" marginwidth="0" border="0" scrolling="no" width="100%" height="250" src="http://top.taobao.com/interface_v2.php?pid=mm_32662861_3310667_10777894&type=y&f=html&ie=utf8&from=taoke&unid=&name=%E4%BB%8A%E6%97%A5%E5%85%B3%E6%B3%A8%E9%A3%99%E5%8D%87&trtp=2&up=false&goodsFilter=all&sw=260&sh=250&sn=5&bgc=E8E9EB&bc=DADADA&fc=0A63AA&tc=535353&cat_ids=1101%2CTR_RXSJB%2CTR_SJPJ%2C50019780%2CTR_SBJP" ></iframe>
+    </li>
+  </ul>
+</section>
+<section>
+  <h1>文章分类</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/java/'>Java (11)</a></li>
+<li class='category'><a href='/blog/categories/javascript/'>Javascript (1)</a></li>
+<li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (9)</a></li>
+<li class='category'><a href='/blog/categories/perl/'>Perl (9)</a></li>
+<li class='category'><a href='/blog/categories/python/'>Python (1)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (10)</a></li>
+<li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
+
+  </ul>
+</section>
+
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/10/23/mogilefsxiang-jie/">MogileFS详解</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/16/mogilefsde-replicatefen-xi/">MogileFS的replicate进程分析</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/14/ying-pan-an-zhuang-centos/">硬盘安装CentOS</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/">IRC:irssi使用教程</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/13/mogstoredshi-yong-nginx/">mogstored使用nginx</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/11/mogilefswen-jian-lu-jing-gui-ze/">mogilefs文件路径规则</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/09/mogilefsshe-bei-quan-zhong-suan-fa/">mogilefs设备权重算法</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/09/29/mogilefsde-fscktan-jiu/">mogilefs fsck探究</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/09/27/aho-corasicksuan-fa/">Aho-Corasick算法</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/09/27/solrsheng-lue-ri-zhi/">显示solr省略的日志</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>好友链接</h1>
+  <ul id="links">
+    <li><a href="http://www.zwsun.com">阿文的自留地</a></li>
+    <li><a href="http://www.deepwarm.com/">明兄的私房菜</a></li>
+  </ul>
+</section>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - 王惠达 huida wanghuida -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'wanghuida';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.wanghd.com/blog/2012/07/13/oauth-jie-shao/';
+        var disqus_url = 'http://www.wanghd.com/blog/2012/07/13/oauth-jie-shao/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      //var twitterWidgets = document.createElement('script');
+      //twitterWidgets.type = 'text/javascript';
+      //twitterWidgets.async = true;
+      //twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      //document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

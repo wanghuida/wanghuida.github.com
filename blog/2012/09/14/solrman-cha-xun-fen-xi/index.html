@@ -1,0 +1,398 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>solr慢查询分析 - 惠达的小宅</title>
+  <meta name="author" content="王惠达 huida wanghuida">
+
+  
+  <meta name="description" content="solr慢请求分析,第一种 1
+2
+3
+4
+5
+6
+7
+8
+9
+INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=560950&q=*:*&wt=json&rows=50} hits=863948 &hellip;">
+  
+
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name='AD51_verify' content='37c113da1db8f547501c3ab9d5a33c41'>
+
+  
+  <link rel="canonical" href="http://www.wanghd.com/blog/2012/09/14/solrman-cha-xun-fen-xi/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="惠达的小宅" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-35556528-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">惠达的小宅</a></h1>
+  
+    <h2>A love-vim engineer.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.wanghd.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a target="_blank" href="http://www.taobao.com/go/chn/tbk_channel/channelcode.php?pid=mm_32662861_3310667_10778125&eventid=101329">Market</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Solr慢查询分析</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-09-14T13:35:00+08:00" pubdate data-updated="true">Sep 14<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h3>solr慢请求分析,第一种</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=560950&q=*:*&wt=json&rows=50} hits=863948 status=0 QTime=2752
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=756250&q=*:*&wt=json&rows=50} hits=863935 status=0 QTime=2472 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=315450&q=*:*&wt=json&rows=50} hits=863935 status=0 QTime=1183 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=557400&q=*:*&wt=json&rows=50} hits=863935 status=0 QTime=2020 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=315550&q=*:*&wt=json&rows=50} hits=863935 status=0 QTime=1061 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=756400&q=*:*&wt=json&rows=50} hits=863935 status=0 QTime=2252 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=315650&q=*:*&wt=json&rows=50} hits=863938 status=0 QTime=1068 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=557500&q=*:*&wt=json&rows=50} hits=863938 status=0 QTime=2012 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=557550&q=*:*&wt=json&rows=50} hits=863938 status=0 QTime=2248 </span></code></pre></td></tr></table></div></figure>
+
+
+<h3>解决方案</h3>
+
+<ul>
+<li>请排除以上查询语句【或限制start】</li>
+</ul>
+
+
+<h3>solr慢请求分析,第二种</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>INFO: [] webapp=/solr path=/select params={mm=2&fl=score,*&sort=score+desc,quetime+desc&start=0&q=贷款+房子+能+不+买&bf=linear(rankscore,29.3246184,0)&qf=title^5+tags^1+bestanswerstr^2+description^1+normalanswerstr^1&wt=json&qt=dismax&fq=-cityid:14&fq=questatus:1+OR+questatus:2+OR+questatus:3+OR+questatus:6&rows=1} hits=317500 status=0 QTime=520 
+</span><span class='line'>INFO: [] webapp=/solr path=/select params={mm=2&fl=score,*&sort=score+desc,quetime+desc&start=0&q=集体+户口+好+好+不&qf=title^5+tags^1+bestanswerstr^2+description^1+normalanswerstr^1&wt=json&qt=dismax&fq=-cityid:12&fq=questatus:1+OR+questatus:2+OR+questatus:3+OR+questatus:6&rows=1} hits=287285 status=0 QTime=622 </span></code></pre></td></tr></table></div></figure>
+
+
+<h3>解决方案</h3>
+
+<ul>
+<li>dismax的mm=2间接使用了OR，建议用AND提高性能【实验中:我想用docfreq来做判断用AND还是OR】</li>
+<li>StopWord:通过solr/admin/luke?fl=normalanswerstr&amp;numTerms=100分析term,过滤掉没有意义的term,例如</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;int name="的"&gt;965396&lt;/int&gt;
+</span><span class='line'>&lt;int name="，"&gt;947429&lt;/int&gt;
+</span><span class='line'>&lt;int name="是"&gt;729063&lt;/int&gt;
+</span><span class='line'>&lt;int name="。"&gt;707417&lt;/int&gt;
+</span><span class='line'>&lt;int name="不"&gt;571925&lt;/int&gt;
+</span><span class='line'>&lt;int name="你"&gt;534142&lt;/int&gt;
+</span><span class='line'>&lt;int name="可以"&gt;525645&lt;/int&gt;
+</span><span class='line'>&lt;int name="就"&gt;460975&lt;/int&gt;
+</span><span class='line'>&lt;int name="有"&gt;443743&lt;/int&gt;
+</span><span class='line'>&lt;int name="了"&gt;437630&lt;/int&gt;
+</span><span class='line'>&lt;int name="要"&gt;372936&lt;/int&gt;
+</span><span class='line'>&lt;int name="！"&gt;342369&lt;/int&gt;
+</span><span class='line'>&lt;int name="好"&gt;331646&lt;/int&gt;
+</span><span class='line'>&lt;int name="在"&gt;324636&lt;/int&gt;
+</span><span class='line'>&lt;int name="一"&gt;279765&lt;/int&gt;
+</span><span class='line'>&lt;int name="个"&gt;269726&lt;/int&gt;
+</span><span class='line'>&lt;int name="能"&gt;233510&lt;/int&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>权重相同的放入同一个字段，也可以用CopyField，可以多加个系数</li>
+</ul>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">王惠达 huida wanghuida</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-09-14T13:35:00+08:00" pubdate data-updated="true">Sep 14<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/java/'>Java</a>, <a class='category' href='/blog/categories/solr/'>Solr</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2012/09/14/solrman-cha-xun-fen-xi/" data-via="" data-counturl="http://www.wanghd.com/blog/2012/09/14/solrman-cha-xun-fen-xi/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/09/07/lucene-ru-men/" title="Previous Post: lucene 入门">&laquo; lucene 入门</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/09/18/xiang-liang-kong-jian-mo-xing/" title="Next Post: 向量空间模型">向量空间模型 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>工程师的最爱</h1>
+  <ul id="taobao_rank">
+    <li>
+  <iframe name="alimamaifrm" frameborder="0" marginheight="0" marginwidth="0" border="0" scrolling="no" width="100%" height="250" src="http://top.taobao.com/interface_v2.php?pid=mm_32662861_3310667_10777894&type=y&f=html&ie=utf8&from=taoke&unid=&name=%E4%BB%8A%E6%97%A5%E5%85%B3%E6%B3%A8%E9%A3%99%E5%8D%87&trtp=2&up=false&goodsFilter=all&sw=260&sh=250&sn=5&bgc=E8E9EB&bc=DADADA&fc=0A63AA&tc=535353&cat_ids=1101%2CTR_RXSJB%2CTR_SJPJ%2C50019780%2CTR_SBJP" ></iframe>
+    </li>
+  </ul>
+</section>
+<section>
+  <h1>文章分类</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/java/'>Java (11)</a></li>
+<li class='category'><a href='/blog/categories/javascript/'>Javascript (1)</a></li>
+<li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (9)</a></li>
+<li class='category'><a href='/blog/categories/perl/'>Perl (9)</a></li>
+<li class='category'><a href='/blog/categories/python/'>Python (1)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (10)</a></li>
+<li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
+
+  </ul>
+</section>
+
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/10/23/mogilefsxiang-jie/">MogileFS详解</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/16/mogilefsde-replicatefen-xi/">MogileFS的replicate进程分析</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/14/ying-pan-an-zhuang-centos/">硬盘安装CentOS</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/">IRC:irssi使用教程</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/13/mogstoredshi-yong-nginx/">mogstored使用nginx</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/11/mogilefswen-jian-lu-jing-gui-ze/">mogilefs文件路径规则</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/09/mogilefsshe-bei-quan-zhong-suan-fa/">mogilefs设备权重算法</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/09/29/mogilefsde-fscktan-jiu/">mogilefs fsck探究</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/09/27/aho-corasicksuan-fa/">Aho-Corasick算法</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/09/27/solrsheng-lue-ri-zhi/">显示solr省略的日志</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>好友链接</h1>
+  <ul id="links">
+    <li><a href="http://www.zwsun.com">阿文的自留地</a></li>
+    <li><a href="http://www.deepwarm.com/">明兄的私房菜</a></li>
+  </ul>
+</section>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - 王惠达 huida wanghuida -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'wanghuida';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.wanghd.com/blog/2012/09/14/solrman-cha-xun-fen-xi/';
+        var disqus_url = 'http://www.wanghd.com/blog/2012/09/14/solrman-cha-xun-fen-xi/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      //var twitterWidgets = document.createElement('script');
+      //twitterWidgets.type = 'text/javascript';
+      //twitterWidgets.async = true;
+      //twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      //document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

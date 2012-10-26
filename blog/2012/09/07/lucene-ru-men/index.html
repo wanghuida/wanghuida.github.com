@@ -1,0 +1,450 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>lucene 入门 - 惠达的小宅</title>
+  <meta name="author" content="王惠达 huida wanghuida">
+
+  
+  <meta name="description" content="官方DEMO IndexFiles
+SearchFiles IndexFiles 在main()方法里分析命令行，然后初始化IndexWriter,打开Directory,初始化StandaryAnalyzer和IndexWriterConfig
+-index参数设置索引存放的地方， &hellip;">
+  
+
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name='AD51_verify' content='37c113da1db8f547501c3ab9d5a33c41'>
+
+  
+  <link rel="canonical" href="http://www.wanghd.com/blog/2012/09/07/lucene-ru-men/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="惠达的小宅" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-35556528-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">惠达的小宅</a></h1>
+  
+    <h2>A love-vim engineer.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.wanghd.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a target="_blank" href="http://www.taobao.com/go/chn/tbk_channel/channelcode.php?pid=mm_32662861_3310667_10778125&eventid=101329">Market</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Lucene 入门</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-09-07T22:10:00+08:00" pubdate data-updated="true">Sep 7<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h3>官方DEMO</h3>
+
+<ul>
+<li><a href="http://lucene.apache.org/core/4_0_0-BETA/demo/src-html/org/apache/lucene/demo/IndexFiles.html">IndexFiles</a></li>
+<li><a href="http://lucene.apache.org/core/4_0_0-BETA/demo/src-html/org/apache/lucene/demo/SearchFiles.html">SearchFiles</a></li>
+</ul>
+
+
+<h3>IndexFiles</h3>
+
+<ul>
+<li>在main()方法里分析命令行，然后初始化IndexWriter,打开Directory,初始化StandaryAnalyzer和IndexWriterConfig</li>
+<li>-index参数设置索引存放的地方，默认存放在index目录下</li>
+<li>-docs参数指定哪个目录下的文件被索引</li>
+<li>-update参数如果被设置，将不删除已经存在的索引，否则清楚后重新建立索引</li>
+<li>IndexWriter使用Directory存储索引信息,这里使用的是FSDirectory实现,其他的子类可以写入RAM,DB</li>
+<li>Analyzer用来分词(indexed tokens)也称为terms,也包括一些其他的处理，例如统一转换，同义词插入，过滤不需要的词等.现在用的StandaryAnalyzer的分词逻辑是Unicode Text Segmentation algorithm,统一转换成小写，过滤掉不要的词，例如a,an等很少被搜索的词语.不同的语言应该用不同的分析器，lucene已经提供了很多语言的分析器了</li>
+<li>IndexWriterConfig用来控制IndexWriter,例如设置OpenMode</li>
+<li>在IndexWriter初始化后，就来到了indexDocs()方法，这个递归函数爬取-docs下的所有文件来建立Document对象.Document包含3个域分别是文件内容，路径和创建时间.如果-update指定，那么就更新文档，否则删除索引目录后添加文档</li>
+</ul>
+
+
+<h3>SearchFiles</h3>
+
+<ul>
+<li>下面是一个简易版的文件查询,利用IndexSearcher,StandaryAnalyzer和QueryParser进行查找,QueryParser也需要StandaryAnalyzer对输入的内容进行分析，例如转换小写，过滤词等.QueryParser通过lucene解析语法生成的Query传递给IndexSearcher</li>
+<li>SearchFiles 用IndexSearcher.search(query,n) 返回得分最高的N条记录.</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">CustomSearch</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="nf">CustomSearch</span><span class="o">()</span> <span class="o">{}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="cm">/**</span>
+</span><span class='line'><span class="cm">   * @param args</span>
+</span><span class='line'><span class="cm">   */</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">String</span> <span class="n">index</span> <span class="o">=</span> <span class="s">&quot;index&quot;</span><span class="o">;</span>
+</span><span class='line'>    <span class="n">String</span> <span class="n">field</span> <span class="o">=</span> <span class="s">&quot;contents&quot;</span><span class="o">;</span>
+</span><span class='line'>    <span class="n">String</span> <span class="n">queryString</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">limit</span> <span class="o">=</span> <span class="mi">10</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">try</span><span class="o">{</span>
+</span><span class='line'>      <span class="n">IndexReader</span> <span class="n">reader</span> <span class="o">=</span> <span class="n">DirectoryReader</span><span class="o">.</span><span class="na">open</span><span class="o">(</span><span class="n">FSDirectory</span><span class="o">.</span><span class="na">open</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">index</span><span class="o">)));</span>
+</span><span class='line'>      <span class="n">IndexSearcher</span> <span class="n">searcher</span> <span class="o">=</span> <span class="k">new</span> <span class="n">IndexSearcher</span><span class="o">(</span><span class="n">reader</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">Analyzer</span> <span class="n">analyzer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StandardAnalyzer</span><span class="o">(</span><span class="n">Version</span><span class="o">.</span><span class="na">LUCENE_40</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">QueryParser</span> <span class="n">parser</span> <span class="o">=</span> <span class="k">new</span> <span class="n">QueryParser</span><span class="o">(</span><span class="n">Version</span><span class="o">.</span><span class="na">LUCENE_40</span><span class="o">,</span> <span class="n">field</span><span class="o">,</span> <span class="n">analyzer</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">BufferedReader</span> <span class="n">in</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BufferedReader</span><span class="o">(</span><span class="k">new</span> <span class="n">InputStreamReader</span><span class="o">(</span><span class="n">System</span><span class="o">.</span><span class="na">in</span><span class="o">,</span><span class="s">&quot;UTF-8&quot;</span><span class="o">));</span>
+</span><span class='line'>      <span class="k">if</span><span class="o">(</span><span class="n">queryString</span> <span class="o">==</span> <span class="kc">null</span><span class="o">){</span>
+</span><span class='line'>        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Enter query:&quot;</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">queryString</span> <span class="o">=</span> <span class="n">in</span><span class="o">.</span><span class="na">readLine</span><span class="o">();</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>      <span class="n">Query</span> <span class="n">query</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="n">queryString</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">printResult</span><span class="o">(</span><span class="n">in</span><span class="o">,</span> <span class="n">searcher</span><span class="o">,</span> <span class="n">query</span><span class="o">,</span> <span class="n">limit</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span><span class="k">catch</span><span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">){</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;can not open index directory!&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">exit</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">ParseException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;can not open index directory!&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">exit</span><span class="o">(</span><span class="mi">2</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">printResult</span><span class="o">(</span><span class="n">BufferedReader</span> <span class="n">in</span><span class="o">,</span><span class="n">IndexSearcher</span> <span class="n">searcher</span><span class="o">,</span><span class="n">Query</span> <span class="n">query</span><span class="o">,</span><span class="kt">int</span> <span class="n">limit</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">TopDocs</span> <span class="n">results</span> <span class="o">=</span> <span class="n">searcher</span><span class="o">.</span><span class="na">search</span><span class="o">(</span><span class="n">query</span><span class="o">,</span> <span class="n">limit</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">ScoreDoc</span><span class="o">[]</span> <span class="n">hits</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="na">scoreDocs</span><span class="o">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">totalHits</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="na">totalHits</span><span class="o">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">printHits</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">while</span><span class="o">(</span><span class="n">printHits</span> <span class="o">&lt;</span> <span class="n">totalHits</span><span class="o">){</span>
+</span><span class='line'>      <span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">hits</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++,</span><span class="n">printHits</span><span class="o">++){</span>
+</span><span class='line'>        <span class="n">Document</span> <span class="n">doc</span> <span class="o">=</span> <span class="n">searcher</span><span class="o">.</span><span class="na">doc</span><span class="o">(</span><span class="n">hits</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">doc</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">&quot;score=%s,id=%s,doc=%s,path=%s&quot;</span><span class="o">,</span><span class="n">hits</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">score</span><span class="o">,</span> <span class="n">printHits</span> <span class="o">+</span> <span class="mi">1</span><span class="o">,</span> <span class="n">hits</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">doc</span><span class="o">,</span> <span class="n">doc</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">&quot;path&quot;</span><span class="o">)</span> <span class="o">));</span>
+</span><span class='line'>        <span class="k">if</span><span class="o">(</span> <span class="o">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="o">)</span> <span class="o">==</span> <span class="n">limit</span> <span class="o">){</span>
+</span><span class='line'>          <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">();</span>
+</span><span class='line'>          <span class="n">results</span> <span class="o">=</span> <span class="n">searcher</span><span class="o">.</span><span class="na">searchAfter</span><span class="o">(</span><span class="n">hits</span><span class="o">[</span><span class="n">i</span><span class="o">],</span> <span class="n">query</span><span class="o">,</span> <span class="n">limit</span><span class="o">);</span>
+</span><span class='line'>          <span class="n">hits</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="na">scoreDocs</span><span class="o">;</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">王惠达 huida wanghuida</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-09-07T22:10:00+08:00" pubdate data-updated="true">Sep 7<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/java/'>Java</a>, <a class='category' href='/blog/categories/solr/'>Solr</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2012/09/07/lucene-ru-men/" data-via="" data-counturl="http://www.wanghd.com/blog/2012/09/07/lucene-ru-men/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/08/30/chang-yong-ming-ling/" title="Previous Post: 常用命令">&laquo; 常用命令</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/09/14/solrman-cha-xun-fen-xi/" title="Next Post: solr慢查询分析">solr慢查询分析 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>工程师的最爱</h1>
+  <ul id="taobao_rank">
+    <li>
+  <iframe name="alimamaifrm" frameborder="0" marginheight="0" marginwidth="0" border="0" scrolling="no" width="100%" height="250" src="http://top.taobao.com/interface_v2.php?pid=mm_32662861_3310667_10777894&type=y&f=html&ie=utf8&from=taoke&unid=&name=%E4%BB%8A%E6%97%A5%E5%85%B3%E6%B3%A8%E9%A3%99%E5%8D%87&trtp=2&up=false&goodsFilter=all&sw=260&sh=250&sn=5&bgc=E8E9EB&bc=DADADA&fc=0A63AA&tc=535353&cat_ids=1101%2CTR_RXSJB%2CTR_SJPJ%2C50019780%2CTR_SBJP" ></iframe>
+    </li>
+  </ul>
+</section>
+<section>
+  <h1>文章分类</h1>
+  <ul id="categories">
+    <li class='category'><a href='/blog/categories/java/'>Java (11)</a></li>
+<li class='category'><a href='/blog/categories/javascript/'>Javascript (1)</a></li>
+<li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (9)</a></li>
+<li class='category'><a href='/blog/categories/perl/'>Perl (9)</a></li>
+<li class='category'><a href='/blog/categories/python/'>Python (1)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (10)</a></li>
+<li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
+
+  </ul>
+</section>
+
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/10/23/mogilefsxiang-jie/">MogileFS详解</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/16/mogilefsde-replicatefen-xi/">MogileFS的replicate进程分析</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/14/ying-pan-an-zhuang-centos/">硬盘安装CentOS</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/">IRC:irssi使用教程</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/13/mogstoredshi-yong-nginx/">mogstored使用nginx</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/11/mogilefswen-jian-lu-jing-gui-ze/">mogilefs文件路径规则</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/09/mogilefsshe-bei-quan-zhong-suan-fa/">mogilefs设备权重算法</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/09/29/mogilefsde-fscktan-jiu/">mogilefs fsck探究</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/09/27/aho-corasicksuan-fa/">Aho-Corasick算法</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/09/27/solrsheng-lue-ri-zhi/">显示solr省略的日志</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>好友链接</h1>
+  <ul id="links">
+    <li><a href="http://www.zwsun.com">阿文的自留地</a></li>
+    <li><a href="http://www.deepwarm.com/">明兄的私房菜</a></li>
+  </ul>
+</section>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - 王惠达 huida wanghuida -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'wanghuida';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.wanghd.com/blog/2012/09/07/lucene-ru-men/';
+        var disqus_url = 'http://www.wanghd.com/blog/2012/09/07/lucene-ru-men/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      //var twitterWidgets = document.createElement('script');
+      //twitterWidgets.type = 'text/javascript';
+      //twitterWidgets.async = true;
+      //twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      //document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

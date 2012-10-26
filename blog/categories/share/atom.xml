@@ -1,0 +1,511 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Share | 惠达的小宅]]></title>
+  <link href="http://www.wanghd.com/blog/categories/share/atom.xml" rel="self"/>
+  <link href="http://www.wanghd.com/"/>
+  <updated>2012-10-27T01:11:05+08:00</updated>
+  <id>http://www.wanghd.com/</id>
+  <author>
+    <name><![CDATA[王惠达 huida wanghuida]]></name>
+    <email><![CDATA[wanghuida258@126.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[硬盘安装CentOS]]></title>
+    <link href="http://www.wanghd.com/blog/2012/10/14/ying-pan-an-zhuang-centos/"/>
+    <updated>2012-10-14T21:48:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/10/14/ying-pan-an-zhuang-centos</id>
+    <content type="html"><![CDATA[<h4>下载diskgenuis进行分区和设置卷标</h4>
+
+<ul>
+<li>【C盘】，NTFS；安装的是win7</li>
+<li>【D盘】，卷标：REV，FAT32；</li>
+</ul>
+
+
+<h4>下载CentOS-6.2-i386-LiveCD.iso</h4>
+
+<ul>
+<li>把isolinux下的vmlinuz0和initrd0.img提取到C盘根目录下</li>
+<li>把centos 6.2 livecd解压到D盘根目录下;</li>
+</ul>
+
+
+<h4>下载EasyBCD进行boot设置</h4>
+
+<ul>
+<li>使用easybcd安装NeoGrub，配置menu.lst，内容如下：</li>
+</ul>
+
+
+<p>```
+title CentOS LiveCD</p>
+
+<h1>如果前面还有分区设置为root (hd0,1)，设置错误了也没关系，重启后会报错，按e调整，再按b去boot</h1>
+
+<p>root (hd0,0)
+kernel /vmlinuz0 root=live:LABEL=REV rootfstype=auto ro liveimg quiet rhgb
+initrd /initrd0.img
+boot
+```</p>
+
+<h4>重启后，选择新选项即可进入CentOS LiveCD环境。</h4>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[IRC:irssi使用教程]]></title>
+    <link href="http://www.wanghd.com/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/"/>
+    <updated>2012-10-13T23:39:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/10/13/irc-irssishi-yong-jiao-cheng</id>
+    <content type="html"><![CDATA[<h3>IRC是什么？</h3>
+
+<ul>
+<li>IRC（Internet Relay Chat的缩写，“因特网中继聊天”）是一种通过网络的即时聊天方式。其主要用于群体聊天，但同样也可以用于个人对个人的聊天。</li>
+</ul>
+
+
+<!-- more -->
+
+
+<h3>安装irssi</h3>
+
+<ul>
+<li>命令行的聊天客户端满酷，就选择了irssi</li>
+</ul>
+
+
+<p><code>bash
+brew install irssi
+</code></p>
+
+<h3>连接服务器</h3>
+
+<ul>
+<li>运行irssi</li>
+<li>连接irc.freenode.net</li>
+</ul>
+
+
+<p><code>bash
+irssi
+/connect irc.freenode.net
+</code></p>
+
+<h3>注册一个自己用户名</h3>
+
+<p><code>
+/nick wanghuida
+/msg nickserv help #会打开一个频道，Ctrl+N/P切换看一下命令,参数错误会有提示
+/msg nickserv register 123456 wanghuida258@126.com
+/msg NickServ VERIFY REGISTER wanghuida xgticwehprrf #这条命令是从邮箱里获取的
+/msg nickserv identify 123456 #用于登陆识别
+</code></p>
+
+<h3>进入聊天室</h3>
+
+<ul>
+<li>可以开始欢快的聊天了</li>
+</ul>
+
+
+<p><code>
+/join #mogilefs
+/join #gentoo-cn
+</code></p>
+
+<h3>设置自动登陆</h3>
+
+<ul>
+<li>也可以不通过命令行来自动登陆</li>
+<li>irssi的默认配置在~/.irssi/config里</li>
+</ul>
+
+
+<p><code>
+alias irssi_williamwang='irssi --connect=irc.freenode.net --nick=williamwang --password=xxxxxx'
+</code></p>
+
+<h3>其他命令</h3>
+
+<ul>
+<li>/wc 或者 /leave ,离开当前频道</li>
+<li>/disconnect &lt;服务器>，断开一个服务器</li>
+<li>/quit 或者 /exit，退出 irssi，结束IRC会话。</li>
+<li>/msg &lt;昵称> &lt;消息>，向某人发私消息（新开窗口）</li>
+<li>/query &lt;昵称> &lt;消息>，向某人发私消息（新开窗口且转换到这个窗口）</li>
+<li>/say &lt;昵称> &lt;消息>，向某人说话（不新开窗口）</li>
+<li>/notice &lt;昵称> &lt;消息>，向指定人发出注意消息</li>
+<li>/me &lt;动作>，在当前聊天室窗口中做出动作。 如做出晕倒动作：/me 晕倒</li>
+<li>/away &lt;原因>，留下信息说明暂时离开，别人向你发出私聊时将会返回此消息，再重新输入 /away（不指定参数）则解除离开状态。</li>
+<li>/ignore &lt;昵称>，忽略某人的聊天内容</li>
+<li>/set autolog on，自动保存聊天记录</li>
+<li>/msg ChanServ info #mogilefs ，查看聊天室信息，用来确认聊天室是否存在</li>
+<li>/msg chanserv help ，创建频道之类的操作可以参考下帮助</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Aho-Corasick算法]]></title>
+    <link href="http://www.wanghd.com/blog/2012/09/27/aho-corasicksuan-fa/"/>
+    <updated>2012-09-27T14:10:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/09/27/aho-corasicksuan-fa</id>
+    <content type="html"><![CDATA[<h3>aho-corasick算法优势</h3>
+
+<ul>
+<li>查找时无需回溯，性能相当好</li>
+<li>当需要查找或替换的词非常多时，生成的trie树可以方便缓存</li>
+</ul>
+
+
+<h3>学习方法</h3>
+
+<ul>
+<li>了解ac算法的基本思想</li>
+<li>阅读源码（看过php, java, perl的版本，还最推荐perl, 因为perl语法精炼,易于阅读）</li>
+<li>ac模拟器（见下面的flash，可以尝试操作一下）</li>
+</ul>
+
+
+<!-- more -->
+
+
+
+
+<object width="650" height="500" type="application/x-shockwave-flash" data="http://www.ivank.net/blogspot/en/AHODrawing.swf">
+<param value="http://www.ivank.net/blogspot/en/AHODrawing.swf" name="movie">
+<!-- http://blog.ivank.net/aho-corasick-algorithm-in-as3.html -->
+</object>
+
+
+<h3>测试Perl的aho-corasick搜索</h3>
+
+<p>```perl
+use Algorithm::AhoCorasick::SearchMachine;</p>
+
+<p>use strict;
+use Data::Dumper;
+use utf8;</p>
+
+<p>my $text = "王惠达啊"; #被搜索的内容
+my @keywords = ("王惠达","惠达啊"); #需要查找的关键字,这两个关键字是设计过的
+my $machine = Algorithm::AhoCorasick::SearchMachine->new(@keywords); #实例化</p>
+
+<p>my %total;
+my $handle_all = sub { #回调函数，把位置和关键字收集起来</p>
+
+<pre><code>my ($pos, $keyword) = @_; 
+if (!exists($total{$pos})) {
+    $total{$pos} = [ ];
+}   
+push @{$total{$pos}}, $keyword;
+undef;
+</code></pre>
+
+<p>};</p>
+
+<p>$machine->feed($text, $handle_all); #查找</p>
+
+<p>print Dumper(\%total); #打印结果
+```</p>
+
+<h3>aho-corasick建立树过程</h3>
+
+<ul>
+<li>将关键字建立起一颗Tire树</li>
+<li>设置第一层的不匹配的转移节点</li>
+<li>设置其余的不匹配转移节点</li>
+<li>初始化状态到根节点</li>
+</ul>
+
+
+<p>```perl
+sub _build_tree {</p>
+
+<pre><code>my $self = shift;
+
+#建立根节点，Node对象包含属性parent,char,results,transitions,failure
+#parent属性放置的也是Node对象
+#char属性是一个字符
+#results属性代表匹配的串,当达到这个状态时可以直接返回
+#transitions属性用来描述树型结构的hash,以char为key,Node对象为value
+#failure属性放置的也是Node对象，当匹配失败时，转移到哪个状态
+$self-&gt;{root} = Algorithm::AhoCorasick::Node-&gt;new();
+
+#将关键字建立起一颗树
+foreach my $p (@{$self-&gt;{keywords}}) { #循环传进来的keywords数组
+    my $nd = $self-&gt;{root}; #每次都是从根节点开始的
+    foreach my $c (split //, $p) { #切割成字符
+        my $ndNew = $nd-&gt;get_transition($c); #如果父节点已经包含该字符,直接取得该节点
+        if (!$ndNew) {
+            #如果父节点不包含该字符，就新建一个Node,并增加到父节点
+            $ndNew = Algorithm::AhoCorasick::Node-&gt;new(parent =&gt; $nd, char =&gt; $c);
+            $nd-&gt;add_transition($ndNew);
+        }   
+        #修改父节点
+        $nd = $ndNew;
+    }   
+    #在最后一个节点,增加一个result，为了搜索时可以直接匹配的字符串 
+    $nd-&gt;add_result($p);
+}   
+
+#设置第一层的不匹配的转移节点
+my @nodes;
+#循环根节点下的所有节点
+foreach my $nd ($self-&gt;{root}-&gt;transitions) {
+    #第一层的不匹配肯定是根节点
+    $nd-&gt;failure($self-&gt;{root});
+    #增加该节点的子节点到数组，为了遍历设置其余节点的不匹配转移节点
+    push @nodes, $nd-&gt;transitions;
+}   
+
+#循环设置其余的不匹配转移节点
+while (@nodes) {
+    my @newNodes;
+    foreach my $nd (@nodes) { #循环着一层的节点
+        my $r = $nd-&gt;parent-&gt;failure; #父节点的不匹配跳转节点
+        my $c = $nd-&gt;char; #该节点的字符
+
+        #如果父节点的失败节点的子节点中包含该字符，跳出while，此时$r是不空的
+        #如果不满足上面的情况,就用父节点的失败节点的失败节点，其实根节点的failure是undef的呀
+        while ($r &amp;&amp; !($r-&gt;get_transition($c))) {
+            $r = $r-&gt;failure;
+        }
+        if (!$r) {
+            $nd-&gt;failure($self-&gt;{root}); #$r=undef，就代表要用根节点
+        } else {
+            #寻找父节点的失败节点的包含该字符的子节点
+            my $tc = $r-&gt;get_transition($c);
+            #为该节点设置失败节点
+            $nd-&gt;failure($tc);
+
+            foreach my $result ($tc-&gt;results) {
+                $nd-&gt;add_result($result);
+            }
+        }
+        #继续下面一层
+        push @newNodes, $nd-&gt;transitions;
+    }
+    @nodes = @newNodes; #再来一遍
+}
+
+#上面根节点的failure是undef，现在设置一下，为查找时可以统一处理
+$self-&gt;{root}-&gt;failure($self-&gt;{root});
+#初始化状态到根节点
+$self-&gt;{state} = $self-&gt;{root};
+</code></pre>
+
+<p>}
+```</p>
+
+<h3>查找过程</h3>
+
+<p>```perl
+sub feed {</p>
+
+<pre><code>my ($self, $text, $callback) = @_;
+
+my $index = 0;
+my $l = length($text);
+while ($index &lt; $l) { #一个一个字符的遍历起来
+    my $trans = undef;
+    while (1) {
+        #从当前状态获取子节点中匹配该字符的节点
+        $trans = $self-&gt;{state}-&gt;get_transition(substr($text, $index, 1));
+        #如果状态是根节点或者匹配到了就跳出while
+        last if ($self-&gt;{state} == $self-&gt;{root}) || $trans;
+        #不是根节点，也没匹配到，转到失败节点
+        $self-&gt;{state} = $self-&gt;{state}-&gt;failure;
+    }
+
+    #如果匹配到就把状态转到匹配的这个节点
+    if ($trans) {
+        $self-&gt;{state} = $trans;
+    }
+    #如果匹配到的状态有返回值，那就调用回调函数
+    foreach my $found ($self-&gt;{state}-&gt;results) {
+        my $rv = &amp;$callback($index - length($found) + 1, $found);
+        #回调函数不好有返回值的呀，有的话一半就停掉了呀
+        if ($rv) {
+            return $rv;
+        }
+    }
+    #继续继续
+    ++$index;
+}
+
+return undef;
+</code></pre>
+
+<p>}
+```</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[向量空间模型]]></title>
+    <link href="http://www.wanghd.com/blog/2012/09/18/xiang-liang-kong-jian-mo-xing/"/>
+    <updated>2012-09-18T08:28:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/09/18/xiang-liang-kong-jian-mo-xing</id>
+    <content type="html"><![CDATA[<h3>向量空间模型广泛使用在文档相似度（算score等等），下面举例描述这个模型：</h3>
+
+<ul>
+<li>假设有两个文档（可以把一个query想象成一个文档）,分别为d1,d2</li>
+<li>假设w1,w2,w3,w4为term</li>
+<li>下图为词频（词频就是在单个文档中出现的次数）,词频为ai,bi</li>
+</ul>
+
+
+<h2>```</h2>
+
+<pre><code>  |  w1  |  w2  |  w3  |  w4  |
+</code></pre>
+
+<p>  d1  |  1   |      |  1   |      |</p>
+
+<h2>  d2  |  2   |  3   |  2   |  1   |</h2>
+
+<p>```</p>
+
+<ul>
+<li>比较夹角公式，越接近越相似,(还需要向量的模公式,|x| = √x<sup>2)</sup></li>
+</ul>
+
+
+<p><img src="/images/post/vsm.png" title="vsm公式" alt="vsm公式" /></p>
+
+<p>```
+sim(d1,d2) = ∑(ai*bi) / √(∑ai<sup>2</sup> * ∑bi<sup>2)</sup></p>
+
+<pre><code>       = 1*2+0*3+1*2+0*1 / √((1^2+0^2+1^2+0^2)*(2^2+3^2+2^2+1^2))
+       = 4 / √(36)
+       = 4 / 6
+       = 2 / 3
+       = 0.66666...
+</code></pre>
+
+<p>```</p>
+
+<ul>
+<li>假设文章只有两维的话，那么空间图就可以画在一个平面直角坐标系当中，读者可以假想两篇只有两个词的文章画图进行理解。</li>
+<li>由公式可以看出计算量是很大的，要提高效率最好的方法就是减少term，俗称降纬</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[常用命令]]></title>
+    <link href="http://www.wanghd.com/blog/2012/08/30/chang-yong-ming-ling/"/>
+    <updated>2012-08-30T13:14:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/08/30/chang-yong-ming-ling</id>
+    <content type="html"><![CDATA[<h3>过滤记录</h3>
+
+<ul>
+<li>-l自动chomp，结果加$/</li>
+<li>-a自动分割</li>
+</ul>
+
+
+<p>```bash
+tail -f access-2012-08-30.log | grep -v '*' \</p>
+
+<pre><code>| perl -w -lane '$a = $F[@F-1];print if $a &gt; 50000 '
+</code></pre>
+
+<p>```</p>
+
+<h3>获取URL内容</h3>
+
+<ul>
+<li>-I 获取头信息</li>
+<li>-x 通过哪台服务器</li>
+<li>-A 设置user agent,可以让log过滤更方便</li>
+</ul>
+
+
+<p><code>bash
+curl -I -x 127.0.0.1  "http://test/abc.jpg" -A "huida"
+</code></p>
+
+<h3>批量删除一天以前的文件</h3>
+
+<p><code>bash
+find /dev/shm/ -type f -mtime +1 | xargs rm
+</code></p>
+
+<h3>计算tcp连接数</h3>
+
+<p><code>bash
+su -
+netstat -lant | wc -l
+</code></p>
+
+<h3>增加网关</h3>
+
+<ul>
+<li>mac版</li>
+</ul>
+
+
+<p><code>bash
+sudo route add -net 10.0.0.0/8 -interface ppp0
+</code></p>
+
+<h3>格式化和mount磁盘</h3>
+
+<ul>
+<li>xfs系统</li>
+</ul>
+
+
+<p><code>bash
+/sbin/mkfs.xfs /dev/sdb
+mount –t xfs /dev/sdb /data1
+vim /etc/fstab
+umount -l /tmp/
+</code></p>
+
+<h3>导出数据</h3>
+
+<ul>
+<li>-h -u -p表示主机，用户，密码</li>
+<li>-D表示数据库</li>
+<li>-e表示执行语句</li>
+<li>-N表示跳过列名, --skip-column-names</li>
+<li>-s表示用tab分割字段, --silent,Be more silent. Print results with a tab as separator, each row on new line.</li>
+</ul>
+
+
+<p><code>bash
+mysql -h -u -p -Ns -Ddatabase -e "select * from ~~~ where ~~~" &gt; /tmp/fid
+</code></p>
+
+<h3>远程取得数据</h3>
+
+<p><code>bash
+sftp
+scp
+rsync
+</code></p>
+
+<h3>查看系统状况</h3>
+
+<p><code>
+iostat -x 1
+free -m
+w
+top
+ping
+lsof -i4TCP -P
+netstat -lnp
+</code></p>
+]]></content>
+  </entry>
+  
+</feed>

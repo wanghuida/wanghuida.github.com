@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Solr | 惠达的小宅]]></title>
+  <link href="http://www.wanghd.com/blog/categories/solr/atom.xml" rel="self"/>
+  <link href="http://www.wanghd.com/"/>
+  <updated>2012-10-27T01:11:05+08:00</updated>
+  <id>http://www.wanghd.com/</id>
+  <author>
+    <name><![CDATA[王惠达 huida wanghuida]]></name>
+    <email><![CDATA[wanghuida258@126.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[显示solr省略的日志]]></title>
+    <link href="http://www.wanghd.com/blog/2012/09/27/solrsheng-lue-ri-zhi/"/>
+    <updated>2012-09-27T13:54:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/09/27/solrsheng-lue-ri-zhi</id>
+    <content type="html"><![CDATA[<h3>solr日志默认的效果</h3>
+
+<ul>
+<li>删除时默认只显示10条记录，其余的使用省略号代替</li>
+<li>一般情况下这样是比较好的，但是有时还是希望看到所有的信息</li>
+</ul>
+
+
+<p><code>
+webapp=/solr path=/update params={wt=json}
+{delete=[11, 12, 13, 14, 15, 16, 17, 18, 19, 20... (100 deletes)]} 0 127
+</code></p>
+
+<!--more -->
+
+
+<h3>测试程序</h3>
+
+<ul>
+<li>查询100条记录后删除</li>
+</ul>
+
+
+<p>```php
+&lt;?php
+include_once('Apache/Solr/Service.php');
+$solr = new Apache_Solr_Service('localhost','8984','/solr');</p>
+
+<p>$rep = $solr->search('<em>:</em>',0,100);
+$rep = $rep->response->docs;</p>
+
+<p>$ids = array();
+foreach($rep as $r){</p>
+
+<pre><code>var_dump($r-&gt;id);
+$ids[] = $r-&gt;id;
+</code></pre>
+
+<p>}
+$solr->deleteByMultipleIds($ids);
+```</p>
+
+<h3>跟踪solr代码</h3>
+
+<ul>
+<li>断点设置在LogUpdateProcessor的processDelete里</li>
+<li>小于maxNumToLog才会添加到deletes</li>
+<li>多余的部分用省略号表示</li>
+</ul>
+
+
+<p>```java
+  @Override
+  public void processDelete( DeleteUpdateCommand cmd ) throws IOException {</p>
+
+<pre><code>if (logDebug) { log.debug("PRE_UPDATE " + cmd.toString()); }
+if (next != null) next.processDelete(cmd);
+
+if (cmd.isDeleteById()) {
+  if (deletes == null) {
+    deletes = new ArrayList&lt;String&gt;();
+    toLog.add("delete",deletes);
+  }
+  if (deletes.size() &lt; maxNumToLog) { //小于maxNumToLog才会添加到deletes
+    long version = cmd.getVersion();
+    String msg = cmd.getId();
+    if (version != 0) msg = msg + " (" + version + ')';
+    deletes.add(msg);
+  }
+} else {
+  if (toLog.size() &lt; maxNumToLog) {
+    long version = cmd.getVersion();
+    String msg = cmd.query;
+    if (version != 0) msg = msg + " (" + version + ')';
+    toLog.add("deleteByQuery", msg);
+  }
+}
+numDeletes++;
+</code></pre>
+
+<p>  }</p>
+
+<p>  @Override
+  public void finish() throws IOException {</p>
+
+<pre><code>//略
+if (deletes != null &amp;&amp; numDeletes &gt; maxNumToLog) {
+  deletes.add("... (" + numDeletes + " deletes)"); //如果大于就要省略号表示
+}
+//略
+</code></pre>
+
+<p>  }
+```</p>
+
+<h3>更改配置，显示所有结果</h3>
+
+<ul>
+<li>默认配置中是没有updateRequestProcessorChain，如果没有配置，默认也会加载下面3个处理器</li>
+<li>RunUpdateProcessorFactory一般必须要有的，作用是更新请求</li>
+<li>DistributedUpdateProcessorFactory作用是更新shard</li>
+<li>LogUpdateProcessorFactory作用是记录更新日志</li>
+<li>maxNumToLog决定日志显示的个数，默认为10</li>
+<li>参考<a href="http://wiki.apache.org/solr/UpdateRequestProcessor">http://wiki.apache.org/solr/UpdateRequestProcessor</a></li>
+<li>参考<a href="http://wiki.apache.org/solr/SolrConfigXml">http://wiki.apache.org/solr/SolrConfigXml</a></li>
+</ul>
+
+
+<p>```
+  <updateRequestProcessorChain name="" default="true" ></p>
+
+<pre><code>&lt;processor class="solr.DistributedUpdateProcessorFactory" /&gt;
+&lt;processor class="solr.LogUpdateProcessorFactory" &gt;
+  &lt;int name="maxNumToLog"&gt;100&lt;/int&gt;
+&lt;/processor&gt;
+&lt;processor class="solr.RunUpdateProcessorFactory" /&gt;
+</code></pre>
+
+<p>  </updateRequestProcessorChain>
+```</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[solr的数值存储和范围查询]]></title>
+    <link href="http://www.wanghd.com/blog/2012/09/21/solrde-shu-zhi-cun-chu-he-fan-wei-cha-xun/"/>
+    <updated>2012-09-21T20:49:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/09/21/solrde-shu-zhi-cun-chu-he-fan-wei-cha-xun</id>
+    <content type="html"><![CDATA[<h3>问题：solr查询q=date:[1348233109 TO *]，QTime=300-500毫秒，范围越大越耗时</h3>
+
+<h3>要点：lucene内部不存储数值，而用多个字符串代替</h3>
+
+<h4>我的疑问：为什么不用数值呀，存储空间少，效率又高? 琢磨了下应该有如下原因吧</h4>
+
+<ul>
+<li>lucene索引的倒排表都是根据字符串排序的，要存储数值看来得另起一套索引</li>
+<li>如果存储数值，查询的排序也不能正常运作了，比如10比2排在前面</li>
+<li>查询12,是准确匹配12能还是能匹配123</li>
+<li>数字问题越来越复杂，基本上串模式在数字上根本行不通，如果数值也是串，那问题就简单多了,和一般的词没两样</li>
+</ul>
+
+
+<h3>lucene测试程序</h3>
+
+<ul>
+<li>添加id为695和705的两个文档，搜索id区域698到2054</li>
+</ul>
+
+
+<p>```java
+public static void main(String[] args) throws IOException, ParseException{</p>
+
+<pre><code>Directory dir = FSDirectory.open(new File("/tmp/tempindex"));
+Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
+IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_40, analyzer);
+iwc.setOpenMode(OpenMode.CREATE);
+IndexWriter writer = new IndexWriter(dir, iwc);
+Document doc = new Document();  
+doc.add(new LongField("id",695,Store.YES));  
+writer.addDocument(doc);  
+doc = new Document();  
+doc.add(new LongField("id",705,Store.YES));  
+writer.addDocument(doc);  
+writer.close();
+
+DirectoryReader reader = DirectoryReader.open(dir);
+IndexSearcher searcher = new IndexSearcher(reader);
+Query q = NumericRangeQuery.newLongRange("id", 698L, 2054L, true, true); 
+ScoreDoc[] hits = searcher.search(q, 200).scoreDocs;  
+for(int i=0; i &lt; hits.length; i++){
+  Document result = searcher.doc(hits[i].doc);
+  IndexableField id = result.getField("id");
+  System.out.println(String.format("doc:%s,id:%s", hits[i].doc, id.numericValue().longValue()));
+}
+reader.close();
+dir.close();
+</code></pre>
+
+<p>}
+```</p>
+
+<h3>调试监测建立索引时，695和705生成的多个字符串</h3>
+
+<ul>
+<li>断点设在NumericUtils.java的longToPrefixCoded方法内</li>
+</ul>
+
+
+<p>```</p>
+
+<pre><code>      695                         705
+</code></pre>
+
+<p>[20 1 0 0 0 0 0 0 0 5 37]   [20 1 0 0 0 0 0 0 0 5 41] 0x20代表long,低字节放到bytes高索引位<br/>
+[24 8 0 0 0 0 0 0 0 2b]     [24 8 0 0 0 0 0 0 0 2c]   每7位代表一个字符
+[28 40 0 0 0 0 0 0 2]       [28 40 0 0 0 0 0 0 2]     每次循环右移precisionStep=4
+[2c 4 0 0 0 0 0 0 0]        [2c 4 0 0 0 0 0 0 0]
+[30 20 0 0 0 0 0 0]         [30 20 0 0 0 0 0 0]
+[34 2 0 0 0 0 0 0]          [34 2 0 0 0 0 0 0]
+[38 10 0 0 0 0 0]           [38 10 0 0 0 0 0]
+[3c 1 0 0 0 0 0]            [3c 1 0 0 0 0 0]
+[40 8 0 0 0 0]              [40 8 0 0 0 0]
+[44 40 0 0 0]               [44 40 0 0 0]
+[48 4 0 0 0]                [48 4 0 0 0]
+[4c 20 0 0]                 [4c 20 0 0]
+[50 2 0 0]                  [50 2 0 0]
+[54 10 0]                   [54 10 0]
+[58 1 0]                    [58 1 0]
+[5c 8]                      [5c 8]
+```</p>
+
+<h3>698-2057的区域转化</h3>
+
+<ul>
+<li>断点设在NumericUtils.java的longToPrefixCoded方法内</li>
+</ul>
+
+
+<p><code>
+698: [20 1 0 0 0 0 0 0 0 5 3a]  703: [20 1 0 0 0 0 0 0 0 5 3f]
+704: [24 8 0 0 0 0 0 0 0 2c]    767: [24 8 0 0 0 0 0 0 0 2f]
+768: [28 40 0 0 0 0 0 0 3]      2047:[28 40 0 0 0 0 0 0 7]
+2048:[20 1 0 0 0 0 0 0 0 10 0]  2054:[20 1 0 0 0 0 0 0 0 10 6]
+</code>
++ precisionStep使用默认的4
++ 703的生成方法是对698的右边4位和二进制“1111”做或运算
++ 704的生成方法是在703的基础上加1,那么右边四位全0，右移4位
++ 767的生成方法是对704的右边4位和二进制“1111”做或运算（其实只要前缀匹配，后面已经无所谓了）
++ 后面的数字生成方法一样</p>
+
+<h3>查询索引比较</h3>
+
+<ul>
+<li>大于等于698,小于等于703的没有</li>
+<li>大于等于704,小于等于767的有，705的第二条记录</li>
+<li>大于等于768,小于等于2047的没有</li>
+<li>大于等于2048,小于等于2054的没有</li>
+</ul>
+
+
+<h3>结论：要提高效率的方法</h3>
+
+<ul>
+<li>调整precisionStep,默认为4，调大索引小性能差，调小索引大性能理论上的好,精度高，见下图</li>
+</ul>
+
+
+<p><img src="/images/post/rangequery.gif" title="rangequery" alt="rangequery" /></p>
+
+<ul>
+<li>如果int够用，可以不用Long用Int</li>
+<li>缩小范围，这是最直接最管用的方法，（优化业务需求）</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[使用JMX分析solr状态]]></title>
+    <link href="http://www.wanghd.com/blog/2012/09/20/shi-yong-jmxfen-xi-solrzhuang-tai/"/>
+    <updated>2012-09-20T14:25:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/09/20/shi-yong-jmxfen-xi-solrzhuang-tai</id>
+    <content type="html"><![CDATA[<h3>开启JMX</h3>
+
+<ul>
+<li>在solrconfig.xml中添加,默认包含</li>
+</ul>
+
+
+<p><code>
+&lt;jmx /&gt;
+</code></p>
+
+<ul>
+<li>重启solr，设置启动参数</li>
+<li>扩展选项请参考<a href="http://www.oracle.com/technetwork/java/javase/tech/vmoptions-jsp-140102.html">官方文档</a></li>
+</ul>
+
+
+<!-- more -->
+
+
+<p><code>
+java -Xmx256M -Xms256M -XX:PermSize=64M -XX:MaxPermSize=64M
+-XX:+UseParallelGC
+-Dcom.sun.management.jmxremote
+-Dcom.sun.management.jmxremote.port=3000
+-Dcom.sun.management.jmxremote.ssl=false
+-Dcom.sun.management.jmxremote.authenticate=false
+-jar start.jar
+</code></p>
+
+<h3>使用jconsole连接，查看进程状态</h3>
+
+<p><code>
+jconsole 127.0.0.1:3000 （jconsole在jdk的bin目录里）
+</code></p>
+
+<h3>实时java堆内存使用情况</h3>
+
+<p><img src="/images/post/heap.png" title="heap" alt="heap" /></p>
+
+<h3>实时cpu使用情况</h3>
+
+<p><img src="/images/post/cpu.png" title="cpu" alt="cpu" /></p>
+
+<h3>MBean分析缓存命中率</h3>
+
+<p><img src="/images/post/documentcache.png" title="documentcache" alt="documentcache" /></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[向量空间模型]]></title>
+    <link href="http://www.wanghd.com/blog/2012/09/18/xiang-liang-kong-jian-mo-xing/"/>
+    <updated>2012-09-18T08:28:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/09/18/xiang-liang-kong-jian-mo-xing</id>
+    <content type="html"><![CDATA[<h3>向量空间模型广泛使用在文档相似度（算score等等），下面举例描述这个模型：</h3>
+
+<ul>
+<li>假设有两个文档（可以把一个query想象成一个文档）,分别为d1,d2</li>
+<li>假设w1,w2,w3,w4为term</li>
+<li>下图为词频（词频就是在单个文档中出现的次数）,词频为ai,bi</li>
+</ul>
+
+
+<h2>```</h2>
+
+<pre><code>  |  w1  |  w2  |  w3  |  w4  |
+</code></pre>
+
+<p>  d1  |  1   |      |  1   |      |</p>
+
+<h2>  d2  |  2   |  3   |  2   |  1   |</h2>
+
+<p>```</p>
+
+<ul>
+<li>比较夹角公式，越接近越相似,(还需要向量的模公式,|x| = √x<sup>2)</sup></li>
+</ul>
+
+
+<p><img src="/images/post/vsm.png" title="vsm公式" alt="vsm公式" /></p>
+
+<p>```
+sim(d1,d2) = ∑(ai*bi) / √(∑ai<sup>2</sup> * ∑bi<sup>2)</sup></p>
+
+<pre><code>       = 1*2+0*3+1*2+0*1 / √((1^2+0^2+1^2+0^2)*(2^2+3^2+2^2+1^2))
+       = 4 / √(36)
+       = 4 / 6
+       = 2 / 3
+       = 0.66666...
+</code></pre>
+
+<p>```</p>
+
+<ul>
+<li>假设文章只有两维的话，那么空间图就可以画在一个平面直角坐标系当中，读者可以假想两篇只有两个词的文章画图进行理解。</li>
+<li>由公式可以看出计算量是很大的，要提高效率最好的方法就是减少term，俗称降纬</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[solr慢查询分析]]></title>
+    <link href="http://www.wanghd.com/blog/2012/09/14/solrman-cha-xun-fen-xi/"/>
+    <updated>2012-09-14T13:35:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/09/14/solrman-cha-xun-fen-xi</id>
+    <content type="html"><![CDATA[<h3>solr慢请求分析,第一种</h3>
+
+<p><code>
+INFO: [] webapp=/solr path=/select/ params={fl=id&amp;sort=quetime+asc&amp;start=560950&amp;q=*:*&amp;wt=json&amp;rows=50} hits=863948 status=0 QTime=2752
+INFO: [] webapp=/solr path=/select/ params={fl=id&amp;sort=quetime+asc&amp;start=756250&amp;q=*:*&amp;wt=json&amp;rows=50} hits=863935 status=0 QTime=2472
+INFO: [] webapp=/solr path=/select/ params={fl=id&amp;sort=quetime+asc&amp;start=315450&amp;q=*:*&amp;wt=json&amp;rows=50} hits=863935 status=0 QTime=1183
+INFO: [] webapp=/solr path=/select/ params={fl=id&amp;sort=quetime+asc&amp;start=557400&amp;q=*:*&amp;wt=json&amp;rows=50} hits=863935 status=0 QTime=2020
+INFO: [] webapp=/solr path=/select/ params={fl=id&amp;sort=quetime+asc&amp;start=315550&amp;q=*:*&amp;wt=json&amp;rows=50} hits=863935 status=0 QTime=1061
+INFO: [] webapp=/solr path=/select/ params={fl=id&amp;sort=quetime+asc&amp;start=756400&amp;q=*:*&amp;wt=json&amp;rows=50} hits=863935 status=0 QTime=2252
+INFO: [] webapp=/solr path=/select/ params={fl=id&amp;sort=quetime+asc&amp;start=315650&amp;q=*:*&amp;wt=json&amp;rows=50} hits=863938 status=0 QTime=1068
+INFO: [] webapp=/solr path=/select/ params={fl=id&amp;sort=quetime+asc&amp;start=557500&amp;q=*:*&amp;wt=json&amp;rows=50} hits=863938 status=0 QTime=2012
+INFO: [] webapp=/solr path=/select/ params={fl=id&amp;sort=quetime+asc&amp;start=557550&amp;q=*:*&amp;wt=json&amp;rows=50} hits=863938 status=0 QTime=2248
+</code></p>
+
+<h3>解决方案</h3>
+
+<ul>
+<li>请排除以上查询语句【或限制start】</li>
+</ul>
+
+
+<h3>solr慢请求分析,第二种</h3>
+
+<p><code>
+INFO: [] webapp=/solr path=/select params={mm=2&amp;fl=score,*&amp;sort=score+desc,quetime+desc&amp;start=0&amp;q=贷款+房子+能+不+买&amp;bf=linear(rankscore,29.3246184,0)&amp;qf=title^5+tags^1+bestanswerstr^2+description^1+normalanswerstr^1&amp;wt=json&amp;qt=dismax&amp;fq=-cityid:14&amp;fq=questatus:1+OR+questatus:2+OR+questatus:3+OR+questatus:6&amp;rows=1} hits=317500 status=0 QTime=520
+INFO: [] webapp=/solr path=/select params={mm=2&amp;fl=score,*&amp;sort=score+desc,quetime+desc&amp;start=0&amp;q=集体+户口+好+好+不&amp;qf=title^5+tags^1+bestanswerstr^2+description^1+normalanswerstr^1&amp;wt=json&amp;qt=dismax&amp;fq=-cityid:12&amp;fq=questatus:1+OR+questatus:2+OR+questatus:3+OR+questatus:6&amp;rows=1} hits=287285 status=0 QTime=622
+</code></p>
+
+<h3>解决方案</h3>
+
+<ul>
+<li>dismax的mm=2间接使用了OR，建议用AND提高性能【实验中:我想用docfreq来做判断用AND还是OR】</li>
+<li>StopWord:通过solr/admin/luke?fl=normalanswerstr&amp;numTerms=100分析term,过滤掉没有意义的term,例如</li>
+</ul>
+
+
+<p><code>
+&lt;int name="的"&gt;965396&lt;/int&gt;
+&lt;int name="，"&gt;947429&lt;/int&gt;
+&lt;int name="是"&gt;729063&lt;/int&gt;
+&lt;int name="。"&gt;707417&lt;/int&gt;
+&lt;int name="不"&gt;571925&lt;/int&gt;
+&lt;int name="你"&gt;534142&lt;/int&gt;
+&lt;int name="可以"&gt;525645&lt;/int&gt;
+&lt;int name="就"&gt;460975&lt;/int&gt;
+&lt;int name="有"&gt;443743&lt;/int&gt;
+&lt;int name="了"&gt;437630&lt;/int&gt;
+&lt;int name="要"&gt;372936&lt;/int&gt;
+&lt;int name="！"&gt;342369&lt;/int&gt;
+&lt;int name="好"&gt;331646&lt;/int&gt;
+&lt;int name="在"&gt;324636&lt;/int&gt;
+&lt;int name="一"&gt;279765&lt;/int&gt;
+&lt;int name="个"&gt;269726&lt;/int&gt;
+&lt;int name="能"&gt;233510&lt;/int&gt;
+</code></p>
+
+<ul>
+<li>权重相同的放入同一个字段，也可以用CopyField，可以多加个系数</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>
