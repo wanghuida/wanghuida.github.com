@@ -9,87 +9,94 @@
   <meta name="author" content="王惠达 huida wanghuida">
 
   
-  <meta name="description" content="今天同事遇见一个诡异的问题 1
-2
-3
-4
-5
-6
-&lt;?php ini_set(&#39;display_errors&#39;,0); #随便调用一个什么方法来产生错误
-abcd(); 明显php错误，但是HTTP返回200 最终关闭加载xdebug一切正常了,返回500错误了
-">
+  <meta name="description" content="王惠达博客 IT技术 php perl python java c ruby wanghuida blog lucene mogilefs">
   
-
 
   <!-- http://t.co/dKP3o1e -->
   <meta name="HandheldFriendly" content="True">
   <meta name="MobileOptimized" content="320">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name='AD51_verify' content='37c113da1db8f547501c3ab9d5a33c41'>
 
   
-  <link rel="canonical" href="http://www.wanghd.com/blog/2012/07/26/xdebug-500cuo-wu-xian-shi-200cheng-gong-de-bug/">
+  <link rel="canonical" href="http://www.wanghd.com/blog/2012/07/26/xdebug-500cuo-wu-xian-shi-200cheng-gong-de-bug">
   <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
+  <link href="/stylesheets/bootstrap/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/bootstrap/responsive.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/syntax/syntax.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <style type="text/css">
+    body {
+      padding-bottom: 40px;
+    }
+    h1 {
+      margin-bottom: 15px;
+    }
+    img {
+      max-width: 100%;
+    }
+    .sharing, .meta, .pager {
+      margin: 20px 0px 20px 0px;
+    }
+    .page-footer p {
+      text-align: center;
+    }
+  </style>
+  <script src="/javascripts/libs/jquery.js"></script>
+  <script src="/javascripts/libs/modernizr-2.0.js"></script>
+  <script src="/javascripts/libs/bootstrap.js"></script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="惠达的小宅" type="application/atom+xml">
-  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-
+  
   
 
-<script type="text/javascript">
-
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-35556528-1']);
-  _gaq.push(['_trackPageview']);
-
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-
-</script>
 </head>
 
 <body   >
-  <header role="banner"><hgroup>
-  <h1><a href="/">惠达的小宅</a></h1>
-  
-    <h2>A love-vim engineer.</h2>
-  
-</hgroup>
+  <nav role="navigation"><div class="navbar">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
 
-</header>
-  <nav role="navigation"><ul class="subscription" data-subscription="rss">
-  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
-  
-</ul>
-  
-<form action="http://google.com/search" method="get">
-  <fieldset role="search">
-    <input type="hidden" name="q" value="site:www.wanghd.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-  </fieldset>
-</form>
-  
-<ul class="main-navigation">
-  <li><a href="/">Blog</a></li>
-  <li><a href="/blog/archives">Archives</a></li>
-  <li><a target="_blank" href="http://www.taobao.com/go/chn/tbk_channel/channelcode.php?pid=mm_32662861_3310667_10778125&eventid=101329">Market</a></li>
+      <a class="brand" href="/">惠达的小宅</a>
+
+      <div class="nav-collapse">
+        <ul class="nav">
+  <li><a href="/">博客首页</a></li>
+  <li><a href="/blog/archives">文章归档</a></li>
+  <li><a href="mailto:wanghuida258@yahoo.cn">联系站长</a></li>
+  <li><a href="http://www.taobao.com/go/chn/tbk_channel/channelcode.php?pid=mm_32662861_3310667_10778125&eventid=101329">淘宝推广</a></li>
+
 </ul>
 
+
+        <ul class="nav pull-right" data-subscription="rss">
+          <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+          
+        </ul>
+
+        
+          <form class="pull-right navbar-search" action="http://google.com/search" method="get">
+            <fieldset role="search">
+              <input type="hidden" name="q" value="site:www.wanghd.com" />
+              <input class="search-query" type="text" name="q" results="0" placeholder="查找"/>
+            </fieldset>
+          </form>
+        
+      </div>
+    </div>
+  </div>
+</div>
 </nav>
-  <div id="main">
-    <div id="content">
-      <div>
-<article class="hentry" role="article">
+  <div class="container">
+    <div class="row-fluid">
+      
+<article class="hentry span9" role="article">
+
   
-  <header>
+  <header class="page-header">
     
       <h1 class="entry-title">Xdebug:500错误显示200成功的bug</h1>
     
@@ -182,38 +189,34 @@ abcd(); 明显php错误，但是HTTP返回200 最终关闭加载xdebug一切正�
 </div>
 
     
-    <p class="meta">
+    
+    <section>
+      <h1>Comments</h1>
+      <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+    </section>
+    
+    <ul class="pager">
       
-        <a class="basic-alignment left" href="/blog/2012/07/22/python-zhou-ti-yan-ji/" title="Previous Post: python 一周体验记">&laquo; python 一周体验记</a>
+      <li class="previous"><a class="basic-alignment left"
+        href="/blog/2012/07/22/python-zhou-ti-yan-ji/" title="Previous Post:
+        python 一周体验记">&laquo; python 一周体验记</a></li>
       
+      <li><a href="/blog/archives">文章归档</a></li>
       
-        <a class="basic-alignment right" href="/blog/2012/07/27/java-volatileli-jie/" title="Next Post: java volatile理解">java volatile理解 &raquo;</a>
+      <li class="next"><a class="basic-alignment right" href="/blog/2012/07/27/java-volatileli-jie/"
+        title="Next Post: java volatile理解">java volatile理解
+        &raquo;</a></li>
       
-    </p>
+    </ul>
   </footer>
 </article>
 
-  <section>
-    <h1>Comments</h1>
-    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-</div>
-  </section>
-
-</div>
-
-<aside class="sidebar">
+<aside class="sidebar-nav span3">
   
-    <section>
-  <h1>工程师的最爱</h1>
-  <ul id="taobao_rank">
-    <li>
-  <iframe name="alimamaifrm" frameborder="0" marginheight="0" marginwidth="0" border="0" scrolling="no" width="100%" height="250" src="http://top.taobao.com/interface_v2.php?pid=mm_32662861_3310667_10777894&type=y&f=html&ie=utf8&from=taoke&unid=&name=%E4%BB%8A%E6%97%A5%E5%85%B3%E6%B3%A8%E9%A3%99%E5%8D%87&trtp=2&up=false&goodsFilter=all&sw=260&sh=250&sn=5&bgc=E8E9EB&bc=DADADA&fc=0A63AA&tc=535353&cat_ids=1101%2CTR_RXSJB%2CTR_SJPJ%2C50019780%2CTR_SBJP" ></iframe>
-    </li>
-  </ul>
-</section>
-<section>
-  <h1>文章分类</h1>
-  <ul id="categories">
+    <section class="well">
+  <ul id="categories" class="nav nav-list">
+    <li class="nav-header">文章分类</li>
     <li class='category'><a href='/blog/categories/java/'>Java (11)</a></li>
 <li class='category'><a href='/blog/categories/javascript/'>Javascript (1)</a></li>
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (9)</a></li>
@@ -225,9 +228,9 @@ abcd(); 明显php错误，但是HTTP返回200 最终关闭加载xdebug一切正�
   </ul>
 </section>
 
-<section>
-  <h1>Recent Posts</h1>
-  <ul id="recent_posts">
+<section class="well">
+  <ul id="recent_posts" class="nav nav-list">
+    <li class="nav-header">最近更新</li>
     
       <li class="post">
         <a href="/blog/2012/10/23/mogilefsxiang-jie/">MogileFS详解</a>
@@ -273,8 +276,15 @@ abcd(); 明显php错误，但是HTTP返回200 最终关闭加载xdebug一切正�
 </section>
 
 <section>
-  <h1>好友链接</h1>
-  <ul id="links">
+  <ul id="taobao_rank" class="nav">
+    <li>
+  <iframe name="alimamaifrm" frameborder="0" marginheight="0" marginwidth="0" border="0" scrolling="no" width="100%" height="250" src="http://top.taobao.com/interface_v2.php?pid=mm_32662861_3310667_10777894&type=y&f=html&ie=utf8&from=taoke&unid=&name=%E4%BB%8A%E6%97%A5%E5%85%B3%E6%B3%A8%E9%A3%99%E5%8D%87&trtp=2&up=false&goodsFilter=all&sw=260&sh=250&sn=5&bgc=E8E9EB&bc=DADADA&fc=0A63AA&tc=535353&cat_ids=1101%2CTR_RXSJB%2CTR_SJPJ%2C50019780%2CTR_SBJP" ></iframe>
+    </li>
+  </ul>
+</section>
+<section class="well">
+  <ul id="links" class="nav nav-list">
+    <li class="nav-header">好友链接</li>
     <li><a href="http://www.zwsun.com">阿文的自留地</a></li>
     <li><a href="http://www.deepwarm.com/">明兄的私房菜</a></li>
   </ul>
@@ -287,7 +297,8 @@ abcd(); 明显php错误，但是HTTP返回200 最终关闭加载xdebug一切正�
 
     </div>
   </div>
-  <footer role="contentinfo"><p>
+  <footer role="contentinfo" class="page-footer"><hr>
+<p>
   Copyright &copy; 2012 - 王惠达 huida wanghuida -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
@@ -319,11 +330,11 @@ abcd(); 明显php错误，但是HTTP返回200 最终关闭加载xdebug一切正�
 
   <script type="text/javascript">
     (function(){
-      //var twitterWidgets = document.createElement('script');
-      //twitterWidgets.type = 'text/javascript';
-      //twitterWidgets.async = true;
-      //twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
-      //document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
     })();
   </script>
 

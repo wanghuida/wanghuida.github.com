@@ -4,11 +4,11 @@
   <title><![CDATA[Category: Mogilefs | 惠达的小宅]]></title>
   <link href="http://www.wanghd.com/blog/categories/mogilefs/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2012-10-27T01:11:05+08:00</updated>
+  <updated>2012-10-27T03:05:55+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
-    <email><![CDATA[wanghuida258@126.com]]></email>
+    <email><![CDATA[wanghuida258@yahoo.com]]></email>
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
@@ -25,9 +25,9 @@
 
 <h3>MogileFS简介</h3>
 
-<h5>MogileFS是一个开源的分布式文件系统，配合cdn和squid，性能非常好(15亿文件没问题，其他数据不方便透露)</h5>
+<blockquote><p>MogileFS是一个<code>开源</code>的<code>分布式文件系统</code>，配合cdn和squid，性能非常好(<code>15亿</code>文件没问题，其他数据不方便透露)</p>
 
-<h5>他由下面几个部分组成:</h5>
+<p>他由下面几个部分组成:</p></blockquote>
 
 <p><img src="/images/post/mogilefs-summary.jpg" title="mogilefs-summary" alt="mogilefs-summary" /></p>
 
@@ -45,13 +45,13 @@
 <!-- more -->
 
 
-<h3>mogstored</h3>
+<h3>Mogstored</h3>
 
-<h5>监控磁盘状态和文件的实际存储,启动mogstored会发现包含2个端口，默认的7501和7500</h5>
+<blockquote><p>监控磁盘状态和文件的实际存储,启动mogstored会发现包含2个端口，默认的7501和7500</p>
 
-<h5>7501用来监控磁盘状态</h5>
+<blockquote><p>7501用来监控磁盘状态</p>
 
-<h5>7500用来处理实际的文件存储</h5>
+<p>7500用来处理实际的文件存储</p></blockquote></blockquote>
 
 <p><img src="/images/post/mogilefs-mogstored.jpg" title="mogilefs-mogstored" alt="mogilefs-mogstored" /></p>
 
@@ -65,11 +65,9 @@
 </ul>
 
 
-<h3>mogilefsd</h3>
+<h3>Mogilefsd</h3>
 
-<h5>主进程负责接受请求，分配任务给query执行,下面详细介绍一下他的子进程</h5>
-
-<p><img src="/images/post/mogilefs-mogilefsd.jpg" title="mogilefs-mogilefsd" alt="mogilefs-mogilefsd" /></p>
+<blockquote><p>主进程负责接受请求，分配任务给query执行,下面详细介绍一下他的子进程</p></blockquote>
 
 <ol>
 <li>query：处理主进程分配的请求，包括util和tool的指令</li>
@@ -91,9 +89,9 @@
 </ul>
 
 
-<h3>memcache</h3>
+<h3>Memcache</h3>
 
-<h5>用来缓存查询结果，降低db压力，query内部存放<em>key对应的fid</em>和<em>fid对应的设备</em></h5>
+<blockquote><p>用来缓存查询结果，降低db压力，query内部存放<code>key对应的fid</code>和<code>fid对应的设备</code></p></blockquote>
 
 <h4>问题总结</h4>
 
@@ -102,9 +100,9 @@
 </ul>
 
 
-<h3>mysql</h3>
+<h3>Mysql</h3>
 
-<h5>用来存储记录，当然也可以使用其他数据库</h5>
+<blockquote><p>用来存储记录，当然也可以使用其他数据库</p></blockquote>
 
 <ol>
 <li>host表：存储主机信息</li>
@@ -144,7 +142,7 @@
 </ul>
 
 
-<h3>utilities</h3>
+<h3>Utilities</h3>
 
 <ol>
 <li>mogadm：该工具直接管理mogilefs的主机、设备、域、类、从数据库、配置、fsck、rebalance</li>
@@ -158,16 +156,16 @@
 </ol>
 
 
-<h3>telnet</h3>
+<h3>Telnet</h3>
 
 <ol>
 <li>!version：显示mogilefs版本</li>
 <li>!recent：显示当前query执行时间（可做监控）</li>
 <li>!queue：显示等待执行的查询（可做监控）</li>
 <li>!stats：从tracker启动开始就记录的一些累加信息和实时信息，比如处理请求的总数、job队列当前记录数、当前等待执行的请求的个数等</li>
-<li>!watch：显示警告和错误信息（可做监控）</li>
+<li>!watch：显示<code>警告</code>和<code>错误</code>信息（可做监控）</li>
 <li>!jobs：显示当前各个job的个数</li>
-<li>!want：动态调整job个数</li>
+<li>!want：<code>动态调整</code>job个数</li>
 <li>!to：不常用，向子进程发送消息，用来调试的</li>
 <li>!shutdown：关闭所有mogilefsd进程</li>
 </ol>

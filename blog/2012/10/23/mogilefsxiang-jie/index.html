@@ -9,79 +9,94 @@
   <meta name="author" content="王惠达 huida wanghuida">
 
   
-  <meta name="description" content="经过一个月的实际应用，我想是时候应该总结一下mogilefs的使用了，如果想和作者交流参考IRC教程 MogileFS简介 MogileFS是一个开源的分布式文件系统，配合cdn和squid，性能非常好(15亿文件没问题，其他数据不方便透露) 他由下面几个部分组成: memcache： &hellip;">
+  <meta name="description" content="王惠达博客 IT技术 php perl python java c ruby wanghuida blog lucene mogilefs">
   
-
 
   <!-- http://t.co/dKP3o1e -->
   <meta name="HandheldFriendly" content="True">
   <meta name="MobileOptimized" content="320">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name='AD51_verify' content='37c113da1db8f547501c3ab9d5a33c41'>
 
   
-  <link rel="canonical" href="http://www.wanghd.com/blog/2012/10/23/mogilefsxiang-jie/">
+  <link rel="canonical" href="http://www.wanghd.com/blog/2012/10/23/mogilefsxiang-jie">
   <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
+  <link href="/stylesheets/bootstrap/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/bootstrap/responsive.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/syntax/syntax.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <style type="text/css">
+    body {
+      padding-bottom: 40px;
+    }
+    h1 {
+      margin-bottom: 15px;
+    }
+    img {
+      max-width: 100%;
+    }
+    .sharing, .meta, .pager {
+      margin: 20px 0px 20px 0px;
+    }
+    .page-footer p {
+      text-align: center;
+    }
+  </style>
+  <script src="/javascripts/libs/jquery.js"></script>
+  <script src="/javascripts/libs/modernizr-2.0.js"></script>
+  <script src="/javascripts/libs/bootstrap.js"></script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="惠达的小宅" type="application/atom+xml">
-  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-
+  
   
 
-<script type="text/javascript">
-
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-35556528-1']);
-  _gaq.push(['_trackPageview']);
-
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-
-</script>
 </head>
 
 <body   >
-  <header role="banner"><hgroup>
-  <h1><a href="/">惠达的小宅</a></h1>
-  
-    <h2>A love-vim engineer.</h2>
-  
-</hgroup>
+  <nav role="navigation"><div class="navbar">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
 
-</header>
-  <nav role="navigation"><ul class="subscription" data-subscription="rss">
-  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
-  
-</ul>
-  
-<form action="http://google.com/search" method="get">
-  <fieldset role="search">
-    <input type="hidden" name="q" value="site:www.wanghd.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-  </fieldset>
-</form>
-  
-<ul class="main-navigation">
-  <li><a href="/">Blog</a></li>
-  <li><a href="/blog/archives">Archives</a></li>
-  <li><a target="_blank" href="http://www.taobao.com/go/chn/tbk_channel/channelcode.php?pid=mm_32662861_3310667_10778125&eventid=101329">Market</a></li>
+      <a class="brand" href="/">惠达的小宅</a>
+
+      <div class="nav-collapse">
+        <ul class="nav">
+  <li><a href="/">博客首页</a></li>
+  <li><a href="/blog/archives">文章归档</a></li>
+  <li><a href="mailto:wanghuida258@yahoo.cn">联系站长</a></li>
+  <li><a href="http://www.taobao.com/go/chn/tbk_channel/channelcode.php?pid=mm_32662861_3310667_10778125&eventid=101329">淘宝推广</a></li>
+
 </ul>
 
+
+        <ul class="nav pull-right" data-subscription="rss">
+          <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+          
+        </ul>
+
+        
+          <form class="pull-right navbar-search" action="http://google.com/search" method="get">
+            <fieldset role="search">
+              <input type="hidden" name="q" value="site:www.wanghd.com" />
+              <input class="search-query" type="text" name="q" results="0" placeholder="查找"/>
+            </fieldset>
+          </form>
+        
+      </div>
+    </div>
+  </div>
+</div>
 </nav>
-  <div id="main">
-    <div id="content">
-      <div>
-<article class="hentry" role="article">
+  <div class="container">
+    <div class="row-fluid">
+      
+<article class="hentry span9" role="article">
+
   
-  <header>
+  <header class="page-header">
     
       <h1 class="entry-title">MogileFS详解</h1>
     
@@ -115,9 +130,9 @@
 
 <h3>MogileFS简介</h3>
 
-<h5>MogileFS是一个开源的分布式文件系统，配合cdn和squid，性能非常好(15亿文件没问题，其他数据不方便透露)</h5>
+<blockquote><p>MogileFS是一个<code>开源</code>的<code>分布式文件系统</code>，配合cdn和squid，性能非常好(<code>15亿</code>文件没问题，其他数据不方便透露)</p>
 
-<h5>他由下面几个部分组成:</h5>
+<p>他由下面几个部分组成:</p></blockquote>
 
 <p><img src="/images/post/mogilefs-summary.jpg" title="mogilefs-summary" alt="mogilefs-summary" /></p>
 
@@ -135,13 +150,13 @@
 <!-- more -->
 
 
-<h3>mogstored</h3>
+<h3>Mogstored</h3>
 
-<h5>监控磁盘状态和文件的实际存储,启动mogstored会发现包含2个端口，默认的7501和7500</h5>
+<blockquote><p>监控磁盘状态和文件的实际存储,启动mogstored会发现包含2个端口，默认的7501和7500</p>
 
-<h5>7501用来监控磁盘状态</h5>
+<blockquote><p>7501用来监控磁盘状态</p>
 
-<h5>7500用来处理实际的文件存储</h5>
+<p>7500用来处理实际的文件存储</p></blockquote></blockquote>
 
 <p><img src="/images/post/mogilefs-mogstored.jpg" title="mogilefs-mogstored" alt="mogilefs-mogstored" /></p>
 
@@ -155,11 +170,9 @@
 </ul>
 
 
-<h3>mogilefsd</h3>
+<h3>Mogilefsd</h3>
 
-<h5>主进程负责接受请求，分配任务给query执行,下面详细介绍一下他的子进程</h5>
-
-<p><img src="/images/post/mogilefs-mogilefsd.jpg" title="mogilefs-mogilefsd" alt="mogilefs-mogilefsd" /></p>
+<blockquote><p>主进程负责接受请求，分配任务给query执行,下面详细介绍一下他的子进程</p></blockquote>
 
 <ol>
 <li>query：处理主进程分配的请求，包括util和tool的指令</li>
@@ -181,9 +194,9 @@
 </ul>
 
 
-<h3>memcache</h3>
+<h3>Memcache</h3>
 
-<h5>用来缓存查询结果，降低db压力，query内部存放<em>key对应的fid</em>和<em>fid对应的设备</em></h5>
+<blockquote><p>用来缓存查询结果，降低db压力，query内部存放<code>key对应的fid</code>和<code>fid对应的设备</code></p></blockquote>
 
 <h4>问题总结</h4>
 
@@ -192,9 +205,9 @@
 </ul>
 
 
-<h3>mysql</h3>
+<h3>Mysql</h3>
 
-<h5>用来存储记录，当然也可以使用其他数据库</h5>
+<blockquote><p>用来存储记录，当然也可以使用其他数据库</p></blockquote>
 
 <ol>
 <li>host表：存储主机信息</li>
@@ -233,7 +246,7 @@
 </ul>
 
 
-<h3>utilities</h3>
+<h3>Utilities</h3>
 
 <ol>
 <li>mogadm：该工具直接管理mogilefs的主机、设备、域、类、从数据库、配置、fsck、rebalance</li>
@@ -247,16 +260,16 @@
 </ol>
 
 
-<h3>telnet</h3>
+<h3>Telnet</h3>
 
 <ol>
 <li>!version：显示mogilefs版本</li>
 <li>!recent：显示当前query执行时间（可做监控）</li>
 <li>!queue：显示等待执行的查询（可做监控）</li>
 <li>!stats：从tracker启动开始就记录的一些累加信息和实时信息，比如处理请求的总数、job队列当前记录数、当前等待执行的请求的个数等</li>
-<li>!watch：显示警告和错误信息（可做监控）</li>
+<li>!watch：显示<code>警告</code>和<code>错误</code>信息（可做监控）</li>
 <li>!jobs：显示当前各个job的个数</li>
-<li>!want：动态调整job个数</li>
+<li>!want：<code>动态调整</code>job个数</li>
 <li>!to：不常用，向子进程发送消息，用来调试的</li>
 <li>!shutdown：关闭所有mogilefsd进程</li>
 </ol>
@@ -304,36 +317,30 @@
 </div>
 
     
-    <p class="meta">
+    
+    <section>
+      <h1>Comments</h1>
+      <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+    </section>
+    
+    <ul class="pager">
       
-        <a class="basic-alignment left" href="/blog/2012/10/16/mogilefsde-replicatefen-xi/" title="Previous Post: MogileFS的replicate进程分析">&laquo; MogileFS的replicate进程分析</a>
+      <li class="previous"><a class="basic-alignment left"
+        href="/blog/2012/10/16/mogilefsde-replicatefen-xi/" title="Previous Post:
+        MogileFS的replicate进程分析">&laquo; MogileFS的replicate进程分析</a></li>
       
+      <li><a href="/blog/archives">文章归档</a></li>
       
-    </p>
+    </ul>
   </footer>
 </article>
 
-  <section>
-    <h1>Comments</h1>
-    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-</div>
-  </section>
-
-</div>
-
-<aside class="sidebar">
+<aside class="sidebar-nav span3">
   
-    <section>
-  <h1>工程师的最爱</h1>
-  <ul id="taobao_rank">
-    <li>
-  <iframe name="alimamaifrm" frameborder="0" marginheight="0" marginwidth="0" border="0" scrolling="no" width="100%" height="250" src="http://top.taobao.com/interface_v2.php?pid=mm_32662861_3310667_10777894&type=y&f=html&ie=utf8&from=taoke&unid=&name=%E4%BB%8A%E6%97%A5%E5%85%B3%E6%B3%A8%E9%A3%99%E5%8D%87&trtp=2&up=false&goodsFilter=all&sw=260&sh=250&sn=5&bgc=E8E9EB&bc=DADADA&fc=0A63AA&tc=535353&cat_ids=1101%2CTR_RXSJB%2CTR_SJPJ%2C50019780%2CTR_SBJP" ></iframe>
-    </li>
-  </ul>
-</section>
-<section>
-  <h1>文章分类</h1>
-  <ul id="categories">
+    <section class="well">
+  <ul id="categories" class="nav nav-list">
+    <li class="nav-header">文章分类</li>
     <li class='category'><a href='/blog/categories/java/'>Java (11)</a></li>
 <li class='category'><a href='/blog/categories/javascript/'>Javascript (1)</a></li>
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (9)</a></li>
@@ -345,9 +352,9 @@
   </ul>
 </section>
 
-<section>
-  <h1>Recent Posts</h1>
-  <ul id="recent_posts">
+<section class="well">
+  <ul id="recent_posts" class="nav nav-list">
+    <li class="nav-header">最近更新</li>
     
       <li class="post">
         <a href="/blog/2012/10/23/mogilefsxiang-jie/">MogileFS详解</a>
@@ -393,8 +400,15 @@
 </section>
 
 <section>
-  <h1>好友链接</h1>
-  <ul id="links">
+  <ul id="taobao_rank" class="nav">
+    <li>
+  <iframe name="alimamaifrm" frameborder="0" marginheight="0" marginwidth="0" border="0" scrolling="no" width="100%" height="250" src="http://top.taobao.com/interface_v2.php?pid=mm_32662861_3310667_10777894&type=y&f=html&ie=utf8&from=taoke&unid=&name=%E4%BB%8A%E6%97%A5%E5%85%B3%E6%B3%A8%E9%A3%99%E5%8D%87&trtp=2&up=false&goodsFilter=all&sw=260&sh=250&sn=5&bgc=E8E9EB&bc=DADADA&fc=0A63AA&tc=535353&cat_ids=1101%2CTR_RXSJB%2CTR_SJPJ%2C50019780%2CTR_SBJP" ></iframe>
+    </li>
+  </ul>
+</section>
+<section class="well">
+  <ul id="links" class="nav nav-list">
+    <li class="nav-header">好友链接</li>
     <li><a href="http://www.zwsun.com">阿文的自留地</a></li>
     <li><a href="http://www.deepwarm.com/">明兄的私房菜</a></li>
   </ul>
@@ -407,7 +421,8 @@
 
     </div>
   </div>
-  <footer role="contentinfo"><p>
+  <footer role="contentinfo" class="page-footer"><hr>
+<p>
   Copyright &copy; 2012 - 王惠达 huida wanghuida -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
@@ -439,11 +454,11 @@
 
   <script type="text/javascript">
     (function(){
-      //var twitterWidgets = document.createElement('script');
-      //twitterWidgets.type = 'text/javascript';
-      //twitterWidgets.async = true;
-      //twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
-      //document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
     })();
   </script>
 
