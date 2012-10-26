@@ -71,10 +71,22 @@ mysql -h -u -p -Ns -Ddatabase -e "select * from ~~~ where ~~~" > /tmp/fid
 ```
 
 
-###取得数据
+###远程取得数据
 
 ```bash
 sftp
 scp
 rsync
+```
+
+###查看系统状况
+
+```
+iostat -x 1
+free -m
+w
+top
+ping
+lsof -i4TCP -P
+netstat -lnp
 ```
