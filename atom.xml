@@ -4,7 +4,7 @@
   <title><![CDATA[惠达的小宅]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2012-10-27T03:05:55+08:00</updated>
+  <updated>2012-10-30T21:47:27+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -33,11 +33,11 @@
 
 <ol>
 <li>memcache：用来缓存查询结果，降低db压力</li>
-<li>mogilefsd：就是tracker，用来处理请求，运行各种job</li>
+<li>mogilefsd：就是tracker，用来接收请求并交给子进程(job)处理</li>
 <li>mogstored：监控磁盘状态和文件的实际存储</li>
 <li>client：支持perl，java，ruby，php，python</li>
 <li>mysql：存储记录</li>
-<li>util：管理、调试的工具</li>
+<li>util：日常维护管理的工具集</li>
 <li>telnet：监控tracker，实时调整job的工具</li>
 </ol>
 
@@ -67,7 +67,7 @@
 
 <h3>Mogilefsd</h3>
 
-<blockquote><p>主进程负责接受请求，分配任务给query执行,下面详细介绍一下他的子进程</p></blockquote>
+<blockquote><p>主进程负责接受请求，分配任务给子进程执行,下面详细介绍一下他的子进程</p></blockquote>
 
 <ol>
 <li>query：处理主进程分配的请求，包括util和tool的指令</li>
@@ -76,7 +76,7 @@
 <li>fsck：检查磁盘文件和数据库是否匹配，不匹配时进行补救</li>
 <li>monitor：监控子进程的状态，实时调整子进程个数</li>
 <li>reaper：监控dead的磁盘，及时补救，把文件加到replicate queue</li>
-<li>jobmaster：管理delete,replicate,rebalance,fsck队列</li>
+<li>jobmaster：读取delete,replicate,rebalance,fsck队列，告诉主进程，主进程再交给对应的子进程处理</li>
 </ol>
 
 
