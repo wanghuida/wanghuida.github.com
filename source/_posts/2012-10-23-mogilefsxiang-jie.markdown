@@ -19,11 +19,11 @@ categories: [Mogilefs, Perl]
 ![mogilefs-summary](/images/post/mogilefs-summary.jpg "mogilefs-summary")
 
 1. memcache：用来缓存查询结果，降低db压力
-1. mogilefsd：就是tracker，用来处理请求，运行各种job
+1. mogilefsd：就是tracker，用来接收请求并交给子进程(job)处理
 1. mogstored：监控磁盘状态和文件的实际存储
 1. client：支持perl，java，ruby，php，python
 1. mysql：存储记录
-1. util：管理、调试的工具
+1. util：日常维护管理的工具集
 1. telnet：监控tracker，实时调整job的工具
 
 <!-- more -->
@@ -51,7 +51,7 @@ categories: [Mogilefs, Perl]
 
 ###Mogilefsd
 
-> 主进程负责接受请求，分配任务给query执行,下面详细介绍一下他的子进程
+> 主进程负责接受请求，分配任务给子进程执行,下面详细介绍一下他的子进程
 
 
 1. query：处理主进程分配的请求，包括util和tool的指令 
@@ -60,7 +60,7 @@ categories: [Mogilefs, Perl]
 1. fsck：检查磁盘文件和数据库是否匹配，不匹配时进行补救
 1. monitor：监控子进程的状态，实时调整子进程个数
 1. reaper：监控dead的磁盘，及时补救，把文件加到replicate queue
-1. jobmaster：管理delete,replicate,rebalance,fsck队列
+1. jobmaster：读取delete,replicate,rebalance,fsck队列，告诉主进程，主进程再交给对应的子进程处理
 
 ####问题总结    
 + query新建文件时，用剩余容量作权重，随机选择。所以新加入一块设备时，极有可能将成为热点设备，最好是一组设备一起加
