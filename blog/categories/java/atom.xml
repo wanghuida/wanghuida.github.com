@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Java | 惠达的小宅]]></title>
   <link href="http://www.wanghd.com/blog/categories/java/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2012-10-30T21:47:27+08:00</updated>
+  <updated>2012-11-04T00:39:47+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,239 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[eclipse配置hadoop的map-reduce开发环境]]></title>
+    <link href="http://www.wanghd.com/blog/2012/11/03/eclipsepei-zhi-hadoopde-map-reducekai-fa-huan-jing/"/>
+    <updated>2012-11-03T00:14:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/11/03/eclipsepei-zhi-hadoopde-map-reducekai-fa-huan-jing</id>
+    <content type="html"><![CDATA[<h3>生成eclipse环境</h3>
+
+<p>```
+cd hadoop-1.0.4</p>
+
+<h1>肯定会遇到诸多问题</h1>
+
+<p>ant eclipse
+```</p>
+
+<blockquote><p>问题1：configure: error: C++ preprocessor "/lib/cpp" fails sanity check</p>
+
+<blockquote><p>mac没有安装Xcode的command tool</p></blockquote>
+
+<p>问题2：can't exec "glibtoolize"</p>
+
+<blockquote><p>brew install autoconf automake libtool</p></blockquote>
+
+<p>问题3: .eclipse.templates does not exist</p>
+
+<blockquote><p>自己在hadoop-1.0.4下创建一个mkdir .eclipse.templates</p></blockquote></blockquote>
+
+<!-- more -->
+
+
+<h3>编译hadoop-eclipse-plugin</h3>
+
+<br />
+
+
+<p>1.进入eclipse插件目录</p>
+
+<p><code>
+cd src/contrib/eclipse-plugin
+</code></p>
+
+<p>2.编辑build.properties</p>
+
+<p>```
+vim build.properties</p>
+
+<h1>设置属性，eclipse.home根据自己的定义</h1>
+
+<p>eclipse.home = /Applications/eclipse
+version = 1.0.4
+```</p>
+
+<p>3.编辑build.xml</p>
+
+<p>```</p>
+
+<h1>在target=jar里面增加下面的jar包</h1>
+
+<p><copy file="${hadoop.root}/lib/commons-lang-2.4.jar"  todir="${build.dir}/lib" verbose="true"/>
+<copy file="${hadoop.root}/lib/commons-configuration-1.6.jar"  todir="${build.dir}/lib" verbose="true"/>
+<copy file="${hadoop.root}/lib/jackson-core-asl-1.8.8.jar"  todir="${build.dir}/lib" verbose="true"/>
+<copy file="${hadoop.root}/lib/jackson-mapper-asl-1.8.8.jar"  todir="${build.dir}/lib" verbose="true"/>
+<copy file="${hadoop.root}/lib/commons-httpclient-3.0.1.jar"  todir="${build.dir}/lib" verbose="true"/>
+```</p>
+
+<p>4.编辑vim META-INF/MANIFEST.MF</p>
+
+<p>```</p>
+
+<h1>修改Bundle-ClassPath</h1>
+
+<p>Bundle-ClassPath: classes/,
+  lib/hadoop-core.jar,
+  lib/commons-configuration-1.6.jar,
+  lib/commons-httpclient-3.0.1.jar,
+  lib/commons-lang-2.4.jar,
+  lib/jackson-core-asl-1.8.8.jar,
+  lib/jackson-mapper-asl-1.8.8.jar</p>
+
+<p>```</p>
+
+<p>5.复制hadoop核心包, 并生成我们需要的插件</p>
+
+<p>```
+cp {root}/hadoop-core-1.0.4.jar {root}/build</p>
+
+<h1>生成jar包</h1>
+
+<p>ant jar
+```</p>
+
+<p>6.编译成功后在build/contrib/eclipse-plugin下找到hadoop-eclipse-plugin-1.0.4.jar</p>
+
+<h3>eclipse配置</h3>
+
+<ul>
+<li><p>复制hadoop-eclipse-plugin-1.0.4.jar到eclipse的plugins下，然后重启eclipse</p></li>
+<li><p>Preferences => Hadoop Map/Reduce</p></li>
+</ul>
+
+
+<p><img src="/images/post/hadoop-eclipse-location.png" title="hadoop-eclipse-location.png" alt="hadoop-eclipse-location.png" /></p>
+
+<ul>
+<li>Window => Show View => Other... => Map/Reduce Locations => New Hadoop Location...</li>
+</ul>
+
+
+<p><img src="/images/post/hadoop-eclipse-general.png" title="hadoop-eclipse-general.png" alt="hadoop-eclipse-general.png" /></p>
+
+<ul>
+<li>看下结果吧</li>
+</ul>
+
+
+<p><img src="/images/post/hadoop-eclipse-result.png" title="hadoop-eclipse-result.png" alt="hadoop-eclipse-result.png" /></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[安装配置hadoop]]></title>
+    <link href="http://www.wanghd.com/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/"/>
+    <updated>2012-11-02T23:38:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/11/02/an-zhuang-pei-zhi-hadoop</id>
+    <content type="html"><![CDATA[<h3>下载stable的hadoop</h3>
+
+<ul>
+<li>hadoop的版本比较多，建议下载<code>stable</code>的，现在是<code>hadoop-1.0.4</code></li>
+<li>提供一个<a href="http://hadoop.apache.org/releases.html#Download">下载链接</a></li>
+</ul>
+
+
+<h3>解压缩</h3>
+
+<p><code>
+tar -zxvf hadoop-1.0.4.tar.gz
+cd hadoop-1.0.4
+</code></p>
+
+<h3>配置hadoop</h3>
+
+<blockquote><p>vim编辑conf/hadoop-env.sh，设置环境变量</p></blockquote>
+
+<p>```</p>
+
+<h1>如果是mac的话，请添加下面这句</h1>
+
+<p>export HADOOP_OPTS="-Djava.security.krb5.realm=OX.AC.UK</p>
+
+<pre><code>-Djava.security.krb5.kdc=kdc0.ox.ac.uk:kdc1.ox.ac.uk"
+</code></pre>
+
+<h1>配置JDK，mac的关系所以路径比较飘逸</h1>
+
+<p>export JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home
+```</p>
+
+<!-- more -->
+
+
+<blockquote><p>vim编译conf/core-site.xml，设置hdfs端口</p></blockquote>
+
+<p>```
+<configuration></p>
+
+<pre><code>&lt;property&gt;
+    &lt;name&gt;fs.default.name&lt;/name&gt;
+    &lt;value&gt;hdfs://localhost:9000&lt;/value&gt;
+&lt;/property&gt;
+</code></pre>
+
+<p></configuration>
+```</p>
+
+<blockquote><p>vim编辑conf/hdfs-site.xml，设置hdfs复制份数</p></blockquote>
+
+<p>```
+<configuration></p>
+
+<pre><code>&lt;property&gt;
+    &lt;name&gt;dfs.replication&lt;/name&gt;  
+    &lt;value&gt;1&lt;/value&gt;  
+&lt;/property&gt; 
+</code></pre>
+
+<p></configuration>
+```</p>
+
+<blockquote><p>vim编译conf/mapred-site.xml，设置job跟踪器的端口(map-reduce的)</p></blockquote>
+
+<p>```
+<configuration></p>
+
+<pre><code>&lt;property&gt;
+    &lt;name&gt;mapred.job.tracker&lt;/name&gt;
+    &lt;value&gt;localhost:9001&lt;/value&gt;
+&lt;/property&gt;
+</code></pre>
+
+<p></configuration>
+```</p>
+
+<h3>配置ssh</h3>
+
+<p><code>
+cat ~/.ssh/id_dsa.pub &gt;&gt; authorized_keys
+</code></p>
+
+<p><img src="/images/post/ssh.jpg" title="ssh" alt="ssh" /></p>
+
+<h3>启动测试hodoop</h3>
+
+<ul>
+<li>如果端口没有被占用的应该一切OK了</li>
+</ul>
+
+
+<p>```
+bin/hadoop namenode -format
+bin/start-all.sh</p>
+
+<h1>增加一些文件，这里用你自己的目录替换</h1>
+
+<p>bin/hadoop fs -put ~/project/mogilefs-tool /mogilefs-tool
+```</p>
+
+<ul>
+<li>在游览器里查看下结果，输入localhost:50070</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[显示solr省略的日志]]></title>
@@ -327,126 +560,6 @@ jconsole 127.0.0.1:3000 （jconsole在jdk的bin目录里）
 <h3>MBean分析缓存命中率</h3>
 
 <p><img src="/images/post/documentcache.png" title="documentcache" alt="documentcache" /></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[向量空间模型]]></title>
-    <link href="http://www.wanghd.com/blog/2012/09/18/xiang-liang-kong-jian-mo-xing/"/>
-    <updated>2012-09-18T08:28:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/09/18/xiang-liang-kong-jian-mo-xing</id>
-    <content type="html"><![CDATA[<h3>向量空间模型广泛使用在文档相似度（算score等等），下面举例描述这个模型：</h3>
-
-<ul>
-<li>假设有两个文档（可以把一个query想象成一个文档）,分别为d1,d2</li>
-<li>假设w1,w2,w3,w4为term</li>
-<li>下图为词频（词频就是在单个文档中出现的次数）,词频为ai,bi</li>
-</ul>
-
-
-<h2>```</h2>
-
-<pre><code>  |  w1  |  w2  |  w3  |  w4  |
-</code></pre>
-
-<p>  d1  |  1   |      |  1   |      |</p>
-
-<h2>  d2  |  2   |  3   |  2   |  1   |</h2>
-
-<p>```</p>
-
-<ul>
-<li>比较夹角公式，越接近越相似,(还需要向量的模公式,|x| = √x<sup>2)</sup></li>
-</ul>
-
-
-<p><img src="/images/post/vsm.png" title="vsm公式" alt="vsm公式" /></p>
-
-<p>```
-sim(d1,d2) = ∑(ai*bi) / √(∑ai<sup>2</sup> * ∑bi<sup>2)</sup></p>
-
-<pre><code>       = 1*2+0*3+1*2+0*1 / √((1^2+0^2+1^2+0^2)*(2^2+3^2+2^2+1^2))
-       = 4 / √(36)
-       = 4 / 6
-       = 2 / 3
-       = 0.66666...
-</code></pre>
-
-<p>```</p>
-
-<ul>
-<li>假设文章只有两维的话，那么空间图就可以画在一个平面直角坐标系当中，读者可以假想两篇只有两个词的文章画图进行理解。</li>
-<li>由公式可以看出计算量是很大的，要提高效率最好的方法就是减少term，俗称降纬</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[solr慢查询分析]]></title>
-    <link href="http://www.wanghd.com/blog/2012/09/14/solrman-cha-xun-fen-xi/"/>
-    <updated>2012-09-14T13:35:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/09/14/solrman-cha-xun-fen-xi</id>
-    <content type="html"><![CDATA[<h3>solr慢请求分析,第一种</h3>
-
-<p><code>
-INFO: [] webapp=/solr path=/select/ params={fl=id&amp;sort=quetime+asc&amp;start=560950&amp;q=*:*&amp;wt=json&amp;rows=50} hits=863948 status=0 QTime=2752
-INFO: [] webapp=/solr path=/select/ params={fl=id&amp;sort=quetime+asc&amp;start=756250&amp;q=*:*&amp;wt=json&amp;rows=50} hits=863935 status=0 QTime=2472
-INFO: [] webapp=/solr path=/select/ params={fl=id&amp;sort=quetime+asc&amp;start=315450&amp;q=*:*&amp;wt=json&amp;rows=50} hits=863935 status=0 QTime=1183
-INFO: [] webapp=/solr path=/select/ params={fl=id&amp;sort=quetime+asc&amp;start=557400&amp;q=*:*&amp;wt=json&amp;rows=50} hits=863935 status=0 QTime=2020
-INFO: [] webapp=/solr path=/select/ params={fl=id&amp;sort=quetime+asc&amp;start=315550&amp;q=*:*&amp;wt=json&amp;rows=50} hits=863935 status=0 QTime=1061
-INFO: [] webapp=/solr path=/select/ params={fl=id&amp;sort=quetime+asc&amp;start=756400&amp;q=*:*&amp;wt=json&amp;rows=50} hits=863935 status=0 QTime=2252
-INFO: [] webapp=/solr path=/select/ params={fl=id&amp;sort=quetime+asc&amp;start=315650&amp;q=*:*&amp;wt=json&amp;rows=50} hits=863938 status=0 QTime=1068
-INFO: [] webapp=/solr path=/select/ params={fl=id&amp;sort=quetime+asc&amp;start=557500&amp;q=*:*&amp;wt=json&amp;rows=50} hits=863938 status=0 QTime=2012
-INFO: [] webapp=/solr path=/select/ params={fl=id&amp;sort=quetime+asc&amp;start=557550&amp;q=*:*&amp;wt=json&amp;rows=50} hits=863938 status=0 QTime=2248
-</code></p>
-
-<h3>解决方案</h3>
-
-<ul>
-<li>请排除以上查询语句【或限制start】</li>
-</ul>
-
-
-<h3>solr慢请求分析,第二种</h3>
-
-<p><code>
-INFO: [] webapp=/solr path=/select params={mm=2&amp;fl=score,*&amp;sort=score+desc,quetime+desc&amp;start=0&amp;q=贷款+房子+能+不+买&amp;bf=linear(rankscore,29.3246184,0)&amp;qf=title^5+tags^1+bestanswerstr^2+description^1+normalanswerstr^1&amp;wt=json&amp;qt=dismax&amp;fq=-cityid:14&amp;fq=questatus:1+OR+questatus:2+OR+questatus:3+OR+questatus:6&amp;rows=1} hits=317500 status=0 QTime=520
-INFO: [] webapp=/solr path=/select params={mm=2&amp;fl=score,*&amp;sort=score+desc,quetime+desc&amp;start=0&amp;q=集体+户口+好+好+不&amp;qf=title^5+tags^1+bestanswerstr^2+description^1+normalanswerstr^1&amp;wt=json&amp;qt=dismax&amp;fq=-cityid:12&amp;fq=questatus:1+OR+questatus:2+OR+questatus:3+OR+questatus:6&amp;rows=1} hits=287285 status=0 QTime=622
-</code></p>
-
-<h3>解决方案</h3>
-
-<ul>
-<li>dismax的mm=2间接使用了OR，建议用AND提高性能【实验中:我想用docfreq来做判断用AND还是OR】</li>
-<li>StopWord:通过solr/admin/luke?fl=normalanswerstr&amp;numTerms=100分析term,过滤掉没有意义的term,例如</li>
-</ul>
-
-
-<p><code>
-&lt;int name="的"&gt;965396&lt;/int&gt;
-&lt;int name="，"&gt;947429&lt;/int&gt;
-&lt;int name="是"&gt;729063&lt;/int&gt;
-&lt;int name="。"&gt;707417&lt;/int&gt;
-&lt;int name="不"&gt;571925&lt;/int&gt;
-&lt;int name="你"&gt;534142&lt;/int&gt;
-&lt;int name="可以"&gt;525645&lt;/int&gt;
-&lt;int name="就"&gt;460975&lt;/int&gt;
-&lt;int name="有"&gt;443743&lt;/int&gt;
-&lt;int name="了"&gt;437630&lt;/int&gt;
-&lt;int name="要"&gt;372936&lt;/int&gt;
-&lt;int name="！"&gt;342369&lt;/int&gt;
-&lt;int name="好"&gt;331646&lt;/int&gt;
-&lt;int name="在"&gt;324636&lt;/int&gt;
-&lt;int name="一"&gt;279765&lt;/int&gt;
-&lt;int name="个"&gt;269726&lt;/int&gt;
-&lt;int name="能"&gt;233510&lt;/int&gt;
-</code></p>
-
-<ul>
-<li>权重相同的放入同一个字段，也可以用CopyField，可以多加个系数</li>
-</ul>
-
 ]]></content>
   </entry>
   

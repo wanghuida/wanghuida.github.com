@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Hadoop | 惠达的小宅]]></title>
+  <link href="http://www.wanghd.com/blog/categories/hadoop/atom.xml" rel="self"/>
+  <link href="http://www.wanghd.com/"/>
+  <updated>2012-11-04T00:39:47+08:00</updated>
+  <id>http://www.wanghd.com/</id>
+  <author>
+    <name><![CDATA[王惠达 huida wanghuida]]></name>
+    <email><![CDATA[wanghuida258@yahoo.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[eclipse配置hadoop的map-reduce开发环境]]></title>
+    <link href="http://www.wanghd.com/blog/2012/11/03/eclipsepei-zhi-hadoopde-map-reducekai-fa-huan-jing/"/>
+    <updated>2012-11-03T00:14:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/11/03/eclipsepei-zhi-hadoopde-map-reducekai-fa-huan-jing</id>
+    <content type="html"><![CDATA[<h3>生成eclipse环境</h3>
+
+<p>```
+cd hadoop-1.0.4</p>
+
+<h1>肯定会遇到诸多问题</h1>
+
+<p>ant eclipse
+```</p>
+
+<blockquote><p>问题1：configure: error: C++ preprocessor "/lib/cpp" fails sanity check</p>
+
+<blockquote><p>mac没有安装Xcode的command tool</p></blockquote>
+
+<p>问题2：can't exec "glibtoolize"</p>
+
+<blockquote><p>brew install autoconf automake libtool</p></blockquote>
+
+<p>问题3: .eclipse.templates does not exist</p>
+
+<blockquote><p>自己在hadoop-1.0.4下创建一个mkdir .eclipse.templates</p></blockquote></blockquote>
+
+<!-- more -->
+
+
+<h3>编译hadoop-eclipse-plugin</h3>
+
+<br />
+
+
+<p>1.进入eclipse插件目录</p>
+
+<p><code>
+cd src/contrib/eclipse-plugin
+</code></p>
+
+<p>2.编辑build.properties</p>
+
+<p>```
+vim build.properties</p>
+
+<h1>设置属性，eclipse.home根据自己的定义</h1>
+
+<p>eclipse.home = /Applications/eclipse
+version = 1.0.4
+```</p>
+
+<p>3.编辑build.xml</p>
+
+<p>```</p>
+
+<h1>在target=jar里面增加下面的jar包</h1>
+
+<p><copy file="${hadoop.root}/lib/commons-lang-2.4.jar"  todir="${build.dir}/lib" verbose="true"/>
+<copy file="${hadoop.root}/lib/commons-configuration-1.6.jar"  todir="${build.dir}/lib" verbose="true"/>
+<copy file="${hadoop.root}/lib/jackson-core-asl-1.8.8.jar"  todir="${build.dir}/lib" verbose="true"/>
+<copy file="${hadoop.root}/lib/jackson-mapper-asl-1.8.8.jar"  todir="${build.dir}/lib" verbose="true"/>
+<copy file="${hadoop.root}/lib/commons-httpclient-3.0.1.jar"  todir="${build.dir}/lib" verbose="true"/>
+```</p>
+
+<p>4.编辑vim META-INF/MANIFEST.MF</p>
+
+<p>```</p>
+
+<h1>修改Bundle-ClassPath</h1>
+
+<p>Bundle-ClassPath: classes/,
+  lib/hadoop-core.jar,
+  lib/commons-configuration-1.6.jar,
+  lib/commons-httpclient-3.0.1.jar,
+  lib/commons-lang-2.4.jar,
+  lib/jackson-core-asl-1.8.8.jar,
+  lib/jackson-mapper-asl-1.8.8.jar</p>
+
+<p>```</p>
+
+<p>5.复制hadoop核心包, 并生成我们需要的插件</p>
+
+<p>```
+cp {root}/hadoop-core-1.0.4.jar {root}/build</p>
+
+<h1>生成jar包</h1>
+
+<p>ant jar
+```</p>
+
+<p>6.编译成功后在build/contrib/eclipse-plugin下找到hadoop-eclipse-plugin-1.0.4.jar</p>
+
+<h3>eclipse配置</h3>
+
+<ul>
+<li><p>复制hadoop-eclipse-plugin-1.0.4.jar到eclipse的plugins下，然后重启eclipse</p></li>
+<li><p>Preferences => Hadoop Map/Reduce</p></li>
+</ul>
+
+
+<p><img src="/images/post/hadoop-eclipse-location.png" title="hadoop-eclipse-location.png" alt="hadoop-eclipse-location.png" /></p>
+
+<ul>
+<li>Window => Show View => Other... => Map/Reduce Locations => New Hadoop Location...</li>
+</ul>
+
+
+<p><img src="/images/post/hadoop-eclipse-general.png" title="hadoop-eclipse-general.png" alt="hadoop-eclipse-general.png" /></p>
+
+<ul>
+<li>看下结果吧</li>
+</ul>
+
+
+<p><img src="/images/post/hadoop-eclipse-result.png" title="hadoop-eclipse-result.png" alt="hadoop-eclipse-result.png" /></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[安装配置hadoop]]></title>
+    <link href="http://www.wanghd.com/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/"/>
+    <updated>2012-11-02T23:38:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/11/02/an-zhuang-pei-zhi-hadoop</id>
+    <content type="html"><![CDATA[<h3>下载stable的hadoop</h3>
+
+<ul>
+<li>hadoop的版本比较多，建议下载<code>stable</code>的，现在是<code>hadoop-1.0.4</code></li>
+<li>提供一个<a href="http://hadoop.apache.org/releases.html#Download">下载链接</a></li>
+</ul>
+
+
+<h3>解压缩</h3>
+
+<p><code>
+tar -zxvf hadoop-1.0.4.tar.gz
+cd hadoop-1.0.4
+</code></p>
+
+<h3>配置hadoop</h3>
+
+<blockquote><p>vim编辑conf/hadoop-env.sh，设置环境变量</p></blockquote>
+
+<p>```</p>
+
+<h1>如果是mac的话，请添加下面这句</h1>
+
+<p>export HADOOP_OPTS="-Djava.security.krb5.realm=OX.AC.UK</p>
+
+<pre><code>-Djava.security.krb5.kdc=kdc0.ox.ac.uk:kdc1.ox.ac.uk"
+</code></pre>
+
+<h1>配置JDK，mac的关系所以路径比较飘逸</h1>
+
+<p>export JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home
+```</p>
+
+<!-- more -->
+
+
+<blockquote><p>vim编译conf/core-site.xml，设置hdfs端口</p></blockquote>
+
+<p>```
+<configuration></p>
+
+<pre><code>&lt;property&gt;
+    &lt;name&gt;fs.default.name&lt;/name&gt;
+    &lt;value&gt;hdfs://localhost:9000&lt;/value&gt;
+&lt;/property&gt;
+</code></pre>
+
+<p></configuration>
+```</p>
+
+<blockquote><p>vim编辑conf/hdfs-site.xml，设置hdfs复制份数</p></blockquote>
+
+<p>```
+<configuration></p>
+
+<pre><code>&lt;property&gt;
+    &lt;name&gt;dfs.replication&lt;/name&gt;  
+    &lt;value&gt;1&lt;/value&gt;  
+&lt;/property&gt; 
+</code></pre>
+
+<p></configuration>
+```</p>
+
+<blockquote><p>vim编译conf/mapred-site.xml，设置job跟踪器的端口(map-reduce的)</p></blockquote>
+
+<p>```
+<configuration></p>
+
+<pre><code>&lt;property&gt;
+    &lt;name&gt;mapred.job.tracker&lt;/name&gt;
+    &lt;value&gt;localhost:9001&lt;/value&gt;
+&lt;/property&gt;
+</code></pre>
+
+<p></configuration>
+```</p>
+
+<h3>配置ssh</h3>
+
+<p><code>
+cat ~/.ssh/id_dsa.pub &gt;&gt; authorized_keys
+</code></p>
+
+<p><img src="/images/post/ssh.jpg" title="ssh" alt="ssh" /></p>
+
+<h3>启动测试hodoop</h3>
+
+<ul>
+<li>如果端口没有被占用的应该一切OK了</li>
+</ul>
+
+
+<p>```
+bin/hadoop namenode -format
+bin/start-all.sh</p>
+
+<h1>增加一些文件，这里用你自己的目录替换</h1>
+
+<p>bin/hadoop fs -put ~/project/mogilefs-tool /mogilefs-tool
+```</p>
+
+<ul>
+<li>在游览器里查看下结果，输入localhost:50070</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>

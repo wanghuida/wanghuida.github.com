@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>使用JMX分析solr状态 - 惠达的小宅</title>
+  <title>安装配置hadoop - 惠达的小宅</title>
   <meta name="author" content="王惠达 huida wanghuida">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.wanghd.com/blog/2012/09/20/shi-yong-jmxfen-xi-solrzhuang-tai">
+  <link rel="canonical" href="http://www.wanghd.com/blog/2012/11/02/an-zhuang-pei-zhi-hadoop">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/bootstrap/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/stylesheets/bootstrap/responsive.css" media="screen, projection" rel="stylesheet" type="text/css">
@@ -98,7 +98,7 @@
   
   <header class="page-header">
     
-      <h1 class="entry-title">使用JMX分析solr状态</h1>
+      <h1 class="entry-title">安装配置hadoop</h1>
     
     
       <p class="meta">
@@ -114,7 +114,7 @@
   
 
 
-<time datetime="2012-09-20T14:25:00+08:00" pubdate data-updated="true">Sep 20<span>th</span>, 2012</time>
+<time datetime="2012-11-02T23:38:00+08:00" pubdate data-updated="true">Nov 2<span>nd</span>, 2012</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -123,27 +123,44 @@
   </header>
 
 
-<div class="entry-content"><h3>开启JMX</h3>
+<div class="entry-content"><h3>下载stable的hadoop</h3>
 
 <ul>
-<li>在solrconfig.xml中添加,默认包含</li>
+<li>hadoop的版本比较多，建议下载<code>stable</code>的，现在是<code>hadoop-1.0.4</code></li>
+<li>提供一个<a href="http://hadoop.apache.org/releases.html#Download">下载链接</a></li>
 </ul>
 
+
+<h3>解压缩</h3>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;jmx /&gt;</span></code></pre></td></tr></table></div></figure>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>tar -zxvf hadoop-1.0.4.tar.gz
+</span><span class='line'>cd hadoop-1.0.4</span></code></pre></td></tr></table></div></figure>
 
 
-<ul>
-<li>重启solr，设置启动参数</li>
-<li>扩展选项请参考<a href="http://www.oracle.com/technetwork/java/javase/tech/vmoptions-jsp-140102.html">官方文档</a></li>
-</ul>
+<h3>配置hadoop</h3>
+
+<blockquote><p>vim编辑conf/hadoop-env.sh，设置环境变量</p></blockquote>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#如果是mac的话，请添加下面这句
+</span><span class='line'>export HADOOP_OPTS="-Djava.security.krb5.realm=OX.AC.UK 
+</span><span class='line'>    -Djava.security.krb5.kdc=kdc0.ox.ac.uk:kdc1.ox.ac.uk"
+</span><span class='line'>#配置JDK，mac的关系所以路径比较飘逸
+</span><span class='line'>export JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home</span></code></pre></td></tr></table></div></figure>
+
+
 
 
 <!-- more -->
 
 
-
+<blockquote><p>vim编译conf/core-site.xml，设置hdfs端口</p></blockquote>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -151,33 +168,75 @@
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>java -Xmx256M -Xms256M -XX:PermSize=64M -XX:MaxPermSize=64M 
-</span><span class='line'>-XX:+UseParallelGC 
-</span><span class='line'>-Dcom.sun.management.jmxremote
-</span><span class='line'>-Dcom.sun.management.jmxremote.port=3000
-</span><span class='line'>-Dcom.sun.management.jmxremote.ssl=false
-</span><span class='line'>-Dcom.sun.management.jmxremote.authenticate=false
-</span><span class='line'>-jar start.jar</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;configuration&gt;
+</span><span class='line'>    &lt;property&gt;
+</span><span class='line'>        &lt;name&gt;fs.default.name&lt;/name&gt;
+</span><span class='line'>        &lt;value&gt;hdfs://localhost:9000&lt;/value&gt;
+</span><span class='line'>    &lt;/property&gt;
+</span><span class='line'>&lt;/configuration&gt;</span></code></pre></td></tr></table></div></figure>
 
 
-<h3>使用jconsole连接，查看进程状态</h3>
+<blockquote><p>vim编辑conf/hdfs-site.xml，设置hdfs复制份数</p></blockquote>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>jconsole 127.0.0.1:3000 （jconsole在jdk的bin目录里）</span></code></pre></td></tr></table></div></figure>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;configuration&gt;
+</span><span class='line'>    &lt;property&gt;
+</span><span class='line'>        &lt;name&gt;dfs.replication&lt;/name&gt;  
+</span><span class='line'>        &lt;value&gt;1&lt;/value&gt;  
+</span><span class='line'>    &lt;/property&gt; 
+</span><span class='line'>&lt;/configuration&gt;</span></code></pre></td></tr></table></div></figure>
 
 
-<h3>实时java堆内存使用情况</h3>
+<blockquote><p>vim编译conf/mapred-site.xml，设置job跟踪器的端口(map-reduce的)</p></blockquote>
 
-<p><img src="/images/post/heap.png" title="heap" alt="heap" /></p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;configuration&gt;
+</span><span class='line'>    &lt;property&gt;
+</span><span class='line'>        &lt;name&gt;mapred.job.tracker&lt;/name&gt;
+</span><span class='line'>        &lt;value&gt;localhost:9001&lt;/value&gt;
+</span><span class='line'>    &lt;/property&gt;
+</span><span class='line'>&lt;/configuration&gt;</span></code></pre></td></tr></table></div></figure>
 
-<h3>实时cpu使用情况</h3>
 
-<p><img src="/images/post/cpu.png" title="cpu" alt="cpu" /></p>
+<h3>配置ssh</h3>
 
-<h3>MBean分析缓存命中率</h3>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cat ~/.ssh/id_dsa.pub &gt;&gt; authorized_keys</span></code></pre></td></tr></table></div></figure>
 
-<p><img src="/images/post/documentcache.png" title="documentcache" alt="documentcache" /></p>
+
+<p><img src="/images/post/ssh.jpg" title="ssh" alt="ssh" /></p>
+
+<h3>启动测试hodoop</h3>
+
+<ul>
+<li>如果端口没有被占用的应该一切OK了</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>bin/hadoop namenode -format
+</span><span class='line'>bin/start-all.sh
+</span><span class='line'>#增加一些文件，这里用你自己的目录替换
+</span><span class='line'>bin/hadoop fs -put ~/project/mogilefs-tool /mogilefs-tool</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>在游览器里查看下结果，输入localhost:50070</li>
+</ul>
+
 </div>
 
 
@@ -200,12 +259,12 @@
   
 
 
-<time datetime="2012-09-20T14:25:00+08:00" pubdate data-updated="true">Sep 20<span>th</span>, 2012</time>
+<time datetime="2012-11-02T23:38:00+08:00" pubdate data-updated="true">Nov 2<span>nd</span>, 2012</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/java/'>Java</a>, <a class='category' href='/blog/categories/solr/'>Solr</a>
+    <a class='category' href='/blog/categories/hadoop/'>Hadoop</a>, <a class='category' href='/blog/categories/java/'>Java</a>
   
 </span>
 
@@ -214,7 +273,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2012/09/20/shi-yong-jmxfen-xi-solrzhuang-tai/" data-via="" data-counturl="http://www.wanghd.com/blog/2012/09/20/shi-yong-jmxfen-xi-solrzhuang-tai/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/" data-via="" data-counturl="http://www.wanghd.com/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/" >Tweet</a>
   
   
   
@@ -231,13 +290,13 @@
     <ul class="pager">
       
       <li class="previous"><a class="basic-alignment left"
-        href="/blog/2012/09/18/xiang-liang-kong-jian-mo-xing/" title="Previous Post:
-        向量空间模型">&laquo; 向量空间模型</a></li>
+        href="/blog/2012/10/23/mogilefsxiang-jie/" title="Previous Post:
+        MogileFS详解">&laquo; MogileFS详解</a></li>
       
       <li><a href="/blog/archives">文章归档</a></li>
       
-      <li class="next"><a class="basic-alignment right" href="/blog/2012/09/21/solrde-shu-zhi-cun-chu-he-fan-wei-cha-xun/"
-        title="Next Post: solr的数值存储和范围查询">solr的数值存储和范围查询
+      <li class="next"><a class="basic-alignment right" href="/blog/2012/11/03/eclipsepei-zhi-hadoopde-map-reducekai-fa-huan-jing/"
+        title="Next Post: eclipse配置hadoop的map-reduce开发环境">eclipse配置hadoop的map-reduce开发环境
         &raquo;</a></li>
       
     </ul>
@@ -344,8 +403,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.wanghd.com/blog/2012/09/20/shi-yong-jmxfen-xi-solrzhuang-tai/';
-        var disqus_url = 'http://www.wanghd.com/blog/2012/09/20/shi-yong-jmxfen-xi-solrzhuang-tai/';
+        var disqus_identifier = 'http://www.wanghd.com/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/';
+        var disqus_url = 'http://www.wanghd.com/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/';
         var disqus_script = 'embed.js';
       
     (function () {

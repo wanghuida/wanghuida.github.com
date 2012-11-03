@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>使用JMX分析solr状态 - 惠达的小宅</title>
+  <title>eclipse配置hadoop的map-reduce开发环境 - 惠达的小宅</title>
   <meta name="author" content="王惠达 huida wanghuida">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.wanghd.com/blog/2012/09/20/shi-yong-jmxfen-xi-solrzhuang-tai">
+  <link rel="canonical" href="http://www.wanghd.com/blog/2012/11/03/eclipsepei-zhi-hadoopde-map-reducekai-fa-huan-jing">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/bootstrap/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/stylesheets/bootstrap/responsive.css" media="screen, projection" rel="stylesheet" type="text/css">
@@ -98,7 +98,7 @@
   
   <header class="page-header">
     
-      <h1 class="entry-title">使用JMX分析solr状态</h1>
+      <h1 class="entry-title">Eclipse配置hadoop的map-reduce开发环境</h1>
     
     
       <p class="meta">
@@ -114,7 +114,7 @@
   
 
 
-<time datetime="2012-09-20T14:25:00+08:00" pubdate data-updated="true">Sep 20<span>th</span>, 2012</time>
+<time datetime="2012-11-03T00:14:00+08:00" pubdate data-updated="true">Nov 3<span>rd</span>, 2012</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -123,27 +123,73 @@
   </header>
 
 
-<div class="entry-content"><h3>开启JMX</h3>
-
-<ul>
-<li>在solrconfig.xml中添加,默认包含</li>
-</ul>
-
+<div class="entry-content"><h3>生成eclipse环境</h3>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;jmx /&gt;</span></code></pre></td></tr></table></div></figure>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cd hadoop-1.0.4
+</span><span class='line'>
+</span><span class='line'>#肯定会遇到诸多问题
+</span><span class='line'>ant eclipse </span></code></pre></td></tr></table></div></figure>
 
 
-<ul>
-<li>重启solr，设置启动参数</li>
-<li>扩展选项请参考<a href="http://www.oracle.com/technetwork/java/javase/tech/vmoptions-jsp-140102.html">官方文档</a></li>
-</ul>
+<blockquote><p>问题1：configure: error: C++ preprocessor &#8220;/lib/cpp&#8221; fails sanity check</p>
 
+<blockquote><p>mac没有安装Xcode的command tool</p></blockquote>
+
+<p>问题2：can&#8217;t exec &#8220;glibtoolize&#8221;</p>
+
+<blockquote><p>brew install autoconf automake libtool</p></blockquote>
+
+<p>问题3: .eclipse.templates does not exist</p>
+
+<blockquote><p>自己在hadoop-1.0.4下创建一个mkdir .eclipse.templates</p></blockquote></blockquote>
 
 <!-- more -->
 
 
+<h3>编译hadoop-eclipse-plugin</h3>
 
+<br />
+
+
+<p>1.进入eclipse插件目录</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cd src/contrib/eclipse-plugin</span></code></pre></td></tr></table></div></figure>
+
+
+<p>2.编辑build.properties</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>vim build.properties
+</span><span class='line'># 设置属性，eclipse.home根据自己的定义
+</span><span class='line'>eclipse.home = /Applications/eclipse
+</span><span class='line'>version = 1.0.4</span></code></pre></td></tr></table></div></figure>
+
+
+<p>3.编辑build.xml</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># 在target=jar里面增加下面的jar包
+</span><span class='line'>&lt;copy file="${hadoop.root}/lib/commons-lang-2.4.jar"  todir="${build.dir}/lib" verbose="true"/&gt;
+</span><span class='line'>&lt;copy file="${hadoop.root}/lib/commons-configuration-1.6.jar"  todir="${build.dir}/lib" verbose="true"/&gt;
+</span><span class='line'>&lt;copy file="${hadoop.root}/lib/jackson-core-asl-1.8.8.jar"  todir="${build.dir}/lib" verbose="true"/&gt;
+</span><span class='line'>&lt;copy file="${hadoop.root}/lib/jackson-mapper-asl-1.8.8.jar"  todir="${build.dir}/lib" verbose="true"/&gt;
+</span><span class='line'>&lt;copy file="${hadoop.root}/lib/commons-httpclient-3.0.1.jar"  todir="${build.dir}/lib" verbose="true"/&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>4.编辑vim META-INF/MANIFEST.MF</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -152,32 +198,53 @@
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>java -Xmx256M -Xms256M -XX:PermSize=64M -XX:MaxPermSize=64M 
-</span><span class='line'>-XX:+UseParallelGC 
-</span><span class='line'>-Dcom.sun.management.jmxremote
-</span><span class='line'>-Dcom.sun.management.jmxremote.port=3000
-</span><span class='line'>-Dcom.sun.management.jmxremote.ssl=false
-</span><span class='line'>-Dcom.sun.management.jmxremote.authenticate=false
-</span><span class='line'>-jar start.jar</span></code></pre></td></tr></table></div></figure>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># 修改Bundle-ClassPath
+</span><span class='line'>Bundle-ClassPath: classes/,
+</span><span class='line'>  lib/hadoop-core.jar,
+</span><span class='line'>  lib/commons-configuration-1.6.jar,
+</span><span class='line'>  lib/commons-httpclient-3.0.1.jar,
+</span><span class='line'>  lib/commons-lang-2.4.jar,
+</span><span class='line'>  lib/jackson-core-asl-1.8.8.jar,
+</span><span class='line'>  lib/jackson-mapper-asl-1.8.8.jar
+</span></code></pre></td></tr></table></div></figure>
 
 
-<h3>使用jconsole连接，查看进程状态</h3>
+<p>5.复制hadoop核心包, 并生成我们需要的插件</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>jconsole 127.0.0.1:3000 （jconsole在jdk的bin目录里）</span></code></pre></td></tr></table></div></figure>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cp {root}/hadoop-core-1.0.4.jar {root}/build
+</span><span class='line'>#生成jar包
+</span><span class='line'>ant jar</span></code></pre></td></tr></table></div></figure>
 
 
-<h3>实时java堆内存使用情况</h3>
+<p>6.编译成功后在build/contrib/eclipse-plugin下找到hadoop-eclipse-plugin-1.0.4.jar</p>
 
-<p><img src="/images/post/heap.png" title="heap" alt="heap" /></p>
+<h3>eclipse配置</h3>
 
-<h3>实时cpu使用情况</h3>
+<ul>
+<li><p>复制hadoop-eclipse-plugin-1.0.4.jar到eclipse的plugins下，然后重启eclipse</p></li>
+<li><p>Preferences => Hadoop Map/Reduce</p></li>
+</ul>
 
-<p><img src="/images/post/cpu.png" title="cpu" alt="cpu" /></p>
 
-<h3>MBean分析缓存命中率</h3>
+<p><img src="/images/post/hadoop-eclipse-location.png" title="hadoop-eclipse-location.png" alt="hadoop-eclipse-location.png" /></p>
 
-<p><img src="/images/post/documentcache.png" title="documentcache" alt="documentcache" /></p>
+<ul>
+<li>Window => Show View => Other&#8230; => Map/Reduce Locations => New Hadoop Location&#8230;</li>
+</ul>
+
+
+<p><img src="/images/post/hadoop-eclipse-general.png" title="hadoop-eclipse-general.png" alt="hadoop-eclipse-general.png" /></p>
+
+<ul>
+<li>看下结果吧</li>
+</ul>
+
+
+<p><img src="/images/post/hadoop-eclipse-result.png" title="hadoop-eclipse-result.png" alt="hadoop-eclipse-result.png" /></p>
 </div>
 
 
@@ -200,12 +267,12 @@
   
 
 
-<time datetime="2012-09-20T14:25:00+08:00" pubdate data-updated="true">Sep 20<span>th</span>, 2012</time>
+<time datetime="2012-11-03T00:14:00+08:00" pubdate data-updated="true">Nov 3<span>rd</span>, 2012</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/java/'>Java</a>, <a class='category' href='/blog/categories/solr/'>Solr</a>
+    <a class='category' href='/blog/categories/hadoop/'>Hadoop</a>, <a class='category' href='/blog/categories/java/'>Java</a>
   
 </span>
 
@@ -214,7 +281,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2012/09/20/shi-yong-jmxfen-xi-solrzhuang-tai/" data-via="" data-counturl="http://www.wanghd.com/blog/2012/09/20/shi-yong-jmxfen-xi-solrzhuang-tai/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2012/11/03/eclipsepei-zhi-hadoopde-map-reducekai-fa-huan-jing/" data-via="" data-counturl="http://www.wanghd.com/blog/2012/11/03/eclipsepei-zhi-hadoopde-map-reducekai-fa-huan-jing/" >Tweet</a>
   
   
   
@@ -231,14 +298,10 @@
     <ul class="pager">
       
       <li class="previous"><a class="basic-alignment left"
-        href="/blog/2012/09/18/xiang-liang-kong-jian-mo-xing/" title="Previous Post:
-        向量空间模型">&laquo; 向量空间模型</a></li>
+        href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/" title="Previous Post:
+        安装配置hadoop">&laquo; 安装配置hadoop</a></li>
       
       <li><a href="/blog/archives">文章归档</a></li>
-      
-      <li class="next"><a class="basic-alignment right" href="/blog/2012/09/21/solrde-shu-zhi-cun-chu-he-fan-wei-cha-xun/"
-        title="Next Post: solr的数值存储和范围查询">solr的数值存储和范围查询
-        &raquo;</a></li>
       
     </ul>
   </footer>
@@ -344,8 +407,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.wanghd.com/blog/2012/09/20/shi-yong-jmxfen-xi-solrzhuang-tai/';
-        var disqus_url = 'http://www.wanghd.com/blog/2012/09/20/shi-yong-jmxfen-xi-solrzhuang-tai/';
+        var disqus_identifier = 'http://www.wanghd.com/blog/2012/11/03/eclipsepei-zhi-hadoopde-map-reducekai-fa-huan-jing/';
+        var disqus_url = 'http://www.wanghd.com/blog/2012/11/03/eclipsepei-zhi-hadoopde-map-reducekai-fa-huan-jing/';
         var disqus_script = 'embed.js';
       
     (function () {
