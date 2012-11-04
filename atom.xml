@@ -4,7 +4,7 @@
   <title><![CDATA[惠达的小宅]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2012-11-04T00:39:47+08:00</updated>
+  <updated>2012-11-04T21:42:54+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -14,11 +14,214 @@
 
   
   <entry>
+    <title type="html"><![CDATA[编写hadoop的Map-Reduce]]></title>
+    <link href="http://www.wanghd.com/blog/2012/11/04/bian-xie-hadoopde-map-reduce/"/>
+    <updated>2012-11-04T21:12:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/11/04/bian-xie-hadoopde-map-reduce</id>
+    <content type="html"><![CDATA[<h3>创建map-reduce项目</h3>
+
+<ul>
+<li>安装hadoop请参考<a href="http://www.wanghd.com/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/">这篇文章</a></li>
+<li>安装hadoop-plugin请参考<a href="http://www.wanghd.com/blog/2012/11/03/eclipsepei-zhi-hadoopde-map-reducekai-fa-huan-jing/">这篇文章</a></li>
+</ul>
+
+
+<p><img src="http://www.wanghd.com/images/post/new-mapred.png" title="new-mapred" alt="new-mapred" /></p>
+
+<h3>创建测试数据</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cd /tmp
+</span><span class='line'>mkdir input
+</span><span class='line'>echo "hello world baby huida" &gt; t1.txt
+</span><span class='line'>echo "world baby baby markdown" &gt; t2.txt
+</span><span class='line'>
+</span><span class='line'>bin/hadoop fs -put /tmp/input input
+</span><span class='line'>bin/hadoop fs -ls</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!-- more -->
+
+
+<h3>复制测试代码</h3>
+
+<ul>
+<li>hadoop源代码里的例子：/src/example/org/apache/hadoop/example/WordCount.java</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">org</span><span class="o">.</span><span class="na">anjuke</span><span class="o">.</span><span class="na">mapred</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">java.util.StringTokenizer</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.apache.hadoop.conf.Configuration</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.apache.hadoop.fs.Path</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.apache.hadoop.io.IntWritable</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.apache.hadoop.io.Text</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.apache.hadoop.mapreduce.Job</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.apache.hadoop.mapreduce.Mapper</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.apache.hadoop.mapreduce.Reducer</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.apache.hadoop.mapreduce.lib.input.FileInputFormat</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.apache.hadoop.mapreduce.lib.output.FileOutputFormat</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.apache.hadoop.util.GenericOptionsParser</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">WordCount</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">TokenizerMapper</span> <span class="kd">extends</span> <span class="n">Mapper</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">,</span> <span class="n">Text</span><span class="o">,</span> <span class="n">Text</span><span class="o">,</span> <span class="n">IntWritable</span><span class="o">&gt;{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">private</span> <span class="kd">final</span> <span class="kd">static</span> <span class="n">IntWritable</span> <span class="n">one</span> <span class="o">=</span> <span class="k">new</span> <span class="n">IntWritable</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">Text</span> <span class="n">word</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Text</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">map</span><span class="o">(</span><span class="n">Object</span> <span class="n">key</span><span class="o">,</span> <span class="n">Text</span> <span class="n">value</span><span class="o">,</span> <span class="n">Context</span> <span class="n">context</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">,</span> <span class="n">InterruptedException</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">StringTokenizer</span> <span class="n">itr</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringTokenizer</span><span class="o">(</span><span class="n">value</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+</span><span class='line'>      <span class="k">while</span> <span class="o">(</span><span class="n">itr</span><span class="o">.</span><span class="na">hasMoreTokens</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">word</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">itr</span><span class="o">.</span><span class="na">nextToken</span><span class="o">());</span>
+</span><span class='line'>        <span class="n">context</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">word</span><span class="o">,</span> <span class="n">one</span><span class="o">);</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">IntSumReducer</span> <span class="kd">extends</span> <span class="n">Reducer</span><span class="o">&lt;</span><span class="n">Text</span><span class="o">,</span><span class="n">IntWritable</span><span class="o">,</span><span class="n">Text</span><span class="o">,</span><span class="n">IntWritable</span><span class="o">&gt;</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">IntWritable</span> <span class="n">result</span> <span class="o">=</span> <span class="k">new</span> <span class="n">IntWritable</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">reduce</span><span class="o">(</span><span class="n">Text</span> <span class="n">key</span><span class="o">,</span> <span class="n">Iterable</span><span class="o">&lt;</span><span class="n">IntWritable</span><span class="o">&gt;</span> <span class="n">values</span><span class="o">,</span> <span class="n">Context</span> <span class="n">context</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">,</span> <span class="n">InterruptedException</span> <span class="o">{</span>
+</span><span class='line'>      <span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+</span><span class='line'>      <span class="k">for</span> <span class="o">(</span><span class="n">IntWritable</span> <span class="n">val</span> <span class="o">:</span> <span class="n">values</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">sum</span> <span class="o">+=</span> <span class="n">val</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>      <span class="n">result</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">sum</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">context</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">result</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">Configuration</span> <span class="n">conf</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Configuration</span><span class="o">();</span>
+</span><span class='line'>    <span class="n">String</span><span class="o">[]</span> <span class="n">otherArgs</span> <span class="o">=</span> <span class="k">new</span> <span class="n">GenericOptionsParser</span><span class="o">(</span><span class="n">conf</span><span class="o">,</span> <span class="n">args</span><span class="o">).</span><span class="na">getRemainingArgs</span><span class="o">();</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">otherArgs</span><span class="o">.</span><span class="na">length</span> <span class="o">!=</span> <span class="mi">2</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">err</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Usage: wordcount &lt;in&gt; &lt;out&gt;&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">exit</span><span class="o">(</span><span class="mi">2</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="n">Job</span> <span class="n">job</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Job</span><span class="o">(</span><span class="n">conf</span><span class="o">,</span> <span class="s">&quot;word count&quot;</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">job</span><span class="o">.</span><span class="na">setJarByClass</span><span class="o">(</span><span class="n">WordCount</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">job</span><span class="o">.</span><span class="na">setMapperClass</span><span class="o">(</span><span class="n">TokenizerMapper</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">job</span><span class="o">.</span><span class="na">setCombinerClass</span><span class="o">(</span><span class="n">IntSumReducer</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">job</span><span class="o">.</span><span class="na">setReducerClass</span><span class="o">(</span><span class="n">IntSumReducer</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">job</span><span class="o">.</span><span class="na">setOutputKeyClass</span><span class="o">(</span><span class="n">Text</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">job</span><span class="o">.</span><span class="na">setOutputValueClass</span><span class="o">(</span><span class="n">IntWritable</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">FileInputFormat</span><span class="o">.</span><span class="na">addInputPath</span><span class="o">(</span><span class="n">job</span><span class="o">,</span> <span class="k">new</span> <span class="n">Path</span><span class="o">(</span><span class="n">otherArgs</span><span class="o">[</span><span class="mi">0</span><span class="o">]));</span>
+</span><span class='line'>    <span class="n">FileOutputFormat</span><span class="o">.</span><span class="na">setOutputPath</span><span class="o">(</span><span class="n">job</span><span class="o">,</span> <span class="k">new</span> <span class="n">Path</span><span class="o">(</span><span class="n">otherArgs</span><span class="o">[</span><span class="mi">1</span><span class="o">]));</span>
+</span><span class='line'>    <span class="n">System</span><span class="o">.</span><span class="na">exit</span><span class="o">(</span><span class="n">job</span><span class="o">.</span><span class="na">waitForCompletion</span><span class="o">(</span><span class="kc">true</span><span class="o">)</span> <span class="o">?</span> <span class="mi">0</span> <span class="o">:</span> <span class="mi">1</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>运行实例</h3>
+
+<ul>
+<li>修改运行参数，根据自己的路径修改</li>
+</ul>
+
+
+<p><img src="http://www.wanghd.com/images/post/wordcount-conf.png" title="wordcount-conf" alt="wordcount-conf" /></p>
+
+<ul>
+<li>点击运行后看结果</li>
+</ul>
+
+
+<p><img src="http://www.wanghd.com/images/post/mapred-run.png" title="mapred-run" alt="mapred-run" /></p>
+
+<p><img src="http://www.wanghd.com/images/post/wordcount-ret.png" title="wordcount-ret" alt="wordcount-ret" /></p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[eclipse配置hadoop的map-reduce开发环境]]></title>
     <link href="http://www.wanghd.com/blog/2012/11/03/eclipsepei-zhi-hadoopde-map-reducekai-fa-huan-jing/"/>
     <updated>2012-11-03T00:14:00+08:00</updated>
     <id>http://www.wanghd.com/blog/2012/11/03/eclipsepei-zhi-hadoopde-map-reducekai-fa-huan-jing</id>
     <content type="html"><![CDATA[<h3>生成eclipse环境</h3>
+
+<ul>
+<li>安装hadoop请参考<a href="http://www.wanghd.com/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/">这篇文章</a></li>
+</ul>
+
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -3213,56 +3416,6 @@
 <li>writeResponse，如果id在DocumentCache里有就直接拿，否则通过reader去获得，再保存到DocumentCache</li>
 <li>输出结果到游览器</li>
 </ol>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[solr启动分析]]></title>
-    <link href="http://www.wanghd.com/blog/2012/08/28/solrqi-dong-fen-xi/"/>
-    <updated>2012-08-28T08:34:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/08/28/solrqi-dong-fen-xi</id>
-    <content type="html"><![CDATA[<h3>solr启动分析</h3>
-
-<p><img src="http://www.wanghd.com/images/post/solrstart.png" title="solr 启动分析" alt="solr 启动分析" /></p>
-
-<ol>
-<li>CoreContainer通过xpath加载solr.xml</li>
-<li>实例化CoreAdminHandler管理CoreContainer，提供reload,status等命令(status可以看到index-size)</li>
-<li>初始化CoreDescriptor，设置核心的配置文件、目录、属性文件</li>
-<li>读取solrconfig.xml，分析后设置到SolrConfig</li>
-<li>读取schema.xml，设置fieldTypes @FieldTypePluginLoader,fields @SchemaField,过滤器,分词器,主键</li>
-<li>构造SolrCore,设置数据目录和各种资源的初始化</li>
-<li>QuerySenderListener，默认2个事件firstSearcher和newSearcher</li>
-<li>IndexDeletionPolicy</li>
-<li>DefaultCodecFactory，4.0的功能，字段的编码器和解码器</li>
-<li>StandardDirectoryFactory，指向data/index/的Directory，用来生成Reader读取索引</li>
-<li>QueryResponseWriter，各种返回结果，例如json,xml</li>
-<li>QParserPlugin，请求分析插件,用以生成QParser，例如BoostQParserPlugin和DisMaxQParserPlugin等</li>
-<li>ValueSourceParser，初始化内置的函数，比如boost,abs,sin..等等</li>
-<li>SearchComponent，例如query,facet,mlt,stat,debug,get</li>
-<li>RequestHandlers，是根据url对应RequestHandler的映射</li>
-<li>DirectUpdateHandler2，commit数据的handler</li>
-<li>最后执行firstSearcher事件预热，注册第一个SolrIndexSearcher</li>
-</ol>
-
-
-<h3>solr package</h3>
-
-<ul>
-<li>org.apache.solr.analysis; 过滤器，分词器</li>
-<li>org.apache.solr.core; solr的核心包,例如CoreContainer,Config,SolrCore,SolrConfig,CachingDirectoryFactory,CoreDescriptor</li>
-<li>org.apache.solr.servlet; 与servlet有关,例如SolrDispatchFilter就属于该包</li>
-<li>org.apache.solr.handler; org.apache.solr.handler.component; 请求处理</li>
-<li>org.apache.solr.handler.admin; 处理用来管理的请求，例如CoreAdminHandler</li>
-<li>org.apache.solr.search; 与查询有关的类，例如缓存，查询分析，返回字段 SolrIndexSearcher</li>
-<li>org.apache.solr.schema; 字段类型，schema通知</li>
-<li>org.apache.solr.util.plugin; 为插件提供的一些工具，抽象和接口，例如AbstractPluginLoader</li>
-<li>org.apache.solr.util; 一些工具，例如FileUtils</li>
-<li>org.apache.solr.update; org.apache.solr.update.processor; 用来更新数据的，例如默认的DirectUpdateHandler2</li>
-<li>org.apache.solr.response;org.apache.solr.response.transform;用来返回数据(序列化,json,xml等数据)</li>
-<li>org.apache.solr.request; 请求相关的信息，例如SolrRequestInfo</li>
-</ul>
 
 ]]></content>
   </entry>

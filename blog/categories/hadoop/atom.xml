@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Hadoop | 惠达的小宅]]></title>
   <link href="http://www.wanghd.com/blog/categories/hadoop/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2012-11-04T00:39:47+08:00</updated>
+  <updated>2012-11-04T21:42:54+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -14,11 +14,148 @@
 
   
   <entry>
+    <title type="html"><![CDATA[编写hadoop的Map-Reduce]]></title>
+    <link href="http://www.wanghd.com/blog/2012/11/04/bian-xie-hadoopde-map-reduce/"/>
+    <updated>2012-11-04T21:12:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/11/04/bian-xie-hadoopde-map-reduce</id>
+    <content type="html"><![CDATA[<h3>创建map-reduce项目</h3>
+
+<ul>
+<li>安装hadoop请参考<a href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/">这篇文章</a></li>
+<li>安装hadoop-plugin请参考<a href="/blog/2012/11/03/eclipsepei-zhi-hadoopde-map-reducekai-fa-huan-jing/">这篇文章</a></li>
+</ul>
+
+
+<p><img src="/images/post/new-mapred.png" title="new-mapred" alt="new-mapred" /></p>
+
+<h3>创建测试数据</h3>
+
+<p>```
+cd /tmp
+mkdir input
+echo "hello world baby huida" > t1.txt
+echo "world baby baby markdown" > t2.txt</p>
+
+<p>bin/hadoop fs -put /tmp/input input
+bin/hadoop fs -ls
+```</p>
+
+<!-- more -->
+
+
+<h3>复制测试代码</h3>
+
+<ul>
+<li>hadoop源代码里的例子：/src/example/org/apache/hadoop/example/WordCount.java</li>
+</ul>
+
+
+<p>```java
+package org.anjuke.mapred;</p>
+
+<p>import java.io.IOException;
+import java.util.StringTokenizer;</p>
+
+<p>import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.util.GenericOptionsParser;</p>
+
+<p>public class WordCount {</p>
+
+<p>  public static class TokenizerMapper extends Mapper&lt;Object, Text, Text, IntWritable>{</p>
+
+<pre><code>private final static IntWritable one = new IntWritable(1);
+private Text word = new Text();
+
+public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+  StringTokenizer itr = new StringTokenizer(value.toString());
+  while (itr.hasMoreTokens()) {
+    word.set(itr.nextToken());
+    context.write(word, one);
+  }
+}
+</code></pre>
+
+<p>  }</p>
+
+<p>  public static class IntSumReducer extends Reducer&lt;Text,IntWritable,Text,IntWritable> {</p>
+
+<pre><code>private IntWritable result = new IntWritable();
+
+public void reduce(Text key, Iterable&lt;IntWritable&gt; values, Context context) throws IOException, InterruptedException {
+  int sum = 0;
+  for (IntWritable val : values) {
+    sum += val.get();
+  }
+  result.set(sum);
+  context.write(key, result);
+}
+</code></pre>
+
+<p>  }</p>
+
+<p>  public static void main(String[] args) throws Exception {</p>
+
+<pre><code>Configuration conf = new Configuration();
+String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
+if (otherArgs.length != 2) {
+  System.err.println("Usage: wordcount &lt;in&gt; &lt;out&gt;");
+  System.exit(2);
+}
+Job job = new Job(conf, "word count");
+job.setJarByClass(WordCount.class);
+job.setMapperClass(TokenizerMapper.class);
+job.setCombinerClass(IntSumReducer.class);
+job.setReducerClass(IntSumReducer.class);
+job.setOutputKeyClass(Text.class);
+job.setOutputValueClass(IntWritable.class);
+FileInputFormat.addInputPath(job, new Path(otherArgs[0]));
+FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
+System.exit(job.waitForCompletion(true) ? 0 : 1);
+</code></pre>
+
+<p>  }
+}
+```</p>
+
+<h3>运行实例</h3>
+
+<ul>
+<li>修改运行参数，根据自己的路径修改</li>
+</ul>
+
+
+<p><img src="/images/post/wordcount-conf.png" title="wordcount-conf" alt="wordcount-conf" /></p>
+
+<ul>
+<li>点击运行后看结果</li>
+</ul>
+
+
+<p><img src="/images/post/mapred-run.png" title="mapred-run" alt="mapred-run" /></p>
+
+<p><img src="/images/post/wordcount-ret.png" title="wordcount-ret" alt="wordcount-ret" /></p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[eclipse配置hadoop的map-reduce开发环境]]></title>
     <link href="http://www.wanghd.com/blog/2012/11/03/eclipsepei-zhi-hadoopde-map-reducekai-fa-huan-jing/"/>
     <updated>2012-11-03T00:14:00+08:00</updated>
     <id>http://www.wanghd.com/blog/2012/11/03/eclipsepei-zhi-hadoopde-map-reducekai-fa-huan-jing</id>
     <content type="html"><![CDATA[<h3>生成eclipse环境</h3>
+
+<ul>
+<li>安装hadoop请参考<a href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/">这篇文章</a></li>
+</ul>
+
 
 <p>```
 cd hadoop-1.0.4</p>
