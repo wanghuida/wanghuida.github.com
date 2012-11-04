@@ -11,6 +11,8 @@ categories: [Hadoop, Java]
 
 ###生成eclipse环境
 
++ 安装hadoop请参考[这篇文章](/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/)
+
 ```
 cd hadoop-1.0.4
 
