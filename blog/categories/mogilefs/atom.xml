@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Mogilefs | 惠达的小宅]]></title>
   <link href="http://www.wanghd.com/blog/categories/mogilefs/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2012-11-04T21:42:54+08:00</updated>
+  <updated>2012-11-06T23:00:46+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,202 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[mogilefs删除队列]]></title>
+    <link href="http://www.wanghd.com/blog/2012/11/06/mogilefsshan-chu-dui-lie/"/>
+    <updated>2012-11-06T19:31:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/11/06/mogilefsshan-chu-dui-lie</id>
+    <content type="html"><![CDATA[<h3>遇到的问题</h3>
+
+<ul>
+<li>发现file_to_delete2队列表里有500万记录，奇怪这些文件为什么要删除？心里不踏实，寻找根源...</li>
+<li>在队列中随便拿一个fid，在file表里查竟然是空的，再找file_on表竟然有数据...</li>
+</ul>
+
+
+<h3>什么时候会插入fid到删除队列呢</h3>
+
+<ol>
+<li>cmd_create_close时，如果连接终端，文件大小等不正确，会增加到删除队列</li>
+<li>cmd_create_close时，如果同一domain下key已经存在，那么会去删除原有的文件(两份文件key相同，但是fid不同，我的问题就出在这)</li>
+<li>mogdelete工具会删除memcache和file表的文件记录，并运用删除队列删除磁盘上的文件和file_on表</li>
+<li>client调用delete方法，和mogdelete一样</li>
+</ol>
+
+
+<!-- more -->
+
+
+<h3>cmd_create_close逻辑</h3>
+
+<ul>
+<li>mogilefs上传文件的逻辑是先问tracker拿文件存储路径，然后上传文件到一个storage，最后调用cmd_create_close方法插入数据记录和replicate队列</li>
+</ul>
+
+
+<p>```perl
+sub cmd_create_close {</p>
+
+<pre><code>my MogileFS::Worker::Query $self = shift;
+my $args = shift;
+
+# has to be filled out for some plugins
+$args-&gt;{dmid} = $self-&gt;check_domain($args)
+    or return $self-&gt;err_line('domain_not_found');
+
+# call out to a hook that might modify the arguments for us
+# 调用插件用的钩子，一般是没的
+MogileFS::run_global_hook('cmd_create_close', $args);
+
+# late validation of parameters
+# 设置下面使用的变量
+my $dmid  = $args-&gt;{dmid};
+my $key   = $args-&gt;{key};
+my $fidid = $args-&gt;{fid}    or return $self-&gt;err_line("no_fid");
+my $devid = $args-&gt;{devid}  or return $self-&gt;err_line("no_devid");
+my $path  = $args-&gt;{path}   or return $self-&gt;err_line("no_path");
+my $checksum = $args-&gt;{checksum};
+
+if ($checksum) {
+    $checksum = eval { MogileFS::Checksum-&gt;from_string($fidid, $checksum) };
+    return $self-&gt;err_line("invalid_checksum_format") if $@;
+}    
+
+# 初始化fid和dfid对象
+my $fid  = MogileFS::FID-&gt;new($fidid);
+my $dfid = MogileFS::DevFID-&gt;new($devid, $fid);
+
+# is the provided path what we'd expect for this fid/devid?
+# 验证是否为伪造路径
+return $self-&gt;err_line("bogus_args")
+    unless $path eq $dfid-&gt;url;
+my $sto = Mgd::get_store();
+
+# find the temp file we're closing and making real.  If another worker
+# already has it, bail out---the client closed it twice.
+# this is racy, but the only expected use case is a client retrying.
+# should still be fixed better once more scalable locking is available.
+# 取得零时文件数据,并删除掉
+my $trow = $sto-&gt;delete_and_return_tempfile_row($fidid) or
+    return $self-&gt;err_line("no_temp_file");
+
+# Protect against leaving orphaned uploads.
+# 定义错误函数，可以看到$fid-&gt;delete会删除file表记录并插入删除队列
+my $failed = sub {
+    $dfid-&gt;add_to_db;
+    $fid-&gt;delete;
+};
+
+# 验证设备
+unless ($trow-&gt;{devids} =~ m/\b$devid\b/) {
+    $failed-&gt;();
+    return $self-&gt;err_line("invalid_destdev", "File uploaded to invalid dest $devid. Valid devices were: " . $trow-&gt;{devids});
+}
+
+# if a temp file is closed without a provided-key, that means to
+# delete it.
+# 验证key
+unless (defined $key &amp;&amp; length($key)) {
+    $failed-&gt;();
+    return $self-&gt;ok_line;
+}
+
+# get size of file and verify that it matches what we were given, if anything
+my $httpfile = MogileFS::HTTPFile-&gt;at($path);
+my $size = $httpfile-&gt;size;
+
+# size check is optional? Needs to support zero byte files.
+# 验证文件大小
+$args-&gt;{size} = -1 unless $args-&gt;{size};
+if (!defined($size) || $size == MogileFS::HTTPFile::FILE_MISSING) {
+    # storage node is unreachable or the file is missing
+    my $type    = defined $size ? "missing" : "cantreach";
+    my $lasterr = MogileFS::Util::last_error();
+    $failed-&gt;();
+    return $self-&gt;err_line("size_verify_error", "Expected: $args-&gt;{size}; actual: 0 ($type); path: $path; error: $lasterr")
+}
+
+if ($args-&gt;{size} &gt; -1 &amp;&amp; ($args-&gt;{size} != $size)) {
+    $failed-&gt;();
+    return $self-&gt;err_line("size_mismatch", "Expected: $args-&gt;{size}; actual: $size; path: $path")
+}
+
+# checksum validation is optional as it can be very expensive
+# However, we /always/ verify it if the client wants us to, even
+# if the class does not enforce or store it.
+# 校验和
+if ($checksum &amp;&amp; $args-&gt;{checksumverify}) {
+    my $alg = $checksum-&gt;hashname;
+    my $actual = $httpfile-&gt;digest($alg, sub { $self-&gt;still_alive });
+    if ($actual ne $checksum-&gt;{checksum}) {
+        $failed-&gt;();
+        $actual = "$alg:" . unpack("H*", $actual);
+        return $self-&gt;err_line("checksum_mismatch",
+                       "Expected: $checksum; actual: $actual; path: $path");
+    }
+}
+# see if we have a fid for this key already
+# 关键的来了，如果在同一个domain下有相同的key，那么删除该文件的file表记录，并插入delete队列
+my $old_fid = MogileFS::FID-&gt;new_from_dmid_and_key($dmid, $key);
+if ($old_fid) {
+    # Fail if a file already exists for this fid.  Should never
+    # happen, as it should not be possible to close a file twice.
+    return $self-&gt;err_line("fid_exists")
+        unless $old_fid-&gt;{fidid} != $fidid;
+
+    $old_fid-&gt;delete;
+}
+
+# TODO: check for EIO?
+
+# insert file_on row
+# 以上都没有问题，那么就确认保存文件到数据库
+# 保存到file_on表
+$dfid-&gt;add_to_db;
+
+$checksum-&gt;maybe_save($dmid, $trow-&gt;{classid}) if $checksum;
+
+# 保存到file表 
+$sto-&gt;replace_into_file(
+                        fidid   =&gt; $fidid,
+                        dmid    =&gt; $dmid,
+                        key     =&gt; $key,
+                        length  =&gt; $size,
+                        classid =&gt; $trow-&gt;{classid},
+                        devcount =&gt; 1,
+                        );
+
+# mark it as needing replicating:
+# 插入文件到replicate队列 
+$fid-&gt;enqueue_for_replication();
+
+# call the hook - if this fails, we need to back the file out
+# 调用钩子
+my $rv = MogileFS::run_global_hook('file_stored', $args);
+if (defined $rv &amp;&amp; ! $rv) { # undef = no hooks, 1 = success, 0 = failure
+    $fid-&gt;delete;                                                                                                                                                           
+    return $self-&gt;err_line("plugin_aborted");
+}
+# all went well, we would've hit condthrow on DB errors
+# 返回正确结果
+return $self-&gt;ok_line;
+</code></pre>
+
+<p>}  <br/>
+```</p>
+
+<h3>总结为什么会出现这种现象</h3>
+
+<ul>
+<li>当在同一个domain下，上传相同key的文件，之前的文件会被删除，但是两个文件的fid是不同的</li>
+<li>$fid->delete这个操作实际是删除memcache和file表数据，file_on表和磁盘上的文件交给队列来处理</li>
+<li>作者考虑到删除文件是比较耗时的操作，所以交给队列慢慢处理，才会导致file表里没数据，但是file_on上仍有数据</li>
+<li>如果可能，尽量避免上传相同的key，这样可以减少对db的读写操作(我准备优化)</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[MogileFS详解]]></title>
@@ -588,110 +784,6 @@ return "/dev$devid/$b/$mmm/$ttt/$nfid.fid";
 <li>这个算法效率很高，并且可以把文件平均分配到目录下</li>
 </ul>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[mogilefs设备权重算法]]></title>
-    <link href="http://www.wanghd.com/blog/2012/10/09/mogilefsshe-bei-quan-zhong-suan-fa/"/>
-    <updated>2012-10-09T11:07:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/10/09/mogilefsshe-bei-quan-zhong-suan-fa</id>
-    <content type="html"><![CDATA[<h3>遇到的问题</h3>
-
-<ul>
-<li>有几块设备已经剩余10%容量，有几块设备剩余75%容量，为什么75%的util相当高呢</li>
-<li>原本理解mogilefs平均分配新文件到设备上，猜想应该是不对的</li>
-</ul>
-
-
-<h3>看看mogilefs到底是怎么做的呢</h3>
-
-<ul>
-<li>处理文件是Query.pl干的，确认新建文件是cmd_create_open函数所为</li>
-</ul>
-
-
-<p>```perl
-sub cmd_create_open {</p>
-
-<pre><code>#略
-
-#默认情况下设备的选择是从这开始的，参数是所有设备
-@devices = sort_devs_by_freespace(Mgd::device_factory()-&gt;get_all); 
-
-#略
-</code></pre>
-
-<p>}
-```</p>
-
-<ul>
-<li>sort_devs_by_freespace用剩余百分比做为权重，生成一个二维数组做参数[前20个]</li>
-<li>真正的返回值是通过MogileFS::Util::weighted_list进行权重计算</li>
-</ul>
-
-
-<p>```perl
-sub sort_devs_by_freespace {</p>
-
-<pre><code>my @devices_with_weights = map { #生成二维数组，剩余大小用来做权重
-    [$_, 100 * $_-&gt;percent_free]
-} sort {  #排序，从大到小排序
-    $b-&gt;percent_free &lt;=&gt; $a-&gt;percent_free;
-} grep {  #过滤设备，只要可以新建文件的，就是状态为alive的
-    $_-&gt;should_get_new_files;
-} @_;
-
-my @list =
-    MogileFS::Util::weighted_list(splice(@devices_with_weights, 0, 20));
-
-return @list;
-</code></pre>
-
-<p>}
-```</p>
-
-<ul>
-<li>这里才是算法的核心，让容量多的多放点文件，但当容量很大时基本随即，做个例子会比较直观</li>
-<li>假设有两个设备，剩余的容量分别是10和75</li>
-<li>那么sum就是85，如果乘以随机数的话可能是8.5(0.1)或者是76.5(0.9)</li>
-<li>如果是8.5，那么75就大于8.5了，先返回了【并且这种概率大】</li>
-<li>如果是76.5，那么75就不大于76.5了, 则返回另一个【这种概率小】</li>
-</ul>
-
-
-<p>```perl
-sub weighted_list (@) {</p>
-
-<pre><code>my @list = grep { $_-&gt;[1] &gt; 0 } @_; #排除掉等于0的 
-my @ret; #初始化返回数组
-
-my $sum = 0;
-$sum += $_-&gt;[1] foreach @list; #累加剩余容量
-
-my $getone = sub {
-    return shift(@list)-&gt;[0]
-        if scalar(@list) == 1; #只有一个了，直接返回
-
-    my $val = rand() * $sum; #总容量乘以0到1的随机数
-    my $curval = 0;
-    for (my $idx = 0; $idx &lt; scalar(@list); $idx++) {
-        my $item = $list[$idx];
-        $curval += $item-&gt;[1]; #累加进去,保证肯定有返回
-        if ($curval &gt;= $val) { #如果curval比随机乘积大
-            my ($ret) = splice(@list, $idx, 1); #切割出来
-            $sum -= $item-&gt;[1]; #从总容量里减去
-            return $ret-&gt;[0];   #返回这个设备
-        }   
-    }   
-};  
-
-push @ret, $getone-&gt;() while @list; #循环执行getone，加到返回数组
-return @ret;
-</code></pre>
-
-<p>}
-```</p>
 ]]></content>
   </entry>
   

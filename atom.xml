@@ -4,7 +4,7 @@
   <title><![CDATA[惠达的小宅]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2012-11-04T21:42:54+08:00</updated>
+  <updated>2012-11-06T23:00:46+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,344 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[mogilefs删除队列]]></title>
+    <link href="http://www.wanghd.com/blog/2012/11/06/mogilefsshan-chu-dui-lie/"/>
+    <updated>2012-11-06T19:31:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/11/06/mogilefsshan-chu-dui-lie</id>
+    <content type="html"><![CDATA[<h3>遇到的问题</h3>
+
+<ul>
+<li>发现file_to_delete2队列表里有500万记录，奇怪这些文件为什么要删除？心里不踏实，寻找根源&#8230;</li>
+<li>在队列中随便拿一个fid，在file表里查竟然是空的，再找file_on表竟然有数据&#8230;</li>
+</ul>
+
+
+<h3>什么时候会插入fid到删除队列呢</h3>
+
+<ol>
+<li>cmd_create_close时，如果连接终端，文件大小等不正确，会增加到删除队列</li>
+<li>cmd_create_close时，如果同一domain下key已经存在，那么会去删除原有的文件(两份文件key相同，但是fid不同，我的问题就出在这)</li>
+<li>mogdelete工具会删除memcache和file表的文件记录，并运用删除队列删除磁盘上的文件和file_on表</li>
+<li>client调用delete方法，和mogdelete一样</li>
+</ol>
+
+
+<!-- more -->
+
+
+<h3>cmd_create_close逻辑</h3>
+
+<ul>
+<li>mogilefs上传文件的逻辑是先问tracker拿文件存储路径，然后上传文件到一个storage，最后调用cmd_create_close方法插入数据记录和replicate队列</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+<span class='line-number'>103</span>
+<span class='line-number'>104</span>
+<span class='line-number'>105</span>
+<span class='line-number'>106</span>
+<span class='line-number'>107</span>
+<span class='line-number'>108</span>
+<span class='line-number'>109</span>
+<span class='line-number'>110</span>
+<span class='line-number'>111</span>
+<span class='line-number'>112</span>
+<span class='line-number'>113</span>
+<span class='line-number'>114</span>
+<span class='line-number'>115</span>
+<span class='line-number'>116</span>
+<span class='line-number'>117</span>
+<span class='line-number'>118</span>
+<span class='line-number'>119</span>
+<span class='line-number'>120</span>
+<span class='line-number'>121</span>
+<span class='line-number'>122</span>
+<span class='line-number'>123</span>
+<span class='line-number'>124</span>
+<span class='line-number'>125</span>
+<span class='line-number'>126</span>
+<span class='line-number'>127</span>
+<span class='line-number'>128</span>
+<span class='line-number'>129</span>
+<span class='line-number'>130</span>
+<span class='line-number'>131</span>
+<span class='line-number'>132</span>
+<span class='line-number'>133</span>
+<span class='line-number'>134</span>
+<span class='line-number'>135</span>
+<span class='line-number'>136</span>
+<span class='line-number'>137</span>
+<span class='line-number'>138</span>
+<span class='line-number'>139</span>
+<span class='line-number'>140</span>
+<span class='line-number'>141</span>
+<span class='line-number'>142</span>
+<span class='line-number'>143</span>
+<span class='line-number'>144</span>
+<span class='line-number'>145</span>
+</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="k">sub </span><span class="nf">cmd_create_close</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nn">MogileFS::Worker::</span><span class="n">Query</span> <span class="nv">$self</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$args</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># has to be filled out for some plugins</span>
+</span><span class='line'>    <span class="nv">$args</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">dmid</span><span class="p">}</span> <span class="o">=</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">check_domain</span><span class="p">(</span><span class="nv">$args</span><span class="p">)</span>
+</span><span class='line'>        <span class="ow">or</span> <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">err_line</span><span class="p">(</span><span class="s">&#39;domain_not_found&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># call out to a hook that might modify the arguments for us</span>
+</span><span class='line'>    <span class="c1"># 调用插件用的钩子，一般是没的</span>
+</span><span class='line'>    <span class="nn">MogileFS::</span><span class="n">run_global_hook</span><span class="p">(</span><span class="s">&#39;cmd_create_close&#39;</span><span class="p">,</span> <span class="nv">$args</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># late validation of parameters</span>
+</span><span class='line'>    <span class="c1"># 设置下面使用的变量</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$dmid</span>  <span class="o">=</span> <span class="nv">$args</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">dmid</span><span class="p">};</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$key</span>   <span class="o">=</span> <span class="nv">$args</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">key</span><span class="p">};</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$fidid</span> <span class="o">=</span> <span class="nv">$args</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">fid</span><span class="p">}</span>    <span class="ow">or</span> <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">err_line</span><span class="p">(</span><span class="s">&quot;no_fid&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$devid</span> <span class="o">=</span> <span class="nv">$args</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">devid</span><span class="p">}</span>  <span class="ow">or</span> <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">err_line</span><span class="p">(</span><span class="s">&quot;no_devid&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$path</span>  <span class="o">=</span> <span class="nv">$args</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">path</span><span class="p">}</span>   <span class="ow">or</span> <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">err_line</span><span class="p">(</span><span class="s">&quot;no_path&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$checksum</span> <span class="o">=</span> <span class="nv">$args</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">checksum</span><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$checksum</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$checksum</span> <span class="o">=</span> <span class="nb">eval</span> <span class="p">{</span> <span class="nn">MogileFS::</span><span class="n">Checksum</span><span class="o">-&gt;</span><span class="n">from_string</span><span class="p">(</span><span class="nv">$fidid</span><span class="p">,</span> <span class="nv">$checksum</span><span class="p">)</span> <span class="p">};</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">err_line</span><span class="p">(</span><span class="s">&quot;invalid_checksum_format&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="vg">$@</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># 初始化fid和dfid对象</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$fid</span>  <span class="o">=</span> <span class="nn">MogileFS::</span><span class="n">FID</span><span class="o">-&gt;</span><span class="k">new</span><span class="p">(</span><span class="nv">$fidid</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$dfid</span> <span class="o">=</span> <span class="nn">MogileFS::</span><span class="n">DevFID</span><span class="o">-&gt;</span><span class="k">new</span><span class="p">(</span><span class="nv">$devid</span><span class="p">,</span> <span class="nv">$fid</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># is the provided path what we&#39;d expect for this fid/devid?</span>
+</span><span class='line'>    <span class="c1"># 验证是否为伪造路径</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">err_line</span><span class="p">(</span><span class="s">&quot;bogus_args&quot;</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">unless</span> <span class="nv">$path</span> <span class="ow">eq</span> <span class="nv">$dfid</span><span class="o">-&gt;</span><span class="n">url</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$sto</span> <span class="o">=</span> <span class="nn">Mgd::</span><span class="n">get_store</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># find the temp file we&#39;re closing and making real.  If another worker</span>
+</span><span class='line'>    <span class="c1"># already has it, bail out---the client closed it twice.</span>
+</span><span class='line'>    <span class="c1"># this is racy, but the only expected use case is a client retrying.</span>
+</span><span class='line'>    <span class="c1"># should still be fixed better once more scalable locking is available.</span>
+</span><span class='line'>    <span class="c1"># 取得零时文件数据,并删除掉</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$trow</span> <span class="o">=</span> <span class="nv">$sto</span><span class="o">-&gt;</span><span class="n">delete_and_return_tempfile_row</span><span class="p">(</span><span class="nv">$fidid</span><span class="p">)</span> <span class="ow">or</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">err_line</span><span class="p">(</span><span class="s">&quot;no_temp_file&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># Protect against leaving orphaned uploads.</span>
+</span><span class='line'>    <span class="c1"># 定义错误函数，可以看到$fid-&gt;delete会删除file表记录并插入删除队列</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$failed</span> <span class="o">=</span> <span class="k">sub </span><span class="p">{</span>
+</span><span class='line'>        <span class="nv">$dfid</span><span class="o">-&gt;</span><span class="n">add_to_db</span><span class="p">;</span>
+</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="nb">delete</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># 验证设备</span>
+</span><span class='line'>    <span class="k">unless</span> <span class="p">(</span><span class="nv">$trow</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">devids</span><span class="p">}</span> <span class="o">=~</span> <span class="sr">m/\b$devid\b/</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$failed</span><span class="o">-&gt;</span><span class="p">();</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">err_line</span><span class="p">(</span><span class="s">&quot;invalid_destdev&quot;</span><span class="p">,</span> <span class="s">&quot;File uploaded to invalid dest $devid. Valid devices were: &quot;</span> <span class="o">.</span> <span class="nv">$trow</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">devids</span><span class="p">});</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># if a temp file is closed without a provided-key, that means to</span>
+</span><span class='line'>    <span class="c1"># delete it.</span>
+</span><span class='line'>    <span class="c1"># 验证key</span>
+</span><span class='line'>    <span class="k">unless</span> <span class="p">(</span><span class="nb">defined</span> <span class="nv">$key</span> <span class="o">&amp;&amp;</span> <span class="nb">length</span><span class="p">(</span><span class="nv">$key</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$failed</span><span class="o">-&gt;</span><span class="p">();</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">ok_line</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># get size of file and verify that it matches what we were given, if anything</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$httpfile</span> <span class="o">=</span> <span class="nn">MogileFS::</span><span class="n">HTTPFile</span><span class="o">-&gt;</span><span class="n">at</span><span class="p">(</span><span class="nv">$path</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$size</span> <span class="o">=</span> <span class="nv">$httpfile</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># size check is optional? Needs to support zero byte files.</span>
+</span><span class='line'>    <span class="c1"># 验证文件大小</span>
+</span><span class='line'>    <span class="nv">$args</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">size</span><span class="p">}</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">unless</span> <span class="nv">$args</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">size</span><span class="p">};</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">defined</span><span class="p">(</span><span class="nv">$size</span><span class="p">)</span> <span class="o">||</span> <span class="nv">$size</span> <span class="o">==</span> <span class="nn">MogileFS::HTTPFile::</span><span class="n">FILE_MISSING</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="c1"># storage node is unreachable or the file is missing</span>
+</span><span class='line'>        <span class="k">my</span> <span class="nv">$type</span>    <span class="o">=</span> <span class="nb">defined</span> <span class="nv">$size</span> <span class="p">?</span> <span class="s">&quot;missing&quot;</span> <span class="p">:</span> <span class="s">&quot;cantreach&quot;</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">my</span> <span class="nv">$lasterr</span> <span class="o">=</span> <span class="nn">MogileFS::Util::</span><span class="n">last_error</span><span class="p">();</span>
+</span><span class='line'>        <span class="nv">$failed</span><span class="o">-&gt;</span><span class="p">();</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">err_line</span><span class="p">(</span><span class="s">&quot;size_verify_error&quot;</span><span class="p">,</span> <span class="s">&quot;Expected: $args-&gt;{size}; actual: 0 ($type); path: $path; error: $lasterr&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$args</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">size</span><span class="p">}</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nv">$args</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">size</span><span class="p">}</span> <span class="o">!=</span> <span class="nv">$size</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$failed</span><span class="o">-&gt;</span><span class="p">();</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">err_line</span><span class="p">(</span><span class="s">&quot;size_mismatch&quot;</span><span class="p">,</span> <span class="s">&quot;Expected: $args-&gt;{size}; actual: $size; path: $path&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># checksum validation is optional as it can be very expensive</span>
+</span><span class='line'>    <span class="c1"># However, we /always/ verify it if the client wants us to, even</span>
+</span><span class='line'>    <span class="c1"># if the class does not enforce or store it.</span>
+</span><span class='line'>    <span class="c1"># 校验和</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$checksum</span> <span class="o">&amp;&amp;</span> <span class="nv">$args</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">checksumverify</span><span class="p">})</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">my</span> <span class="nv">$alg</span> <span class="o">=</span> <span class="nv">$checksum</span><span class="o">-&gt;</span><span class="n">hashname</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">my</span> <span class="nv">$actual</span> <span class="o">=</span> <span class="nv">$httpfile</span><span class="o">-&gt;</span><span class="n">digest</span><span class="p">(</span><span class="nv">$alg</span><span class="p">,</span> <span class="k">sub </span><span class="p">{</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">still_alive</span> <span class="p">});</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nv">$actual</span> <span class="ow">ne</span> <span class="nv">$checksum</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">checksum</span><span class="p">})</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nv">$failed</span><span class="o">-&gt;</span><span class="p">();</span>
+</span><span class='line'>            <span class="nv">$actual</span> <span class="o">=</span> <span class="s">&quot;$alg:&quot;</span> <span class="o">.</span> <span class="nb">unpack</span><span class="p">(</span><span class="s">&quot;H*&quot;</span><span class="p">,</span> <span class="nv">$actual</span><span class="p">);</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">err_line</span><span class="p">(</span><span class="s">&quot;checksum_mismatch&quot;</span><span class="p">,</span>
+</span><span class='line'>                           <span class="s">&quot;Expected: $checksum; actual: $actual; path: $path&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1"># see if we have a fid for this key already</span>
+</span><span class='line'>    <span class="c1"># 关键的来了，如果在同一个domain下有相同的key，那么删除该文件的file表记录，并插入delete队列</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$old_fid</span> <span class="o">=</span> <span class="nn">MogileFS::</span><span class="n">FID</span><span class="o">-&gt;</span><span class="n">new_from_dmid_and_key</span><span class="p">(</span><span class="nv">$dmid</span><span class="p">,</span> <span class="nv">$key</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$old_fid</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="c1"># Fail if a file already exists for this fid.  Should never</span>
+</span><span class='line'>        <span class="c1"># happen, as it should not be possible to close a file twice.</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">err_line</span><span class="p">(</span><span class="s">&quot;fid_exists&quot;</span><span class="p">)</span>
+</span><span class='line'>            <span class="k">unless</span> <span class="nv">$old_fid</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">fidid</span><span class="p">}</span> <span class="o">!=</span> <span class="nv">$fidid</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nv">$old_fid</span><span class="o">-&gt;</span><span class="nb">delete</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># TODO: check for EIO?</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># insert file_on row</span>
+</span><span class='line'>    <span class="c1"># 以上都没有问题，那么就确认保存文件到数据库</span>
+</span><span class='line'>    <span class="c1"># 保存到file_on表</span>
+</span><span class='line'>    <span class="nv">$dfid</span><span class="o">-&gt;</span><span class="n">add_to_db</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nv">$checksum</span><span class="o">-&gt;</span><span class="n">maybe_save</span><span class="p">(</span><span class="nv">$dmid</span><span class="p">,</span> <span class="nv">$trow</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">classid</span><span class="p">})</span> <span class="k">if</span> <span class="nv">$checksum</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># 保存到file表 </span>
+</span><span class='line'>    <span class="nv">$sto</span><span class="o">-&gt;</span><span class="n">replace_into_file</span><span class="p">(</span>
+</span><span class='line'>                            <span class="n">fidid</span>   <span class="o">=&gt;</span> <span class="nv">$fidid</span><span class="p">,</span>
+</span><span class='line'>                            <span class="n">dmid</span>    <span class="o">=&gt;</span> <span class="nv">$dmid</span><span class="p">,</span>
+</span><span class='line'>                            <span class="n">key</span>     <span class="o">=&gt;</span> <span class="nv">$key</span><span class="p">,</span>
+</span><span class='line'>                            <span class="nb">length</span>  <span class="o">=&gt;</span> <span class="nv">$size</span><span class="p">,</span>
+</span><span class='line'>                            <span class="n">classid</span> <span class="o">=&gt;</span> <span class="nv">$trow</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">classid</span><span class="p">},</span>
+</span><span class='line'>                            <span class="n">devcount</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span>
+</span><span class='line'>                            <span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># mark it as needing replicating:</span>
+</span><span class='line'>    <span class="c1"># 插入文件到replicate队列 </span>
+</span><span class='line'>    <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">enqueue_for_replication</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># call the hook - if this fails, we need to back the file out</span>
+</span><span class='line'>    <span class="c1"># 调用钩子</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$rv</span> <span class="o">=</span> <span class="nn">MogileFS::</span><span class="n">run_global_hook</span><span class="p">(</span><span class="s">&#39;file_stored&#39;</span><span class="p">,</span> <span class="nv">$args</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nb">defined</span> <span class="nv">$rv</span> <span class="o">&amp;&amp;</span> <span class="o">!</span> <span class="nv">$rv</span><span class="p">)</span> <span class="p">{</span> <span class="c1"># undef = no hooks, 1 = success, 0 = failure</span>
+</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="nb">delete</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">err_line</span><span class="p">(</span><span class="s">&quot;plugin_aborted&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1"># all went well, we would&#39;ve hit condthrow on DB errors</span>
+</span><span class='line'>    <span class="c1"># 返回正确结果</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">ok_line</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>总结为什么会出现这种现象</h3>
+
+<ul>
+<li>当在同一个domain下，上传相同key的文件，之前的文件会被删除，但是两个文件的fid是不同的</li>
+<li>$fid->delete这个操作实际是删除memcache和file表数据，file_on表和磁盘上的文件交给队列来处理</li>
+<li>作者考虑到删除文件是比较耗时的操作，所以交给队列慢慢处理，才会导致file表里没数据，但是file_on上仍有数据</li>
+<li>如果可能，尽量避免上传相同的key，这样可以减少对db的读写操作(我准备优化)</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[编写hadoop的Map-Reduce]]></title>
@@ -3392,30 +3730,6 @@
 </span><span class='line'>lsof -i4TCP -P
 </span><span class='line'>netstat -lnp
 </span></code></pre></td></tr></table></div></figure>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[solr查询过程]]></title>
-    <link href="http://www.wanghd.com/blog/2012/08/29/solrcha-xun-guo-cheng/"/>
-    <updated>2012-08-29T16:25:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/08/29/solrcha-xun-guo-cheng</id>
-    <content type="html"><![CDATA[<h3>solr查询分析</h3>
-
-<p><img src="http://www.wanghd.com/images/post/solrsearch.png" title="solr 查询分析" alt="solr 查询分析" /></p>
-
-<ol>
-<li>设置SolrQueryRequest,SolrQueryResponse</li>
-<li>在SolrRequestInfo里设置一个ThreadLocal<SolrRequestInfo>,set solrreq,solrresp</li>
-<li>通过url取得handler，例如/select就是使用SearchHandler</li>
-<li>handler抽象类里的handleRequest</li>
-<li>handler调用handleRequestBody开始处理请求，建立responseBuilder</li>
-<li>QueryComponent.prepare，设置returnFields，没有fl的情况下wantsAllFields，设置默认的LuceneQParser分析器，实例化SolrQueryParser</li>
-<li>QueryComponet.execute，取得关联的文档id，保存到resultCache</li>
-<li>writeResponse，如果id在DocumentCache里有就直接拿，否则通过reader去获得，再保存到DocumentCache</li>
-<li>输出结果到游览器</li>
-</ol>
 
 ]]></content>
   </entry>
