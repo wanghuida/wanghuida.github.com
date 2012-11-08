@@ -18,7 +18,7 @@
     </url>
     <url>
         <loc>http://www.wanghd.com/blog/2012/07/07/octopress-introduce/</loc>
-        <lastmod>2012-10-27T02:27:54+08:00</lastmod>
+        <lastmod>2012-11-08T22:24:22+08:00</lastmod>
     </url>
     <url>
         <loc>http://www.wanghd.com/blog/2012/07/13/oauth-jie-shao/</loc>
@@ -151,11 +151,23 @@
         <lastmod>2012-11-06T22:58:53+08:00</lastmod>
     </url>
     <url>
+        <loc>
+            http://www.wanghd.com/blog/2012/11/07/nginxfan-xiang-dai-li-zi-dong-urldecodewen-ti/
+        </loc>
+        <lastmod>2012-11-08T22:24:20+08:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://www.wanghd.com/blog/2012/11/08/perlfu-jin-cheng-jian-ting-zi-jin-cheng-gong-zuo-shi-li/
+        </loc>
+        <lastmod>2012-11-08T22:24:35+08:00</lastmod>
+    </url>
+    <url>
         <loc>http://www.wanghd.com/blog/archives/</loc>
-        <lastmod>2012-11-06T22:58:53+08:00</lastmod>
+        <lastmod>2012-11-08T22:24:35+08:00</lastmod>
     </url>
     <url>
         <loc>http://www.wanghd.com/</loc>
-        <lastmod>2012-11-06T22:58:53+08:00</lastmod>
+        <lastmod>2012-11-08T22:24:35+08:00</lastmod>
     </url>
 </urlset>

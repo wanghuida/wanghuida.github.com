@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Mogilefs | 惠达的小宅]]></title>
   <link href="http://www.wanghd.com/blog/categories/mogilefs/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2012-11-06T23:00:46+08:00</updated>
+  <updated>2012-11-08T22:26:09+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,112 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[perl父进程监听，子进程工作实例]]></title>
+    <link href="http://www.wanghd.com/blog/2012/11/08/perlfu-jin-cheng-jian-ting-zi-jin-cheng-gong-zuo-shi-li/"/>
+    <updated>2012-11-08T22:15:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/11/08/perlfu-jin-cheng-jian-ting-zi-jin-cheng-gong-zuo-shi-li</id>
+    <content type="html"><![CDATA[<ol>
+<li>构造后台进程</li>
+<li>主进程监到连接，创建子进程接收消息并处理消息</li>
+<li>主进程继续监听，同时非阻塞的回收子进程</li>
+</ol>
+
+
+<!-- more -->
+
+
+<p>```perl</p>
+
+<h1>!/usr/bin/perl</h1>
+
+<p>use warnings;
+use strict;
+use IO::Socket;
+use Socket qw(SO_KEEPALIVE);
+use IO::Poll;
+use POSIX;
+use Carp;
+use Errno  qw(EINPROGRESS EWOULDBLOCK EISCONN ENOTSOCK</p>
+
+<pre><code>          EPIPE EAGAIN EBADF ECONNRESET ENOPROTOOPT);
+</code></pre>
+
+<p>$| = 1;
+daemonize();</p>
+
+<p>my $server = IO::Socket::INET->new(LocalAddr => "0.0.0.0:5678",</p>
+
+<pre><code>                               Type      =&gt; SOCK_STREAM,
+                               Proto     =&gt; 'tcp',
+                               Blocking  =&gt; 0,
+                               Reuse     =&gt; 1,
+                               Listen    =&gt; 1024 )
+or die "Error creating socket: $@\n";
+</code></pre>
+
+<p>$server->sockopt(SO_KEEPALIVE, 1);</p>
+
+<p>while(1) {</p>
+
+<pre><code>while(my $pid = waitpid -1, WNOHANG) {
+    #print "child[$pid] closed\n" if($pid &gt; 0);
+    last unless $pid &gt; 0;  
+}
+
+if(my $csock = $server-&gt;accept) {                                                                                                                           
+    my $pid = fork;
+
+    if($pid){
+        close($csock);
+        undef $csock;
+    }else{
+        $0 .= " [perl child]"; 
+        while(1) {
+            my $buf;
+            my $len = sysread($csock, $buf, 1048576, 0);
+            work($buf); 
+            last if (!$len &amp;&amp; $! != EWOULDBLOCK);
+        }
+        exit 0;
+    }
+}
+</code></pre>
+
+<p>}</p>
+
+<h1>子进程的工作</h1>
+
+<p>sub work(){</p>
+
+<pre><code>print @_."\n";
+</code></pre>
+
+<p>}</p>
+
+<p>sub daemonize {</p>
+
+<pre><code>my($pid, $sess_id, $i);
+
+if ($pid = fork) { exit 0; }
+
+croak "Cannot detach from controlling terminal"
+    unless $sess_id = POSIX::setsid();
+
+$SIG{'HUP'} = 'IGNORE';
+if ($pid = fork) { exit 0; }
+
+chdir "/";
+
+umask 0;
+</code></pre>
+
+<p>}</p>
+
+<p>```</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[mogilefs删除队列]]></title>
@@ -736,52 +842,6 @@ location /dev1/ {
 <li>nginx比perlbal更稳定，基本不会挂掉了</li>
 <li>mogadm device add 时不要忘记配置nginx后重启，也别忘记自己建文件夹【nginx多一步】</li>
 <li>nginx配置好user,所以不会创建的文件权限为root:root,不用nginx就要用su mogile -c mogstored了</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[mogilefs文件路径规则]]></title>
-    <link href="http://www.wanghd.com/blog/2012/10/11/mogilefswen-jian-lu-jing-gui-ze/"/>
-    <updated>2012-10-11T16:16:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/10/11/mogilefswen-jian-lu-jing-gui-ze</id>
-    <content type="html"><![CDATA[<h3>同事问我mogilefs文件路径的规律是什么</h3>
-
-<ul>
-<li>以前有看到过，但是没有记录，一下子就被问悶了，突然发现就记录一下</li>
-<li>当fid长度不足10时，前置补0到长度为10,假设补好后的结果为0258693147</li>
-<li>通过正则把path切割成0/258/693/147这样</li>
-<li>最后的路径结果是：/设备/0/258/693/147/0258693147.fid</li>
-</ul>
-
-
-<p>```perl
-sub uri_path {</p>
-
-<pre><code>my $self = shift;
-my $devid = $self-&gt;{devid};
-my $fidid = $self-&gt;{fidid};
-
-my $nfid;
-my $len = length $fidid;
-if ($len &lt; 10) {
-    $nfid = '0' x (10 - $len) . $fidid;
-} else {
-    $nfid = $fidid;
-}   
-my ( $b, $mmm, $ttt, $hto ) = ( $nfid =~ m{(\d)(\d{3})(\d{3})(\d{3})} );
-
-return "/dev$devid/$b/$mmm/$ttt/$nfid.fid";
-</code></pre>
-
-<p>}
-```</p>
-
-<h3>总结一下</h3>
-
-<ul>
-<li>这个算法效率很高，并且可以把文件平均分配到目录下</li>
 </ul>
 
 ]]></content>

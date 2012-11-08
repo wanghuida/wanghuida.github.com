@@ -100,6 +100,115 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2012/07/26/xdebug-500cuo-wu-xian-shi-200cheng-gong-de-bug/">Xdebug:500错误显示200成功的bug</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-26T16:15:00+08:00" pubdate data-updated="true">Jul 26<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/07/26/xdebug-500cuo-wu-xian-shi-200cheng-gong-de-bug/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>今天同事遇见一个诡异的问题</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">ini_set</span><span class="p">(</span><span class="s1">&#39;display_errors&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">#随便调用一个什么方法来产生错误</span>
+</span><span class='line'><span class="nx">abcd</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>明显php错误，但是HTTP返回200</li>
+</ul>
+
+
+<h3>最终关闭加载xdebug一切正常了,返回500错误了</h3>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2012/07/22/python-zhou-ti-yan-ji/">Python 一周体验记</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-22T10:27:00+08:00" pubdate data-updated="true">Jul 22<span>nd</span>, 2012</time>
+        
+         | <a href="/blog/2012/07/22/python-zhou-ti-yan-ji/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>python可以快速上手</h3>
+
+<ul>
+<li>推荐官方的新手教程 <a href="http://docs.python.org/tutorial/">http://docs.python.org/tutorial/</a></li>
+</ul>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2012/07/22/python-zhou-ti-yan-ji/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2012/07/13/oauth-jie-shao/">OAuth 介绍</a></h1>
     
     
@@ -731,10 +840,10 @@
     <li class='category'><a href='/blog/categories/hadoop/'>Hadoop (3)</a></li>
 <li class='category'><a href='/blog/categories/java/'>Java (14)</a></li>
 <li class='category'><a href='/blog/categories/javascript/'>Javascript (1)</a></li>
-<li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (10)</a></li>
-<li class='category'><a href='/blog/categories/perl/'>Perl (10)</a></li>
+<li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (11)</a></li>
+<li class='category'><a href='/blog/categories/perl/'>Perl (11)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (1)</a></li>
-<li class='category'><a href='/blog/categories/share/'>Share (10)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (11)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
 
   </ul>
@@ -743,6 +852,14 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2012/11/08/perlfu-jin-cheng-jian-ting-zi-jin-cheng-gong-zuo-shi-li/">perl父进程监听，子进程工作实例</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/11/07/nginxfan-xiang-dai-li-zi-dong-urldecodewen-ti/">nginx反向代理自动urldecode问题</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2012/11/06/mogilefsshan-chu-dui-lie/">mogilefs删除队列</a>
@@ -774,14 +891,6 @@
     
       <li class="post">
         <a href="/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/">IRC:irssi使用教程</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/10/13/mogstoredshi-yong-nginx/">mogstored使用nginx</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/10/11/mogilefswen-jian-lu-jing-gui-ze/">mogilefs文件路径规则</a>
       </li>
     
   </ul>

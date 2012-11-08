@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Share | 惠达的小宅]]></title>
   <link href="http://www.wanghd.com/blog/categories/share/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2012-11-06T23:00:46+08:00</updated>
+  <updated>2012-11-08T22:26:09+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,39 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[nginx反向代理自动urldecode问题]]></title>
+    <link href="http://www.wanghd.com/blog/2012/11/07/nginxfan-xiang-dai-li-zi-dong-urldecodewen-ti/"/>
+    <updated>2012-11-07T16:40:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/11/07/nginxfan-xiang-dai-li-zi-dong-urldecodewen-ti</id>
+    <content type="html"><![CDATA[<h3>今天妖孽了，发现nginx反向代理会自动urldecode</h3>
+
+<ul>
+<li>同事监控两个nginx的access_log，惊人的发现日志里的url不同</li>
+<li>去掉反斜杠就ok了，不太清楚nginx内部是如何处理的</li>
+</ul>
+
+
+<p>```
+location / {</p>
+
+<pre><code>proxy_pass        http://localhost:8000/;
+</code></pre>
+
+<p>}</p>
+
+<h1>修改为下面这样后，一切OK了</h1>
+
+<p>location / {</p>
+
+<pre><code>proxy_pass        http://localhost:8000;
+</code></pre>
+
+<p>}
+```</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[硬盘安装CentOS]]></title>
@@ -396,115 +429,6 @@ sim(d1,d2) = ∑(ai*bi) / √(∑ai<sup>2</sup> * ∑bi<sup>2)</sup></p>
 <li>由公式可以看出计算量是很大的，要提高效率最好的方法就是减少term，俗称降纬</li>
 </ul>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[常用命令]]></title>
-    <link href="http://www.wanghd.com/blog/2012/08/30/chang-yong-ming-ling/"/>
-    <updated>2012-08-30T13:14:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/08/30/chang-yong-ming-ling</id>
-    <content type="html"><![CDATA[<h3>过滤记录</h3>
-
-<ul>
-<li>-l自动chomp，结果加$/</li>
-<li>-a自动分割</li>
-</ul>
-
-
-<p>```bash
-tail -f access-2012-08-30.log | grep -v '*' \</p>
-
-<pre><code>| perl -w -lane '$a = $F[@F-1];print if $a &gt; 50000 '
-</code></pre>
-
-<p>```</p>
-
-<h3>获取URL内容</h3>
-
-<ul>
-<li>-I 获取头信息</li>
-<li>-x 通过哪台服务器</li>
-<li>-A 设置user agent,可以让log过滤更方便</li>
-</ul>
-
-
-<p><code>bash
-curl -I -x 127.0.0.1  "http://test/abc.jpg" -A "huida"
-</code></p>
-
-<h3>批量删除一天以前的文件</h3>
-
-<p><code>bash
-find /dev/shm/ -type f -mtime +1 | xargs rm
-</code></p>
-
-<h3>计算tcp连接数</h3>
-
-<p><code>bash
-su -
-netstat -lant | wc -l
-</code></p>
-
-<h3>增加网关</h3>
-
-<ul>
-<li>mac版</li>
-</ul>
-
-
-<p><code>bash
-sudo route add -net 10.0.0.0/8 -interface ppp0
-</code></p>
-
-<h3>格式化和mount磁盘</h3>
-
-<ul>
-<li>xfs系统</li>
-</ul>
-
-
-<p><code>bash
-/sbin/mkfs.xfs /dev/sdb
-mount –t xfs /dev/sdb /data1
-vim /etc/fstab
-umount -l /tmp/
-</code></p>
-
-<h3>导出数据</h3>
-
-<ul>
-<li>-h -u -p表示主机，用户，密码</li>
-<li>-D表示数据库</li>
-<li>-e表示执行语句</li>
-<li>-N表示跳过列名, --skip-column-names</li>
-<li>-s表示用tab分割字段, --silent,Be more silent. Print results with a tab as separator, each row on new line.</li>
-</ul>
-
-
-<p><code>bash
-mysql -h -u -p -Ns -Ddatabase -e "select * from ~~~ where ~~~" &gt; /tmp/fid
-</code></p>
-
-<h3>远程取得数据</h3>
-
-<p><code>bash
-sftp
-scp
-rsync
-</code></p>
-
-<h3>查看系统状况</h3>
-
-<p><code>
-iostat -x 1
-free -m
-w
-top
-ping
-lsof -i4TCP -P
-netstat -lnp
-</code></p>
 ]]></content>
   </entry>
   

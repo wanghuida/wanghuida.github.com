@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>mogilefs文件路径规则 - 惠达的小宅</title>
+  <title>nginx反向代理自动urldecode问题 - 惠达的小宅</title>
   <meta name="author" content="王惠达 huida wanghuida">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.wanghd.com/blog/2012/10/11/mogilefswen-jian-lu-jing-gui-ze">
+  <link rel="canonical" href="http://www.wanghd.com/blog/2012/11/07/nginxfan-xiang-dai-li-zi-dong-urldecodewen-ti">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/bootstrap/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/stylesheets/bootstrap/responsive.css" media="screen, projection" rel="stylesheet" type="text/css">
@@ -98,7 +98,7 @@
   
   <header class="page-header">
     
-      <h1 class="entry-title">Mogilefs文件路径规则</h1>
+      <h1 class="entry-title">Nginx反向代理自动urldecode问题</h1>
     
     
       <p class="meta">
@@ -114,7 +114,7 @@
   
 
 
-<time datetime="2012-10-11T16:16:00+08:00" pubdate data-updated="true">Oct 11<span>th</span>, 2012</time>
+<time datetime="2012-11-07T16:40:00+08:00" pubdate data-updated="true">Nov 7<span>th</span>, 2012</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -123,56 +123,28 @@
   </header>
 
 
-<div class="entry-content"><h3>同事问我mogilefs文件路径的规律是什么</h3>
+<div class="entry-content"><h3>今天妖孽了，发现nginx反向代理会自动urldecode</h3>
 
 <ul>
-<li>以前有看到过，但是没有记录，一下子就被问悶了，突然发现就记录一下</li>
-<li>当fid长度不足10时，前置补0到长度为10,假设补好后的结果为0258693147</li>
-<li>通过正则把path切割成0/258/693/147这样</li>
-<li>最后的路径结果是：/设备/0/258/693/147/0258693147.fid</li>
+<li>同事监控两个nginx的access_log，惊人的发现日志里的url不同</li>
+<li>去掉反斜杠就ok了，不太清楚nginx内部是如何处理的</li>
 </ul>
 
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="k">sub </span><span class="nf">uri_path</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$self</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$devid</span> <span class="o">=</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">devid</span><span class="p">};</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$fidid</span> <span class="o">=</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">fidid</span><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$nfid</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$len</span> <span class="o">=</span> <span class="nb">length</span> <span class="nv">$fidid</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$len</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nv">$nfid</span> <span class="o">=</span> <span class="s">&#39;0&#39;</span> <span class="n">x</span> <span class="p">(</span><span class="mi">10</span> <span class="o">-</span> <span class="nv">$len</span><span class="p">)</span> <span class="o">.</span> <span class="nv">$fidid</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nv">$nfid</span> <span class="o">=</span> <span class="nv">$fidid</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">my</span> <span class="p">(</span> <span class="nv">$b</span><span class="p">,</span> <span class="nv">$mmm</span><span class="p">,</span> <span class="nv">$ttt</span><span class="p">,</span> <span class="nv">$hto</span> <span class="p">)</span> <span class="o">=</span> <span class="p">(</span> <span class="nv">$nfid</span> <span class="o">=~</span> <span class="sr">m{(\d)(\d{3}</span><span class="p">)(</span><span class="o">\</span><span class="n">d</span><span class="p">{</span><span class="mi">3</span><span class="p">})(</span><span class="o">\</span><span class="n">d</span><span class="p">{</span><span class="mi">3</span><span class="p">})}</span> <span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">return</span> <span class="s">&quot;/dev$devid/$b/$mmm/$ttt/$nfid.fid&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>总结一下</h3>
-
-<ul>
-<li>这个算法效率很高，并且可以把文件平均分配到目录下</li>
-</ul>
+</pre></td><td class='code'><pre><code class=''><span class='line'>location / {
+</span><span class='line'>    proxy_pass        http://localhost:8000/;
+</span><span class='line'>}
+</span><span class='line'>#修改为下面这样后，一切OK了
+</span><span class='line'>location / {
+</span><span class='line'>    proxy_pass        http://localhost:8000;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
 
 </div>
 
@@ -196,12 +168,12 @@
   
 
 
-<time datetime="2012-10-11T16:16:00+08:00" pubdate data-updated="true">Oct 11<span>th</span>, 2012</time>
+<time datetime="2012-11-07T16:40:00+08:00" pubdate data-updated="true">Nov 7<span>th</span>, 2012</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/mogilefs/'>Mogilefs</a>, <a class='category' href='/blog/categories/perl/'>Perl</a>
+    <a class='category' href='/blog/categories/share/'>Share</a>
   
 </span>
 
@@ -210,7 +182,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2012/10/11/mogilefswen-jian-lu-jing-gui-ze/" data-via="" data-counturl="http://www.wanghd.com/blog/2012/10/11/mogilefswen-jian-lu-jing-gui-ze/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2012/11/07/nginxfan-xiang-dai-li-zi-dong-urldecodewen-ti/" data-via="" data-counturl="http://www.wanghd.com/blog/2012/11/07/nginxfan-xiang-dai-li-zi-dong-urldecodewen-ti/" >Tweet</a>
   
   
   
@@ -227,13 +199,13 @@
     <ul class="pager">
       
       <li class="previous"><a class="basic-alignment left"
-        href="/blog/2012/10/09/mogilefsshe-bei-quan-zhong-suan-fa/" title="Previous Post:
-        mogilefs设备权重算法">&laquo; mogilefs设备权重算法</a></li>
+        href="/blog/2012/11/06/mogilefsshan-chu-dui-lie/" title="Previous Post:
+        mogilefs删除队列">&laquo; mogilefs删除队列</a></li>
       
       <li><a href="/blog/archives">文章归档</a></li>
       
-      <li class="next"><a class="basic-alignment right" href="/blog/2012/10/13/mogstoredshi-yong-nginx/"
-        title="Next Post: mogstored使用nginx">mogstored使用nginx
+      <li class="next"><a class="basic-alignment right" href="/blog/2012/11/08/perlfu-jin-cheng-jian-ting-zi-jin-cheng-gong-zuo-shi-li/"
+        title="Next Post: perl父进程监听，子进程工作实例">perl父进程监听，子进程工作实例
         &raquo;</a></li>
       
     </ul>
@@ -340,8 +312,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.wanghd.com/blog/2012/10/11/mogilefswen-jian-lu-jing-gui-ze/';
-        var disqus_url = 'http://www.wanghd.com/blog/2012/10/11/mogilefswen-jian-lu-jing-gui-ze/';
+        var disqus_identifier = 'http://www.wanghd.com/blog/2012/11/07/nginxfan-xiang-dai-li-zi-dong-urldecodewen-ti/';
+        var disqus_url = 'http://www.wanghd.com/blog/2012/11/07/nginxfan-xiang-dai-li-zi-dong-urldecodewen-ti/';
         var disqus_script = 'embed.js';
       
     (function () {
