@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Perl | 惠达的小宅]]></title>
   <link href="http://www.wanghd.com/blog/categories/perl/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2012-11-08T22:26:09+08:00</updated>
+  <updated>2012-11-09T17:42:31+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -36,8 +36,11 @@
 use strict;
 use IO::Socket;
 use Socket qw(SO_KEEPALIVE);
-use IO::Poll;
-use POSIX;
+use IO::Poll;</p>
+
+<h1>POSIX标准是必须要的，否则waitpid会阻塞住</h1>
+
+<p>use POSIX;
 use Carp;
 use Errno  qw(EINPROGRESS EWOULDBLOCK EISCONN ENOTSOCK</p>
 

@@ -206,6 +206,7 @@
 <span class='line-number'>69</span>
 <span class='line-number'>70</span>
 <span class='line-number'>71</span>
+<span class='line-number'>72</span>
 </pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="c1">#!/usr/bin/perl</span>
 </span><span class='line'>
 </span><span class='line'><span class="k">use</span> <span class="n">warnings</span><span class="p">;</span>
@@ -213,6 +214,7 @@
 </span><span class='line'><span class="k">use</span> <span class="nn">IO::</span><span class="n">Socket</span><span class="p">;</span>
 </span><span class='line'><span class="k">use</span> <span class="n">Socket</span> <span class="sx">qw(SO_KEEPALIVE)</span><span class="p">;</span>
 </span><span class='line'><span class="k">use</span> <span class="nn">IO::</span><span class="n">Poll</span><span class="p">;</span>
+</span><span class='line'><span class="c1">#POSIX标准是必须要的，否则waitpid会阻塞住</span>
 </span><span class='line'><span class="k">use</span> <span class="n">POSIX</span><span class="p">;</span>
 </span><span class='line'><span class="k">use</span> <span class="n">Carp</span><span class="p">;</span>
 </span><span class='line'><span class="k">use</span> <span class="n">Errno</span>  <span class="sx">qw(EINPROGRESS EWOULDBLOCK EISCONN ENOTSOCK</span>

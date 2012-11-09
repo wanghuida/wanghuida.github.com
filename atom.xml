@@ -4,7 +4,7 @@
   <title><![CDATA[惠达的小宅]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2012-11-08T22:26:09+08:00</updated>
+  <updated>2012-11-09T17:42:31+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -101,6 +101,7 @@
 <span class='line-number'>69</span>
 <span class='line-number'>70</span>
 <span class='line-number'>71</span>
+<span class='line-number'>72</span>
 </pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="c1">#!/usr/bin/perl</span>
 </span><span class='line'>
 </span><span class='line'><span class="k">use</span> <span class="n">warnings</span><span class="p">;</span>
@@ -108,6 +109,7 @@
 </span><span class='line'><span class="k">use</span> <span class="nn">IO::</span><span class="n">Socket</span><span class="p">;</span>
 </span><span class='line'><span class="k">use</span> <span class="n">Socket</span> <span class="sx">qw(SO_KEEPALIVE)</span><span class="p">;</span>
 </span><span class='line'><span class="k">use</span> <span class="nn">IO::</span><span class="n">Poll</span><span class="p">;</span>
+</span><span class='line'><span class="c1">#POSIX标准是必须要的，否则waitpid会阻塞住</span>
 </span><span class='line'><span class="k">use</span> <span class="n">POSIX</span><span class="p">;</span>
 </span><span class='line'><span class="k">use</span> <span class="n">Carp</span><span class="p">;</span>
 </span><span class='line'><span class="k">use</span> <span class="n">Errno</span>  <span class="sx">qw(EINPROGRESS EWOULDBLOCK EISCONN ENOTSOCK</span>
