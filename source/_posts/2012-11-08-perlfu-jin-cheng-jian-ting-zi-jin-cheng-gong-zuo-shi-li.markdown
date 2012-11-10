@@ -68,7 +68,7 @@ while(1) {
 }
 
 #子进程的工作
-sub work(){
+sub work{
     print @_."\n";
 }
 
