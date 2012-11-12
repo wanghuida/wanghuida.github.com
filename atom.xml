@@ -4,7 +4,7 @@
   <title><![CDATA[惠达的小宅]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2012-11-09T17:42:31+08:00</updated>
+  <updated>2012-11-10T16:36:28+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,91 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[安装配置hive]]></title>
+    <link href="http://www.wanghd.com/blog/2012/11/10/an-zhuang-pei-zhi-hive/"/>
+    <updated>2012-11-10T14:59:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/11/10/an-zhuang-pei-zhi-hive</id>
+    <content type="html"><![CDATA[<ul>
+<li>先安装hadoop请参考<a href="http://www.wanghd.com/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/">这篇文章</a></li>
+<li>hive介绍：通过类似于sql语句的方式去计算结果，数据都存放在hdfs</li>
+</ul>
+
+
+<h3>下载并解压hive</h3>
+
+<ul>
+<li>给个官方<a href="http://www.apache.org/dyn/closer.cgi/hive/">链接</a></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>tar -xzvf hive-x.y.z.tar.gz
+</span><span class='line'>cd hive-x.y.z
+</span><span class='line'>PATH=$PATH:/Users/william/project/hadoop-1.0.4/bin:/Users/william/project/hive-0.8.1/bin
+</span><span class='line'>. ~/.bash_profile</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>直接在终端输入hive，然后输入show tables;然会OK，就行了</li>
+</ul>
+
+
+<!-- more -->
+
+
+<h3>创建测试表</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>create table test (id INT,name STRING);
+</span><span class='line'>create table test2 (id INT,name STRING) partitioned by (ds STRING);
+</span><span class='line'>create table result (id int,name string);</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>导入数据</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>load data local inpath '/Users/william/project/hive-0.8.1/examples/files/kv1.txt' overwrite into table test;
+</span><span class='line'>load data local inpath '/Users/william/project/hive-0.8.1/examples/files/kv2.txt' overwrite into table test2 partition (ds='2012-10-01');
+</span><span class='line'>load data local inpath '/Users/william/project/hive-0.8.1/examples/files/kv3.txt' overwrite into table test2 partition (ds='2012-10-02');</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>操作数据</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>select count(*) from test2 where ds='2012-10-01';
+</span><span class='line'>insert overwrite directory '/tmp/hdfs_out' select t.* from test2 t where t.ds='2012-10-01';
+</span><span class='line'>insert overwrite local directory '/tmp/local_out' select a.* from test a;
+</span><span class='line'>insert overwrite table result select a.* from test a where a.id &lt; 100;</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>换种风格操作数据</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>from test t                                                                 
+</span><span class='line'>    insert overwrite directory '/tmp/other_out' select t.* where t.id &lt; 60      
+</span><span class='line'>    insert overwrite local directory '/tmp/other_out2' select t.* where t.id &gt; 60;</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>还可以自己写脚本做数据转换器</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[perl父进程监听，子进程工作实例]]></title>
@@ -154,7 +239,7 @@
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="c1">#子进程的工作</span>
-</span><span class='line'><span class="k">sub </span><span class="nf">work</span><span class="p">(){</span>
+</span><span class='line'><span class="k">sub </span><span class="nf">work</span><span class="p">{</span>
 </span><span class='line'>    <span class="k">print</span> <span class="nv">@_</span><span class="o">.</span><span class="s">&quot;\n&quot;</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>
@@ -3553,99 +3638,6 @@
 <ul>
 <li>假设文章只有两维的话，那么空间图就可以画在一个平面直角坐标系当中，读者可以假想两篇只有两个词的文章画图进行理解。</li>
 <li>由公式可以看出计算量是很大的，要提高效率最好的方法就是减少term，俗称降纬</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[solr慢查询分析]]></title>
-    <link href="http://www.wanghd.com/blog/2012/09/14/solrman-cha-xun-fen-xi/"/>
-    <updated>2012-09-14T13:35:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/09/14/solrman-cha-xun-fen-xi</id>
-    <content type="html"><![CDATA[<h3>solr慢请求分析,第一种</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=560950&q=*:*&wt=json&rows=50} hits=863948 status=0 QTime=2752
-</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=756250&q=*:*&wt=json&rows=50} hits=863935 status=0 QTime=2472 
-</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=315450&q=*:*&wt=json&rows=50} hits=863935 status=0 QTime=1183 
-</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=557400&q=*:*&wt=json&rows=50} hits=863935 status=0 QTime=2020 
-</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=315550&q=*:*&wt=json&rows=50} hits=863935 status=0 QTime=1061 
-</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=756400&q=*:*&wt=json&rows=50} hits=863935 status=0 QTime=2252 
-</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=315650&q=*:*&wt=json&rows=50} hits=863938 status=0 QTime=1068 
-</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=557500&q=*:*&wt=json&rows=50} hits=863938 status=0 QTime=2012 
-</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=557550&q=*:*&wt=json&rows=50} hits=863938 status=0 QTime=2248 </span></code></pre></td></tr></table></div></figure>
-
-
-<h3>解决方案</h3>
-
-<ul>
-<li>请排除以上查询语句【或限制start】</li>
-</ul>
-
-
-<h3>solr慢请求分析,第二种</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>INFO: [] webapp=/solr path=/select params={mm=2&fl=score,*&sort=score+desc,quetime+desc&start=0&q=贷款+房子+能+不+买&bf=linear(rankscore,29.3246184,0)&qf=title^5+tags^1+bestanswerstr^2+description^1+normalanswerstr^1&wt=json&qt=dismax&fq=-cityid:14&fq=questatus:1+OR+questatus:2+OR+questatus:3+OR+questatus:6&rows=1} hits=317500 status=0 QTime=520 
-</span><span class='line'>INFO: [] webapp=/solr path=/select params={mm=2&fl=score,*&sort=score+desc,quetime+desc&start=0&q=集体+户口+好+好+不&qf=title^5+tags^1+bestanswerstr^2+description^1+normalanswerstr^1&wt=json&qt=dismax&fq=-cityid:12&fq=questatus:1+OR+questatus:2+OR+questatus:3+OR+questatus:6&rows=1} hits=287285 status=0 QTime=622 </span></code></pre></td></tr></table></div></figure>
-
-
-<h3>解决方案</h3>
-
-<ul>
-<li>dismax的mm=2间接使用了OR，建议用AND提高性能【实验中:我想用docfreq来做判断用AND还是OR】</li>
-<li>StopWord:通过solr/admin/luke?fl=normalanswerstr&amp;numTerms=100分析term,过滤掉没有意义的term,例如</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;int name="的"&gt;965396&lt;/int&gt;
-</span><span class='line'>&lt;int name="，"&gt;947429&lt;/int&gt;
-</span><span class='line'>&lt;int name="是"&gt;729063&lt;/int&gt;
-</span><span class='line'>&lt;int name="。"&gt;707417&lt;/int&gt;
-</span><span class='line'>&lt;int name="不"&gt;571925&lt;/int&gt;
-</span><span class='line'>&lt;int name="你"&gt;534142&lt;/int&gt;
-</span><span class='line'>&lt;int name="可以"&gt;525645&lt;/int&gt;
-</span><span class='line'>&lt;int name="就"&gt;460975&lt;/int&gt;
-</span><span class='line'>&lt;int name="有"&gt;443743&lt;/int&gt;
-</span><span class='line'>&lt;int name="了"&gt;437630&lt;/int&gt;
-</span><span class='line'>&lt;int name="要"&gt;372936&lt;/int&gt;
-</span><span class='line'>&lt;int name="！"&gt;342369&lt;/int&gt;
-</span><span class='line'>&lt;int name="好"&gt;331646&lt;/int&gt;
-</span><span class='line'>&lt;int name="在"&gt;324636&lt;/int&gt;
-</span><span class='line'>&lt;int name="一"&gt;279765&lt;/int&gt;
-</span><span class='line'>&lt;int name="个"&gt;269726&lt;/int&gt;
-</span><span class='line'>&lt;int name="能"&gt;233510&lt;/int&gt;</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>权重相同的放入同一个字段，也可以用CopyField，可以多加个系数</li>
 </ul>
 
 ]]></content>

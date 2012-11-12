@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Java | 惠达的小宅]]></title>
   <link href="http://www.wanghd.com/blog/categories/java/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2012-11-09T17:42:31+08:00</updated>
+  <updated>2012-11-10T16:36:28+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,82 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[安装配置hive]]></title>
+    <link href="http://www.wanghd.com/blog/2012/11/10/an-zhuang-pei-zhi-hive/"/>
+    <updated>2012-11-10T14:59:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/11/10/an-zhuang-pei-zhi-hive</id>
+    <content type="html"><![CDATA[<ul>
+<li>先安装hadoop请参考<a href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/">这篇文章</a></li>
+<li>hive介绍：通过类似于sql语句的方式去计算结果，数据都存放在hdfs</li>
+</ul>
+
+
+<h3>下载并解压hive</h3>
+
+<ul>
+<li>给个官方<a href="http://www.apache.org/dyn/closer.cgi/hive/">链接</a></li>
+</ul>
+
+
+<p><code>
+tar -xzvf hive-x.y.z.tar.gz
+cd hive-x.y.z
+PATH=$PATH:/Users/william/project/hadoop-1.0.4/bin:/Users/william/project/hive-0.8.1/bin
+. ~/.bash_profile
+</code></p>
+
+<ul>
+<li>直接在终端输入hive，然后输入show tables;然会OK，就行了</li>
+</ul>
+
+
+<!-- more -->
+
+
+<h3>创建测试表</h3>
+
+<p><code>
+create table test (id INT,name STRING);
+create table test2 (id INT,name STRING) partitioned by (ds STRING);
+create table result (id int,name string);
+</code></p>
+
+<h3>导入数据</h3>
+
+<p><code>
+load data local inpath '/Users/william/project/hive-0.8.1/examples/files/kv1.txt' overwrite into table test;
+load data local inpath '/Users/william/project/hive-0.8.1/examples/files/kv2.txt' overwrite into table test2 partition (ds='2012-10-01');
+load data local inpath '/Users/william/project/hive-0.8.1/examples/files/kv3.txt' overwrite into table test2 partition (ds='2012-10-02');
+</code></p>
+
+<h3>操作数据</h3>
+
+<p><code>
+select count(*) from test2 where ds='2012-10-01';
+insert overwrite directory '/tmp/hdfs_out' select t.* from test2 t where t.ds='2012-10-01';
+insert overwrite local directory '/tmp/local_out' select a.* from test a;
+insert overwrite table result select a.* from test a where a.id &lt; 100;
+</code></p>
+
+<h3>换种风格操作数据</h3>
+
+<p>```
+from test t</p>
+
+<pre><code>insert overwrite directory '/tmp/other_out' select t.* where t.id &lt; 60      
+insert overwrite local directory '/tmp/other_out2' select t.* where t.id &gt; 60;
+</code></pre>
+
+<p>```</p>
+
+<ul>
+<li>还可以自己写脚本做数据转换器</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[编写hadoop的Map-Reduce]]></title>
@@ -508,140 +584,6 @@ if (deletes != null &amp;&amp; numDeletes &gt; maxNumToLog) {
 
 <p>  </updateRequestProcessorChain>
 ```</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[solr的数值存储和范围查询]]></title>
-    <link href="http://www.wanghd.com/blog/2012/09/21/solrde-shu-zhi-cun-chu-he-fan-wei-cha-xun/"/>
-    <updated>2012-09-21T20:49:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/09/21/solrde-shu-zhi-cun-chu-he-fan-wei-cha-xun</id>
-    <content type="html"><![CDATA[<h3>问题：solr查询q=date:[1348233109 TO *]，QTime=300-500毫秒，范围越大越耗时</h3>
-
-<h3>要点：lucene内部不存储数值，而用多个字符串代替</h3>
-
-<h4>我的疑问：为什么不用数值呀，存储空间少，效率又高? 琢磨了下应该有如下原因吧</h4>
-
-<ul>
-<li>lucene索引的倒排表都是根据字符串排序的，要存储数值看来得另起一套索引</li>
-<li>如果存储数值，查询的排序也不能正常运作了，比如10比2排在前面</li>
-<li>查询12,是准确匹配12能还是能匹配123</li>
-<li>数字问题越来越复杂，基本上串模式在数字上根本行不通，如果数值也是串，那问题就简单多了,和一般的词没两样</li>
-</ul>
-
-
-<h3>lucene测试程序</h3>
-
-<ul>
-<li>添加id为695和705的两个文档，搜索id区域698到2054</li>
-</ul>
-
-
-<p>```java
-public static void main(String[] args) throws IOException, ParseException{</p>
-
-<pre><code>Directory dir = FSDirectory.open(new File("/tmp/tempindex"));
-Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
-IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_40, analyzer);
-iwc.setOpenMode(OpenMode.CREATE);
-IndexWriter writer = new IndexWriter(dir, iwc);
-Document doc = new Document();  
-doc.add(new LongField("id",695,Store.YES));  
-writer.addDocument(doc);  
-doc = new Document();  
-doc.add(new LongField("id",705,Store.YES));  
-writer.addDocument(doc);  
-writer.close();
-
-DirectoryReader reader = DirectoryReader.open(dir);
-IndexSearcher searcher = new IndexSearcher(reader);
-Query q = NumericRangeQuery.newLongRange("id", 698L, 2054L, true, true); 
-ScoreDoc[] hits = searcher.search(q, 200).scoreDocs;  
-for(int i=0; i &lt; hits.length; i++){
-  Document result = searcher.doc(hits[i].doc);
-  IndexableField id = result.getField("id");
-  System.out.println(String.format("doc:%s,id:%s", hits[i].doc, id.numericValue().longValue()));
-}
-reader.close();
-dir.close();
-</code></pre>
-
-<p>}
-```</p>
-
-<h3>调试监测建立索引时，695和705生成的多个字符串</h3>
-
-<ul>
-<li>断点设在NumericUtils.java的longToPrefixCoded方法内</li>
-</ul>
-
-
-<p>```</p>
-
-<pre><code>      695                         705
-</code></pre>
-
-<p>[20 1 0 0 0 0 0 0 0 5 37]   [20 1 0 0 0 0 0 0 0 5 41] 0x20代表long,低字节放到bytes高索引位<br/>
-[24 8 0 0 0 0 0 0 0 2b]     [24 8 0 0 0 0 0 0 0 2c]   每7位代表一个字符
-[28 40 0 0 0 0 0 0 2]       [28 40 0 0 0 0 0 0 2]     每次循环右移precisionStep=4
-[2c 4 0 0 0 0 0 0 0]        [2c 4 0 0 0 0 0 0 0]
-[30 20 0 0 0 0 0 0]         [30 20 0 0 0 0 0 0]
-[34 2 0 0 0 0 0 0]          [34 2 0 0 0 0 0 0]
-[38 10 0 0 0 0 0]           [38 10 0 0 0 0 0]
-[3c 1 0 0 0 0 0]            [3c 1 0 0 0 0 0]
-[40 8 0 0 0 0]              [40 8 0 0 0 0]
-[44 40 0 0 0]               [44 40 0 0 0]
-[48 4 0 0 0]                [48 4 0 0 0]
-[4c 20 0 0]                 [4c 20 0 0]
-[50 2 0 0]                  [50 2 0 0]
-[54 10 0]                   [54 10 0]
-[58 1 0]                    [58 1 0]
-[5c 8]                      [5c 8]
-```</p>
-
-<h3>698-2057的区域转化</h3>
-
-<ul>
-<li>断点设在NumericUtils.java的longToPrefixCoded方法内</li>
-</ul>
-
-
-<p><code>
-698: [20 1 0 0 0 0 0 0 0 5 3a]  703: [20 1 0 0 0 0 0 0 0 5 3f]
-704: [24 8 0 0 0 0 0 0 0 2c]    767: [24 8 0 0 0 0 0 0 0 2f]
-768: [28 40 0 0 0 0 0 0 3]      2047:[28 40 0 0 0 0 0 0 7]
-2048:[20 1 0 0 0 0 0 0 0 10 0]  2054:[20 1 0 0 0 0 0 0 0 10 6]
-</code>
-+ precisionStep使用默认的4
-+ 703的生成方法是对698的右边4位和二进制“1111”做或运算
-+ 704的生成方法是在703的基础上加1,那么右边四位全0，右移4位
-+ 767的生成方法是对704的右边4位和二进制“1111”做或运算（其实只要前缀匹配，后面已经无所谓了）
-+ 后面的数字生成方法一样</p>
-
-<h3>查询索引比较</h3>
-
-<ul>
-<li>大于等于698,小于等于703的没有</li>
-<li>大于等于704,小于等于767的有，705的第二条记录</li>
-<li>大于等于768,小于等于2047的没有</li>
-<li>大于等于2048,小于等于2054的没有</li>
-</ul>
-
-
-<h3>结论：要提高效率的方法</h3>
-
-<ul>
-<li>调整precisionStep,默认为4，调大索引小性能差，调小索引大性能理论上的好,精度高，见下图</li>
-</ul>
-
-
-<p><img src="/images/post/rangequery.gif" title="rangequery" alt="rangequery" /></p>
-
-<ul>
-<li>如果int够用，可以不用Long用Int</li>
-<li>缩小范围，这是最直接最管用的方法，（优化业务需求）</li>
-</ul>
-
 ]]></content>
   </entry>
   

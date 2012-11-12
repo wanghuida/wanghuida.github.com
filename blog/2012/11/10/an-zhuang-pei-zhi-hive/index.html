@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>均方根 - 惠达的小宅</title>
+  <title>安装配置hive - 惠达的小宅</title>
   <meta name="author" content="王惠达 huida wanghuida">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.wanghd.com/blog/2012/08/15/jun-fang-gen">
+  <link rel="canonical" href="http://www.wanghd.com/blog/2012/11/10/an-zhuang-pei-zhi-hive">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/bootstrap/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/stylesheets/bootstrap/responsive.css" media="screen, projection" rel="stylesheet" type="text/css">
@@ -98,7 +98,7 @@
   
   <header class="page-header">
     
-      <h1 class="entry-title">均方根</h1>
+      <h1 class="entry-title">安装配置hive</h1>
     
     
       <p class="meta">
@@ -114,7 +114,7 @@
   
 
 
-<time datetime="2012-08-15T16:46:00+08:00" pubdate data-updated="true">Aug 15<span>th</span>, 2012</time>
+<time datetime="2012-11-10T14:59:00+08:00" pubdate data-updated="true">Nov 10<span>th</span>, 2012</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -123,7 +123,83 @@
   </header>
 
 
-<div class="entry-content"><h3>未完待续</h3>
+<div class="entry-content"><ul>
+<li>先安装hadoop请参考<a href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/">这篇文章</a></li>
+<li>hive介绍：通过类似于sql语句的方式去计算结果，数据都存放在hdfs</li>
+</ul>
+
+
+<h3>下载并解压hive</h3>
+
+<ul>
+<li>给个官方<a href="http://www.apache.org/dyn/closer.cgi/hive/">链接</a></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>tar -xzvf hive-x.y.z.tar.gz
+</span><span class='line'>cd hive-x.y.z
+</span><span class='line'>PATH=$PATH:/Users/william/project/hadoop-1.0.4/bin:/Users/william/project/hive-0.8.1/bin
+</span><span class='line'>. ~/.bash_profile</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>直接在终端输入hive，然后输入show tables;然会OK，就行了</li>
+</ul>
+
+
+<!-- more -->
+
+
+<h3>创建测试表</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>create table test (id INT,name STRING);
+</span><span class='line'>create table test2 (id INT,name STRING) partitioned by (ds STRING);
+</span><span class='line'>create table result (id int,name string);</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>导入数据</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>load data local inpath '/Users/william/project/hive-0.8.1/examples/files/kv1.txt' overwrite into table test;
+</span><span class='line'>load data local inpath '/Users/william/project/hive-0.8.1/examples/files/kv2.txt' overwrite into table test2 partition (ds='2012-10-01');
+</span><span class='line'>load data local inpath '/Users/william/project/hive-0.8.1/examples/files/kv3.txt' overwrite into table test2 partition (ds='2012-10-02');</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>操作数据</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>select count(*) from test2 where ds='2012-10-01';
+</span><span class='line'>insert overwrite directory '/tmp/hdfs_out' select t.* from test2 t where t.ds='2012-10-01';
+</span><span class='line'>insert overwrite local directory '/tmp/local_out' select a.* from test a;
+</span><span class='line'>insert overwrite table result select a.* from test a where a.id &lt; 100;</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>换种风格操作数据</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>from test t                                                                 
+</span><span class='line'>    insert overwrite directory '/tmp/other_out' select t.* where t.id &lt; 60      
+</span><span class='line'>    insert overwrite local directory '/tmp/other_out2' select t.* where t.id &gt; 60;</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>还可以自己写脚本做数据转换器</li>
+</ul>
+
 </div>
 
 
@@ -146,12 +222,12 @@
   
 
 
-<time datetime="2012-08-15T16:46:00+08:00" pubdate data-updated="true">Aug 15<span>th</span>, 2012</time>
+<time datetime="2012-11-10T14:59:00+08:00" pubdate data-updated="true">Nov 10<span>th</span>, 2012</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/share/'>Share</a>
+    <a class='category' href='/blog/categories/hadoop/'>Hadoop</a>, <a class='category' href='/blog/categories/java/'>Java</a>
   
 </span>
 
@@ -160,7 +236,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2012/08/15/jun-fang-gen/" data-via="" data-counturl="http://www.wanghd.com/blog/2012/08/15/jun-fang-gen/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2012/11/10/an-zhuang-pei-zhi-hive/" data-via="" data-counturl="http://www.wanghd.com/blog/2012/11/10/an-zhuang-pei-zhi-hive/" >Tweet</a>
   
   
   
@@ -177,14 +253,10 @@
     <ul class="pager">
       
       <li class="previous"><a class="basic-alignment left"
-        href="/blog/2012/08/08/vimsu-ji-biao/" title="Previous Post:
-        vim速记表">&laquo; vim速记表</a></li>
+        href="/blog/2012/11/08/perlfu-jin-cheng-jian-ting-zi-jin-cheng-gong-zuo-shi-li/" title="Previous Post:
+        perl父进程监听，子进程工作实例">&laquo; perl父进程监听，子进程工作实例</a></li>
       
       <li><a href="/blog/archives">文章归档</a></li>
-      
-      <li class="next"><a class="basic-alignment right" href="/blog/2012/08/16/xian-cheng-chi/"
-        title="Next Post: 线程池">线程池
-        &raquo;</a></li>
       
     </ul>
   </footer>
@@ -290,8 +362,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.wanghd.com/blog/2012/08/15/jun-fang-gen/';
-        var disqus_url = 'http://www.wanghd.com/blog/2012/08/15/jun-fang-gen/';
+        var disqus_identifier = 'http://www.wanghd.com/blog/2012/11/10/an-zhuang-pei-zhi-hive/';
+        var disqus_url = 'http://www.wanghd.com/blog/2012/11/10/an-zhuang-pei-zhi-hive/';
         var disqus_script = 'embed.js';
       
     (function () {
