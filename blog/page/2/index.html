@@ -100,6 +100,66 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2012/11/07/nginxfan-xiang-dai-li-zi-dong-urldecodewen-ti/">Nginx反向代理自动urldecode问题</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-07T16:40:00+08:00" pubdate data-updated="true">Nov 7<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/07/nginxfan-xiang-dai-li-zi-dong-urldecodewen-ti/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>今天妖孽了，发现nginx反向代理会自动urldecode</h3>
+
+<ul>
+<li>同事监控两个nginx的access_log，惊人的发现日志里的url不同</li>
+<li>去掉反斜杠就ok了，不太清楚nginx内部是如何处理的</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>location / {
+</span><span class='line'>    proxy_pass        http://localhost:8000/;
+</span><span class='line'>}
+</span><span class='line'>#修改为下面这样后，一切OK了
+</span><span class='line'>location / {
+</span><span class='line'>    proxy_pass        http://localhost:8000;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2012/11/06/mogilefsshan-chu-dui-lie/">Mogilefs删除队列</a></h1>
     
     
@@ -753,94 +813,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/10/11/mogilefswen-jian-lu-jing-gui-ze/">Mogilefs文件路径规则</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-10-11T16:16:00+08:00" pubdate data-updated="true">Oct 11<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/10/11/mogilefswen-jian-lu-jing-gui-ze/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>同事问我mogilefs文件路径的规律是什么</h3>
-
-<ul>
-<li>以前有看到过，但是没有记录，一下子就被问悶了，突然发现就记录一下</li>
-<li>当fid长度不足10时，前置补0到长度为10,假设补好后的结果为0258693147</li>
-<li>通过正则把path切割成0/258/693/147这样</li>
-<li>最后的路径结果是：/设备/0/258/693/147/0258693147.fid</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="k">sub </span><span class="nf">uri_path</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$self</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$devid</span> <span class="o">=</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">devid</span><span class="p">};</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$fidid</span> <span class="o">=</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">fidid</span><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$nfid</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$len</span> <span class="o">=</span> <span class="nb">length</span> <span class="nv">$fidid</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$len</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nv">$nfid</span> <span class="o">=</span> <span class="s">&#39;0&#39;</span> <span class="n">x</span> <span class="p">(</span><span class="mi">10</span> <span class="o">-</span> <span class="nv">$len</span><span class="p">)</span> <span class="o">.</span> <span class="nv">$fidid</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nv">$nfid</span> <span class="o">=</span> <span class="nv">$fidid</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">my</span> <span class="p">(</span> <span class="nv">$b</span><span class="p">,</span> <span class="nv">$mmm</span><span class="p">,</span> <span class="nv">$ttt</span><span class="p">,</span> <span class="nv">$hto</span> <span class="p">)</span> <span class="o">=</span> <span class="p">(</span> <span class="nv">$nfid</span> <span class="o">=~</span> <span class="sr">m{(\d)(\d{3}</span><span class="p">)(</span><span class="o">\</span><span class="n">d</span><span class="p">{</span><span class="mi">3</span><span class="p">})(</span><span class="o">\</span><span class="n">d</span><span class="p">{</span><span class="mi">3</span><span class="p">})}</span> <span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">return</span> <span class="s">&quot;/dev$devid/$b/$mmm/$ttt/$nfid.fid&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>总结一下</h3>
-
-<ul>
-<li>这个算法效率很高，并且可以把文件平均分配到目录下</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/3/">&larr; 其他文章</a></li>
@@ -859,8 +831,8 @@
     <li class='category'><a href='/blog/categories/hadoop/'>Hadoop (4)</a></li>
 <li class='category'><a href='/blog/categories/java/'>Java (15)</a></li>
 <li class='category'><a href='/blog/categories/javascript/'>Javascript (1)</a></li>
-<li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (14)</a></li>
-<li class='category'><a href='/blog/categories/perl/'>Perl (14)</a></li>
+<li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
+<li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (1)</a></li>
 <li class='category'><a href='/blog/categories/share/'>Share (12)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
@@ -871,6 +843,10 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng/">mogilefs设备损坏处理流程</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2012/11/25/inotify/">inotify,rsync统一化配置</a>
@@ -906,10 +882,6 @@
     
       <li class="post">
         <a href="/blog/2012/11/08/perlfu-jin-cheng-jian-ting-zi-jin-cheng-gong-zuo-shi-li/">perl父进程监听，子进程工作实例</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/07/nginxfan-xiang-dai-li-zi-dong-urldecodewen-ti/">nginx反向代理自动urldecode问题</a>
       </li>
     
   </ul>

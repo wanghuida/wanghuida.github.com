@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>向量空间模型 - 惠达的小宅</title>
+  <title>mogilefs设备损坏处理流程 - 惠达的小宅</title>
   <meta name="author" content="王惠达 huida wanghuida">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.wanghd.com/blog/2012/09/18/xiang-liang-kong-jian-mo-xing">
+  <link rel="canonical" href="http://www.wanghd.com/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/bootstrap/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/stylesheets/bootstrap/responsive.css" media="screen, projection" rel="stylesheet" type="text/css">
@@ -98,7 +98,7 @@
   
   <header class="page-header">
     
-      <h1 class="entry-title">向量空间模型</h1>
+      <h1 class="entry-title">Mogilefs设备损坏处理流程</h1>
     
     
       <p class="meta">
@@ -114,7 +114,7 @@
   
 
 
-<time datetime="2012-09-18T08:28:00+08:00" pubdate data-updated="true">Sep 18<span>th</span>, 2012</time>
+<time datetime="2012-11-25T19:34:00+08:00" pubdate data-updated="true">Nov 25<span>th</span>, 2012</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -123,52 +123,98 @@
   </header>
 
 
-<div class="entry-content"><h3>向量空间模型广泛使用在文档相似度（算score等等），下面举例描述这个模型：</h3>
-
-<ul>
-<li>假设有两个文档（可以把一个query想象成一个文档）,分别为d1,d2</li>
-<li>假设w1,w2,w3,w4为term</li>
-<li>下图为词频（词频就是在单个文档中出现的次数）,词频为ai,bi</li>
+<div class="entry-content"><ul>
+<li>这里单个dev对应一个磁盘,假设是sdb</li>
+<li>文件系统使用xfs</li>
+<li>mogstored使用nginx</li>
 </ul>
 
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>-----------------------------------
-</span><span class='line'>      |  w1  |  w2  |  w3  |  w4  |
-</span><span class='line'>  d1  |  1   |      |  1   |      |
-</span><span class='line'>  d2  |  2   |  3   |  2   |  1   |
-</span><span class='line'>-----------------------------------</span></code></pre></td></tr></table></div></figure>
+<p>1.把磁盘标记为dead</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>mogadm device mark &lt;hostname&gt; &lt;devid&gt; &lt;status&gt;
+</span></code></pre></td></tr></table></div></figure>
 
 
-<ul>
-<li>比较夹角公式，越接近越相似,(还需要向量的模公式,|x| = √x<sup>2)</sup></li>
-</ul>
 
 
-<p><img src="/images/post/vsm.png" title="vsm公式" alt="vsm公式" /></p>
+<!-- more -->
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+
+<p>2.格式化新磁盘或损坏的磁盘, 并挂到新的目录</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sim(d1,d2) = ∑(ai*bi) / √(∑ai^2 * ∑bi^2)
-</span><span class='line'>           = 1*2+0*3+1*2+0*1 / √((1^2+0^2+1^2+0^2)*(2^2+3^2+2^2+1^2))
-</span><span class='line'>           = 4 / √(36)
-</span><span class='line'>           = 4 / 6
-</span><span class='line'>           = 2 / 3
-</span><span class='line'>           = 0.66666...</span></code></pre></td></tr></table></div></figure>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>mkfs.xfs -f -i <span class="nv">size</span><span class="o">=</span>512 -l <span class="nv">size</span><span class="o">=</span>128m,lazy-count<span class="o">=</span>1 -d <span class="nv">agcount</span><span class="o">=</span>16 /dev/sdb
+</span><span class='line'>
+</span><span class='line'>mkdir -p /var/mogdata/<span class="o">{</span>new-dev<span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>mount -t xfs -o noatime,noikeep,logbufs<span class="o">=</span>8 /var/mogdata/<span class="o">{</span>new-dev<span class="o">}</span> /dev/sdb
+</span><span class='line'>
+</span><span class='line'><span class="c">#增加到fstab</span>
+</span><span class='line'>vim /etc/fstab
+</span><span class='line'>/dev/sdb     /var/mogdata/<span class="o">{</span>new-dev<span class="o">}</span>    xfs    noatime,noikeep,logbufs<span class="o">=</span>8    0 0
+</span></code></pre></td></tr></table></div></figure>
 
 
-<ul>
-<li>假设文章只有两维的话，那么空间图就可以画在一个平面直角坐标系当中，读者可以假想两篇只有两个词的文章画图进行理解。</li>
-<li>由公式可以看出计算量是很大的，要提高效率最好的方法就是减少term，俗称降纬</li>
-</ul>
+<p>3.配置nginx</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>chown -R mogile.daemon /var/mogdata/<span class="o">{</span>new-dev<span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#建议注释掉损坏的location</span>
+</span><span class='line'>vim /etc/nginx/conf.d/<span class="o">{</span>xxx.conf<span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>location /<span class="o">{</span>new-dev<span class="o">}</span>/ <span class="o">{</span>
+</span><span class='line'>    expires             max;
+</span><span class='line'>    root                /var/mogdata;
+</span><span class='line'>    client_max_body_size        20m;
+</span><span class='line'>    client_body_temp_path       /var/mogdata/<span class="o">{</span>new-dev<span class="o">}</span>/temp;
+</span><span class='line'>    dav_methods                 PUT DELETE MKCOL;
+</span><span class='line'>    create_full_put_path        on;
+</span><span class='line'>    dav_access                  user:rw group:r all:r;
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>/etc/init.d/nginx reload
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>4.增加一个新设备</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>mogadm device add &lt;hostname&gt; &lt;devid&gt; <span class="o">[</span>opts<span class="o">]</span>        Add a device to a host.
+</span><span class='line'>
+</span><span class='line'>      &lt;devid&gt;              Numeric devid.  Never reuse these.
+</span><span class='line'>      &lt;hostname&gt;           Hostname to add a device
+</span><span class='line'>      --status<span class="o">=</span>s           One of <span class="s1">&#39;alive&#39;</span> or <span class="s1">&#39;down&#39;</span>.  Defaults to <span class="s1">&#39;alive&#39;</span>.
+</span></code></pre></td></tr></table></div></figure>
 
 </div>
 
@@ -192,12 +238,12 @@
   
 
 
-<time datetime="2012-09-18T08:28:00+08:00" pubdate data-updated="true">Sep 18<span>th</span>, 2012</time>
+<time datetime="2012-11-25T19:34:00+08:00" pubdate data-updated="true">Nov 25<span>th</span>, 2012</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/java/'>Java</a>, <a class='category' href='/blog/categories/share/'>Share</a>, <a class='category' href='/blog/categories/solr/'>Solr</a>
+    <a class='category' href='/blog/categories/mogilefs/'>Mogilefs</a>, <a class='category' href='/blog/categories/perl/'>Perl</a>
   
 </span>
 
@@ -206,7 +252,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2012/09/18/xiang-liang-kong-jian-mo-xing/" data-via="" data-counturl="http://www.wanghd.com/blog/2012/09/18/xiang-liang-kong-jian-mo-xing/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng/" data-via="" data-counturl="http://www.wanghd.com/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng/" >Tweet</a>
   
   
   
@@ -223,14 +269,10 @@
     <ul class="pager">
       
       <li class="previous"><a class="basic-alignment left"
-        href="/blog/2012/09/14/solrman-cha-xun-fen-xi/" title="Previous Post:
-        solr慢查询分析">&laquo; solr慢查询分析</a></li>
+        href="/blog/2012/11/25/inotify/" title="Previous Post:
+        inotify,rsync统一化配置">&laquo; inotify,rsync统一化配置</a></li>
       
       <li><a href="/blog/archives">文章归档</a></li>
-      
-      <li class="next"><a class="basic-alignment right" href="/blog/2012/09/20/shi-yong-jmxfen-xi-solrzhuang-tai/"
-        title="Next Post: 使用JMX分析solr状态">使用JMX分析solr状态
-        &raquo;</a></li>
       
     </ul>
   </footer>
@@ -350,8 +392,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.wanghd.com/blog/2012/09/18/xiang-liang-kong-jian-mo-xing/';
-        var disqus_url = 'http://www.wanghd.com/blog/2012/09/18/xiang-liang-kong-jian-mo-xing/';
+        var disqus_identifier = 'http://www.wanghd.com/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng/';
+        var disqus_url = 'http://www.wanghd.com/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng/';
         var disqus_script = 'embed.js';
       
     (function () {

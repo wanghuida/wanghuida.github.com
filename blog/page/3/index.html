@@ -100,6 +100,94 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2012/10/11/mogilefswen-jian-lu-jing-gui-ze/">Mogilefs文件路径规则</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-11T16:16:00+08:00" pubdate data-updated="true">Oct 11<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/10/11/mogilefswen-jian-lu-jing-gui-ze/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>同事问我mogilefs文件路径的规律是什么</h3>
+
+<ul>
+<li>以前有看到过，但是没有记录，一下子就被问悶了，突然发现就记录一下</li>
+<li>当fid长度不足10时，前置补0到长度为10,假设补好后的结果为0258693147</li>
+<li>通过正则把path切割成0/258/693/147这样</li>
+<li>最后的路径结果是：/设备/0/258/693/147/0258693147.fid</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="k">sub </span><span class="nf">uri_path</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$self</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$devid</span> <span class="o">=</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">devid</span><span class="p">};</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$fidid</span> <span class="o">=</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">fidid</span><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$nfid</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$len</span> <span class="o">=</span> <span class="nb">length</span> <span class="nv">$fidid</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$len</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$nfid</span> <span class="o">=</span> <span class="s">&#39;0&#39;</span> <span class="n">x</span> <span class="p">(</span><span class="mi">10</span> <span class="o">-</span> <span class="nv">$len</span><span class="p">)</span> <span class="o">.</span> <span class="nv">$fidid</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$nfid</span> <span class="o">=</span> <span class="nv">$fidid</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">my</span> <span class="p">(</span> <span class="nv">$b</span><span class="p">,</span> <span class="nv">$mmm</span><span class="p">,</span> <span class="nv">$ttt</span><span class="p">,</span> <span class="nv">$hto</span> <span class="p">)</span> <span class="o">=</span> <span class="p">(</span> <span class="nv">$nfid</span> <span class="o">=~</span> <span class="sr">m{(\d)(\d{3}</span><span class="p">)(</span><span class="o">\</span><span class="n">d</span><span class="p">{</span><span class="mi">3</span><span class="p">})(</span><span class="o">\</span><span class="n">d</span><span class="p">{</span><span class="mi">3</span><span class="p">})}</span> <span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="s">&quot;/dev$devid/$b/$mmm/$ttt/$nfid.fid&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>总结一下</h3>
+
+<ul>
+<li>这个算法效率很高，并且可以把文件平均分配到目录下</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2012/10/09/mogilefsshe-bei-quan-zhong-suan-fa/">Mogilefs设备权重算法</a></h1>
     
     
@@ -1149,163 +1237,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/08/30/chang-yong-ming-ling/">常用命令</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-08-30T13:14:00+08:00" pubdate data-updated="true">Aug 30<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/08/30/chang-yong-ming-ling/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>过滤记录</h3>
-
-<ul>
-<li>-l自动chomp，结果加$/</li>
-<li>-a自动分割</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>tail -f access-2012-08-30.log | grep -v <span class="s1">&#39;*&#39;</span> <span class="se">\ </span>
-</span><span class='line'>    | perl -w -lane <span class="s1">&#39;$a = $F[@F-1];print if $a &gt; 50000 &#39;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>获取URL内容</h3>
-
-<ul>
-<li>-I 获取头信息</li>
-<li>-x 通过哪台服务器</li>
-<li>-A 设置user agent,可以让log过滤更方便</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>curl -I -x 127.0.0.1  <span class="s2">&quot;http://test/abc.jpg&quot;</span> -A <span class="s2">&quot;huida&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>批量删除一天以前的文件</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>find /dev/shm/ -type f -mtime +1 | xargs rm
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>计算tcp连接数</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>su -
-</span><span class='line'>netstat -lant | wc -l
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>增加网关</h3>
-
-<ul>
-<li>mac版</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo route add -net 10.0.0.0/8 -interface ppp0
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>格式化和mount磁盘</h3>
-
-<ul>
-<li>xfs系统</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>/sbin/mkfs.xfs /dev/sdb
-</span><span class='line'>mount –t xfs /dev/sdb /data1
-</span><span class='line'>vim /etc/fstab
-</span><span class='line'>umount -l /tmp/
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>导出数据</h3>
-
-<ul>
-<li>-h -u -p表示主机，用户，密码</li>
-<li>-D表示数据库</li>
-<li>-e表示执行语句</li>
-<li>-N表示跳过列名, &#8211;skip-column-names</li>
-<li>-s表示用tab分割字段, &#8211;silent,Be more silent. Print results with a tab as separator, each row on new line.</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>mysql -h -u -p -Ns -Ddatabase -e <span class="s2">&quot;select * from ~~~ where ~~~&quot;</span> &gt; /tmp/fid
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>远程取得数据</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>sftp
-</span><span class='line'>scp
-</span><span class='line'>rsync
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>查看系统状况</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>iostat -x 1
-</span><span class='line'>free -m
-</span><span class='line'>w
-</span><span class='line'>top
-</span><span class='line'>ping
-</span><span class='line'>lsof -i4TCP -P
-</span><span class='line'>netstat -lnp
-</span></code></pre></td></tr></table></div></figure>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/4/">&larr; 其他文章</a></li>
@@ -1324,8 +1255,8 @@
     <li class='category'><a href='/blog/categories/hadoop/'>Hadoop (4)</a></li>
 <li class='category'><a href='/blog/categories/java/'>Java (15)</a></li>
 <li class='category'><a href='/blog/categories/javascript/'>Javascript (1)</a></li>
-<li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (14)</a></li>
-<li class='category'><a href='/blog/categories/perl/'>Perl (14)</a></li>
+<li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
+<li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (1)</a></li>
 <li class='category'><a href='/blog/categories/share/'>Share (12)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
@@ -1336,6 +1267,10 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng/">mogilefs设备损坏处理流程</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2012/11/25/inotify/">inotify,rsync统一化配置</a>
@@ -1371,10 +1306,6 @@
     
       <li class="post">
         <a href="/blog/2012/11/08/perlfu-jin-cheng-jian-ting-zi-jin-cheng-gong-zuo-shi-li/">perl父进程监听，子进程工作实例</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/07/nginxfan-xiang-dai-li-zi-dong-urldecodewen-ti/">nginx反向代理自动urldecode问题</a>
       </li>
     
   </ul>
