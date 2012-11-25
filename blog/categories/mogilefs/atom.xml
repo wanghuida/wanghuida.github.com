@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Mogilefs | 惠达的小宅]]></title>
   <link href="http://www.wanghd.com/blog/categories/mogilefs/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2012-11-16T10:04:51+08:00</updated>
+  <updated>2012-11-25T19:31:26+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,372 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[MogileFS安装配置]]></title>
+    <link href="http://www.wanghd.com/blog/2012/11/22/mogilefsan-zhuang-pei-zhi/"/>
+    <updated>2012-11-22T17:19:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/11/22/mogilefsan-zhuang-pei-zhi</id>
+    <content type="html"><![CDATA[<h3>基本介绍</h3>
+
+<ul>
+<li>mogilefs是一个分布式的文件系统解决方案</li>
+<li>特点是:无单点失效的问题，自动复制无需raid，easy的命名空间，自修复机制，成熟的管理工具，源码清晰推荐阅读</li>
+</ul>
+
+
+<!-- more -->
+
+
+<h3>安装基本组件</h3>
+
+<p>```bash
+yum groupinstall "Development Tools"</p>
+
+<h1>cpan是perl的包管理工具</h1>
+
+<p>yum install cpan
+```</p>
+
+<h3>安装mogilefs</h3>
+
+<p>```bash</p>
+
+<h1>进入cpan,初始化直接自动就好</h1>
+
+<p>cpan</p>
+
+<blockquote><p>install IO::AIO
+install MogileFS::Client
+install MogileFS::Utils</p>
+
+<h1>如果有问题直接用force install</h1>
+
+<p>install MogileFS::Server
+```</p></blockquote>
+
+<h3>安装配置mysql</h3>
+
+<p>```bash</p>
+
+<h1>安装mysql</h1>
+
+<p>yum install mysql mysql-server
+mysqladmin -u root password 123456</p>
+
+<h1>进入mysql,新建mogile用户</h1>
+
+<p>mysql -uroot -p123456
+mysql> create database mogilefs;
+mysql> grant all on mogilefs.* to mogile@localhost identified by '123456';
+mysql> flush privileges;</p>
+
+<h1>导入mogilefs表</h1>
+
+<p>mogdbsetup --dbpass=123456 --yes
+```</p>
+
+<h3>mogilefs配置</h3>
+
+<ul>
+<li>mogilefsd配置</li>
+</ul>
+
+
+<p>```bash</p>
+
+<h1>/etc/mogilefs是默认的配置路径，-c可以修改</h1>
+
+<p>mkdir -p /etc/mogilefs
+cd /etc/mogilefs
+vim mogilefsd.conf</p>
+
+<h1>内容如下</h1>
+
+<p>pidfile = /tmp/mogilefsd.pid    #存放pid
+daemonize = 1                   #守护进程</p>
+
+<p>db_dsn  = DBI:mysql:mogilefs:127.0.0.1  #数据库配置
+db_user = mogile
+db_pass = 123456</p>
+
+<p>conf_port = 7001                #监听端口
+node_timeout = 2                #节点超时时间
+rebalance_ignore_missing = 1    #rebalance时会删除文件，删除时如果找不到文件不报错直接跳过</p>
+
+<p>query_jobs = 20                 #正真处理请求的job个数
+delete_jobs = 3                 #处理删除队列的job个数
+replicate_jobs = 5              #处理复制队列的job个数
+reaper_jobs = 1                 #设备设置为dead后，处理补救工作的job个数</p>
+
+<pre><code>                            #其实还有其他job，默认为1个
+</code></pre>
+
+<p>```</p>
+
+<ul>
+<li>mogstored配置</li>
+</ul>
+
+
+<p>```bash</p>
+
+<h1>设置文件存储路径，不要忘记修改拥有者</h1>
+
+<p>mkdir -p /var/mogdata
+adduser --gid daemon mogile
+chown mogile.daemon /var/mogdata
+vim mogstored.conf</p>
+
+<h1>内容如下</h1>
+
+<p>httplisten = 0.0.0.0:7500       #文件存储端口
+mgmtlisten = 0.0.0.0:7501       #监控磁盘状态端口
+docroot = /var/mogdata          #文件存储路径</p>
+
+<p>pidfile = /tmp/mogstored.pid    #存储pid
+daemonize = 1                   #守护进程
+```</p>
+
+<h3>启动mogilefs</h3>
+
+<p>```bash
+vim /etc/security/limits.conf</p>
+
+<h1>内容如下，让mogile可以打开更多的连接数</h1>
+
+<p>mogile soft nofile 65535
+mogile hard nofile 65535</p>
+
+<h1>切换用户启动</h1>
+
+<p>su mogile -c 'mogstored'
+su mogile -c 'mogilefsd'</p>
+
+<h1>验证已经启动成功</h1>
+
+<p>ps auxf | grep mogile
+mogadm check</p>
+
+<p>```</p>
+
+<h3>已经安装好了，接来应该做点什么呢</h3>
+
+<ul>
+<li>学习mogadm指令，因为mogadm是必会工具</li>
+<li>试着client连接mogilefsd存储文件吧</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Time::HiRes介绍]]></title>
+    <link href="http://www.wanghd.com/blog/2012/11/22/time-hiresjie-shao/"/>
+    <updated>2012-11-22T17:18:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/11/22/time-hiresjie-shao</id>
+    <content type="html"><![CDATA[<h3>Time::HiRes库介绍</h3>
+
+<ul>
+<li>HiRes是high resolution的简写，译为高分辨率</li>
+<li>HiRes其实是提供一些更高精度的alarm, sleep, gettimeofday, interval timers</li>
+</ul>
+
+
+<!-- more -->
+
+
+<h3>usleep，nanosleep实例</h3>
+
+<ul>
+<li>usleep参数是微妙</li>
+<li>nanosleep参数是纳秒</li>
+</ul>
+
+
+<p><code>perl
+Time::HiRes::usleep(100_000);
+print "100 milliseconds\n";
+Time::HiRes::nanosleep(1000_000_000);
+print "1 seconds\n";
+</code></p>
+
+<h3>ualarm实例</h3>
+
+<ul>
+<li>ualarm(0)会撤销警告信号</li>
+</ul>
+
+
+<p>```perl
+eval {</p>
+
+<pre><code>local $SIG{ALRM} = sub { die "receive signal\n" };
+Time::HiRes::ualarm 1000_000;
+sleep 2;
+print "never print";
+</code></pre>
+
+<p>};</p>
+
+<p>if($@) {</p>
+
+<pre><code>print $@;
+</code></pre>
+
+<p>}</p>
+
+<p>eval {</p>
+
+<pre><code>local $SIG{ALRM} = sub { die "receive signal\n" };
+Time::HiRes::ualarm 2000_000;
+sleep 1;
+Time::HiRes::ualarm 0; #cancel alarm
+</code></pre>
+
+<p>};</p>
+
+<p>if($@) {</p>
+
+<pre><code>print $@;
+</code></pre>
+
+<p>}else{</p>
+
+<pre><code>print "cancel alarm signal\n";
+</code></pre>
+
+<p>}  <br/>
+```</p>
+
+<h3>tv_interval和gettimeofday实例</h3>
+
+<ul>
+<li>tv_interval返回两个gettimeofday引用相差的秒数</li>
+<li>省略tv_interval的第二个参数，会自动使用当前时间代替</li>
+</ul>
+
+
+<p><code>perl
+my @start = Time::HiRes::gettimeofday;
+print Dumper(\@start);
+sleep(4);
+my $diff = Time::HiRes::tv_interval(\@start);
+print "$diff\n";
+</code></p>
+
+<h3>setitimer实例</h3>
+
+<ol>
+<li>ITIMER_REAL: 真实时间</li>
+<li>ITIMER_VIRTUAL: 用户时间</li>
+<li><p>ITIMER_PROF: 系统时间</p></li>
+<li><p>getitimer可以取得setitimer还有多久开始执行</p></li>
+</ol>
+
+
+<p>```perl
+use Time::HiRes qw ( setitimer ITIMER_VIRTUAL time );
+$SIG{VTALRM} = sub { print time, "\n" };
+setitimer(ITIMER_VIRTUAL, 3.5, 1);
+while(1){ }</p>
+
+<p>```</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[修复mogilefs目录owner]]></title>
+    <link href="http://www.wanghd.com/blog/2012/11/22/xiu-fu-mogilefsmu-lu-owner/"/>
+    <updated>2012-11-22T17:16:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/11/22/xiu-fu-mogilefsmu-lu-owner</id>
+    <content type="html"><![CDATA[<h3>什么情况会导致mogilefs的数据目录owner不正确</h3>
+
+<ul>
+<li>直接使用root启动mogstored会导致增加的文件和文件夹为root</li>
+<li>重新用mogile启动mogstored后，mogile用户无法删除root的文件，最终delete队列无法处理</li>
+</ul>
+
+
+<h3>如何处理</h3>
+
+<ol>
+<li>直接chown -R，这是最直接的方法，如果1T的磁盘被这样操作，会10小时util为100</li>
+<li>自己写一个脚本慢处理，脚本思路如下</li>
+</ol>
+
+
+<!-- more -->
+
+
+<p>```perl
+package MtChown;</p>
+
+<p>use strict;
+use warnings;
+use Data::Dumper;
+use Carp;
+use Time::HiRes;</p>
+
+<p>sub run {</p>
+
+<pre><code>my ($dir,$user) = @_;
+
+if(!defined($dir) || !defined($user)){
+    print "please set option [-D|--dir -u|--user]\n"; 
+    return 0; 
+}
+$dir =~ s/(.+)\/$/$1/i;
+
+croak("[$dir] isn't a directory or file") unless (-f $dir or -d $dir);
+my ($login,$pass,$uid,$gid) = getpwnam($user) or die "$user not in passwd file";
+carp("$uid,$gid");
+process($dir,$uid,$gid);
+return 1;
+</code></pre>
+
+<p>}</p>
+
+<p>sub process {</p>
+
+<pre><code>my ($dir,$u,$g) = @_;
+if (-d $dir) {
+    opendir(FILE,$dir) or croak("opendir error [$dir]");
+    my @files = readdir(FILE);
+    closedir(FILE);
+    foreach (@files) {
+        next if ($_ eq '.' || $_ eq '..');
+        my $tmp_dir = "$dir/$_";
+        if (-d $tmp_dir) {
+            process($tmp_dir,$u,$g)
+        }else {
+            chowner($u,$g,$tmp_dir);
+        }
+    }
+}
+chowner($u,$g,$dir);
+</code></pre>
+
+<p>}</p>
+
+<p>sub chowner {</p>
+
+<pre><code>my ($u,$g,$dir) = @_;
+my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,$blksize,$blocks) = stat($dir);
+if($u != $uid || $g != $gid){
+    my $ret = chown $u,$g,($dir);
+    $ret &lt;= 0 ? carp("chown [$u,$g,$dir] error") : carp("chown [$u,$g,$dir] success");
+}
+my $microsec = 50_000;
+Time::HiRes::usleep($microsec);
+</code></pre>
+
+<p>}</p>
+
+<p>1;
+```</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[perl父进程监听，子进程工作实例]]></title>
@@ -313,538 +679,6 @@ return $self-&gt;ok_line;
 <li>$fid->delete这个操作实际是删除memcache和file表数据，file_on表和磁盘上的文件交给队列来处理</li>
 <li>作者考虑到删除文件是比较耗时的操作，所以交给队列慢慢处理，才会导致file表里没数据，但是file_on上仍有数据</li>
 <li>如果可能，尽量避免上传相同的key，这样可以减少对db的读写操作(我准备优化)</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[MogileFS详解]]></title>
-    <link href="http://www.wanghd.com/blog/2012/10/23/mogilefsxiang-jie/"/>
-    <updated>2012-10-23T22:48:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/10/23/mogilefsxiang-jie</id>
-    <content type="html"><![CDATA[<ul>
-<li>经过一个月的实际应用，我想是时候应该总结一下mogilefs的使用了，如果想和作者交流参考<a href="/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/">IRC教程</a></li>
-</ul>
-
-
-<h3>MogileFS简介</h3>
-
-<blockquote><p>MogileFS是一个<code>开源</code>的<code>分布式文件系统</code>，配合cdn和squid，性能非常好(<code>15亿</code>文件没问题，其他数据不方便透露)</p>
-
-<p>他由下面几个部分组成:</p></blockquote>
-
-<p><img src="/images/post/mogilefs-summary.jpg" title="mogilefs-summary" alt="mogilefs-summary" /></p>
-
-<ol>
-<li>memcache：用来缓存查询结果，降低db压力</li>
-<li>mogilefsd：就是tracker，用来接收请求并交给子进程(job)处理</li>
-<li>mogstored：监控磁盘状态和文件的实际存储</li>
-<li>client：支持perl，java，ruby，php，python</li>
-<li>mysql：存储记录</li>
-<li>util：日常维护管理的工具集</li>
-<li>telnet：监控tracker，实时调整job的工具</li>
-</ol>
-
-
-<!-- more -->
-
-
-<h3>Mogstored</h3>
-
-<blockquote><p>监控磁盘状态和文件的实际存储,启动mogstored会发现包含2个端口，默认的7501和7500</p>
-
-<blockquote><p>7501用来监控磁盘状态</p>
-
-<p>7500用来处理实际的文件存储</p></blockquote></blockquote>
-
-<p><img src="/images/post/mogilefs-mogstored.jpg" title="mogilefs-mogstored" alt="mogilefs-mogstored" /></p>
-
-<h4>问题总结</h4>
-
-<ul>
-<li>原本我一直以为mogstored自己实现了一套文件存储，但实际上不是。它使用的是WebDav，所以可以使用nginx代替默认的perlbal，实际用下来nginx更稳定</li>
-<li>WebDav：一种基于 HTTP 1.1协议的通信协议.它扩展了HTTP 1.1，在GET、POST、HEAD等几个HTTP标准方法以外添加了一些新的方法，例如PUT(新增)、DELETE(删除)、MKCOL(创建目录)</li>
-<li>在mogstored的使用上，犯过一个错误：直接使用root启动mogstored，那么创建的文件夹和文件都是属于root，导致delete job无法删除该文件（同事陈磊发现）</li>
-<li>文件存储规则：/dev-xx/0/123/456/789/0123456789.fid，fid不足十位补0，通过fid进行切割变为目录，即分散又效率</li>
-</ul>
-
-
-<h3>Mogilefsd</h3>
-
-<blockquote><p>主进程负责接受请求，分配任务给子进程执行,下面详细介绍一下他的子进程</p></blockquote>
-
-<ol>
-<li>query：处理主进程分配的请求，包括util和tool的指令</li>
-<li>delete：根据删除队列对文件进行删除操作</li>
-<li>replicate：复制文件直到满足mindevcount(文件复制几份)</li>
-<li>fsck：检查磁盘文件和数据库是否匹配，不匹配时进行补救</li>
-<li>monitor：监控子进程的状态，实时调整子进程个数</li>
-<li>reaper：监控dead的磁盘，及时补救，把文件加到replicate queue</li>
-<li>jobmaster：读取delete,replicate,rebalance,fsck队列，告诉主进程，主进程再交给对应的子进程处理</li>
-</ol>
-
-
-<h4>问题总结</h4>
-
-<ul>
-<li>query新建文件时，用剩余容量作权重，随机选择。所以新加入一块设备时，极有可能将成为热点设备，最好是一组设备一起加</li>
-<li>如果设备出现问题，直接格式化后直接使用会导致数据库记录还在，文件丢失，最终fsck和replicate队列堆积，正确的做法是把设备状态设置为dead，然后格式化用一个新的devid使用</li>
-<li>如果确定磁盘损坏，就一定要设置dead状态，reaper会自动补救</li>
-</ul>
-
-
-<h3>Memcache</h3>
-
-<blockquote><p>用来缓存查询结果，降低db压力，query内部存放<code>key对应的fid</code>和<code>fid对应的设备</code></p></blockquote>
-
-<h4>问题总结</h4>
-
-<ul>
-<li>db压力下不来的原因是客户端取得文件时没有设置noverify参数，如果确定要使用memcache就一定要设置noverify，否则不使用memcache</li>
-</ul>
-
-
-<h3>Mysql</h3>
-
-<blockquote><p>用来存储记录，当然也可以使用其他数据库</p></blockquote>
-
-<ol>
-<li>host表：存储主机信息</li>
-<li>device表：存储设备，一般单个device对应一块磁盘，也可以不这样</li>
-<li>domain表：定义域，单个域下key唯一</li>
-<li>class表：文件存放策略，包括份数，复制策略，校验和</li>
-<li>server_settings表：部分配置信息和job配置信息</li>
-<li>file表：文件信息</li>
-<li>file_on表：文件存放在哪些存储设备</li>
-<li>file_to_delete2表：删除队列表，升级后以前的不用了</li>
-<li>file_to_queue表：type=1是fsck队列，type=2是rebalance队列</li>
-<li>fsck_log表：fsck日志表，TYPE很多很诡异，参考<a href="/blog/2012/09/29/mogilefsde-fscktan-jiu/">fsk探究</a></li>
-<li>file_to_replicate表：复制队列</li>
-</ol>
-
-
-<h4>问题总结</h4>
-
-<ul>
-<li>怀疑file_on表会有慢查询，其实不会太慢，因为Innodb默认asc排序</li>
-</ul>
-
-
-<p>```</p>
-
-<h1>file_on的索引情况</h1>
-
-<p>PRIMARY KEY (<code>fid</code>,<code>devid</code>),KEY <code>devid</code> (<code>devid</code>)</p>
-
-<h1>下面的语句是不会慢的</h1>
-
-<p>select * from file_on where devid = ? and fid > ? order by fid asc limit 100
-```</p>
-
-<ul>
-<li>怀疑多个replicate队列同时操作同一个fid时是否会出现bug，其实不会，因为replicate使用mysql的get_lock(fid),release_lock(fid)</li>
-</ul>
-
-
-<h3>Utilities</h3>
-
-<ol>
-<li>mogadm：该工具直接管理mogilefs的主机、设备、域、类、从数据库、配置、fsck、rebalance</li>
-<li>mogstat：观察fsck,rebalance,replication,delete运行状况</li>
-<li>mogfiledebug：查看文件存储信息，也可以查file_on表</li>
-<li>mogfetch：导出指定的文件</li>
-<li>mogdelete：删除指定的文件</li>
-<li>mogrename：更改文件的key</li>
-<li>mogupload：插入一个文件</li>
-<li>moglistfids，moglistkeys：批量列出记录，自己写脚本时可以使用</li>
-</ol>
-
-
-<h3>Telnet</h3>
-
-<ol>
-<li>!version：显示mogilefs版本</li>
-<li>!recent：显示当前query执行时间（可做监控）</li>
-<li>!queue：显示等待执行的查询（可做监控）</li>
-<li>!stats：从tracker启动开始就记录的一些累加信息和实时信息，比如处理请求的总数、job队列当前记录数、当前等待执行的请求的个数等</li>
-<li>!watch：显示<code>警告</code>和<code>错误</code>信息（可做监控）</li>
-<li>!jobs：显示当前各个job的个数</li>
-<li>!want：<code>动态调整</code>job个数</li>
-<li>!to：不常用，向子进程发送消息，用来调试的</li>
-<li>!shutdown：关闭所有mogilefsd进程</li>
-</ol>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[MogileFS的replicate进程分析]]></title>
-    <link href="http://www.wanghd.com/blog/2012/10/16/mogilefsde-replicatefen-xi/"/>
-    <updated>2012-10-16T15:47:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/10/16/mogilefsde-replicatefen-xi</id>
-    <content type="html"><![CDATA[<h4>基本流程</h4>
-
-<ol>
-<li>从replicate queue里获取需要处理数据,进行循环</li>
-<li>执行真正的【replicate操作】，操作时会锁住这个fid，然后返回结果【下面会对该操作具体分析】</li>
-<li>返回没问题，删除队列并释放锁</li>
-<li>返回failed_getting_lock说明正在处理了</li>
-<li>返回no_source说明file_on表上没有关于该文件的记录，nexttry设置为最大并释放锁</li>
-<li>返回too_happy说明devcount > mindevcount，会尝试删除多余的并释放锁（前提是文件存在，所以不会修复file_on有，文件丢失的情况）</li>
-<li>如果以上都不满足，nexttry根据规则增加，failcount递增并释放锁</li>
-</ol>
-
-
-<h4>replicate操作分析</h4>
-
-<ul>
-<li>简单说replicate操作就是取得合适的device进行复制，合适的意思是尽量避免同一个host的device，没办法才用同一个host的device，有错误就返回具体信息</li>
-<li>replicate操作才是真正的复制，代码比较多，但是不难理解（难点都会有注释）</li>
-</ul>
-
-
-<!-- more -->
-
-
-<p>```perl
-sub replicate {</p>
-
-<pre><code>my ($fid, %opts) = @_;      #参数赋值
-$fid = MogileFS::FID-&gt;new($fid) unless ref $fid;   #实例fid对象
-my $fidid = $fid-&gt;id; #fid的id
-
-debug("Replication for $fidid called, opts=".join(',',keys(%opts))) if $Mgd::DEBUG &gt;= 2;
-
-
-my $errref    = delete $opts{'errref'};  #错误消息的引用
-my $no_unlock = delete $opts{'no_unlock'};  #上锁,使用Mysql的锁,get_lock和release_lock
-#复制源，复制到哪些设备，排除的设备，避免的设备
-my $fixed_source = delete $opts{'source_devid'};
-my $mask_devids  = delete $opts{'mask_devids'}  || {};
-my $avoid_devids = delete $opts{'avoid_devids'} || {};
-my $target_devids = delete $opts{'target_devids'} || []; # inverse of avoid_devids.
-die "unknown_opts" if %opts;
-die unless ref $mask_devids eq "HASH";
-
-my $sdevid; #下面会看到，就是复制源
-
-my $sto = Mgd::get_store();
-#释放锁的函数release_lock(name)
-my $unlock = sub {
-    $sto-&gt;note_done_replicating($fidid);
-};
-
-#这是一个返回函数，返回结果用的
-my $retunlock = sub {
-    my $rv = shift;
-    my ($errmsg, $errcode);
-    if (@_ == 2) {
-        ($errcode, $errmsg) = @_;
-        $errmsg = "$errcode: $errmsg"; # include code with message
-    } else {
-        ($errmsg) = @_;
-    }
-    $$errref = $errcode if $errref;
-
-    my $ret;
-    if ($errcode &amp;&amp; $errcode eq "failed_getting_lock") {
-        # don't emit a warning with error() on lock failure.  not
-        # a big deal, don't scare people.
-        $ret = 0;
-    } else {
-        $ret = $rv ? $rv : error($errmsg);
-    }
-    if ($no_unlock) {
-        die "ERROR: must be called in list context w/ no_unlock" unless wantarray;
-        return ($ret, $unlock);
-    } else {
-        die "ERROR: must not be called in list context w/o no_unlock" if wantarray;
-        $unlock-&gt;();
-        return $ret;
-    }
-};
-
-# hashref of devid -&gt; MogileFS::Device所有的device
-my $devs = Mgd::device_factory()-&gt;map_by_id
-    or die "No device map";
-
-#错误话就调用retunlock 
-return $retunlock-&gt;(0, "failed_getting_lock", "Unable to obtain lock for fid $fidid")
-    unless $sto-&gt;should_begin_replicating_fidid($fidid);#这里获取mysql的锁 get_lock(name,timeout),name里fidid
-
-# if the fid doesn't even exist, consider our job done!  no point
-# replicating file contents of a file no longer in the namespace.
-#没有fid返回
-return $retunlock-&gt;("nofid") unless $fid-&gt;exists;
-
-#Class.pm对象
-my $cls = $fid-&gt;class;
-#策略对象MogileFS::ReplicationPolicy::MultipleHosts
-my $polobj = $cls-&gt;repl_policy_obj;
-
-# learn what this devices file is already on
-#所有设备
-my @on_devs;         # all devices fid is on, reachable or not.
-#排除dead和drain的设备
-my @on_devs_tellpol; # subset of @on_devs, to tell the policy class about
-#可读的设备
-my @on_up_devid;     # subset of @on_devs:  just devs that are readable
-#设置上面的数组
-foreach my $devid ($fid-&gt;devids) {
-    my $d = Mgd::device_factory()-&gt;get_by_id($devid)
-        or next;
-    #fid在哪些dev上
-    push @on_devs, $d;
-    #should_hava_files表示状态不为drain或者dead
-    if ($d-&gt;dstate-&gt;should_have_files &amp;&amp; ! $mask_devids-&gt;{$devid}) {
-        push @on_devs_tellpol, $d;
-    }
-    #有read权限
-    if ($d-&gt;dstate-&gt;can_read_from) {
-        push @on_up_devid, $devid;
-    }
-}
-#如果一个设备都没，就返回
-return $retunlock-&gt;(0, "no_source",   "Source is no longer available replicating $fidid") if @on_devs == 0;
-return $retunlock-&gt;(0, "source_down", "No alive devices available replicating $fidid") if @on_up_devid == 0;
-
-#fixed_source设置错误，根本就没有
-if ($fixed_source &amp;&amp; ! grep { $_ == $fixed_source } @on_up_devid) {
-    error("Fixed source dev$fixed_source requested for $fidid but not available. Trying other devices");
-}
-
-#错误的设备记录，下面循环里就不会再使用了
-my %dest_failed;    # devid -&gt; 1 for each devid we were asked to copy to, but failed.
-my %source_failed;  # devid -&gt; 1 for each devid we had problems reading from.
-#用来标记真的复制了，下面的循环会使用
-my $got_copy_request = 0;  # true once replication policy asks us to move something somewhere
-my $copy_err;
-
-#过滤复制到哪些设备
-my $dest_devs = $devs;
-if (@$target_devids) {
-    $dest_devs = {map { $_ =&gt; $devs-&gt;{$_} } @$target_devids};
-}
-
-my $rr;  #MogileFS::ReplicationRequest对象
-#开始循环复制，因为会有可能要复制3份的嘛。
-while (1) {
-    #MogileFS::ReplicationPolicy::MultipleHosts的replicate_to
-    #取得ReplicationRequest对象【该对象是通过ReplicationPolicy::MultipleHosts策略生成的】
-    #该对象会有4种返回值，分别是，1：对象形式，说明需要并可以复制。2：tmp_no_answer，没有可选择的device。
-    #3：all_good，一切OK。4：too_good，好过头了呀。
-    $rr = rr_upgrade($polobj-&gt;replicate_to(
-                                           fid       =&gt; $fidid, #fidid
-                                           on_devs   =&gt; \@on_devs_tellpol, # all device objects fid is on, dead or otherwise
-                                           all_devs  =&gt; $dest_devs, #所有的dev，如果有target_devids的话那就用target的咯
-                                           failed    =&gt; \%dest_failed, #失败信息
-                                           min       =&gt; $cls-&gt;mindevcount, #最小设备
-                                           ));
-    #是happy就跳出，跳出会有后续处理的
-    last if $rr-&gt;is_happy;
-
-    #经过过滤的dev
-    my @ddevs;  # dest devs, in order of preference
-    #选择出来的devid
-    my $ddevid; # dest devid we've chosen to copy to
-    #这里设置ddevs,其实就是host不同的设备
-    if (@ddevs = $rr-&gt;copy_to_one_of_ideally) {
-        #过滤掉不希望的
-        if (my @not_masked_ids = (grep { ! $mask_devids-&gt;{$_} &amp;&amp;
-                                         ! $avoid_devids-&gt;{$_}
-                                     }
-                                  map { $_-&gt;id } @ddevs)) {
-            $ddevid = $not_masked_ids[0]; #拿一个放到ddevid
-        } else {
-            return $retunlock-&gt;("would_worsen");
-        }
-    } elsif (@ddevs = $rr-&gt;copy_to_one_of_desperate) { #没有不同的host，没办法同一个host也行啊
-        # TODO: reschedule a replication for 'n' minutes in future, or
-        # when new hosts/devices become available or change state
-        $ddevid = $ddevs[0]-&gt;id;
-    } else {
-        #跳出了呀，
-        last;
-    }
-    #标记一下真的复制了
-    $got_copy_request = 1;
-
-    # replication policy shouldn't tell us to put a file on a device
-    # we've already told it that we've failed at.  so if we get that response,
-    # the policy plugin is broken and we should terminate now.
-    #不在错误数组里
-    if ($dest_failed{$ddevid}) {
-        return $retunlock-&gt;(0, "policy_error_doing_failed",
-                            "replication policy told us to do something we already told it we failed at while replicating fid $fidid");
-    }
-
-    # replication policy shouldn't tell us to put a file on a
-    # device that it's already on.  that's just stupid.
-    #已经在这file_on上了么，不行的呀
-    if (grep { $_-&gt;id == $ddevid } @on_devs) {
-        return $retunlock-&gt;(0, "policy_error_already_there",
-                            "replication policy told us to put fid $fidid on dev $ddevid, but it's already there!");
-    }
-
-    # find where we're replicating from
-    #这里开始设置复制源
-    {
-        # TODO: use an observed good device+host as source to start.
-        #排除掉错误源
-        my @choices = grep { ! $source_failed{$_} } @on_up_devid;
-        return $retunlock-&gt;(0, "source_down", "No devices available replicating $fidid") unless @choices;
-        #如果有fixed_source那就用，没有么就随即选一个吧
-        if ($fixed_source &amp;&amp; grep { $_ == $fixed_source } @choices) {
-            $sdevid = $fixed_source;
-        } else {
-            @choices = List::Util::shuffle(@choices);
-            MogileFS::run_global_hook('replicate_order_final_choices', $devs, \@choices);
-            $sdevid = shift @choices;
-        }
-    }
-
-    #是子进程的判断
-    my $worker = MogileFS::ProcManager-&gt;is_child or die;
-    #校验和，不用的呀，不考虑
-    my $digest = Digest-&gt;new($cls-&gt;hashname) if $cls-&gt;hashtype;
-    #真的复制了
-    my $rv = http_copy(
-                       sdevid       =&gt; $sdevid,
-                       ddevid       =&gt; $ddevid,
-                       fid          =&gt; $fidid,
-                       rfid         =&gt; $fid,
-                       expected_len =&gt; undef,  # FIXME: get this info to pass along
-                       errref       =&gt; \$copy_err,
-                       callback     =&gt; sub { $worker-&gt;still_alive; },
-                       digest       =&gt; $digest,
-                       );
-    die "Bogus error code: $copy_err" if !$rv &amp;&amp; $copy_err !~ /^(?:src|dest)_error$/;
-    #如果错误了，设置失败数组，next等于其他语言的continue呀，继续找其他的
-    unless ($rv) {
-        error("Failed copying fid $fidid from devid $sdevid to devid $ddevid (error type: $copy_err)");
-        if ($copy_err eq "src_error") {
-            $source_failed{$sdevid} = 1;
-
-            if ($fixed_source &amp;&amp; $fixed_source == $sdevid) {
-                error("Fixed source dev$fixed_source was requested for $fidid but failed: will try other sources");
-            }
-
-        } else {
-            $dest_failed{$ddevid} = 1;
-        }
-        next;
-    }
-    #复制成功了，开始插入数据了
-    my $dfid = MogileFS::DevFID-&gt;new($ddevid, $fid);
-    $dfid-&gt;add_to_db;
-    if ($digest &amp;&amp; !$fid-&gt;checksum) {
-        $sto-&gt;set_checksum($fidid, $cls-&gt;hashtype, $digest-&gt;digest);
-    }
-
-    #设置一下变量，加入要复制3分是应该再继续复制的
-    push @on_devs, $devs-&gt;{$ddevid};
-    push @on_devs_tellpol, $devs-&gt;{$ddevid};
-    push @on_up_devid, $ddevid;
-}
-
-# We are over replicated. Let caller decide if it should rebalance.
-#好过头了
-if ($rr-&gt;too_happy) {
-    return $retunlock-&gt;(0, "too_happy", "fid $fidid is on too many devices");
-}
-#这是满足策略的情况
-if ($rr-&gt;is_happy) {
-    return $retunlock-&gt;(1) if $got_copy_request;
-    #没有地方去复制了
-    return $retunlock-&gt;("lost_race");  # some other process got to it first.  policy was happy immediately.
-}
-#应该不会走到这里了
-return $retunlock-&gt;(0, "policy_no_suggestions",
-                    "replication policy ran out of suggestions for us replicating fid $fidid");
-</code></pre>
-
-<p>}
-```</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[mogstored使用nginx]]></title>
-    <link href="http://www.wanghd.com/blog/2012/10/13/mogstoredshi-yong-nginx/"/>
-    <updated>2012-10-13T11:37:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/10/13/mogstoredshi-yong-nginx</id>
-    <content type="html"><![CDATA[<h3>配置nginx.conf</h3>
-
-<ul>
-<li>使用mogile用户，如果使用root会导致delete job无法删除(因为新文件是root的呀)</li>
-</ul>
-
-
-<p><code>
-user mogile daemon
-</code></p>
-
-<ul>
-<li>autoindex on: 必须要加，否则mogadm check显示错误，因为返回错误状态码</li>
-<li>expires max: 过期头设置到2037年, and the Cache-Control max-age to 10 years.</li>
-<li>client_max_body_size 20m: 放宽上传大小</li>
-<li><p>client_body_temp_path xxxx: 存放零时文件的目录</p></li>
-<li><p>配置WebDav,首先要确认HttpDavModule已经被加载，默认是不加载的 ./configure --with-http_dav_module</p></li>
-<li>dav_methods PUT DELETE MKCOL; 允许的方法put是上传，delete是删除,mkcol是创建文件夹</li>
-<li>dav_access user:rw group:r all:r; 设置权限</li>
-<li>create_full_put_path on; put新文件默认只能在已存在的目录，不过这条指令允许创建所有的中间目录</li>
-</ul>
-
-
-<p>```
-server
-{</p>
-
-<pre><code>listen 7500;
-error_log /var/log/nginx/mogstore.error.log crit;
-access_log /var/log/nginx/mogstore.access.log gzip;
-
-location / {
-    autoindex   on;
-    root        /huida/mogdata;
-}
-
-location /dev1/ {
-    expires             max;
-    root                /huida/mogdata;
-    client_max_body_size        20m;
-    client_body_temp_path       /huida/mogdata/dev1/temp;
-    dav_methods                 PUT DELETE MKCOL;
-    create_full_put_path        on;
-    dav_access                  user:rw group:r all:r;
-}
-</code></pre>
-
-<p>}
-```</p>
-
-<h3>配置mogstored.conf</h3>
-
-<ul>
-<li>已经不需要perlbal了</li>
-<li>虽然是不用server了，不过mogstored还是要启动，因为还有个磁盘监控7501端口</li>
-</ul>
-
-
-<p>```</p>
-
-<h1>httplisten = 0.0.0.0:7500</h1>
-
-<p>server = none
-```</p>
-
-<h3>结论</h3>
-
-<ul>
-<li>nginx比perlbal更稳定，基本不会挂掉了</li>
-<li>mogadm device add 时不要忘记配置nginx后重启，也别忘记自己建文件夹【nginx多一步】</li>
-<li>nginx配置好user,所以不会创建的文件权限为root:root,不用nginx就要用su mogile -c mogstored了</li>
 </ul>
 
 ]]></content>

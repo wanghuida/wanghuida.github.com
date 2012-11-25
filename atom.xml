@@ -4,7 +4,7 @@
   <title><![CDATA[惠达的小宅]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2012-11-16T10:04:51+08:00</updated>
+  <updated>2012-11-25T19:31:26+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,596 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[inotify,rsync统一化配置]]></title>
+    <link href="http://www.wanghd.com/blog/2012/11/25/inotify/"/>
+    <updated>2012-11-25T16:14:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/11/25/inotify</id>
+    <content type="html"><![CDATA[<h3>为什么要统一化配置，手动改改不行？</h3>
+
+<ul>
+<li>假设有10台服务器，要改10次，错误和遗漏在所难免</li>
+<li>需要有一个地方备份配置</li>
+<li>也许还需要对配置文件进行版本控制</li>
+</ul>
+
+
+<h3>inotify+rsync改变这一切</h3>
+
+<ul>
+<li>inotify可以递归的监控文件是否有新建，修改等</li>
+<li>rsync用来同步</li>
+</ul>
+
+
+<!-- more -->
+
+
+<h3>安装inotify</h3>
+
+<ul>
+<li>内核版本要Linux 2.6.13以上</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>wget --no-check-certificate https://github.com/downloads/rvoicilas/inotify-tools/inotify-tools-3.14.tar.gz
+</span><span class='line'>tar -zxvf inotify-tools-3.14.tar.gz
+</span><span class='line'><span class="nb">cd </span>inotify-tools-3.14
+</span><span class='line'>./configure
+</span><span class='line'>make
+</span><span class='line'>make install
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>测试脚本监控修改并自动同步</h3>
+
+<ul>
+<li>&#8211;exclude是用来排除隐藏文件</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'><span class="nv">ip</span><span class="o">=</span><span class="s2">&quot;192.168.30.1 192.168.30.2&quot;</span>
+</span><span class='line'><span class="nv">src</span><span class="o">=</span><span class="s2">&quot;/tmp/test&quot;</span>
+</span><span class='line'>inotifywait --exclude <span class="s1">&#39;/\.&#39;</span> -mrq -e close_write,delete,move <span class="nv">$src</span> | <span class="k">while </span><span class="nb">read </span>line
+</span><span class='line'><span class="k">do</span>
+</span><span class='line'><span class="k">    </span>sleep 1
+</span><span class='line'>    <span class="nb">echo</span> <span class="nv">$line</span>
+</span><span class='line'>    <span class="k">for </span>i in <span class="nv">$ip</span>
+</span><span class='line'>    <span class="k">do </span>
+</span><span class='line'><span class="k">        </span>rsync --exclude<span class="o">=</span><span class="s2">&quot;.*&quot;</span> -av --delete-after <span class="s2">&quot;$src/&quot;</span> -e ssh <span class="s2">&quot;$i:$src/&quot;</span>
+</span><span class='line'>    <span class="k">done</span>
+</span><span class='line'><span class="k">done</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[MogileFS安装配置]]></title>
+    <link href="http://www.wanghd.com/blog/2012/11/22/mogilefsan-zhuang-pei-zhi/"/>
+    <updated>2012-11-22T17:19:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/11/22/mogilefsan-zhuang-pei-zhi</id>
+    <content type="html"><![CDATA[<h3>基本介绍</h3>
+
+<ul>
+<li>mogilefs是一个分布式的文件系统解决方案</li>
+<li>特点是:无单点失效的问题，自动复制无需raid，easy的命名空间，自修复机制，成熟的管理工具，源码清晰推荐阅读</li>
+</ul>
+
+
+<!-- more -->
+
+
+<h3>安装基本组件</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>yum groupinstall <span class="s2">&quot;Development Tools&quot;</span>
+</span><span class='line'><span class="c">#cpan是perl的包管理工具</span>
+</span><span class='line'>yum install cpan
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>安装mogilefs</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#进入cpan,初始化直接自动就好</span>
+</span><span class='line'>cpan
+</span><span class='line'>&gt; install IO::AIO
+</span><span class='line'>&gt; install MogileFS::Client
+</span><span class='line'>&gt; install MogileFS::Utils
+</span><span class='line'><span class="c">#如果有问题直接用force install</span>
+</span><span class='line'>&gt; install MogileFS::Server
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>安装配置mysql</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#安装mysql</span>
+</span><span class='line'>yum install mysql mysql-server
+</span><span class='line'>mysqladmin -u root password 123456
+</span><span class='line'><span class="c">#进入mysql,新建mogile用户</span>
+</span><span class='line'>mysql -uroot -p123456
+</span><span class='line'>mysql&gt; create database mogilefs;
+</span><span class='line'>mysql&gt; grant all on mogilefs.* to mogile@localhost identified by <span class="s1">&#39;123456&#39;</span>;
+</span><span class='line'>mysql&gt; flush privileges;
+</span><span class='line'>
+</span><span class='line'><span class="c">#导入mogilefs表</span>
+</span><span class='line'>mogdbsetup --dbpass<span class="o">=</span>123456 --yes
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>mogilefs配置</h3>
+
+<ul>
+<li>mogilefsd配置</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#/etc/mogilefs是默认的配置路径，-c可以修改</span>
+</span><span class='line'>mkdir -p /etc/mogilefs
+</span><span class='line'><span class="nb">cd</span> /etc/mogilefs
+</span><span class='line'>vim mogilefsd.conf
+</span><span class='line'>
+</span><span class='line'><span class="c">#内容如下</span>
+</span><span class='line'><span class="nv">pidfile</span> <span class="o">=</span> /tmp/mogilefsd.pid    <span class="c">#存放pid</span>
+</span><span class='line'><span class="nv">daemonize</span> <span class="o">=</span> 1                   <span class="c">#守护进程</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">db_dsn</span>  <span class="o">=</span> DBI:mysql:mogilefs:127.0.0.1  <span class="c">#数据库配置</span>
+</span><span class='line'><span class="nv">db_user</span> <span class="o">=</span> mogile
+</span><span class='line'><span class="nv">db_pass</span> <span class="o">=</span> 123456
+</span><span class='line'>
+</span><span class='line'><span class="nv">conf_port</span> <span class="o">=</span> 7001                <span class="c">#监听端口</span>
+</span><span class='line'><span class="nv">node_timeout</span> <span class="o">=</span> 2                <span class="c">#节点超时时间 </span>
+</span><span class='line'><span class="nv">rebalance_ignore_missing</span> <span class="o">=</span> 1    <span class="c">#rebalance时会删除文件，删除时如果找不到文件不报错直接跳过 </span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">query_jobs</span> <span class="o">=</span> 20                 <span class="c">#正真处理请求的job个数</span>
+</span><span class='line'><span class="nv">delete_jobs</span> <span class="o">=</span> 3                 <span class="c">#处理删除队列的job个数</span>
+</span><span class='line'><span class="nv">replicate_jobs</span> <span class="o">=</span> 5              <span class="c">#处理复制队列的job个数</span>
+</span><span class='line'><span class="nv">reaper_jobs</span> <span class="o">=</span> 1                 <span class="c">#设备设置为dead后，处理补救工作的job个数 </span>
+</span><span class='line'>                                <span class="c">#其实还有其他job，默认为1个</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>mogstored配置</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#设置文件存储路径，不要忘记修改拥有者</span>
+</span><span class='line'>mkdir -p /var/mogdata
+</span><span class='line'>adduser --gid daemon mogile
+</span><span class='line'>chown mogile.daemon /var/mogdata
+</span><span class='line'>vim mogstored.conf
+</span><span class='line'>
+</span><span class='line'><span class="c">#内容如下</span>
+</span><span class='line'><span class="nv">httplisten</span> <span class="o">=</span> 0.0.0.0:7500       <span class="c">#文件存储端口</span>
+</span><span class='line'><span class="nv">mgmtlisten</span> <span class="o">=</span> 0.0.0.0:7501       <span class="c">#监控磁盘状态端口</span>
+</span><span class='line'><span class="nv">docroot</span> <span class="o">=</span> /var/mogdata          <span class="c">#文件存储路径</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">pidfile</span> <span class="o">=</span> /tmp/mogstored.pid    <span class="c">#存储pid</span>
+</span><span class='line'><span class="nv">daemonize</span> <span class="o">=</span> 1                   <span class="c">#守护进程</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>启动mogilefs</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>vim /etc/security/limits.conf
+</span><span class='line'><span class="c">#内容如下，让mogile可以打开更多的连接数</span>
+</span><span class='line'>mogile soft nofile 65535
+</span><span class='line'>mogile hard nofile 65535
+</span><span class='line'>
+</span><span class='line'><span class="c">#切换用户启动</span>
+</span><span class='line'>su mogile -c <span class="s1">&#39;mogstored&#39;</span>
+</span><span class='line'>su mogile -c <span class="s1">&#39;mogilefsd&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#验证已经启动成功</span>
+</span><span class='line'>ps auxf | grep mogile
+</span><span class='line'>mogadm check
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>已经安装好了，接来应该做点什么呢</h3>
+
+<ul>
+<li>学习mogadm指令，因为mogadm是必会工具</li>
+<li>试着client连接mogilefsd存储文件吧</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Time::HiRes介绍]]></title>
+    <link href="http://www.wanghd.com/blog/2012/11/22/time-hiresjie-shao/"/>
+    <updated>2012-11-22T17:18:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/11/22/time-hiresjie-shao</id>
+    <content type="html"><![CDATA[<h3>Time::HiRes库介绍</h3>
+
+<ul>
+<li>HiRes是high resolution的简写，译为高分辨率</li>
+<li>HiRes其实是提供一些更高精度的alarm, sleep, gettimeofday, interval timers</li>
+</ul>
+
+
+<!-- more -->
+
+
+<h3>usleep，nanosleep实例</h3>
+
+<ul>
+<li>usleep参数是微妙</li>
+<li>nanosleep参数是纳秒</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="nn">Time::HiRes::</span><span class="n">usleep</span><span class="p">(</span><span class="mi">100_000</span><span class="p">);</span>
+</span><span class='line'><span class="k">print</span> <span class="s">&quot;100 milliseconds\n&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="nn">Time::HiRes::</span><span class="n">nanosleep</span><span class="p">(</span><span class="mi">1000_000_000</span><span class="p">);</span>
+</span><span class='line'><span class="k">print</span> <span class="s">&quot;1 seconds\n&quot;</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>ualarm实例</h3>
+
+<ul>
+<li>ualarm(0)会撤销警告信号</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="nb">eval</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nb">local</span> <span class="nv">$SIG</span><span class="p">{</span><span class="n">ALRM</span><span class="p">}</span> <span class="o">=</span> <span class="k">sub </span><span class="p">{</span> <span class="nb">die</span> <span class="s">&quot;receive signal\n&quot;</span> <span class="p">};</span>
+</span><span class='line'>    <span class="nn">Time::HiRes::</span><span class="n">ualarm</span> <span class="mi">1000_000</span><span class="p">;</span>
+</span><span class='line'>    <span class="nb">sleep</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">print</span> <span class="s">&quot;never print&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span><span class="p">(</span><span class="vg">$@</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">print</span> <span class="vg">$@</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="nb">eval</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nb">local</span> <span class="nv">$SIG</span><span class="p">{</span><span class="n">ALRM</span><span class="p">}</span> <span class="o">=</span> <span class="k">sub </span><span class="p">{</span> <span class="nb">die</span> <span class="s">&quot;receive signal\n&quot;</span> <span class="p">};</span>
+</span><span class='line'>    <span class="nn">Time::HiRes::</span><span class="n">ualarm</span> <span class="mi">2000_000</span><span class="p">;</span>
+</span><span class='line'>    <span class="nb">sleep</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>    <span class="nn">Time::HiRes::</span><span class="n">ualarm</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">#cancel alarm</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span><span class="p">(</span><span class="vg">$@</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">print</span> <span class="vg">$@</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>    <span class="k">print</span> <span class="s">&quot;cancel alarm signal\n&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>tv_interval和gettimeofday实例</h3>
+
+<ul>
+<li>tv_interval返回两个gettimeofday引用相差的秒数</li>
+<li>省略tv_interval的第二个参数，会自动使用当前时间代替</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="k">my</span> <span class="nv">@start</span> <span class="o">=</span> <span class="nn">Time::HiRes::</span><span class="n">gettimeofday</span><span class="p">;</span>
+</span><span class='line'><span class="k">print</span> <span class="n">Dumper</span><span class="p">(</span><span class="o">\</span><span class="nv">@start</span><span class="p">);</span>
+</span><span class='line'><span class="nb">sleep</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+</span><span class='line'><span class="k">my</span> <span class="nv">$diff</span> <span class="o">=</span> <span class="nn">Time::HiRes::</span><span class="n">tv_interval</span><span class="p">(</span><span class="o">\</span><span class="nv">@start</span><span class="p">);</span>
+</span><span class='line'><span class="k">print</span> <span class="s">&quot;$diff\n&quot;</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>setitimer实例</h3>
+
+<ol>
+<li>ITIMER_REAL: 真实时间</li>
+<li>ITIMER_VIRTUAL: 用户时间</li>
+<li><p>ITIMER_PROF: 系统时间</p></li>
+<li><p>getitimer可以取得setitimer还有多久开始执行</p></li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="k">use</span> <span class="nn">Time::</span><span class="n">HiRes</span> <span class="sx">qw ( </span><span class="n">setitimer</span> <span class="n">ITIMER_VIRTUAL</span> <span class="nb">time</span> <span class="p">);</span>
+</span><span class='line'><span class="nv">$SIG</span><span class="p">{</span><span class="n">VTALRM</span><span class="p">}</span> <span class="o">=</span> <span class="k">sub </span><span class="p">{</span> <span class="k">print</span> <span class="nb">time</span><span class="p">,</span> <span class="s">&quot;\n&quot;</span> <span class="p">};</span>
+</span><span class='line'><span class="n">setitimer</span><span class="p">(</span><span class="n">ITIMER_VIRTUAL</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span><span class='line'><span class="k">while</span><span class="p">(</span><span class="mi">1</span><span class="p">){</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[mongodb实战]]></title>
+    <link href="http://www.wanghd.com/blog/2012/11/22/mongodbshi-zhan/"/>
+    <updated>2012-11-22T17:18:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/11/22/mongodbshi-zhan</id>
+    <content type="html"><![CDATA[
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[log4j介绍]]></title>
+    <link href="http://www.wanghd.com/blog/2012/11/22/log4jjie-shao/"/>
+    <updated>2012-11-22T17:18:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/11/22/log4jjie-shao</id>
+    <content type="html"><![CDATA[
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[redis实战]]></title>
+    <link href="http://www.wanghd.com/blog/2012/11/22/redisshi-zhan/"/>
+    <updated>2012-11-22T17:17:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/11/22/redisshi-zhan</id>
+    <content type="html"><![CDATA[
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[修复mogilefs目录owner]]></title>
+    <link href="http://www.wanghd.com/blog/2012/11/22/xiu-fu-mogilefsmu-lu-owner/"/>
+    <updated>2012-11-22T17:16:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/11/22/xiu-fu-mogilefsmu-lu-owner</id>
+    <content type="html"><![CDATA[<h3>什么情况会导致mogilefs的数据目录owner不正确</h3>
+
+<ul>
+<li>直接使用root启动mogstored会导致增加的文件和文件夹为root</li>
+<li>重新用mogile启动mogstored后，mogile用户无法删除root的文件，最终delete队列无法处理</li>
+</ul>
+
+
+<h3>如何处理</h3>
+
+<ol>
+<li>直接chown -R，这是最直接的方法，如果1T的磁盘被这样操作，会10小时util为100</li>
+<li>自己写一个脚本慢处理，脚本思路如下</li>
+</ol>
+
+
+<!-- more -->
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="nb">package</span> <span class="n">MtChown</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">use</span> <span class="n">strict</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="n">warnings</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nn">Data::</span><span class="n">Dumper</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="n">Carp</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nn">Time::</span><span class="n">HiRes</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">sub </span><span class="nf">run</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">my</span> <span class="p">(</span><span class="nv">$dir</span><span class="p">,</span><span class="nv">$user</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nb">defined</span><span class="p">(</span><span class="nv">$dir</span><span class="p">)</span> <span class="o">||</span> <span class="o">!</span><span class="nb">defined</span><span class="p">(</span><span class="nv">$user</span><span class="p">)){</span>
+</span><span class='line'>        <span class="k">print</span> <span class="s">&quot;please set option [-D|--dir -u|--user]\n&quot;</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="nv">$dir</span> <span class="o">=~</span> <span class="sr">s/(.+)\/$/$1/i</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">croak</span><span class="p">(</span><span class="s">&quot;[$dir] isn&#39;t a directory or file&quot;</span><span class="p">)</span> <span class="k">unless</span> <span class="p">(</span><span class="o">-</span><span class="n">f</span> <span class="nv">$dir</span> <span class="ow">or</span> <span class="o">-</span><span class="n">d</span> <span class="nv">$dir</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">my</span> <span class="p">(</span><span class="nv">$login</span><span class="p">,</span><span class="nv">$pass</span><span class="p">,</span><span class="nv">$uid</span><span class="p">,</span><span class="nv">$gid</span><span class="p">)</span> <span class="o">=</span> <span class="nb">getpwnam</span><span class="p">(</span><span class="nv">$user</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">die</span> <span class="s">&quot;$user not in passwd file&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">carp</span><span class="p">(</span><span class="s">&quot;$uid,$gid&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">process</span><span class="p">(</span><span class="nv">$dir</span><span class="p">,</span><span class="nv">$uid</span><span class="p">,</span><span class="nv">$gid</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">sub </span><span class="nf">process</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">my</span> <span class="p">(</span><span class="nv">$dir</span><span class="p">,</span><span class="nv">$u</span><span class="p">,</span><span class="nv">$g</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="o">-</span><span class="n">d</span> <span class="nv">$dir</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nb">opendir</span><span class="p">(</span><span class="n">FILE</span><span class="p">,</span><span class="nv">$dir</span><span class="p">)</span> <span class="ow">or</span> <span class="n">croak</span><span class="p">(</span><span class="s">&quot;opendir error [$dir]&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">my</span> <span class="nv">@files</span> <span class="o">=</span> <span class="nb">readdir</span><span class="p">(</span><span class="n">FILE</span><span class="p">);</span>
+</span><span class='line'>        <span class="nb">closedir</span><span class="p">(</span><span class="n">FILE</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">foreach</span> <span class="p">(</span><span class="nv">@files</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">next</span> <span class="k">if</span> <span class="p">(</span><span class="nv">$_</span> <span class="ow">eq</span> <span class="s">&#39;.&#39;</span> <span class="o">||</span> <span class="nv">$_</span> <span class="ow">eq</span> <span class="s">&#39;..&#39;</span><span class="p">);</span>
+</span><span class='line'>            <span class="k">my</span> <span class="nv">$tmp_dir</span> <span class="o">=</span> <span class="s">&quot;$dir/$_&quot;</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="o">-</span><span class="n">d</span> <span class="nv">$tmp_dir</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                <span class="n">process</span><span class="p">(</span><span class="nv">$tmp_dir</span><span class="p">,</span><span class="nv">$u</span><span class="p">,</span><span class="nv">$g</span><span class="p">)</span>
+</span><span class='line'>            <span class="p">}</span><span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>                <span class="n">chowner</span><span class="p">(</span><span class="nv">$u</span><span class="p">,</span><span class="nv">$g</span><span class="p">,</span><span class="nv">$tmp_dir</span><span class="p">);</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="n">chowner</span><span class="p">(</span><span class="nv">$u</span><span class="p">,</span><span class="nv">$g</span><span class="p">,</span><span class="nv">$dir</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">sub </span><span class="nf">chowner</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">my</span> <span class="p">(</span><span class="nv">$u</span><span class="p">,</span><span class="nv">$g</span><span class="p">,</span><span class="nv">$dir</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">my</span> <span class="p">(</span><span class="nv">$dev</span><span class="p">,</span><span class="nv">$ino</span><span class="p">,</span><span class="nv">$mode</span><span class="p">,</span><span class="nv">$nlink</span><span class="p">,</span><span class="nv">$uid</span><span class="p">,</span><span class="nv">$gid</span><span class="p">,</span><span class="nv">$rdev</span><span class="p">,</span><span class="nv">$size</span><span class="p">,</span><span class="nv">$atime</span><span class="p">,</span><span class="nv">$mtime</span><span class="p">,</span><span class="nv">$ctime</span><span class="p">,</span><span class="nv">$blksize</span><span class="p">,</span><span class="nv">$blocks</span><span class="p">)</span> <span class="o">=</span> <span class="nb">stat</span><span class="p">(</span><span class="nv">$dir</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="nv">$u</span> <span class="o">!=</span> <span class="nv">$uid</span> <span class="o">||</span> <span class="nv">$g</span> <span class="o">!=</span> <span class="nv">$gid</span><span class="p">){</span>
+</span><span class='line'>        <span class="k">my</span> <span class="nv">$ret</span> <span class="o">=</span> <span class="nb">chown</span> <span class="nv">$u</span><span class="p">,</span><span class="nv">$g</span><span class="p">,(</span><span class="nv">$dir</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$ret</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="p">?</span> <span class="n">carp</span><span class="p">(</span><span class="s">&quot;chown [$u,$g,$dir] error&quot;</span><span class="p">)</span> <span class="p">:</span> <span class="n">carp</span><span class="p">(</span><span class="s">&quot;chown [$u,$g,$dir] success&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$microsec</span> <span class="o">=</span> <span class="mi">50_000</span><span class="p">;</span>
+</span><span class='line'>    <span class="nn">Time::HiRes::</span><span class="n">usleep</span><span class="p">(</span><span class="nv">$microsec</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="mi">1</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[安装配置hive]]></title>
@@ -2093,1551 +2683,6 @@
 
 <ul>
 <li>这个算法效率很高，并且可以把文件平均分配到目录下</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[mogilefs设备权重算法]]></title>
-    <link href="http://www.wanghd.com/blog/2012/10/09/mogilefsshe-bei-quan-zhong-suan-fa/"/>
-    <updated>2012-10-09T11:07:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/10/09/mogilefsshe-bei-quan-zhong-suan-fa</id>
-    <content type="html"><![CDATA[<h3>遇到的问题</h3>
-
-<ul>
-<li>有几块设备已经剩余10%容量，有几块设备剩余75%容量，为什么75%的util相当高呢</li>
-<li>原本理解mogilefs平均分配新文件到设备上，猜想应该是不对的</li>
-</ul>
-
-
-<h3>看看mogilefs到底是怎么做的呢</h3>
-
-<ul>
-<li>处理文件是Query.pl干的，确认新建文件是cmd_create_open函数所为</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="k">sub </span><span class="nf">cmd_create_open</span> <span class="p">{</span>
-</span><span class='line'>    <span class="c1">#略</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">#默认情况下设备的选择是从这开始的，参数是所有设备</span>
-</span><span class='line'>    <span class="nv">@devices</span> <span class="o">=</span> <span class="n">sort_devs_by_freespace</span><span class="p">(</span><span class="nn">Mgd::</span><span class="n">device_factory</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">get_all</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">#略</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>sort_devs_by_freespace用剩余百分比做为权重，生成一个二维数组做参数[前20个]</li>
-<li>真正的返回值是通过MogileFS::Util::weighted_list进行权重计算</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="k">sub </span><span class="nf">sort_devs_by_freespace</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">@devices_with_weights</span> <span class="o">=</span> <span class="nb">map</span> <span class="p">{</span> <span class="c1">#生成二维数组，剩余大小用来做权重</span>
-</span><span class='line'>        <span class="p">[</span><span class="nv">$_</span><span class="p">,</span> <span class="mi">100</span> <span class="o">*</span> <span class="nv">$_</span><span class="o">-&gt;</span><span class="n">percent_free</span><span class="p">]</span>
-</span><span class='line'>    <span class="p">}</span> <span class="nb">sort</span> <span class="p">{</span>  <span class="c1">#排序，从大到小排序</span>
-</span><span class='line'>        <span class="nv">$b</span><span class="o">-&gt;</span><span class="n">percent_free</span> <span class="sr">&lt;=&gt;</span> <span class="nv">$a</span><span class="o">-&gt;</span><span class="n">percent_free</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span> <span class="nb">grep</span> <span class="p">{</span>  <span class="c1">#过滤设备，只要可以新建文件的，就是状态为alive的</span>
-</span><span class='line'>        <span class="nv">$_</span><span class="o">-&gt;</span><span class="n">should_get_new_files</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span> <span class="nv">@_</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">@list</span> <span class="o">=</span>
-</span><span class='line'>        <span class="nn">MogileFS::Util::</span><span class="n">weighted_list</span><span class="p">(</span><span class="nb">splice</span><span class="p">(</span><span class="nv">@devices_with_weights</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">));</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">return</span> <span class="nv">@list</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>这里才是算法的核心，让容量多的多放点文件，但当容量很大时基本随即，做个例子会比较直观</li>
-<li>假设有两个设备，剩余的容量分别是10和75</li>
-<li>那么sum就是85，如果乘以随机数的话可能是8.5(0.1)或者是76.5(0.9)</li>
-<li>如果是8.5，那么75就大于8.5了，先返回了【并且这种概率大】</li>
-<li>如果是76.5，那么75就不大于76.5了, 则返回另一个【这种概率小】</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="k">sub </span><span class="nf">weighted_list</span> <span class="p">(@)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">@list</span> <span class="o">=</span> <span class="nb">grep</span> <span class="p">{</span> <span class="nv">$_</span><span class="o">-&gt;</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">}</span> <span class="nv">@_</span><span class="p">;</span> <span class="c1">#排除掉等于0的 </span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">@ret</span><span class="p">;</span> <span class="c1">#初始化返回数组</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="nv">$sum</span> <span class="o">+=</span> <span class="nv">$_</span><span class="o">-&gt;</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">foreach</span> <span class="nv">@list</span><span class="p">;</span> <span class="c1">#累加剩余容量</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$getone</span> <span class="o">=</span> <span class="k">sub </span><span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nb">shift</span><span class="p">(</span><span class="nv">@list</span><span class="p">)</span><span class="o">-&gt;</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</span><span class='line'>            <span class="k">if</span> <span class="nb">scalar</span><span class="p">(</span><span class="nv">@list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">#只有一个了，直接返回</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="k">my</span> <span class="nv">$val</span> <span class="o">=</span> <span class="nb">rand</span><span class="p">()</span> <span class="o">*</span> <span class="nv">$sum</span><span class="p">;</span> <span class="c1">#总容量乘以0到1的随机数</span>
-</span><span class='line'>        <span class="k">my</span> <span class="nv">$curval</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">for</span> <span class="p">(</span><span class="k">my</span> <span class="nv">$idx</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$idx</span> <span class="o">&lt;</span> <span class="nb">scalar</span><span class="p">(</span><span class="nv">@list</span><span class="p">);</span> <span class="nv">$idx</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="k">my</span> <span class="nv">$item</span> <span class="o">=</span> <span class="nv">$list</span><span class="p">[</span><span class="nv">$idx</span><span class="p">];</span>
-</span><span class='line'>            <span class="nv">$curval</span> <span class="o">+=</span> <span class="nv">$item</span><span class="o">-&gt;</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span> <span class="c1">#累加进去,保证肯定有返回</span>
-</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="nv">$curval</span> <span class="o">&gt;=</span> <span class="nv">$val</span><span class="p">)</span> <span class="p">{</span> <span class="c1">#如果curval比随机乘积大</span>
-</span><span class='line'>                <span class="k">my</span> <span class="p">(</span><span class="nv">$ret</span><span class="p">)</span> <span class="o">=</span> <span class="nb">splice</span><span class="p">(</span><span class="nv">@list</span><span class="p">,</span> <span class="nv">$idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">#切割出来</span>
-</span><span class='line'>                <span class="nv">$sum</span> <span class="o">-=</span> <span class="nv">$item</span><span class="o">-&gt;</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span> <span class="c1">#从总容量里减去</span>
-</span><span class='line'>                <span class="k">return</span> <span class="nv">$ret</span><span class="o">-&gt;</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>   <span class="c1">#返回这个设备</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nb">push</span> <span class="nv">@ret</span><span class="p">,</span> <span class="nv">$getone</span><span class="o">-&gt;</span><span class="p">()</span> <span class="k">while</span> <span class="nv">@list</span><span class="p">;</span> <span class="c1">#循环执行getone，加到返回数组</span>
-</span><span class='line'>    <span class="k">return</span> <span class="nv">@ret</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[mogilefs fsck探究]]></title>
-    <link href="http://www.wanghd.com/blog/2012/09/29/mogilefsde-fscktan-jiu/"/>
-    <updated>2012-09-29T15:13:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/09/29/mogilefsde-fscktan-jiu</id>
-    <content type="html"><![CDATA[<h3>fsck的作用</h3>
-
-<ul>
-<li>检查mogilefs文件的健康程度，检查的维度有devcount,file_on表,文件长度，校验和（可选）</li>
-<li>如果文件丢失，通过路径尝试全设备扫描去查找该文件【只是通过路径去找】</li>
-</ul>
-
-
-<h3>使用fsck时，碰到的问题:队列保持不变，无法处理后续的文件</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>//启动fsck
-</span><span class='line'>mogadm fsck start  
-</span><span class='line'>//查看fsck状态，问题出现：进度不变,无法进一步检查文件
-</span><span class='line'>mogadm fsck status 
-</span><span class='line'>//查看数据库里的队列，发现队列一直保持，没有被处理
-</span><span class='line'>select count(*) from file_to_queue where type=1 （type=1代表fsck队列，type=2代表rebalance队列）;</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>结论（先给出结论，后面有具体的分析流程）</h3>
-
-<ul>
-<li>随意取得队列中的某一条记录的devcount等于3，过去操作造成的</li>
-<li>mindevcount却等于2，这会让fsck进行修复</li>
-<li>在修复时，发现3个设备中有一个设备是不可达的，状态也不是dead，返回无法处理，fsck不会把该记录从队列中删除，因为他期望你尽快修复该设备或者设置为dead</li>
-<li>解决方法有3个，第一种就是恢复或dead该设备【推荐】，第二种比较山寨,改代码删队列，第三种直接修改数据库,风险较大</li>
-</ul>
-
-
-<h3>mogadm fsck status详情</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>   Running: 运行状态 
-</span><span class='line'>    Status: 完成度
-</span><span class='line'>      Time: 执行时间
-</span><span class='line'>Check Type: 检查的策略【可以通过fsck_opt_policy_only修改】
-</span><span class='line'>
-</span><span class='line'>NOPA: file_on表里一个都没
-</span><span class='line'>POVI: 违反策略
-</span><span class='line'>MISS: 在某个设备上没有找到文件
-</span><span class='line'>BLEN: file表里的length和磁盘上的文件大小不匹配
-</span><span class='line'>GONE: 无法修复了
-</span><span class='line'>SRCH: 开始全设备扫描
-</span><span class='line'>FOND: 全设备扫描后找了该文件
-</span><span class='line'>REPL: 加入复制队列，复制一份文件
-</span><span class='line'>BCNT: file表里的devcount不正确</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<!-- more -->
-
-
-<h3>MogileFS::Worker::Fsck的work方法分析</h3>
-
-<ul>
-<li>因为之前有分析过MogileFS启动源码，所以知道fsck子进程启动就调用MogileFS::Worker::Fsck里的work方法</li>
-<li>里面循环调用了最关键的check_fid方法来检查fid对象，返回的结果是已经处理（HANDLED）和没办法处理（STALLED）</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="k">sub </span><span class="nf">work</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$self</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span> <span class="c1">#perl面向对象获取自己的引用</span>
-</span><span class='line'>    <span class="nn">POSIX::</span><span class="n">nice</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>  <span class="c1">#调整进程的优先级</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$sto</span>         <span class="o">=</span> <span class="nn">Mgd::</span><span class="n">get_store</span><span class="p">();</span> <span class="c1">#获取操作数据库的对象</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">#2秒调用一次这个匿名方法</span>
-</span><span class='line'>    <span class="n">every</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="k">sub </span><span class="p">{</span>
-</span><span class='line'>        <span class="k">my</span> <span class="nv">$sleep_set</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span> <span class="c1">#一个调整sleep时间的函数，下面可以看到设置为0不去调整，就用2秒</span>
-</span><span class='line'>        <span class="nv">$nowish</span> <span class="o">=</span> <span class="nb">time</span><span class="p">();</span>      <span class="c1">#当前时间</span>
-</span><span class='line'>        <span class="nb">local</span> <span class="nv">$</span><span class="nn">Mgd::</span><span class="nv">nowish</span> <span class="o">=</span> <span class="nv">$nowish</span><span class="p">;</span> <span class="c1">#零时变量</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="k">my</span> <span class="nv">$queue_todo</span> <span class="o">=</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">queue_todo</span><span class="p">(</span><span class="s">&#39;fsck&#39;</span><span class="p">);</span>    <span class="c1">#获取fsck队列里的数据</span>
-</span><span class='line'>        <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">send_to_parent</span><span class="p">(</span><span class="s">&#39;worker_bored 50 fsck&#39;</span><span class="p">);</span> <span class="c1">#告诉父进程，我还活着</span>
-</span><span class='line'>        <span class="k">return</span> <span class="k">unless</span> <span class="nv">@</span><span class="p">{</span><span class="nv">$queue_todo</span><span class="p">};</span>                  <span class="c1">#没有需要需要处理就返回</span>
-</span><span class='line'>        <span class="k">return</span> <span class="k">unless</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">validate_dbh</span><span class="p">;</span>             <span class="c1">#验证db，无法连接就退出</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="k">my</span> <span class="nv">@fids</span> <span class="o">=</span> <span class="p">();</span>  <span class="c1">#fids数组，用来存放文件的id,也是数据库里文件的唯一标识 </span>
-</span><span class='line'>        <span class="c1">#遍历队列的数据，$todo就是数据库里的信息 type=1</span>
-</span><span class='line'>        <span class="k">while</span> <span class="p">(</span><span class="k">my</span> <span class="nv">$todo</span> <span class="o">=</span> <span class="nb">shift</span> <span class="nv">@</span><span class="p">{</span><span class="nv">$queue_todo</span><span class="p">})</span> <span class="p">{</span>
-</span><span class='line'>            <span class="c1">#new 一个fid对象，只是new，还没有读取fid信息</span>
-</span><span class='line'>            <span class="k">my</span> <span class="nv">$fid</span> <span class="o">=</span> <span class="nn">MogileFS::</span><span class="n">FID</span><span class="o">-&gt;</span><span class="k">new</span><span class="p">(</span><span class="nv">$todo</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">fid</span><span class="p">});</span>
-</span><span class='line'>            <span class="c1">#这里才是通过查file表，判断他是不是存在</span>
-</span><span class='line'>            <span class="k">unless</span> <span class="p">(</span><span class="nv">$fid</span><span class="o">-&gt;</span><span class="nb">exists</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="c1">#从file_to_queue表里删除</span>
-</span><span class='line'>                <span class="nv">$sto</span><span class="o">-&gt;</span><span class="n">delete_fid_from_file_to_queue</span><span class="p">(</span><span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">,</span> <span class="n">FSCK_QUEUE</span><span class="p">);</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>            <span class="nb">push</span><span class="p">(</span><span class="nv">@fids</span><span class="p">,</span> <span class="nv">$fid</span><span class="p">);</span> <span class="c1">#如果有，那就把fid对象放到数组里</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="k">return</span> <span class="k">unless</span> <span class="nv">@fids</span><span class="p">;</span>   <span class="c1">#如果没有需要处理的就返回了 </span>
-</span><span class='line'>        <span class="c1">#从setting表里读取fsck_opt_policy_only配置</span>
-</span><span class='line'>        <span class="c1">#1代表只检查数据库信息，0代表检查数据信息和文件长度</span>
-</span><span class='line'>        <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">opt_nostat</span><span class="p">}</span> <span class="o">=</span> <span class="nn">MogileFS::</span><span class="n">Config</span><span class="o">-&gt;</span><span class="n">server_setting</span><span class="p">(</span><span class="s">&#39;fsck_opt_policy_only&#39;</span><span class="p">)</span>     <span class="o">||</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>        <span class="c1">#从setting表里读取fsck_checksum配置,代表是否需要检查校验和,可选值为md5,sha-1,off</span>
-</span><span class='line'>        <span class="k">my</span> <span class="nv">$alg</span> <span class="o">=</span> <span class="nn">MogileFS::</span><span class="n">Config</span><span class="o">-&gt;</span><span class="n">server_setting_cached</span><span class="p">(</span><span class="s">&quot;fsck_checksum&quot;</span><span class="p">);</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nb">defined</span><span class="p">(</span><span class="nv">$alg</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nv">$alg</span> <span class="ow">eq</span> <span class="s">&quot;off&quot;</span><span class="p">)</span> <span class="p">{</span>   <span class="c1">#如果没有定义或为off</span>
-</span><span class='line'>            <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">opt_checksum</span><span class="p">}</span> <span class="o">=</span> <span class="s">&quot;off&quot;</span><span class="p">;</span>      <span class="c1">#那就设置成off,不检查</span>
-</span><span class='line'>        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>            <span class="c1">#验证一下是否为md5 或 sha-1,如果不是那就设置为0</span>
-</span><span class='line'>            <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">opt_checksum</span><span class="p">}</span> <span class="o">=</span> <span class="nn">MogileFS::</span><span class="n">Checksum</span><span class="o">-&gt;</span><span class="n">valid_alg</span><span class="p">(</span><span class="nv">$alg</span><span class="p">)</span> <span class="p">?</span> <span class="nv">$alg</span> <span class="p">:</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="nn">MogileFS::</span><span class="n">FID</span><span class="o">-&gt;</span><span class="n">mass_load_devids</span><span class="p">(</span><span class="nv">@fids</span><span class="p">);</span> <span class="c1">#通过file_on表获取每个fid存放在哪些device上</span>
-</span><span class='line'>        <span class="nv">$sleep_set</span><span class="o">-&gt;</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span> <span class="c1">#微调sleep时间，写死为0，可能是调试用的</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="k">foreach</span> <span class="k">my</span> <span class="nv">$fid</span> <span class="p">(</span><span class="nv">@fids</span><span class="p">)</span> <span class="p">{</span>               <span class="c1">#循环每一个fid对象</span>
-</span><span class='line'>            <span class="c1">#这里是关键是亮点，是接下去分析的入口</span>
-</span><span class='line'>            <span class="c1">#返回的结果是已经处理（HANDLED）和没办法处理（STALLED）</span>
-</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$self</span><span class="o">-&gt;</span><span class="n">check_fid</span><span class="p">(</span><span class="nv">$fid</span><span class="p">))</span> <span class="p">{</span>
-</span><span class='line'>                <span class="c1">#如果运行到了这里，说明跟磁盘有连通性的问题</span>
-</span><span class='line'>                <span class="c1">#最重要的是不会删除队列，放在里面以后再尝试</span>
-</span><span class='line'>                <span class="c1">#其实队列的卡住的问题就出在这里,接下去进入check_fid看看</span>
-</span><span class='line'>                <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">still_alive</span><span class="p">;</span>
-</span><span class='line'>                <span class="k">next</span><span class="p">;</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>            <span class="c1">#已经处理了，就可以删除队列里的数据了</span>
-</span><span class='line'>            <span class="nv">$sto</span><span class="o">-&gt;</span><span class="n">delete_fid_from_file_to_queue</span><span class="p">(</span><span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">,</span> <span class="n">FSCK_QUEUE</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>MogileFS::Worker::Fsck的check_fid方法分析</h3>
-
-<ul>
-<li>传入的参数是$fid是MogileFS::FID对象</li>
-<li>返回0表示磁盘不可达（STALLED）</li>
-<li>返回1代表fid对象已经被处理，不管这个fid是不是有问题，没问题就不处理，有问题就记录日志并修复</li>
-<li>真正去修复一个fid对象的函数是fix_fid,接下去会分析</li>
-<li>问题渐渐浮出水面，坏掉的设备没有被dead，或者直接删除掉设备有可能会让队列卡住</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-<span class='line-number'>73</span>
-<span class='line-number'>74</span>
-<span class='line-number'>75</span>
-<span class='line-number'>76</span>
-<span class='line-number'>77</span>
-<span class='line-number'>78</span>
-<span class='line-number'>79</span>
-<span class='line-number'>80</span>
-<span class='line-number'>81</span>
-<span class='line-number'>82</span>
-<span class='line-number'>83</span>
-<span class='line-number'>84</span>
-<span class='line-number'>85</span>
-<span class='line-number'>86</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="c1">#下面是返回值，被定义成常量</span>
-</span><span class='line'><span class="k">use</span> <span class="n">constant</span> <span class="n">STALLED</span> <span class="o">=&gt;</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">constant</span> <span class="n">HANDLED</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'><span class="k">sub </span><span class="nf">check_fid</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">my</span> <span class="p">(</span><span class="nv">$self</span><span class="p">,</span> <span class="nv">$fid</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>      <span class="c1">#设置对象自己和fid对象</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$fix</span> <span class="o">=</span> <span class="k">sub </span><span class="p">{</span>             <span class="c1">#定义一个修复的数据的函数,只是定义，真正的调用在下面逻辑</span>
-</span><span class='line'>        <span class="c1">#fix_fid是最重要的函数用来修复fid对象，也是接下去需要分析的入口</span>
-</span><span class='line'>        <span class="c1">#这里使用了eval{}，这样可以捕获错误</span>
-</span><span class='line'>        <span class="k">my</span> <span class="nv">$fixed</span> <span class="o">=</span> <span class="nb">eval</span> <span class="p">{</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">fix_fid</span><span class="p">(</span><span class="nv">$fid</span><span class="p">)</span> <span class="p">};</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="nb">defined</span> <span class="nv">$fixed</span><span class="p">)</span> <span class="p">{</span>                     <span class="c1">#如果产生了错误</span>
-</span><span class='line'>            <span class="c1">#输出异常日志，我们的问题就会运行到这里输出这样的信息</span>
-</span><span class='line'>            <span class="n">error</span><span class="p">(</span><span class="s">&quot;Fsck stalled for fid $fid: $@&quot;</span><span class="p">);</span>
-</span><span class='line'>            <span class="c1">#返回一个不会去删除队列的结果，造成队列积满</span>
-</span><span class='line'>            <span class="c1">#所以直接去fix_fid里查看错误的判断就可以知道为什么了</span>
-</span><span class='line'>            <span class="k">return</span> <span class="n">STALLED</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">fsck_log</span><span class="p">(</span><span class="n">EV_CANT_FIX</span><span class="p">)</span> <span class="k">if</span> <span class="o">!</span> <span class="nv">$fixed</span><span class="p">;</span>  <span class="c1">#记录日志，不可以修复,GONE</span>
-</span><span class='line'>        <span class="nv">$nowish</span> <span class="o">=</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">still_alive</span><span class="p">;</span>             <span class="c1">#更新时间</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">HANDLED</span><span class="p">;</span>                           <span class="c1">#返回已经处理</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">unless</span> <span class="p">(</span><span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">devids</span><span class="p">)</span> <span class="p">{</span>         <span class="c1">#一个设备上都没有的话</span>
-</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">fsck_log</span><span class="p">(</span><span class="n">EV_NO_PATHS</span><span class="p">);</span><span class="c1">#记录日志path都没 NOPA</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nv">$fix</span><span class="o">-&gt;</span><span class="p">();</span>            <span class="c1">#搜索所有设备作为最后的努力来定位它</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="c1">#查找数据库file_on数量，要满足mindevcount，如果超过也属于不满足（神奇的too happy）</span>
-</span><span class='line'>    <span class="k">unless</span> <span class="p">(</span><span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">devids_meet_policy</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">fsck_log</span><span class="p">(</span><span class="n">EV_POLICY_VIOLATION</span><span class="p">);</span><span class="c1">#记录日志违反策略 POVI</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nv">$fix</span><span class="o">-&gt;</span><span class="p">();</span>                    <span class="c1">#尝试修复</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">#如果不skip_devcount，同时file_on和file里的devcount对不起来</span>
-</span><span class='line'>    <span class="k">unless</span> <span class="p">(</span><span class="nn">MogileFS::</span><span class="n">Config</span><span class="o">-&gt;</span><span class="n">server_setting_cached</span><span class="p">(</span><span class="s">&#39;skip_devcount&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="nb">scalar</span><span class="p">(</span><span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">devids</span><span class="p">)</span> <span class="o">==</span> <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">devcount</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">fsck_log</span><span class="p">(</span><span class="n">EV_BAD_COUNT</span><span class="p">);</span> <span class="c1">#记录日志file表里devcount不正确</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nv">$fix</span><span class="o">-&gt;</span><span class="p">();</span>              <span class="c1">#尝试修复，其实是调用$fid-&gt;update_devcount();</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">#我们不使用，其实他是判断checksum表里是否有记录</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">class</span><span class="o">-&gt;</span><span class="n">hashtype</span> <span class="o">&amp;&amp;</span> <span class="o">!</span> <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">checksum</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nv">$fix</span><span class="o">-&gt;</span><span class="p">();</span>        <span class="c1">#尝试修复</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">#如果配置了fsck_opt_policy_only那就到此结束了,不会去判断文件长度和校验和了</span>
-</span><span class='line'>    <span class="c1">#如果策略是这样，事故后的fsck就有意义了</span>
-</span><span class='line'>    <span class="k">return</span> <span class="n">HANDLED</span> <span class="k">if</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">opt_nostat</span><span class="p">};</span>
-</span><span class='line'>    <span class="c1">#如果配置检查校验和,默认不使用</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">opt_checksum</span><span class="p">}</span> <span class="o">&amp;&amp;</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">opt_checksum</span><span class="p">}</span> <span class="ow">ne</span> <span class="s">&quot;off&quot;</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nv">$fix</span><span class="o">-&gt;</span><span class="p">();</span> <span class="c1">#尝试修复</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$err</span><span class="p">;</span> <span class="c1">#记录错误的变量</span>
-</span><span class='line'>    <span class="c1">#parallel_check_sizes会取得磁盘上文件的大小</span>
-</span><span class='line'>    <span class="c1">#匿名的对比函数,第一个参数是设备,第二参数就是磁盘上文件的大小</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$rv</span> <span class="o">=</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">parallel_check_sizes</span><span class="p">([</span> <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">devfids</span> <span class="p">],</span> <span class="k">sub </span><span class="p">{</span>
-</span><span class='line'>        <span class="k">my</span> <span class="p">(</span><span class="nv">$dfid</span><span class="p">,</span> <span class="nv">$disk_size</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>            <span class="c1">#devfid对象，和磁盘上文件的大小</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="nb">defined</span> <span class="nv">$disk_size</span><span class="p">)</span> <span class="p">{</span>             <span class="c1">#如果拿不到磁盘上文件的大小</span>
-</span><span class='line'>            <span class="k">my</span> <span class="nv">$dev</span>  <span class="o">=</span> <span class="nv">$dfid</span><span class="o">-&gt;</span><span class="n">device</span><span class="p">;</span>           <span class="c1">#设备对象</span>
-</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="nv">$dev</span><span class="o">-&gt;</span><span class="n">dstate</span><span class="o">-&gt;</span><span class="n">is_perm_dead</span><span class="p">)</span> <span class="p">{</span>   <span class="c1">#如果磁盘的状态是dead</span>
-</span><span class='line'>                <span class="nv">$err</span> <span class="o">=</span> <span class="s">&quot;needfix&quot;</span><span class="p">;</span>               <span class="c1">#记录错误为需要修复</span>
-</span><span class='line'>                <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>                       <span class="c1">#返回0</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>            <span class="c1">#输出连通性问题的日志</span>
-</span><span class='line'>            <span class="n">error</span><span class="p">(</span><span class="s">&quot;Connectivity problem reaching device &quot;</span> <span class="o">.</span> <span class="nv">$dev</span><span class="o">-&gt;</span><span class="n">id</span> <span class="o">.</span> <span class="s">&quot; on host &quot;</span> <span class="o">.</span> <span class="nv">$dev</span><span class="o">-&gt;</span><span class="n">host</span><span class="o">-&gt;</span><span class="n">ip</span> <span class="o">.</span> <span class="s">&quot;\n&quot;</span><span class="p">);</span>
-</span><span class='line'>            <span class="nv">$err</span> <span class="o">=</span> <span class="s">&quot;stalled&quot;</span><span class="p">;</span>                   <span class="c1">#记录错误为无法处理</span>
-</span><span class='line'>            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>                           <span class="c1">#返回0</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="k">return</span> <span class="mi">1</span> <span class="k">if</span> <span class="nv">$disk_size</span> <span class="o">==</span> <span class="nv">$fid</span><span class="o">-&gt;</span><span class="nb">length</span><span class="p">;</span> <span class="c1">#file表里的length和磁盘上的大小一样,直接返回1</span>
-</span><span class='line'>        <span class="nv">$err</span> <span class="o">=</span> <span class="s">&quot;needfix&quot;</span><span class="p">;</span>                       <span class="c1">#下面就是大小不一样了，记录错误为需要修复</span>
-</span><span class='line'>        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>                               <span class="c1">#返回0</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$rv</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="p">(</span><span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">class</span><span class="o">-&gt;</span><span class="n">hashtype</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="p">(</span><span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">opt_checksum</span><span class="p">}</span> <span class="o">&amp;&amp;</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">opt_checksum</span><span class="p">}</span> <span class="ow">eq</span> <span class="s">&quot;off&quot;</span><span class="p">))</span>
-</span><span class='line'>            <span class="p">?</span> <span class="nv">$fix</span><span class="o">-&gt;</span><span class="p">()</span> <span class="p">:</span> <span class="n">HANDLED</span><span class="p">;</span>               <span class="c1">#不扯校验和了，直接返回已处理</span>
-</span><span class='line'>    <span class="p">}</span> <span class="k">elsif</span> <span class="p">(</span><span class="nv">$err</span> <span class="ow">eq</span> <span class="s">&quot;stalled&quot;</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="c1">#返回无法处理，也会造成队列堆积，因为file_on表里的device没有设置为dead</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">STALLED</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span> <span class="k">elsif</span> <span class="p">(</span><span class="nv">$err</span> <span class="ow">eq</span> <span class="s">&quot;needfix&quot;</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="c1">#进行修复</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nv">$fix</span><span class="o">-&gt;</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>        <span class="c1">#这里应该不会执行到</span>
-</span><span class='line'>        <span class="nb">die</span> <span class="s">&quot;Unknown error checking fid sizes in parallel.\n&quot;</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>MogileFS::Worker::Fsck的fix_fid方法分析</h3>
-
-<ul>
-<li>该方法有可能会比较慢，因为file_on表上一条记录都没会尝试查找所有设备，【通过path】</li>
-<li>die是由于设备连接性问题造成的，会引起队列堵死</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-<span class='line-number'>73</span>
-<span class='line-number'>74</span>
-<span class='line-number'>75</span>
-<span class='line-number'>76</span>
-<span class='line-number'>77</span>
-<span class='line-number'>78</span>
-<span class='line-number'>79</span>
-<span class='line-number'>80</span>
-<span class='line-number'>81</span>
-<span class='line-number'>82</span>
-<span class='line-number'>83</span>
-<span class='line-number'>84</span>
-<span class='line-number'>85</span>
-<span class='line-number'>86</span>
-<span class='line-number'>87</span>
-<span class='line-number'>88</span>
-<span class='line-number'>89</span>
-<span class='line-number'>90</span>
-<span class='line-number'>91</span>
-<span class='line-number'>92</span>
-<span class='line-number'>93</span>
-<span class='line-number'>94</span>
-<span class='line-number'>95</span>
-<span class='line-number'>96</span>
-<span class='line-number'>97</span>
-<span class='line-number'>98</span>
-<span class='line-number'>99</span>
-<span class='line-number'>100</span>
-<span class='line-number'>101</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="k">use</span> <span class="n">constant</span> <span class="n">CANT_FIX</span> <span class="o">=&gt;</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">#不可以被修复</span>
-</span><span class='line'><span class="k">sub </span><span class="nf">fix_fid</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">my</span> <span class="p">(</span><span class="nv">$self</span><span class="p">,</span> <span class="nv">$fid</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>                     <span class="c1">#对象自己，fid对象</span>
-</span><span class='line'>    <span class="n">debug</span><span class="p">(</span><span class="nb">sprintf</span><span class="p">(</span><span class="s">&quot;Fixing FID %d&quot;</span><span class="p">,</span> <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">));</span> <span class="c1">#调试信息，正在修复哪个fid</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">#通过file_on更新一下file表里的devcount; </span>
-</span><span class='line'>    <span class="c1">#这里学习了下mysql的get_lock</span>
-</span><span class='line'>    <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">update_devcount</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">#遍历devids属性生成多个devfid对象放到数组,其实就是file_on表</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">@dfids</span> <span class="o">=</span> <span class="nb">map</span> <span class="p">{</span> <span class="nn">MogileFS::</span><span class="n">DevFID</span><span class="o">-&gt;</span><span class="k">new</span><span class="p">(</span><span class="nv">$_</span><span class="p">,</span> <span class="nv">$fid</span><span class="p">)</span> <span class="p">}</span> <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">devids</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">@good_devs</span><span class="p">;</span>        <span class="c1">#初始化好的设备</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">@bad_devs</span><span class="p">;</span>         <span class="c1">#初始化坏的设备数组</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">%already_checked</span><span class="p">;</span>  <span class="c1">#初始化已经检查过的设备hash</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$check_dfids</span> <span class="o">=</span> <span class="k">sub </span><span class="p">{</span> <span class="c1">#定义一个监测函数</span>
-</span><span class='line'>        <span class="k">my</span> <span class="nv">$is_desperate_mode</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span> <span class="c1">#是否全设备扫描</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="k">foreach</span> <span class="k">my</span> <span class="nv">$dfid</span> <span class="p">(</span><span class="nv">@dfids</span><span class="p">)</span> <span class="p">{</span> <span class="c1">#遍历fid的devfid对象</span>
-</span><span class='line'>            <span class="k">my</span> <span class="nv">$dev</span> <span class="o">=</span> <span class="nv">$dfid</span><span class="o">-&gt;</span><span class="n">device</span><span class="p">;</span>
-</span><span class='line'>            <span class="k">next</span> <span class="k">if</span> <span class="nv">$already_checked</span><span class="p">{</span><span class="nv">$dev</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">}</span><span class="o">++</span><span class="p">;</span> <span class="c1">#已经检查过就跳过了</span>
-</span><span class='line'>
-</span><span class='line'>            <span class="c1">#磁盘状态为dead，那就放到bad_devs里</span>
-</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="nv">$dev</span><span class="o">-&gt;</span><span class="n">dstate</span><span class="o">-&gt;</span><span class="n">is_perm_dead</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="nb">push</span> <span class="nv">@bad_devs</span><span class="p">,</span> <span class="nv">$dev</span><span class="p">;</span>
-</span><span class='line'>                <span class="k">next</span><span class="p">;</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>            <span class="k">my</span> <span class="nv">$disk_size</span> <span class="o">=</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">size_on_disk</span><span class="p">(</span><span class="nv">$dfid</span><span class="p">);</span>  <span class="c1">#获取磁盘上的文件大小</span>
-</span><span class='line'>            <span class="c1">#这里是我们产生问题的根源。。。设备不可达，也没设置成dead</span>
-</span><span class='line'>            <span class="nb">die</span> <span class="s">&quot;dev &quot;</span> <span class="o">.</span> <span class="nv">$dev</span><span class="o">-&gt;</span><span class="n">id</span> <span class="o">.</span> <span class="s">&quot; unreachable&quot;</span> <span class="k">unless</span> <span class="nb">defined</span> <span class="nv">$disk_size</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="nv">$disk_size</span> <span class="o">==</span> <span class="nv">$fid</span><span class="o">-&gt;</span><span class="nb">length</span><span class="p">)</span> <span class="p">{</span> <span class="c1">#如果长度一样</span>
-</span><span class='line'>                <span class="nb">push</span> <span class="nv">@good_devs</span><span class="p">,</span> <span class="nv">$dfid</span><span class="o">-&gt;</span><span class="n">device</span><span class="p">;</span> <span class="c1">#加到好的设备里</span>
-</span><span class='line'>                <span class="c1">#如果是全设备扫描，那就等于发现了丢失文件，就可以返回了，不用继续查找了</span>
-</span><span class='line'>                <span class="k">return</span> <span class="k">if</span> <span class="nv">$is_desperate_mode</span><span class="p">;</span>
-</span><span class='line'>                <span class="k">next</span><span class="p">;</span> <span class="c1">#下一个,其他编程语言的continue</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>            <span class="k">unless</span> <span class="p">(</span><span class="nv">$is_desperate_mode</span><span class="p">)</span> <span class="p">{</span> <span class="c1">#如果不是全设备扫描</span>
-</span><span class='line'>                <span class="k">if</span> <span class="p">(</span><span class="nv">$disk_size</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                    <span class="c1">#没有找到文件呀,MISS</span>
-</span><span class='line'>                    <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">fsck_log</span><span class="p">(</span><span class="n">EV_FILE_MISSING</span><span class="p">,</span> <span class="nv">$dev</span><span class="p">);</span>
-</span><span class='line'>                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>                    <span class="c1">#长度不正确呀,BLEN</span>
-</span><span class='line'>                    <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">fsck_log</span><span class="p">(</span><span class="n">EV_BAD_LENGTH</span><span class="p">,</span> <span class="nv">$dev</span><span class="p">);</span>
-</span><span class='line'>                <span class="p">}</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>            <span class="nb">push</span> <span class="nv">@bad_devs</span><span class="p">,</span> <span class="nv">$dfid</span><span class="o">-&gt;</span><span class="n">device</span><span class="p">;</span> <span class="c1">#增加到坏设备里</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nv">$check_dfids</span><span class="o">-&gt;</span><span class="p">();</span> <span class="c1">#调用上面的监测函数</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">unless</span> <span class="p">(</span><span class="nv">@good_devs</span><span class="p">)</span> <span class="p">{</span> <span class="c1"># 如果一个好的都没</span>
-</span><span class='line'>        <span class="c1">#记录日志,全设备扫描 SRCH</span>
-</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">fsck_log</span><span class="p">(</span><span class="n">EV_START_SEARCH</span><span class="p">);</span>
-</span><span class='line'>        <span class="c1">#重新设置@dfids,全部的设备</span>
-</span><span class='line'>        <span class="nv">@dfids</span> <span class="o">=</span> <span class="nn">List::Util::</span><span class="n">shuffle</span><span class="p">(</span>
-</span><span class='line'>                                     <span class="nb">map</span>  <span class="p">{</span> <span class="nn">MogileFS::</span><span class="n">DevFID</span><span class="o">-&gt;</span><span class="k">new</span><span class="p">(</span><span class="nv">$_</span><span class="p">,</span> <span class="nv">$fid</span><span class="p">)</span>  <span class="p">}</span>
-</span><span class='line'>                                     <span class="nb">grep</span> <span class="p">{</span> <span class="nv">$_</span><span class="o">-&gt;</span><span class="n">dstate</span><span class="o">-&gt;</span><span class="n">should_fsck_search_on</span> <span class="p">}</span>
-</span><span class='line'>                                     <span class="nn">Mgd::</span><span class="n">device_factory</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">get_all</span>
-</span><span class='line'>                                     <span class="p">);</span>
-</span><span class='line'>        <span class="c1">#重新再找一次,这次是全盘扫描模式</span>
-</span><span class='line'>        <span class="nv">$check_dfids</span><span class="o">-&gt;</span><span class="p">(</span><span class="s">&quot;desperate&quot;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="c1"># 不能修复了呀，找不到文件了</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">CANT_FIX</span> <span class="k">unless</span> <span class="nv">@good_devs</span><span class="p">;</span>
-</span><span class='line'>        <span class="c1"># 如果能找到，记录日志,FOND</span>
-</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">fsck_log</span><span class="p">(</span><span class="n">EV_FOUND_FID</span><span class="p">);</span>
-</span><span class='line'>        <span class="c1"># 加到数据库里,就是file_on的表里</span>
-</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">note_on_device</span><span class="p">(</span><span class="nv">$good_devs</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1"># 循环坏的设备，删除掉file_on里的数据</span>
-</span><span class='line'>    <span class="k">foreach</span> <span class="k">my</span> <span class="nv">$bdev</span> <span class="p">(</span><span class="nv">@bad_devs</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">error</span><span class="p">(</span><span class="s">&quot;removing file_on mapping for fid=&quot;</span> <span class="o">.</span> <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">id</span> <span class="o">.</span> <span class="s">&quot;, dev=&quot;</span> <span class="o">.</span> <span class="nv">$bdev</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">);</span>
-</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">forget_about_device</span><span class="p">(</span><span class="nv">$bdev</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">want_reload</span><span class="p">;</span> <span class="c1">#重新加载fid对象</span>
-</span><span class='line'>    <span class="c1"># 如果还是没能满足策略，就就应该复制一份了呀</span>
-</span><span class='line'>    <span class="k">unless</span> <span class="p">(</span><span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">devids_meet_policy</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="c1">#加入到replacte队列中</span>
-</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">enqueue_for_replication</span><span class="p">(</span><span class="n">in</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">);</span>
-</span><span class='line'>        <span class="c1">#记录日志 REPL</span>
-</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">fsck_log</span><span class="p">(</span><span class="n">EV_RE_REPLICATE</span><span class="p">);</span>
-</span><span class='line'>        <span class="c1">#返回已经处理</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">HANDLED</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1"># 更新devcount</span>
-</span><span class='line'>    <span class="k">unless</span><span class="p">(</span><span class="nn">MogileFS::</span><span class="n">Config</span><span class="o">-&gt;</span><span class="n">server_setting_cached</span><span class="p">(</span><span class="s">&#39;skip_devcount&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="nb">scalar</span><span class="p">(</span><span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">devids</span><span class="p">)</span> <span class="o">==</span> <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">devcount</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">update_devcount</span><span class="p">();</span>
-</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">fsck_log</span><span class="p">(</span><span class="n">EV_BAD_COUNT</span><span class="p">);</span> <span class="c1">#记录日志BCNT</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">return</span> <span class="n">HANDLED</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Aho-Corasick算法]]></title>
-    <link href="http://www.wanghd.com/blog/2012/09/27/aho-corasicksuan-fa/"/>
-    <updated>2012-09-27T14:10:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/09/27/aho-corasicksuan-fa</id>
-    <content type="html"><![CDATA[<h3>aho-corasick算法优势</h3>
-
-<ul>
-<li>查找时无需回溯，性能相当好</li>
-<li>当需要查找或替换的词非常多时，生成的trie树可以方便缓存</li>
-</ul>
-
-
-<h3>学习方法</h3>
-
-<ul>
-<li>了解ac算法的基本思想</li>
-<li>阅读源码（看过php, java, perl的版本，还最推荐perl, 因为perl语法精炼,易于阅读）</li>
-<li>ac模拟器（见下面的flash，可以尝试操作一下）</li>
-</ul>
-
-
-<!-- more -->
-
-
-
-
-<object width="650" height="500" type="application/x-shockwave-flash" data="http://www.ivank.net/blogspot/en/AHODrawing.swf">
-<param value="http://www.ivank.net/blogspot/en/AHODrawing.swf" name="movie">
-<!-- http://blog.ivank.net/aho-corasick-algorithm-in-as3.html -->
-</object>
-
-
-<h3>测试Perl的aho-corasick搜索</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="k">use</span> <span class="nn">Algorithm::AhoCorasick::</span><span class="n">SearchMachine</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">use</span> <span class="n">strict</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="nn">Data::</span><span class="n">Dumper</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">utf8</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">my</span> <span class="nv">$text</span> <span class="o">=</span> <span class="s">&quot;王惠达啊&quot;</span><span class="p">;</span> <span class="c1">#被搜索的内容</span>
-</span><span class='line'><span class="k">my</span> <span class="nv">@keywords</span> <span class="o">=</span> <span class="p">(</span><span class="s">&quot;王惠达&quot;</span><span class="p">,</span><span class="s">&quot;惠达啊&quot;</span><span class="p">);</span> <span class="c1">#需要查找的关键字,这两个关键字是设计过的</span>
-</span><span class='line'><span class="k">my</span> <span class="nv">$machine</span> <span class="o">=</span> <span class="nn">Algorithm::AhoCorasick::</span><span class="n">SearchMachine</span><span class="o">-&gt;</span><span class="k">new</span><span class="p">(</span><span class="nv">@keywords</span><span class="p">);</span> <span class="c1">#实例化</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">my</span> <span class="nv">%total</span><span class="p">;</span>
-</span><span class='line'><span class="k">my</span> <span class="nv">$handle_all</span> <span class="o">=</span> <span class="k">sub </span><span class="p">{</span> <span class="c1">#回调函数，把位置和关键字收集起来</span>
-</span><span class='line'>    <span class="k">my</span> <span class="p">(</span><span class="nv">$pos</span><span class="p">,</span> <span class="nv">$keyword</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">exists</span><span class="p">(</span><span class="nv">$total</span><span class="p">{</span><span class="nv">$pos</span><span class="p">}))</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nv">$total</span><span class="p">{</span><span class="nv">$pos</span><span class="p">}</span> <span class="o">=</span> <span class="p">[</span> <span class="p">];</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="nb">push</span> <span class="nv">@</span><span class="p">{</span><span class="nv">$total</span><span class="p">{</span><span class="nv">$pos</span><span class="p">}},</span> <span class="nv">$keyword</span><span class="p">;</span>
-</span><span class='line'>    <span class="nb">undef</span><span class="p">;</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">$machine</span><span class="o">-&gt;</span><span class="n">feed</span><span class="p">(</span><span class="nv">$text</span><span class="p">,</span> <span class="nv">$handle_all</span><span class="p">);</span> <span class="c1">#查找</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">print</span> <span class="n">Dumper</span><span class="p">(</span><span class="o">\</span><span class="nv">%total</span><span class="p">);</span> <span class="c1">#打印结果</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>aho-corasick建立树过程</h3>
-
-<ul>
-<li>将关键字建立起一颗Tire树</li>
-<li>设置第一层的不匹配的转移节点</li>
-<li>设置其余的不匹配转移节点</li>
-<li>初始化状态到根节点</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-<span class='line-number'>73</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="k">sub </span><span class="nf">_build_tree</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$self</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">#建立根节点，Node对象包含属性parent,char,results,transitions,failure</span>
-</span><span class='line'>    <span class="c1">#parent属性放置的也是Node对象</span>
-</span><span class='line'>    <span class="c1">#char属性是一个字符</span>
-</span><span class='line'>    <span class="c1">#results属性代表匹配的串,当达到这个状态时可以直接返回</span>
-</span><span class='line'>    <span class="c1">#transitions属性用来描述树型结构的hash,以char为key,Node对象为value</span>
-</span><span class='line'>    <span class="c1">#failure属性放置的也是Node对象，当匹配失败时，转移到哪个状态</span>
-</span><span class='line'>    <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">root</span><span class="p">}</span> <span class="o">=</span> <span class="nn">Algorithm::AhoCorasick::</span><span class="n">Node</span><span class="o">-&gt;</span><span class="k">new</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">#将关键字建立起一颗树</span>
-</span><span class='line'>    <span class="k">foreach</span> <span class="k">my</span> <span class="nv">$p</span> <span class="p">(</span><span class="nv">@</span><span class="p">{</span><span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">keywords</span><span class="p">}})</span> <span class="p">{</span> <span class="c1">#循环传进来的keywords数组</span>
-</span><span class='line'>        <span class="k">my</span> <span class="nv">$nd</span> <span class="o">=</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">root</span><span class="p">};</span> <span class="c1">#每次都是从根节点开始的</span>
-</span><span class='line'>        <span class="k">foreach</span> <span class="k">my</span> <span class="nv">$c</span> <span class="p">(</span><span class="nb">split</span> <span class="sr">//</span><span class="p">,</span> <span class="nv">$p</span><span class="p">)</span> <span class="p">{</span> <span class="c1">#切割成字符</span>
-</span><span class='line'>            <span class="k">my</span> <span class="nv">$ndNew</span> <span class="o">=</span> <span class="nv">$nd</span><span class="o">-&gt;</span><span class="n">get_transition</span><span class="p">(</span><span class="nv">$c</span><span class="p">);</span> <span class="c1">#如果父节点已经包含该字符,直接取得该节点</span>
-</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$ndNew</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="c1">#如果父节点不包含该字符，就新建一个Node,并增加到父节点</span>
-</span><span class='line'>                <span class="nv">$ndNew</span> <span class="o">=</span> <span class="nn">Algorithm::AhoCorasick::</span><span class="n">Node</span><span class="o">-&gt;</span><span class="k">new</span><span class="p">(</span><span class="n">parent</span> <span class="o">=&gt;</span> <span class="nv">$nd</span><span class="p">,</span> <span class="n">char</span> <span class="o">=&gt;</span> <span class="nv">$c</span><span class="p">);</span>
-</span><span class='line'>                <span class="nv">$nd</span><span class="o">-&gt;</span><span class="n">add_transition</span><span class="p">(</span><span class="nv">$ndNew</span><span class="p">);</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>            <span class="c1">#修改父节点</span>
-</span><span class='line'>            <span class="nv">$nd</span> <span class="o">=</span> <span class="nv">$ndNew</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="c1">#在最后一个节点,增加一个result，为了搜索时可以直接匹配的字符串 </span>
-</span><span class='line'>        <span class="nv">$nd</span><span class="o">-&gt;</span><span class="n">add_result</span><span class="p">(</span><span class="nv">$p</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">#设置第一层的不匹配的转移节点</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">@nodes</span><span class="p">;</span>
-</span><span class='line'>    <span class="c1">#循环根节点下的所有节点</span>
-</span><span class='line'>    <span class="k">foreach</span> <span class="k">my</span> <span class="nv">$nd</span> <span class="p">(</span><span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">root</span><span class="p">}</span><span class="o">-&gt;</span><span class="n">transitions</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="c1">#第一层的不匹配肯定是根节点</span>
-</span><span class='line'>        <span class="nv">$nd</span><span class="o">-&gt;</span><span class="n">failure</span><span class="p">(</span><span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">root</span><span class="p">});</span>
-</span><span class='line'>        <span class="c1">#增加该节点的子节点到数组，为了遍历设置其余节点的不匹配转移节点</span>
-</span><span class='line'>        <span class="nb">push</span> <span class="nv">@nodes</span><span class="p">,</span> <span class="nv">$nd</span><span class="o">-&gt;</span><span class="n">transitions</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">#循环设置其余的不匹配转移节点</span>
-</span><span class='line'>    <span class="k">while</span> <span class="p">(</span><span class="nv">@nodes</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">my</span> <span class="nv">@newNodes</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">foreach</span> <span class="k">my</span> <span class="nv">$nd</span> <span class="p">(</span><span class="nv">@nodes</span><span class="p">)</span> <span class="p">{</span> <span class="c1">#循环着一层的节点</span>
-</span><span class='line'>            <span class="k">my</span> <span class="nv">$r</span> <span class="o">=</span> <span class="nv">$nd</span><span class="o">-&gt;</span><span class="n">parent</span><span class="o">-&gt;</span><span class="n">failure</span><span class="p">;</span> <span class="c1">#父节点的不匹配跳转节点</span>
-</span><span class='line'>            <span class="k">my</span> <span class="nv">$c</span> <span class="o">=</span> <span class="nv">$nd</span><span class="o">-&gt;</span><span class="n">char</span><span class="p">;</span> <span class="c1">#该节点的字符</span>
-</span><span class='line'>
-</span><span class='line'>            <span class="c1">#如果父节点的失败节点的子节点中包含该字符，跳出while，此时$r是不空的</span>
-</span><span class='line'>            <span class="c1">#如果不满足上面的情况,就用父节点的失败节点的失败节点，其实根节点的failure是undef的呀</span>
-</span><span class='line'>            <span class="k">while</span> <span class="p">(</span><span class="nv">$r</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="p">(</span><span class="nv">$r</span><span class="o">-&gt;</span><span class="n">get_transition</span><span class="p">(</span><span class="nv">$c</span><span class="p">)))</span> <span class="p">{</span>
-</span><span class='line'>                <span class="nv">$r</span> <span class="o">=</span> <span class="nv">$r</span><span class="o">-&gt;</span><span class="n">failure</span><span class="p">;</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$r</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="nv">$nd</span><span class="o">-&gt;</span><span class="n">failure</span><span class="p">(</span><span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">root</span><span class="p">});</span> <span class="c1">#$r=undef，就代表要用根节点</span>
-</span><span class='line'>            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>                <span class="c1">#寻找父节点的失败节点的包含该字符的子节点</span>
-</span><span class='line'>                <span class="k">my</span> <span class="nv">$tc</span> <span class="o">=</span> <span class="nv">$r</span><span class="o">-&gt;</span><span class="n">get_transition</span><span class="p">(</span><span class="nv">$c</span><span class="p">);</span>
-</span><span class='line'>                <span class="c1">#为该节点设置失败节点</span>
-</span><span class='line'>                <span class="nv">$nd</span><span class="o">-&gt;</span><span class="n">failure</span><span class="p">(</span><span class="nv">$tc</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>                <span class="k">foreach</span> <span class="k">my</span> <span class="nv">$result</span> <span class="p">(</span><span class="nv">$tc</span><span class="o">-&gt;</span><span class="n">results</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                    <span class="nv">$nd</span><span class="o">-&gt;</span><span class="n">add_result</span><span class="p">(</span><span class="nv">$result</span><span class="p">);</span>
-</span><span class='line'>                <span class="p">}</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>            <span class="c1">#继续下面一层</span>
-</span><span class='line'>            <span class="nb">push</span> <span class="nv">@newNodes</span><span class="p">,</span> <span class="nv">$nd</span><span class="o">-&gt;</span><span class="n">transitions</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="nv">@nodes</span> <span class="o">=</span> <span class="nv">@newNodes</span><span class="p">;</span> <span class="c1">#再来一遍</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">#上面根节点的failure是undef，现在设置一下，为查找时可以统一处理</span>
-</span><span class='line'>    <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">root</span><span class="p">}</span><span class="o">-&gt;</span><span class="n">failure</span><span class="p">(</span><span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">root</span><span class="p">});</span>
-</span><span class='line'>    <span class="c1">#初始化状态到根节点</span>
-</span><span class='line'>    <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">state</span><span class="p">}</span> <span class="o">=</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">root</span><span class="p">};</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>查找过程</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="k">sub </span><span class="nf">feed</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">my</span> <span class="p">(</span><span class="nv">$self</span><span class="p">,</span> <span class="nv">$text</span><span class="p">,</span> <span class="nv">$callback</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$l</span> <span class="o">=</span> <span class="nb">length</span><span class="p">(</span><span class="nv">$text</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">while</span> <span class="p">(</span><span class="nv">$index</span> <span class="o">&lt;</span> <span class="nv">$l</span><span class="p">)</span> <span class="p">{</span> <span class="c1">#一个一个字符的遍历起来</span>
-</span><span class='line'>        <span class="k">my</span> <span class="nv">$trans</span> <span class="o">=</span> <span class="nb">undef</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="c1">#从当前状态获取子节点中匹配该字符的节点</span>
-</span><span class='line'>            <span class="nv">$trans</span> <span class="o">=</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">state</span><span class="p">}</span><span class="o">-&gt;</span><span class="n">get_transition</span><span class="p">(</span><span class="nb">substr</span><span class="p">(</span><span class="nv">$text</span><span class="p">,</span> <span class="nv">$index</span><span class="p">,</span> <span class="mi">1</span><span class="p">));</span>
-</span><span class='line'>            <span class="c1">#如果状态是根节点或者匹配到了就跳出while</span>
-</span><span class='line'>            <span class="k">last</span> <span class="k">if</span> <span class="p">(</span><span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">state</span><span class="p">}</span> <span class="o">==</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">root</span><span class="p">})</span> <span class="o">||</span> <span class="nv">$trans</span><span class="p">;</span>
-</span><span class='line'>            <span class="c1">#不是根节点，也没匹配到，转到失败节点</span>
-</span><span class='line'>            <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">state</span><span class="p">}</span> <span class="o">=</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">state</span><span class="p">}</span><span class="o">-&gt;</span><span class="n">failure</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="c1">#如果匹配到就把状态转到匹配的这个节点</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nv">$trans</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">state</span><span class="p">}</span> <span class="o">=</span> <span class="nv">$trans</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="c1">#如果匹配到的状态有返回值，那就调用回调函数</span>
-</span><span class='line'>        <span class="k">foreach</span> <span class="k">my</span> <span class="nv">$found</span> <span class="p">(</span><span class="nv">$self</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">state</span><span class="p">}</span><span class="o">-&gt;</span><span class="n">results</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="k">my</span> <span class="nv">$rv</span> <span class="o">=</span> <span class="o">&amp;</span><span class="nv">$callback</span><span class="p">(</span><span class="nv">$index</span> <span class="o">-</span> <span class="nb">length</span><span class="p">(</span><span class="nv">$found</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nv">$found</span><span class="p">);</span>
-</span><span class='line'>            <span class="c1">#回调函数不好有返回值的呀，有的话一半就停掉了呀</span>
-</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="nv">$rv</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="k">return</span> <span class="nv">$rv</span><span class="p">;</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="c1">#继续继续</span>
-</span><span class='line'>        <span class="o">++</span><span class="nv">$index</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">return</span> <span class="nb">undef</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[显示solr省略的日志]]></title>
-    <link href="http://www.wanghd.com/blog/2012/09/27/solrsheng-lue-ri-zhi/"/>
-    <updated>2012-09-27T13:54:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/09/27/solrsheng-lue-ri-zhi</id>
-    <content type="html"><![CDATA[<h3>solr日志默认的效果</h3>
-
-<ul>
-<li>删除时默认只显示10条记录，其余的使用省略号代替</li>
-<li>一般情况下这样是比较好的，但是有时还是希望看到所有的信息</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>webapp=/solr path=/update params={wt=json} 
-</span><span class='line'>{delete=[11, 12, 13, 14, 15, 16, 17, 18, 19, 20... (100 deletes)]} 0 127</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<!--more -->
-
-
-<h3>测试程序</h3>
-
-<ul>
-<li>查询100条记录后删除</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
-</span><span class='line'><span class="k">include_once</span><span class="p">(</span><span class="s1">&#39;Apache/Solr/Service.php&#39;</span><span class="p">);</span>
-</span><span class='line'><span class="nv">$solr</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Apache_Solr_Service</span><span class="p">(</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span><span class="s1">&#39;8984&#39;</span><span class="p">,</span><span class="s1">&#39;/solr&#39;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">$rep</span> <span class="o">=</span> <span class="nv">$solr</span><span class="o">-&gt;</span><span class="na">search</span><span class="p">(</span><span class="s1">&#39;*:*&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">);</span>
-</span><span class='line'><span class="nv">$rep</span> <span class="o">=</span> <span class="nv">$rep</span><span class="o">-&gt;</span><span class="na">response</span><span class="o">-&gt;</span><span class="na">docs</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">$ids</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
-</span><span class='line'><span class="k">foreach</span><span class="p">(</span><span class="nv">$rep</span> <span class="k">as</span> <span class="nv">$r</span><span class="p">){</span>
-</span><span class='line'>    <span class="nb">var_dump</span><span class="p">(</span><span class="nv">$r</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">);</span>
-</span><span class='line'>    <span class="nv">$ids</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$r</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="nv">$solr</span><span class="o">-&gt;</span><span class="na">deleteByMultipleIds</span><span class="p">(</span><span class="nv">$ids</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>跟踪solr代码</h3>
-
-<ul>
-<li>断点设置在LogUpdateProcessor的processDelete里</li>
-<li>小于maxNumToLog才会添加到deletes</li>
-<li>多余的部分用省略号表示</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'>  <span class="nd">@Override</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">processDelete</span><span class="o">(</span> <span class="n">DeleteUpdateCommand</span> <span class="n">cmd</span> <span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">logDebug</span><span class="o">)</span> <span class="o">{</span> <span class="n">log</span><span class="o">.</span><span class="na">debug</span><span class="o">(</span><span class="s">&quot;PRE_UPDATE &quot;</span> <span class="o">+</span> <span class="n">cmd</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span> <span class="o">}</span>
-</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">next</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="n">next</span><span class="o">.</span><span class="na">processDelete</span><span class="o">(</span><span class="n">cmd</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">cmd</span><span class="o">.</span><span class="na">isDeleteById</span><span class="o">())</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">if</span> <span class="o">(</span><span class="n">deletes</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">deletes</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;();</span>
-</span><span class='line'>        <span class="n">toLog</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">&quot;delete&quot;</span><span class="o">,</span><span class="n">deletes</span><span class="o">);</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>      <span class="k">if</span> <span class="o">(</span><span class="n">deletes</span><span class="o">.</span><span class="na">size</span><span class="o">()</span> <span class="o">&lt;</span> <span class="n">maxNumToLog</span><span class="o">)</span> <span class="o">{</span> <span class="c1">//小于maxNumToLog才会添加到deletes</span>
-</span><span class='line'>        <span class="kt">long</span> <span class="n">version</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="na">getVersion</span><span class="o">();</span>
-</span><span class='line'>        <span class="n">String</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="na">getId</span><span class="o">();</span>
-</span><span class='line'>        <span class="k">if</span> <span class="o">(</span><span class="n">version</span> <span class="o">!=</span> <span class="mi">0</span><span class="o">)</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span> <span class="o">+</span> <span class="s">&quot; (&quot;</span> <span class="o">+</span> <span class="n">version</span> <span class="o">+</span> <span class="sc">&#39;)&#39;</span><span class="o">;</span>
-</span><span class='line'>        <span class="n">deletes</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">msg</span><span class="o">);</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">if</span> <span class="o">(</span><span class="n">toLog</span><span class="o">.</span><span class="na">size</span><span class="o">()</span> <span class="o">&lt;</span> <span class="n">maxNumToLog</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="kt">long</span> <span class="n">version</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="na">getVersion</span><span class="o">();</span>
-</span><span class='line'>        <span class="n">String</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="na">query</span><span class="o">;</span>
-</span><span class='line'>        <span class="k">if</span> <span class="o">(</span><span class="n">version</span> <span class="o">!=</span> <span class="mi">0</span><span class="o">)</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span> <span class="o">+</span> <span class="s">&quot; (&quot;</span> <span class="o">+</span> <span class="n">version</span> <span class="o">+</span> <span class="sc">&#39;)&#39;</span><span class="o">;</span>
-</span><span class='line'>        <span class="n">toLog</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">&quot;deleteByQuery&quot;</span><span class="o">,</span> <span class="n">msg</span><span class="o">);</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>    <span class="n">numDeletes</span><span class="o">++;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@Override</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">finish</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-</span><span class='line'>    <span class="c1">//略</span>
-</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">deletes</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">numDeletes</span> <span class="o">&gt;</span> <span class="n">maxNumToLog</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">deletes</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">&quot;... (&quot;</span> <span class="o">+</span> <span class="n">numDeletes</span> <span class="o">+</span> <span class="s">&quot; deletes)&quot;</span><span class="o">);</span> <span class="c1">//如果大于就要省略号表示</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>    <span class="c1">//略</span>
-</span><span class='line'>  <span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>更改配置，显示所有结果</h3>
-
-<ul>
-<li>默认配置中是没有updateRequestProcessorChain，如果没有配置，默认也会加载下面3个处理器</li>
-<li>RunUpdateProcessorFactory一般必须要有的，作用是更新请求</li>
-<li>DistributedUpdateProcessorFactory作用是更新shard</li>
-<li>LogUpdateProcessorFactory作用是记录更新日志</li>
-<li>maxNumToLog决定日志显示的个数，默认为10</li>
-<li>参考<a href="http://wiki.apache.org/solr/UpdateRequestProcessor">http://wiki.apache.org/solr/UpdateRequestProcessor</a></li>
-<li>参考<a href="http://wiki.apache.org/solr/SolrConfigXml">http://wiki.apache.org/solr/SolrConfigXml</a></li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'>  <span class="o">&lt;</span><span class="n">updateRequestProcessorChain</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;&quot;</span> <span class="k">default</span><span class="o">=</span><span class="s">&quot;true&quot;</span> <span class="o">&gt;</span>
-</span><span class='line'>    <span class="o">&lt;</span><span class="n">processor</span> <span class="n">class</span><span class="o">=</span><span class="s">&quot;solr.DistributedUpdateProcessorFactory&quot;</span> <span class="o">/&gt;</span>
-</span><span class='line'>    <span class="o">&lt;</span><span class="n">processor</span> <span class="n">class</span><span class="o">=</span><span class="s">&quot;solr.LogUpdateProcessorFactory&quot;</span> <span class="o">&gt;</span>
-</span><span class='line'>      <span class="o">&lt;</span><span class="kt">int</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;maxNumToLog&quot;</span><span class="o">&gt;</span><span class="mi">100</span><span class="o">&lt;/</span><span class="kt">int</span><span class="o">&gt;</span>
-</span><span class='line'>    <span class="o">&lt;/</span><span class="n">processor</span><span class="o">&gt;</span>
-</span><span class='line'>    <span class="o">&lt;</span><span class="n">processor</span> <span class="n">class</span><span class="o">=</span><span class="s">&quot;solr.RunUpdateProcessorFactory&quot;</span> <span class="o">/&gt;</span>
-</span><span class='line'>  <span class="o">&lt;/</span><span class="n">updateRequestProcessorChain</span><span class="o">&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[solr的数值存储和范围查询]]></title>
-    <link href="http://www.wanghd.com/blog/2012/09/21/solrde-shu-zhi-cun-chu-he-fan-wei-cha-xun/"/>
-    <updated>2012-09-21T20:49:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/09/21/solrde-shu-zhi-cun-chu-he-fan-wei-cha-xun</id>
-    <content type="html"><![CDATA[<h3>问题：solr查询q=date:[1348233109 TO *]，QTime=300-500毫秒，范围越大越耗时</h3>
-
-<h3>要点：lucene内部不存储数值，而用多个字符串代替</h3>
-
-<h4>我的疑问：为什么不用数值呀，存储空间少，效率又高? 琢磨了下应该有如下原因吧</h4>
-
-<ul>
-<li>lucene索引的倒排表都是根据字符串排序的，要存储数值看来得另起一套索引</li>
-<li>如果存储数值，查询的排序也不能正常运作了，比如10比2排在前面</li>
-<li>查询12,是准确匹配12能还是能匹配123</li>
-<li>数字问题越来越复杂，基本上串模式在数字上根本行不通，如果数值也是串，那问题就简单多了,和一般的词没两样</li>
-</ul>
-
-
-<h3>lucene测试程序</h3>
-
-<ul>
-<li>添加id为695和705的两个文档，搜索id区域698到2054</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">,</span> <span class="n">ParseException</span><span class="o">{</span>
-</span><span class='line'>    <span class="n">Directory</span> <span class="n">dir</span> <span class="o">=</span> <span class="n">FSDirectory</span><span class="o">.</span><span class="na">open</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="s">&quot;/tmp/tempindex&quot;</span><span class="o">));</span>
-</span><span class='line'>    <span class="n">Analyzer</span> <span class="n">analyzer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StandardAnalyzer</span><span class="o">(</span><span class="n">Version</span><span class="o">.</span><span class="na">LUCENE_40</span><span class="o">);</span>
-</span><span class='line'>    <span class="n">IndexWriterConfig</span> <span class="n">iwc</span> <span class="o">=</span> <span class="k">new</span> <span class="n">IndexWriterConfig</span><span class="o">(</span><span class="n">Version</span><span class="o">.</span><span class="na">LUCENE_40</span><span class="o">,</span> <span class="n">analyzer</span><span class="o">);</span>
-</span><span class='line'>    <span class="n">iwc</span><span class="o">.</span><span class="na">setOpenMode</span><span class="o">(</span><span class="n">OpenMode</span><span class="o">.</span><span class="na">CREATE</span><span class="o">);</span>
-</span><span class='line'>    <span class="n">IndexWriter</span> <span class="n">writer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">IndexWriter</span><span class="o">(</span><span class="n">dir</span><span class="o">,</span> <span class="n">iwc</span><span class="o">);</span>
-</span><span class='line'>    <span class="n">Document</span> <span class="n">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Document</span><span class="o">();</span>
-</span><span class='line'>    <span class="n">doc</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">LongField</span><span class="o">(</span><span class="s">&quot;id&quot;</span><span class="o">,</span><span class="mi">695</span><span class="o">,</span><span class="n">Store</span><span class="o">.</span><span class="na">YES</span><span class="o">));</span>
-</span><span class='line'>    <span class="n">writer</span><span class="o">.</span><span class="na">addDocument</span><span class="o">(</span><span class="n">doc</span><span class="o">);</span>
-</span><span class='line'>    <span class="n">doc</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Document</span><span class="o">();</span>
-</span><span class='line'>    <span class="n">doc</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">LongField</span><span class="o">(</span><span class="s">&quot;id&quot;</span><span class="o">,</span><span class="mi">705</span><span class="o">,</span><span class="n">Store</span><span class="o">.</span><span class="na">YES</span><span class="o">));</span>
-</span><span class='line'>    <span class="n">writer</span><span class="o">.</span><span class="na">addDocument</span><span class="o">(</span><span class="n">doc</span><span class="o">);</span>
-</span><span class='line'>    <span class="n">writer</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">DirectoryReader</span> <span class="n">reader</span> <span class="o">=</span> <span class="n">DirectoryReader</span><span class="o">.</span><span class="na">open</span><span class="o">(</span><span class="n">dir</span><span class="o">);</span>
-</span><span class='line'>    <span class="n">IndexSearcher</span> <span class="n">searcher</span> <span class="o">=</span> <span class="k">new</span> <span class="n">IndexSearcher</span><span class="o">(</span><span class="n">reader</span><span class="o">);</span>
-</span><span class='line'>    <span class="n">Query</span> <span class="n">q</span> <span class="o">=</span> <span class="n">NumericRangeQuery</span><span class="o">.</span><span class="na">newLongRange</span><span class="o">(</span><span class="s">&quot;id&quot;</span><span class="o">,</span> <span class="mi">698L</span><span class="o">,</span> <span class="mi">2054L</span><span class="o">,</span> <span class="kc">true</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
-</span><span class='line'>    <span class="n">ScoreDoc</span><span class="o">[]</span> <span class="n">hits</span> <span class="o">=</span> <span class="n">searcher</span><span class="o">.</span><span class="na">search</span><span class="o">(</span><span class="n">q</span><span class="o">,</span> <span class="mi">200</span><span class="o">).</span><span class="na">scoreDocs</span><span class="o">;</span>
-</span><span class='line'>    <span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">hits</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++){</span>
-</span><span class='line'>      <span class="n">Document</span> <span class="n">result</span> <span class="o">=</span> <span class="n">searcher</span><span class="o">.</span><span class="na">doc</span><span class="o">(</span><span class="n">hits</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">doc</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">IndexableField</span> <span class="n">id</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="na">getField</span><span class="o">(</span><span class="s">&quot;id&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">&quot;doc:%s,id:%s&quot;</span><span class="o">,</span> <span class="n">hits</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">doc</span><span class="o">,</span> <span class="n">id</span><span class="o">.</span><span class="na">numericValue</span><span class="o">().</span><span class="na">longValue</span><span class="o">()));</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>    <span class="n">reader</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
-</span><span class='line'>    <span class="n">dir</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>调试监测建立索引时，695和705生成的多个字符串</h3>
-
-<ul>
-<li>断点设在NumericUtils.java的longToPrefixCoded方法内</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'>      <span class="mi">695</span>                         <span class="mi">705</span>
-</span><span class='line'><span class="o">[</span><span class="mi">20</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">5</span> <span class="mi">37</span><span class="o">]</span>   <span class="o">[</span><span class="mi">20</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">5</span> <span class="mi">41</span><span class="o">]</span> <span class="mh">0x20</span><span class="err">代表</span><span class="kt">long</span><span class="o">,</span><span class="err">低字节放到</span><span class="n">bytes</span><span class="err">高索引位</span>
-</span><span class='line'><span class="o">[</span><span class="mi">24</span> <span class="mi">8</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">2</span><span class="n">b</span><span class="o">]</span>     <span class="o">[</span><span class="mi">24</span> <span class="mi">8</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">2</span><span class="n">c</span><span class="o">]</span>   <span class="err">每</span><span class="mi">7</span><span class="err">位代表一个字符</span>
-</span><span class='line'><span class="o">[</span><span class="mi">28</span> <span class="mi">40</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">2</span><span class="o">]</span>       <span class="o">[</span><span class="mi">28</span> <span class="mi">40</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">2</span><span class="o">]</span>     <span class="err">每次循环右移</span><span class="n">precisionStep</span><span class="o">=</span><span class="mi">4</span>
-</span><span class='line'><span class="o">[</span><span class="mi">2</span><span class="n">c</span> <span class="mi">4</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>        <span class="o">[</span><span class="mi">2</span><span class="n">c</span> <span class="mi">4</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>
-</span><span class='line'><span class="o">[</span><span class="mi">30</span> <span class="mi">20</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>         <span class="o">[</span><span class="mi">30</span> <span class="mi">20</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>
-</span><span class='line'><span class="o">[</span><span class="mi">34</span> <span class="mi">2</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>          <span class="o">[</span><span class="mi">34</span> <span class="mi">2</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>
-</span><span class='line'><span class="o">[</span><span class="mi">38</span> <span class="mi">10</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>           <span class="o">[</span><span class="mi">38</span> <span class="mi">10</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>
-</span><span class='line'><span class="o">[</span><span class="mi">3</span><span class="n">c</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>            <span class="o">[</span><span class="mi">3</span><span class="n">c</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>
-</span><span class='line'><span class="o">[</span><span class="mi">40</span> <span class="mi">8</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>              <span class="o">[</span><span class="mi">40</span> <span class="mi">8</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>
-</span><span class='line'><span class="o">[</span><span class="mi">44</span> <span class="mi">40</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>               <span class="o">[</span><span class="mi">44</span> <span class="mi">40</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>
-</span><span class='line'><span class="o">[</span><span class="mi">48</span> <span class="mi">4</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>                <span class="o">[</span><span class="mi">48</span> <span class="mi">4</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>
-</span><span class='line'><span class="o">[</span><span class="mi">4</span><span class="n">c</span> <span class="mi">20</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>                 <span class="o">[</span><span class="mi">4</span><span class="n">c</span> <span class="mi">20</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>
-</span><span class='line'><span class="o">[</span><span class="mi">50</span> <span class="mi">2</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>                  <span class="o">[</span><span class="mi">50</span> <span class="mi">2</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">]</span>
-</span><span class='line'><span class="o">[</span><span class="mi">54</span> <span class="mi">10</span> <span class="mi">0</span><span class="o">]</span>                   <span class="o">[</span><span class="mi">54</span> <span class="mi">10</span> <span class="mi">0</span><span class="o">]</span>
-</span><span class='line'><span class="o">[</span><span class="mi">58</span> <span class="mi">1</span> <span class="mi">0</span><span class="o">]</span>                    <span class="o">[</span><span class="mi">58</span> <span class="mi">1</span> <span class="mi">0</span><span class="o">]</span>
-</span><span class='line'><span class="o">[</span><span class="mi">5</span><span class="n">c</span> <span class="mi">8</span><span class="o">]</span>                      <span class="o">[</span><span class="mi">5</span><span class="n">c</span> <span class="mi">8</span><span class="o">]</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>698-2057的区域转化</h3>
-
-<ul>
-<li>断点设在NumericUtils.java的longToPrefixCoded方法内</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="mi">698</span><span class="o">:</span> <span class="o">[</span><span class="mi">20</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">5</span> <span class="mi">3</span><span class="n">a</span><span class="o">]</span>  <span class="mi">703</span><span class="o">:</span> <span class="o">[</span><span class="mi">20</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">5</span> <span class="mi">3</span><span class="n">f</span><span class="o">]</span>
-</span><span class='line'><span class="mi">704</span><span class="o">:</span> <span class="o">[</span><span class="mi">24</span> <span class="mi">8</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">2</span><span class="n">c</span><span class="o">]</span>    <span class="mi">767</span><span class="o">:</span> <span class="o">[</span><span class="mi">24</span> <span class="mi">8</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">2</span><span class="n">f</span><span class="o">]</span>
-</span><span class='line'><span class="mi">768</span><span class="o">:</span> <span class="o">[</span><span class="mi">28</span> <span class="mi">40</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">3</span><span class="o">]</span>      <span class="mi">2047</span><span class="o">:[</span><span class="mi">28</span> <span class="mi">40</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">7</span><span class="o">]</span>
-</span><span class='line'><span class="mi">2048</span><span class="o">:[</span><span class="mi">20</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">10</span> <span class="mi">0</span><span class="o">]</span>  <span class="mi">2054</span><span class="o">:[</span><span class="mi">20</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">10</span> <span class="mi">6</span><span class="o">]</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>precisionStep使用默认的4</li>
-<li>703的生成方法是对698的右边4位和二进制“1111”做或运算</li>
-<li>704的生成方法是在703的基础上加1,那么右边四位全0，右移4位</li>
-<li>767的生成方法是对704的右边4位和二进制“1111”做或运算（其实只要前缀匹配，后面已经无所谓了）</li>
-<li>后面的数字生成方法一样</li>
-</ul>
-
-
-<h3>查询索引比较</h3>
-
-<ul>
-<li>大于等于698,小于等于703的没有</li>
-<li>大于等于704,小于等于767的有，705的第二条记录</li>
-<li>大于等于768,小于等于2047的没有</li>
-<li>大于等于2048,小于等于2054的没有</li>
-</ul>
-
-
-<h3>结论：要提高效率的方法</h3>
-
-<ul>
-<li>调整precisionStep,默认为4，调大索引小性能差，调小索引大性能理论上的好,精度高，见下图</li>
-</ul>
-
-
-<p><img src="http://www.wanghd.com/images/post/rangequery.gif" title="rangequery" alt="rangequery" /></p>
-
-<ul>
-<li>如果int够用，可以不用Long用Int</li>
-<li>缩小范围，这是最直接最管用的方法，（优化业务需求）</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[使用JMX分析solr状态]]></title>
-    <link href="http://www.wanghd.com/blog/2012/09/20/shi-yong-jmxfen-xi-solrzhuang-tai/"/>
-    <updated>2012-09-20T14:25:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/09/20/shi-yong-jmxfen-xi-solrzhuang-tai</id>
-    <content type="html"><![CDATA[<h3>开启JMX</h3>
-
-<ul>
-<li>在solrconfig.xml中添加,默认包含</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;jmx /&gt;</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>重启solr，设置启动参数</li>
-<li>扩展选项请参考<a href="http://www.oracle.com/technetwork/java/javase/tech/vmoptions-jsp-140102.html">官方文档</a></li>
-</ul>
-
-
-<!-- more -->
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>java -Xmx256M -Xms256M -XX:PermSize=64M -XX:MaxPermSize=64M 
-</span><span class='line'>-XX:+UseParallelGC 
-</span><span class='line'>-Dcom.sun.management.jmxremote
-</span><span class='line'>-Dcom.sun.management.jmxremote.port=3000
-</span><span class='line'>-Dcom.sun.management.jmxremote.ssl=false
-</span><span class='line'>-Dcom.sun.management.jmxremote.authenticate=false
-</span><span class='line'>-jar start.jar</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>使用jconsole连接，查看进程状态</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>jconsole 127.0.0.1:3000 （jconsole在jdk的bin目录里）</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>实时java堆内存使用情况</h3>
-
-<p><img src="http://www.wanghd.com/images/post/heap.png" title="heap" alt="heap" /></p>
-
-<h3>实时cpu使用情况</h3>
-
-<p><img src="http://www.wanghd.com/images/post/cpu.png" title="cpu" alt="cpu" /></p>
-
-<h3>MBean分析缓存命中率</h3>
-
-<p><img src="http://www.wanghd.com/images/post/documentcache.png" title="documentcache" alt="documentcache" /></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[向量空间模型]]></title>
-    <link href="http://www.wanghd.com/blog/2012/09/18/xiang-liang-kong-jian-mo-xing/"/>
-    <updated>2012-09-18T08:28:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/09/18/xiang-liang-kong-jian-mo-xing</id>
-    <content type="html"><![CDATA[<h3>向量空间模型广泛使用在文档相似度（算score等等），下面举例描述这个模型：</h3>
-
-<ul>
-<li>假设有两个文档（可以把一个query想象成一个文档）,分别为d1,d2</li>
-<li>假设w1,w2,w3,w4为term</li>
-<li>下图为词频（词频就是在单个文档中出现的次数）,词频为ai,bi</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>-----------------------------------
-</span><span class='line'>      |  w1  |  w2  |  w3  |  w4  |
-</span><span class='line'>  d1  |  1   |      |  1   |      |
-</span><span class='line'>  d2  |  2   |  3   |  2   |  1   |
-</span><span class='line'>-----------------------------------</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>比较夹角公式，越接近越相似,(还需要向量的模公式,|x| = √x<sup>2)</sup></li>
-</ul>
-
-
-<p><img src="http://www.wanghd.com/images/post/vsm.png" title="vsm公式" alt="vsm公式" /></p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sim(d1,d2) = ∑(ai*bi) / √(∑ai^2 * ∑bi^2)
-</span><span class='line'>           = 1*2+0*3+1*2+0*1 / √((1^2+0^2+1^2+0^2)*(2^2+3^2+2^2+1^2))
-</span><span class='line'>           = 4 / √(36)
-</span><span class='line'>           = 4 / 6
-</span><span class='line'>           = 2 / 3
-</span><span class='line'>           = 0.66666...</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>假设文章只有两维的话，那么空间图就可以画在一个平面直角坐标系当中，读者可以假想两篇只有两个词的文章画图进行理解。</li>
-<li>由公式可以看出计算量是很大的，要提高效率最好的方法就是减少term，俗称降纬</li>
 </ul>
 
 ]]></content>
