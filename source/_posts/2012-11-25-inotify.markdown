@@ -19,6 +19,9 @@ categories: [Share]
 + inotify可以递归的监控文件是否有新建，修改等
 + rsync用来同步
 
+
+<!-- more -->
+
 ###安装inotify
 
 + 内核版本要Linux 2.6.13以上
