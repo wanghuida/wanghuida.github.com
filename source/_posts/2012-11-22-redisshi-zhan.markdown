@@ -15,6 +15,8 @@ categories: [NoSQL, Share]
 + 官方网址：[http://redis.io](http://redis.io)
 + [freenode](/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/)的聊天室名称是#redis
 
+<!-- more -->
+
 ### 安装redis
 
 + mac下安装redis非常简单
