@@ -418,7 +418,122 @@
   </header>
 
 
-  <div class="entry-content">
+  <div class="entry-content"><h3>redis是什么？</h3>
+
+<ul>
+<li>redis是一个开源的，先进的key-value存储服务器端</li>
+<li>value可以包含多种结构，比如strings, hashes, lists, sets ,sorted sets</li>
+<li>官方网址：<a href="http://redis.io">http://redis.io</a></li>
+<li><a href="/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/">freenode</a>的聊天室名称是#redis</li>
+</ul>
+
+
+<h3>安装redis</h3>
+
+<ul>
+<li>mac下安装redis非常简单</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>brew install redis
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>linux下的安装步骤如下</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#下载，解压和编译</span>
+</span><span class='line'><span class="nv">$ </span>wget http://redis.googlecode.com/files/redis-2.6.5.tar.gz
+</span><span class='line'><span class="nv">$ </span>tar xzf redis-2.6.5.tar.gz
+</span><span class='line'><span class="nv">$ </span><span class="nb">cd </span>redis-2.6.5
+</span><span class='line'><span class="nv">$ </span>make
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>配置redis</h3>
+
+<ul>
+<li>redis的默认配置文件是redis.conf，里面有详细的注释</li>
+<li>下面是简单的单台redis配置</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#base</span>
+</span><span class='line'>daemonize yes                       <span class="c">#守护进程</span>
+</span><span class='line'>port 6379                           <span class="c">#监听端口</span>
+</span><span class='line'><span class="nb">bind </span>127.0.0.1                      <span class="c">#绑定的ip地址</span>
+</span><span class='line'>timeout 0                           <span class="c">#断开空闲的客户端时间</span>
+</span><span class='line'>loglevel notice                     <span class="c">#记录到错误日志的等级</span>
+</span><span class='line'>logfile /usr/local/log/redis.log    <span class="c">#记录的日志文件</span>
+</span><span class='line'>databases 16                        <span class="c">#可以选择的db个数</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#rdb默认开启的持久化模式</span>
+</span><span class='line'>save 900 1                          <span class="c">#save &lt;秒&gt; &lt;改变个数&gt;             </span>
+</span><span class='line'>save 300 10
+</span><span class='line'>save 60 10000
+</span><span class='line'>stop-writes-on-bgsave-error yes     <span class="c">#当bgsave错误时停止rdb写入</span>
+</span><span class='line'>rdbcompression yes                  <span class="c">#采用LZF压缩</span>
+</span><span class='line'>rdbchecksum yes                     <span class="c">#校验和</span>
+</span><span class='line'>dbfilename dump.rdb                 <span class="c">#保存的文件名</span>
+</span><span class='line'>dir /usr/local/var/db/redis/        <span class="c">#保存的路径</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>启动redis server端</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>redis-server <span class="o">[</span>/path/to/redis.conf<span class="o">]</span>         <span class="c">#mac</span>
+</span><span class='line'><span class="nv">$ </span>src/redis-server <span class="o">[</span>/path/to/redis.conf<span class="o">]</span>     <span class="c">#linux</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>打开client端，并测试</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>redis-cli             <span class="c">#mac</span>
+</span><span class='line'><span class="nv">$ </span>src/redis-cli         <span class="c">#linux</span>
+</span><span class='line'>
+</span><span class='line'>redis&gt; <span class="nb">set </span>name wanghuida
+</span><span class='line'>OK
+</span><span class='line'>redis&gt; get name
+</span><span class='line'><span class="s2">&quot;wanghuida&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
 </div>
   
   
@@ -620,9 +735,10 @@
 <li class='category'><a href='/blog/categories/java/'>Java (15)</a></li>
 <li class='category'><a href='/blog/categories/javascript/'>Javascript (1)</a></li>
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (1)</a></li>
-<li class='category'><a href='/blog/categories/share/'>Share (12)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (13)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
 
   </ul>

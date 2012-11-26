@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>向量空间模型 - 惠达的小宅</title>
+  <title>Category: NoSQL - 惠达的小宅</title>
   <meta name="author" content="王惠达 huida wanghuida">
 
   
-  <meta name="description" content="王惠达博客 IT技术 php perl python java c ruby wanghuida blog lucene mogilefs">
+  <meta name="description" content="Category: NoSQL">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.wanghd.com/blog/2012/09/18/xiang-liang-kong-jian-mo-xing">
+  <link rel="canonical" href="http://www.wanghd.comblog/categories/nosql">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/bootstrap/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/stylesheets/bootstrap/responsive.css" media="screen, projection" rel="stylesheet" type="text/css">
@@ -93,147 +93,38 @@
   <div class="container">
     <div class="row-fluid">
       
-<article class="hentry span9" role="article">
+<article role="article" class="span9">
 
   
   <header class="page-header">
-    
-      <h1 class="entry-title">向量空间模型</h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-09-18T08:28:00+08:00" pubdate data-updated="true">Sep 18<span>th</span>, 2012</time>
-        
-         | <a href="#disqus_thread">Comments</a>
-        
-      </p>
+    <h1 class="entry-title">Category: NoSQL</h1>
     
   </header>
+  
+  <div id="blog-archives" class="category">
 
 
-<div class="entry-content"><h3>向量空间模型广泛使用在文档相似度（算score等等），下面举例描述这个模型：</h3>
 
-<ul>
-<li>假设有两个文档（可以把一个query想象成一个文档）,分别为d1,d2</li>
-<li>假设w1,w2,w3,w4为term</li>
-<li>下图为词频（词频就是在单个文档中出现的次数）,词频为ai,bi</li>
-</ul>
+  
+  <h1>2012</h1>
 
+<article>
+  <div class="well">
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>-----------------------------------
-</span><span class='line'>      |  w1  |  w2  |  w3  |  w4  |
-</span><span class='line'>  d1  |  1   |      |  1   |      |
-</span><span class='line'>  d2  |  2   |  3   |  2   |  1   |
-</span><span class='line'>-----------------------------------</span></code></pre></td></tr></table></div></figure>
+<h2><a href="/blog/2012/11/22/redisshi-zhan/">redis实战</a></h2>
+<time datetime="2012-11-22T17:17:00+08:00" pubdate><span class='month'>Nov</span> <span class='day'>22</span> <span class='year'>2012</span></time>
 
-
-<ul>
-<li>比较夹角公式，越接近越相似,(还需要向量的模公式,|x| = √x<sup>2)</sup></li>
-</ul>
-
-
-<p><img src="/images/post/vsm.png" title="vsm公式" alt="vsm公式" /></p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sim(d1,d2) = ∑(ai*bi) / √(∑ai^2 * ∑bi^2)
-</span><span class='line'>           = 1*2+0*3+1*2+0*1 / √((1^2+0^2+1^2+0^2)*(2^2+3^2+2^2+1^2))
-</span><span class='line'>           = 4 / √(36)
-</span><span class='line'>           = 4 / 6
-</span><span class='line'>           = 2 / 3
-</span><span class='line'>           = 0.66666...</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>假设文章只有两维的话，那么空间图就可以画在一个平面直角坐标系当中，读者可以假想两篇只有两个词的文章画图进行理解。</li>
-<li>由公式可以看出计算量是很大的，要提高效率最好的方法就是减少term，俗称降纬</li>
-</ul>
+<footer>
+  <span class="categories">posted in <a class='category' href='/blog/categories/nosql/'>NoSQL</a>, <a class='category' href='/blog/categories/share/'>Share</a></span>
+</footer>
 
 </div>
 
+</article>
 
-  <footer>
-    <p class="meta">
-      
-  
-
-<span class="byline author vcard">Posted by <span class="fn">王惠达 huida wanghuida</span></span>
-
-      
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-09-18T08:28:00+08:00" pubdate data-updated="true">Sep 18<span>th</span>, 2012</time>
-      
-
-<span class="categories">
-  
-    <a class='category' href='/blog/categories/java/'>Java</a>, <a class='category' href='/blog/categories/share/'>Share</a>, <a class='category' href='/blog/categories/solr/'>Solr</a>
-  
-</span>
-
-
-    </p>
-    
-      <div class="sharing">
-  
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2012/09/18/xiang-liang-kong-jian-mo-xing/" data-via="" data-counturl="http://www.wanghd.com/blog/2012/09/18/xiang-liang-kong-jian-mo-xing/" >Tweet</a>
-  
-  
-  
 </div>
 
-    
-    
-    <section>
-      <h1>Comments</h1>
-      <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-</div>
-    </section>
-    
-    <ul class="pager">
-      
-      <li class="previous"><a class="basic-alignment left"
-        href="/blog/2012/09/14/solrman-cha-xun-fen-xi/" title="Previous Post:
-        solr慢查询分析">&laquo; solr慢查询分析</a></li>
-      
-      <li><a href="/blog/archives">文章归档</a></li>
-      
-      <li class="next"><a class="basic-alignment right" href="/blog/2012/09/20/shi-yong-jmxfen-xi-solrzhuang-tai/"
-        title="Next Post: 使用JMX分析solr状态">使用JMX分析solr状态
-        &raquo;</a></li>
-      
-    </ul>
-  </footer>
+  
 </article>
 
 <aside class="sidebar-nav span3">
@@ -350,10 +241,7 @@
       var disqus_shortname = 'wanghuida';
       
         
-        // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.wanghd.com/blog/2012/09/18/xiang-liang-kong-jian-mo-xing/';
-        var disqus_url = 'http://www.wanghd.com/blog/2012/09/18/xiang-liang-kong-jian-mo-xing/';
-        var disqus_script = 'embed.js';
+        var disqus_script = 'count.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

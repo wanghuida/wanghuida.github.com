@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: NoSQL | 惠达的小宅]]></title>
+  <link href="http://www.wanghd.com/blog/categories/nosql/atom.xml" rel="self"/>
+  <link href="http://www.wanghd.com/"/>
+  <updated>2012-11-27T00:28:39+08:00</updated>
+  <id>http://www.wanghd.com/</id>
+  <author>
+    <name><![CDATA[王惠达 huida wanghuida]]></name>
+    <email><![CDATA[wanghuida258@yahoo.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[redis实战]]></title>
+    <link href="http://www.wanghd.com/blog/2012/11/22/redisshi-zhan/"/>
+    <updated>2012-11-22T17:17:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/11/22/redisshi-zhan</id>
+    <content type="html"><![CDATA[<h3>redis是什么？</h3>
+
+<ul>
+<li>redis是一个开源的，先进的key-value存储服务器端</li>
+<li>value可以包含多种结构，比如strings, hashes, lists, sets ,sorted sets</li>
+<li>官方网址：<a href="http://redis.io">http://redis.io</a></li>
+<li><a href="/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/">freenode</a>的聊天室名称是#redis</li>
+</ul>
+
+
+<h3>安装redis</h3>
+
+<ul>
+<li>mac下安装redis非常简单</li>
+</ul>
+
+
+<p><code>bash
+$ brew install redis
+</code></p>
+
+<ul>
+<li>linux下的安装步骤如下</li>
+</ul>
+
+
+<p>```bash</p>
+
+<h1>下载，解压和编译</h1>
+
+<p>$ wget http://redis.googlecode.com/files/redis-2.6.5.tar.gz
+$ tar xzf redis-2.6.5.tar.gz
+$ cd redis-2.6.5
+$ make
+```</p>
+
+<h3>配置redis</h3>
+
+<ul>
+<li>redis的默认配置文件是redis.conf，里面有详细的注释</li>
+<li>下面是简单的单台redis配置</li>
+</ul>
+
+
+<p>```</p>
+
+<h1>base</h1>
+
+<p>daemonize yes                       #守护进程
+port 6379                           #监听端口
+bind 127.0.0.1                      #绑定的ip地址
+timeout 0                           #断开空闲的客户端时间
+loglevel notice                     #记录到错误日志的等级
+logfile /usr/local/log/redis.log    #记录的日志文件
+databases 16                        #可以选择的db个数</p>
+
+<h1>rdb默认开启的持久化模式</h1>
+
+<p>save 900 1                          #save &lt;秒> &lt;改变个数>           <br/>
+save 300 10
+save 60 10000
+stop-writes-on-bgsave-error yes     #当bgsave错误时停止rdb写入
+rdbcompression yes                  #采用LZF压缩
+rdbchecksum yes                     #校验和
+dbfilename dump.rdb                 #保存的文件名
+dir /usr/local/var/db/redis/        #保存的路径
+```</p>
+
+<h3>启动redis server端</h3>
+
+<p><code>bash
+$ redis-server [/path/to/redis.conf]         #mac
+$ src/redis-server [/path/to/redis.conf]     #linux
+</code></p>
+
+<h3>打开client端，并测试</h3>
+
+<p>```bash
+$ redis-cli             #mac
+$ src/redis-cli         #linux</p>
+
+<p>redis> set name wanghuida
+OK
+redis> get name
+"wanghuida"
+```</p>
+]]></content>
+  </entry>
+  
+</feed>
