@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Java | 老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/blog/categories/java/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2012-12-10T22:08:18+08:00</updated>
+  <updated>2012-12-17T22:40:59+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,27 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[System.out.println 乱码]]></title>
+    <link href="http://www.wanghd.com/blog/2012/12/17/system-dot-out-dot-printlnluan-ma/"/>
+    <updated>2012-12-17T22:30:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2012/12/17/system-dot-out-dot-printlnluan-ma</id>
+    <content type="html"><![CDATA[<h3>今天郁闷发现eclipse控制中文乱码</h3>
+
+<ul>
+<li>在网上找答案真心蛋疼，说啥的都有</li>
+<li>特此在这里记录一下</li>
+</ul>
+
+
+<p><code>
+Run Configurations... -&gt; Common选项卡 -&gt; Encoding区，选择Other UTF-8
+</code></p>
+
+<p><img src="/images/post/console-messy-code.jpg" title="console messy code" alt="console messy code" /></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[安装配置hive]]></title>
@@ -456,134 +477,6 @@ bin/start-all.sh</p>
 <li>在游览器里查看下结果，输入localhost:50070</li>
 </ul>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[显示solr省略的日志]]></title>
-    <link href="http://www.wanghd.com/blog/2012/09/27/solrsheng-lue-ri-zhi/"/>
-    <updated>2012-09-27T13:54:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/09/27/solrsheng-lue-ri-zhi</id>
-    <content type="html"><![CDATA[<h3>solr日志默认的效果</h3>
-
-<ul>
-<li>删除时默认只显示10条记录，其余的使用省略号代替</li>
-<li>一般情况下这样是比较好的，但是有时还是希望看到所有的信息</li>
-</ul>
-
-
-<p><code>
-webapp=/solr path=/update params={wt=json}
-{delete=[11, 12, 13, 14, 15, 16, 17, 18, 19, 20... (100 deletes)]} 0 127
-</code></p>
-
-<!--more -->
-
-
-<h3>测试程序</h3>
-
-<ul>
-<li>查询100条记录后删除</li>
-</ul>
-
-
-<p>```php
-&lt;?php
-include_once('Apache/Solr/Service.php');
-$solr = new Apache_Solr_Service('localhost','8984','/solr');</p>
-
-<p>$rep = $solr->search('<em>:</em>',0,100);
-$rep = $rep->response->docs;</p>
-
-<p>$ids = array();
-foreach($rep as $r){</p>
-
-<pre><code>var_dump($r-&gt;id);
-$ids[] = $r-&gt;id;
-</code></pre>
-
-<p>}
-$solr->deleteByMultipleIds($ids);
-```</p>
-
-<h3>跟踪solr代码</h3>
-
-<ul>
-<li>断点设置在LogUpdateProcessor的processDelete里</li>
-<li>小于maxNumToLog才会添加到deletes</li>
-<li>多余的部分用省略号表示</li>
-</ul>
-
-
-<p>```java
-  @Override
-  public void processDelete( DeleteUpdateCommand cmd ) throws IOException {</p>
-
-<pre><code>if (logDebug) { log.debug("PRE_UPDATE " + cmd.toString()); }
-if (next != null) next.processDelete(cmd);
-
-if (cmd.isDeleteById()) {
-  if (deletes == null) {
-    deletes = new ArrayList&lt;String&gt;();
-    toLog.add("delete",deletes);
-  }
-  if (deletes.size() &lt; maxNumToLog) { //小于maxNumToLog才会添加到deletes
-    long version = cmd.getVersion();
-    String msg = cmd.getId();
-    if (version != 0) msg = msg + " (" + version + ')';
-    deletes.add(msg);
-  }
-} else {
-  if (toLog.size() &lt; maxNumToLog) {
-    long version = cmd.getVersion();
-    String msg = cmd.query;
-    if (version != 0) msg = msg + " (" + version + ')';
-    toLog.add("deleteByQuery", msg);
-  }
-}
-numDeletes++;
-</code></pre>
-
-<p>  }</p>
-
-<p>  @Override
-  public void finish() throws IOException {</p>
-
-<pre><code>//略
-if (deletes != null &amp;&amp; numDeletes &gt; maxNumToLog) {
-  deletes.add("... (" + numDeletes + " deletes)"); //如果大于就要省略号表示
-}
-//略
-</code></pre>
-
-<p>  }
-```</p>
-
-<h3>更改配置，显示所有结果</h3>
-
-<ul>
-<li>默认配置中是没有updateRequestProcessorChain，如果没有配置，默认也会加载下面3个处理器</li>
-<li>RunUpdateProcessorFactory一般必须要有的，作用是更新请求</li>
-<li>DistributedUpdateProcessorFactory作用是更新shard</li>
-<li>LogUpdateProcessorFactory作用是记录更新日志</li>
-<li>maxNumToLog决定日志显示的个数，默认为10</li>
-<li>参考<a href="http://wiki.apache.org/solr/UpdateRequestProcessor">http://wiki.apache.org/solr/UpdateRequestProcessor</a></li>
-<li>参考<a href="http://wiki.apache.org/solr/SolrConfigXml">http://wiki.apache.org/solr/SolrConfigXml</a></li>
-</ul>
-
-
-<p>```
-  <updateRequestProcessorChain name="" default="true" ></p>
-
-<pre><code>&lt;processor class="solr.DistributedUpdateProcessorFactory" /&gt;
-&lt;processor class="solr.LogUpdateProcessorFactory" &gt;
-  &lt;int name="maxNumToLog"&gt;100&lt;/int&gt;
-&lt;/processor&gt;
-&lt;processor class="solr.RunUpdateProcessorFactory" /&gt;
-</code></pre>
-
-<p>  </updateRequestProcessorChain>
-```</p>
 ]]></content>
   </entry>
   

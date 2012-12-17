@@ -100,6 +100,55 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2012/11/08/perlfu-jin-cheng-jian-ting-zi-jin-cheng-gong-zuo-shi-li/">Perl父进程监听，子进程工作实例</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-08T22:15:00+08:00" pubdate data-updated="true">Nov 8<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/08/perlfu-jin-cheng-jian-ting-zi-jin-cheng-gong-zuo-shi-li/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><ol>
+<li>构造后台进程</li>
+<li>主进程监到连接，创建子进程接收消息并处理消息</li>
+<li>主进程继续监听，同时非阻塞的回收子进程</li>
+</ol>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2012/11/08/perlfu-jin-cheng-jian-ting-zi-jin-cheng-gong-zuo-shi-li/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2012/11/07/nginxfan-xiang-dai-li-zi-dong-urldecodewen-ti/">Nginx反向代理自动urldecode问题</a></h1>
     
     
@@ -687,132 +736,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/10/13/mogstoredshi-yong-nginx/">Mogstored使用nginx</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-10-13T11:37:00+08:00" pubdate data-updated="true">Oct 13<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/10/13/mogstoredshi-yong-nginx/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>配置nginx.conf</h3>
-
-<ul>
-<li>使用mogile用户，如果使用root会导致delete job无法删除(因为新文件是root的呀)</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>user mogile daemon</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>autoindex on: 必须要加，否则mogadm check显示错误，因为返回错误状态码</li>
-<li>expires max: 过期头设置到2037年, and the Cache-Control max-age to 10 years.</li>
-<li>client_max_body_size 20m: 放宽上传大小</li>
-<li><p>client_body_temp_path xxxx: 存放零时文件的目录</p></li>
-<li><p>配置WebDav,首先要确认HttpDavModule已经被加载，默认是不加载的 ./configure &#8211;with-http_dav_module</p></li>
-<li>dav_methods PUT DELETE MKCOL; 允许的方法put是上传，delete是删除,mkcol是创建文件夹</li>
-<li>dav_access user:rw group:r all:r; 设置权限</li>
-<li>create_full_put_path on; put新文件默认只能在已存在的目录，不过这条指令允许创建所有的中间目录</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>server 
-</span><span class='line'>{
-</span><span class='line'>    listen 7500;
-</span><span class='line'>    error_log /var/log/nginx/mogstore.error.log crit;
-</span><span class='line'>    access_log /var/log/nginx/mogstore.access.log gzip;
-</span><span class='line'>
-</span><span class='line'>    location / {
-</span><span class='line'>        autoindex   on;
-</span><span class='line'>        root        /huida/mogdata;
-</span><span class='line'>    }
-</span><span class='line'>
-</span><span class='line'>    location /dev1/ {
-</span><span class='line'>        expires             max;
-</span><span class='line'>        root                /huida/mogdata;
-</span><span class='line'>        client_max_body_size        20m;
-</span><span class='line'>        client_body_temp_path       /huida/mogdata/dev1/temp;
-</span><span class='line'>        dav_methods                 PUT DELETE MKCOL;
-</span><span class='line'>        create_full_put_path        on;
-</span><span class='line'>        dav_access                  user:rw group:r all:r;
-</span><span class='line'>    }
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>配置mogstored.conf</h3>
-
-<ul>
-<li>已经不需要perlbal了</li>
-<li>虽然是不用server了，不过mogstored还是要启动，因为还有个磁盘监控7501端口</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>#httplisten = 0.0.0.0:7500
-</span><span class='line'>server = none</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>结论</h3>
-
-<ul>
-<li>nginx比perlbal更稳定，基本不会挂掉了</li>
-<li>mogadm device add 时不要忘记配置nginx后重启，也别忘记自己建文件夹【nginx多一步】</li>
-<li>nginx配置好user,所以不会创建的文件权限为root:root,不用nginx就要用su mogile -c mogstored了</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/3/">&larr; 其他文章</a></li>
@@ -829,7 +752,7 @@
   <ul id="categories" class="nav nav-list">
     <li class="nav-header">文章分类</li>
     <li class='category'><a href='/blog/categories/hadoop/'>Hadoop (4)</a></li>
-<li class='category'><a href='/blog/categories/java/'>Java (15)</a></li>
+<li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
 <li class='category'><a href='/blog/categories/javascript/'>Javascript (1)</a></li>
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
 <li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
@@ -857,6 +780,10 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2012/12/17/system-dot-out-dot-printlnluan-ma/">System.out.println 乱码</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng/">mogilefs设备损坏处理流程</a>
@@ -892,10 +819,6 @@
     
       <li class="post">
         <a href="/blog/2012/11/10/an-zhuang-pei-zhi-hive/">安装配置hive</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/08/perlfu-jin-cheng-jian-ting-zi-jin-cheng-gong-zuo-shi-li/">perl父进程监听，子进程工作实例</a>
       </li>
     
   </ul>
