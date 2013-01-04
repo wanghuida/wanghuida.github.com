@@ -100,6 +100,128 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2012/09/14/solrman-cha-xun-fen-xi/">Solr慢查询分析</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-09-14T13:35:00+08:00" pubdate data-updated="true">Sep 14<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/09/14/solrman-cha-xun-fen-xi/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>solr慢请求分析,第一种</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=560950&q=*:*&wt=json&rows=50} hits=863948 status=0 QTime=2752
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=756250&q=*:*&wt=json&rows=50} hits=863935 status=0 QTime=2472 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=315450&q=*:*&wt=json&rows=50} hits=863935 status=0 QTime=1183 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=557400&q=*:*&wt=json&rows=50} hits=863935 status=0 QTime=2020 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=315550&q=*:*&wt=json&rows=50} hits=863935 status=0 QTime=1061 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=756400&q=*:*&wt=json&rows=50} hits=863935 status=0 QTime=2252 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=315650&q=*:*&wt=json&rows=50} hits=863938 status=0 QTime=1068 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=557500&q=*:*&wt=json&rows=50} hits=863938 status=0 QTime=2012 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=557550&q=*:*&wt=json&rows=50} hits=863938 status=0 QTime=2248 </span></code></pre></td></tr></table></div></figure>
+
+
+<h3>解决方案</h3>
+
+<ul>
+<li>请排除以上查询语句【或限制start】</li>
+</ul>
+
+
+<h3>solr慢请求分析,第二种</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>INFO: [] webapp=/solr path=/select params={mm=2&fl=score,*&sort=score+desc,quetime+desc&start=0&q=贷款+房子+能+不+买&bf=linear(rankscore,29.3246184,0)&qf=title^5+tags^1+bestanswerstr^2+description^1+normalanswerstr^1&wt=json&qt=dismax&fq=-cityid:14&fq=questatus:1+OR+questatus:2+OR+questatus:3+OR+questatus:6&rows=1} hits=317500 status=0 QTime=520 
+</span><span class='line'>INFO: [] webapp=/solr path=/select params={mm=2&fl=score,*&sort=score+desc,quetime+desc&start=0&q=集体+户口+好+好+不&qf=title^5+tags^1+bestanswerstr^2+description^1+normalanswerstr^1&wt=json&qt=dismax&fq=-cityid:12&fq=questatus:1+OR+questatus:2+OR+questatus:3+OR+questatus:6&rows=1} hits=287285 status=0 QTime=622 </span></code></pre></td></tr></table></div></figure>
+
+
+<h3>解决方案</h3>
+
+<ul>
+<li>dismax的mm=2间接使用了OR，建议用AND提高性能【实验中:我想用docfreq来做判断用AND还是OR】</li>
+<li>StopWord:通过solr/admin/luke?fl=normalanswerstr&amp;numTerms=100分析term,过滤掉没有意义的term,例如</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;int name="的"&gt;965396&lt;/int&gt;
+</span><span class='line'>&lt;int name="，"&gt;947429&lt;/int&gt;
+</span><span class='line'>&lt;int name="是"&gt;729063&lt;/int&gt;
+</span><span class='line'>&lt;int name="。"&gt;707417&lt;/int&gt;
+</span><span class='line'>&lt;int name="不"&gt;571925&lt;/int&gt;
+</span><span class='line'>&lt;int name="你"&gt;534142&lt;/int&gt;
+</span><span class='line'>&lt;int name="可以"&gt;525645&lt;/int&gt;
+</span><span class='line'>&lt;int name="就"&gt;460975&lt;/int&gt;
+</span><span class='line'>&lt;int name="有"&gt;443743&lt;/int&gt;
+</span><span class='line'>&lt;int name="了"&gt;437630&lt;/int&gt;
+</span><span class='line'>&lt;int name="要"&gt;372936&lt;/int&gt;
+</span><span class='line'>&lt;int name="！"&gt;342369&lt;/int&gt;
+</span><span class='line'>&lt;int name="好"&gt;331646&lt;/int&gt;
+</span><span class='line'>&lt;int name="在"&gt;324636&lt;/int&gt;
+</span><span class='line'>&lt;int name="一"&gt;279765&lt;/int&gt;
+</span><span class='line'>&lt;int name="个"&gt;269726&lt;/int&gt;
+</span><span class='line'>&lt;int name="能"&gt;233510&lt;/int&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>权重相同的放入同一个字段，也可以用CopyField，可以多加个系数</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2012/09/07/lucene-ru-men/">Lucene 入门</a></h1>
     
     
@@ -1012,53 +1134,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/07/27/java-volatileli-jie/">Java Volatile理解</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-07-27T21:55:00+08:00" pubdate data-updated="true">Jul 27<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/07/27/java-volatileli-jie/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>volatile的含义其实很好理解，希望配合图可以更加清晰的解释</h3>
-
-<p><img src="/images/post/volatile.jpg" title="volatile 图例说明" alt="volatile" /></p>
-
-<ul>
-<li>多个线程加载同一个对象时，会从主内存复制一个副本到线程工作内存</li>
-<li>如果对象没有volatile属性，只有write操作才会让主内存的对象得到修改（其他线程这时才有可能拿到最新的结果）</li>
-<li>如果对象有volatile属性，load,use,asign,store都会拿到实时的结果（因为会一直同步更新结果）</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/5/">&larr; 其他文章</a></li>
@@ -1081,7 +1156,7 @@
 <li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (1)</a></li>
-<li class='category'><a href='/blog/categories/share/'>Share (13)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (14)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
 
   </ul>
@@ -1103,6 +1178,10 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2013/01/04/jqueryzai-firefoxxia-wu-fa-autocomplete/">jquery在firefox下无法autocomplete</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2012/12/17/system-dot-out-dot-printlnluan-ma/">System.out.println 乱码</a>
@@ -1140,10 +1219,6 @@
         <a href="/blog/2012/11/22/xiu-fu-mogilefsmu-lu-owner/">修复mogilefs目录owner</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2012/11/10/an-zhuang-pei-zhi-hive/">安装配置hive</a>
-      </li>
-    
   </ul>
 </section>
 
@@ -1177,7 +1252,7 @@
 
 <hr>
 <p>
-  Copyright &copy; 2012 - 王惠达 huida wanghuida -
+  Copyright &copy; 2013 - 王惠达 huida wanghuida -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
    - <span class="credit">沪ICP备12048826号</span>
 </p>

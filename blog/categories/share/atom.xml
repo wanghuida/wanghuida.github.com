@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Share | 老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/blog/categories/share/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2012-12-19T10:41:43+08:00</updated>
+  <updated>2013-01-04T17:38:30+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,34 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[jquery在firefox下无法autocomplete]]></title>
+    <link href="http://www.wanghd.com/blog/2013/01/04/jqueryzai-firefoxxia-wu-fa-autocomplete/"/>
+    <updated>2013-01-04T17:29:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/01/04/jqueryzai-firefoxxia-wu-fa-autocomplete</id>
+    <content type="html"><![CDATA[<h4>jquery的autocomplete中文输入在firefox无法正常使用</h4>
+
+<ul>
+<li>firefox下用input事件触发keydown即可</li>
+</ul>
+
+
+<p>```
+$('元素').bind('input', function(){</p>
+
+<pre><code>$(this).trigger('keydown');
+</code></pre>
+
+<p>}).bind("keydown", function(event){</p>
+
+<pre><code>事件
+</code></pre>
+
+<p>}
+```</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[inotify,rsync统一化配置]]></title>
@@ -253,100 +281,6 @@ boot
 ```</p>
 
 <h4>重启后，选择新选项即可进入CentOS LiveCD环境。</h4>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[IRC:irssi使用教程]]></title>
-    <link href="http://www.wanghd.com/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/"/>
-    <updated>2012-10-13T23:39:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/10/13/irc-irssishi-yong-jiao-cheng</id>
-    <content type="html"><![CDATA[<h3>IRC是什么？</h3>
-
-<ul>
-<li>IRC（Internet Relay Chat的缩写，“因特网中继聊天”）是一种通过网络的即时聊天方式。其主要用于群体聊天，但同样也可以用于个人对个人的聊天。</li>
-</ul>
-
-
-<!-- more -->
-
-
-<h3>安装irssi</h3>
-
-<ul>
-<li>命令行的聊天客户端满酷，就选择了irssi</li>
-</ul>
-
-
-<p><code>bash
-brew install irssi
-</code></p>
-
-<h3>连接服务器</h3>
-
-<ul>
-<li>运行irssi</li>
-<li>连接irc.freenode.net</li>
-</ul>
-
-
-<p><code>bash
-irssi
-/connect irc.freenode.net
-</code></p>
-
-<h3>注册一个自己用户名</h3>
-
-<p><code>
-/nick wanghuida
-/msg nickserv help #会打开一个频道，Ctrl+N/P切换看一下命令,参数错误会有提示
-/msg nickserv register 123456 wanghuida258@126.com
-/msg NickServ VERIFY REGISTER wanghuida xgticwehprrf #这条命令是从邮箱里获取的
-/msg nickserv identify 123456 #用于登陆识别
-</code></p>
-
-<h3>进入聊天室</h3>
-
-<ul>
-<li>可以开始欢快的聊天了</li>
-</ul>
-
-
-<p><code>
-/join #mogilefs
-/join #gentoo-cn
-</code></p>
-
-<h3>设置自动登陆</h3>
-
-<ul>
-<li>也可以不通过命令行来自动登陆</li>
-<li>irssi的默认配置在~/.irssi/config里</li>
-</ul>
-
-
-<p><code>
-alias irssi_williamwang='irssi --connect=irc.freenode.net --nick=williamwang --password=xxxxxx'
-</code></p>
-
-<h3>其他命令</h3>
-
-<ul>
-<li>/wc 或者 /leave ,离开当前频道</li>
-<li>/disconnect &lt;服务器>，断开一个服务器</li>
-<li>/quit 或者 /exit，退出 irssi，结束IRC会话。</li>
-<li>/msg &lt;昵称> &lt;消息>，向某人发私消息（新开窗口）</li>
-<li>/query &lt;昵称> &lt;消息>，向某人发私消息（新开窗口且转换到这个窗口）</li>
-<li>/say &lt;昵称> &lt;消息>，向某人说话（不新开窗口）</li>
-<li>/notice &lt;昵称> &lt;消息>，向指定人发出注意消息</li>
-<li>/me &lt;动作>，在当前聊天室窗口中做出动作。 如做出晕倒动作：/me 晕倒</li>
-<li>/away &lt;原因>，留下信息说明暂时离开，别人向你发出私聊时将会返回此消息，再重新输入 /away（不指定参数）则解除离开状态。</li>
-<li>/ignore &lt;昵称>，忽略某人的聊天内容</li>
-<li>/set autolog on，自动保存聊天记录</li>
-<li>/msg ChanServ info #mogilefs ，查看聊天室信息，用来确认聊天室是否存在</li>
-<li>/msg chanserv help ，创建频道之类的操作可以参考下帮助</li>
-</ul>
-
 ]]></content>
   </entry>
   
