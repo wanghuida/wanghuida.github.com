@@ -4,7 +4,7 @@
   <title><![CDATA[老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2013-01-04T17:38:30+08:00</updated>
+  <updated>2013-01-06T17:37:42+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,75 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[date函数的误用]]></title>
+    <link href="http://www.wanghd.com/blog/2013/01/06/datehan-shu-de-wu-yong/"/>
+    <updated>2013-01-06T17:22:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/01/06/datehan-shu-de-wu-yong</id>
+    <content type="html"><![CDATA[<h3>需求：得到给定日期为一年中的第几周，并取得该周的年份</h3>
+
+<ul>
+<li>产生bug的写法</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
+</span><span class='line'><span class="nv">$time_2012_12_31</span> <span class="o">=</span> <span class="nb">mktime</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">31</span><span class="p">,</span><span class="mi">2012</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$week_2012_12_31</span> <span class="o">=</span> <span class="nb">date</span><span class="p">(</span><span class="s1">&#39;W&#39;</span><span class="p">,</span><span class="nv">$time_2012_12_31</span><span class="p">);</span>
+</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;2012-12-31: week is </span><span class="si">{</span><span class="nv">$week_2012_12_31</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$error_year_2012_12_31</span> <span class="o">=</span> <span class="nb">date</span><span class="p">(</span><span class="s1">&#39;Y&#39;</span><span class="p">,</span><span class="nv">$time_2012_12_31</span><span class="p">);</span>
+</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;2012-12-31: error year is </span><span class="si">{</span><span class="nv">$error_year_2012_12_31</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">#输出错误的结果</span>
+</span><span class='line'><span class="mi">2012</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="o">:</span> <span class="nx">week</span> <span class="nx">is</span> <span class="mo">01</span>
+</span><span class='line'><span class="mi">2012</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="o">:</span> <span class="nx">error</span> <span class="nx">year</span> <span class="nx">is</span> <span class="mi">2012</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>正确的写法，统一采用ISO-8601标准</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
+</span><span class='line'><span class="nv">$time_2012_12_31</span> <span class="o">=</span> <span class="nb">mktime</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">31</span><span class="p">,</span><span class="mi">2012</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$week_2012_12_31</span> <span class="o">=</span> <span class="nb">date</span><span class="p">(</span><span class="s1">&#39;W&#39;</span><span class="p">,</span><span class="nv">$time_2012_12_31</span><span class="p">);</span>
+</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;2012-12-31: week is </span><span class="si">{</span><span class="nv">$week_2012_12_31</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$year_2012_12_31</span> <span class="o">=</span> <span class="nb">date</span><span class="p">(</span><span class="s1">&#39;o&#39;</span><span class="p">,</span><span class="nv">$time_2012_12_31</span><span class="p">);</span>
+</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;2012-12-31: year is </span><span class="si">{</span><span class="nv">$year_2012_12_31</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">#输出正确的结果</span>
+</span><span class='line'><span class="mi">2012</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="o">:</span> <span class="nx">week</span> <span class="nx">is</span> <span class="mo">01</span>
+</span><span class='line'><span class="mi">2012</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="o">:</span> <span class="nx">year</span> <span class="nx">is</span> <span class="mi">2013</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[jquery在firefox下无法autocomplete]]></title>
@@ -2644,52 +2713,6 @@
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[硬盘安装CentOS]]></title>
-    <link href="http://www.wanghd.com/blog/2012/10/14/ying-pan-an-zhuang-centos/"/>
-    <updated>2012-10-14T21:48:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/10/14/ying-pan-an-zhuang-centos</id>
-    <content type="html"><![CDATA[<h4>下载diskgenuis进行分区和设置卷标</h4>
-
-<ul>
-<li>【C盘】，NTFS；安装的是win7</li>
-<li>【D盘】，卷标：REV，FAT32；</li>
-</ul>
-
-
-<h4>下载CentOS-6.2-i386-LiveCD.iso</h4>
-
-<ul>
-<li>把isolinux下的vmlinuz0和initrd0.img提取到C盘根目录下</li>
-<li>把centos 6.2 livecd解压到D盘根目录下;</li>
-</ul>
-
-
-<h4>下载EasyBCD进行boot设置</h4>
-
-<ul>
-<li>使用easybcd安装NeoGrub，配置menu.lst，内容如下：</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>title CentOS LiveCD
-</span><span class='line'>#如果前面还有分区设置为root (hd0,1)，设置错误了也没关系，重启后会报错，按e调整，再按b去boot
-</span><span class='line'>root (hd0,0) 
-</span><span class='line'>kernel /vmlinuz0 root=live:LABEL=REV rootfstype=auto ro liveimg quiet rhgb 
-</span><span class='line'>initrd /initrd0.img
-</span><span class='line'>boot</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>重启后，选择新选项即可进入CentOS LiveCD环境。</h4>
 ]]></content>
   </entry>
   

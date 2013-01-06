@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Time::HiRes介绍 - 老虎的眼睛</title>
+  <title>date函数的误用 - 老虎的眼睛</title>
   <meta name="author" content="王惠达 huida wanghuida">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.wanghd.com/blog/2012/11/22/time-hiresjie-shao">
+  <link rel="canonical" href="http://www.wanghd.com/blog/2013/01/06/datehan-shu-de-wu-yong">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/bootstrap/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/stylesheets/bootstrap/responsive.css" media="screen, projection" rel="stylesheet" type="text/css">
@@ -98,7 +98,7 @@
   
   <header class="page-header">
     
-      <h1 class="entry-title">Time::HiRes介绍</h1>
+      <h1 class="entry-title">Date函数的误用</h1>
     
     
       <p class="meta">
@@ -114,7 +114,7 @@
   
 
 
-<time datetime="2012-11-22T17:18:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
+<time datetime="2013-01-06T17:22:00+08:00" pubdate data-updated="true">Jan 6<span>th</span>, 2013</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -123,40 +123,10 @@
   </header>
 
 
-<div class="entry-content"><h3>Time::HiRes库介绍</h3>
+<div class="entry-content"><h3>需求：得到给定日期为一年中的第几周，并取得该周的年份</h3>
 
 <ul>
-<li>HiRes是high resolution的简写，译为高分辨率</li>
-<li>HiRes其实是提供一些更高精度的alarm, sleep, gettimeofday, interval timers</li>
-</ul>
-
-
-<!-- more -->
-
-
-<h3>usleep，nanosleep实例</h3>
-
-<ul>
-<li>usleep参数是微妙</li>
-<li>nanosleep参数是纳秒</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="nn">Time::HiRes::</span><span class="n">usleep</span><span class="p">(</span><span class="mi">100_000</span><span class="p">);</span>
-</span><span class='line'><span class="k">print</span> <span class="s">&quot;100 milliseconds\n&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="nn">Time::HiRes::</span><span class="n">nanosleep</span><span class="p">(</span><span class="mi">1000_000_000</span><span class="p">);</span>
-</span><span class='line'><span class="k">print</span> <span class="s">&quot;1 seconds\n&quot;</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>ualarm实例</h3>
-
-<ul>
-<li>ualarm(0)会撤销警告信号</li>
+<li>产生bug的写法</li>
 </ul>
 
 
@@ -171,51 +141,22 @@
 <span class='line-number'>9</span>
 <span class='line-number'>10</span>
 <span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="nb">eval</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nb">local</span> <span class="nv">$SIG</span><span class="p">{</span><span class="n">ALRM</span><span class="p">}</span> <span class="o">=</span> <span class="k">sub </span><span class="p">{</span> <span class="nb">die</span> <span class="s">&quot;receive signal\n&quot;</span> <span class="p">};</span>
-</span><span class='line'>    <span class="nn">Time::HiRes::</span><span class="n">ualarm</span> <span class="mi">1000_000</span><span class="p">;</span>
-</span><span class='line'>    <span class="nb">sleep</span> <span class="mi">2</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">print</span> <span class="s">&quot;never print&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="p">};</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
+</span><span class='line'><span class="nv">$time_2012_12_31</span> <span class="o">=</span> <span class="nb">mktime</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">31</span><span class="p">,</span><span class="mi">2012</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$week_2012_12_31</span> <span class="o">=</span> <span class="nb">date</span><span class="p">(</span><span class="s1">&#39;W&#39;</span><span class="p">,</span><span class="nv">$time_2012_12_31</span><span class="p">);</span>
+</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;2012-12-31: week is </span><span class="si">{</span><span class="nv">$week_2012_12_31</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
 </span><span class='line'>
-</span><span class='line'><span class="k">if</span><span class="p">(</span><span class="vg">$@</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">print</span> <span class="vg">$@</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nv">$error_year_2012_12_31</span> <span class="o">=</span> <span class="nb">date</span><span class="p">(</span><span class="s1">&#39;Y&#39;</span><span class="p">,</span><span class="nv">$time_2012_12_31</span><span class="p">);</span>
+</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;2012-12-31: error year is </span><span class="si">{</span><span class="nv">$error_year_2012_12_31</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
 </span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="nb">eval</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nb">local</span> <span class="nv">$SIG</span><span class="p">{</span><span class="n">ALRM</span><span class="p">}</span> <span class="o">=</span> <span class="k">sub </span><span class="p">{</span> <span class="nb">die</span> <span class="s">&quot;receive signal\n&quot;</span> <span class="p">};</span>
-</span><span class='line'>    <span class="nn">Time::HiRes::</span><span class="n">ualarm</span> <span class="mi">2000_000</span><span class="p">;</span>
-</span><span class='line'>    <span class="nb">sleep</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>    <span class="nn">Time::HiRes::</span><span class="n">ualarm</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">#cancel alarm</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">if</span><span class="p">(</span><span class="vg">$@</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">print</span> <span class="vg">$@</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>    <span class="k">print</span> <span class="s">&quot;cancel alarm signal\n&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="c1">#输出错误的结果</span>
+</span><span class='line'><span class="mi">2012</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="o">:</span> <span class="nx">week</span> <span class="nx">is</span> <span class="mo">01</span>
+</span><span class='line'><span class="mi">2012</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="o">:</span> <span class="nx">error</span> <span class="nx">year</span> <span class="nx">is</span> <span class="mi">2012</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<h3>tv_interval和gettimeofday实例</h3>
-
 <ul>
-<li>tv_interval返回两个gettimeofday引用相差的秒数</li>
-<li>省略tv_interval的第二个参数，会自动使用当前时间代替</li>
+<li>正确的写法，统一采用ISO-8601标准</li>
 </ul>
 
 
@@ -224,35 +165,24 @@
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="k">my</span> <span class="nv">@start</span> <span class="o">=</span> <span class="nn">Time::HiRes::</span><span class="n">gettimeofday</span><span class="p">;</span>
-</span><span class='line'><span class="k">print</span> <span class="n">Dumper</span><span class="p">(</span><span class="o">\</span><span class="nv">@start</span><span class="p">);</span>
-</span><span class='line'><span class="nb">sleep</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
-</span><span class='line'><span class="k">my</span> <span class="nv">$diff</span> <span class="o">=</span> <span class="nn">Time::HiRes::</span><span class="n">tv_interval</span><span class="p">(</span><span class="o">\</span><span class="nv">@start</span><span class="p">);</span>
-</span><span class='line'><span class="k">print</span> <span class="s">&quot;$diff\n&quot;</span><span class="p">;</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
+</span><span class='line'><span class="nv">$time_2012_12_31</span> <span class="o">=</span> <span class="nb">mktime</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">31</span><span class="p">,</span><span class="mi">2012</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$week_2012_12_31</span> <span class="o">=</span> <span class="nb">date</span><span class="p">(</span><span class="s1">&#39;W&#39;</span><span class="p">,</span><span class="nv">$time_2012_12_31</span><span class="p">);</span>
+</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;2012-12-31: week is </span><span class="si">{</span><span class="nv">$week_2012_12_31</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$year_2012_12_31</span> <span class="o">=</span> <span class="nb">date</span><span class="p">(</span><span class="s1">&#39;o&#39;</span><span class="p">,</span><span class="nv">$time_2012_12_31</span><span class="p">);</span>
+</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;2012-12-31: year is </span><span class="si">{</span><span class="nv">$year_2012_12_31</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">#输出正确的结果</span>
+</span><span class='line'><span class="mi">2012</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="o">:</span> <span class="nx">week</span> <span class="nx">is</span> <span class="mo">01</span>
+</span><span class='line'><span class="mi">2012</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="o">:</span> <span class="nx">year</span> <span class="nx">is</span> <span class="mi">2013</span>
 </span></code></pre></td></tr></table></div></figure>
-
-
-<h3>setitimer实例</h3>
-
-<ol>
-<li>ITIMER_REAL: 真实时间</li>
-<li>ITIMER_VIRTUAL: 用户时间</li>
-<li><p>ITIMER_PROF: 系统时间</p></li>
-<li><p>getitimer可以取得setitimer还有多久开始执行</p></li>
-</ol>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="k">use</span> <span class="nn">Time::</span><span class="n">HiRes</span> <span class="sx">qw ( </span><span class="n">setitimer</span> <span class="n">ITIMER_VIRTUAL</span> <span class="nb">time</span> <span class="p">);</span>
-</span><span class='line'><span class="nv">$SIG</span><span class="p">{</span><span class="n">VTALRM</span><span class="p">}</span> <span class="o">=</span> <span class="k">sub </span><span class="p">{</span> <span class="k">print</span> <span class="nb">time</span><span class="p">,</span> <span class="s">&quot;\n&quot;</span> <span class="p">};</span>
-</span><span class='line'><span class="n">setitimer</span><span class="p">(</span><span class="n">ITIMER_VIRTUAL</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-</span><span class='line'><span class="k">while</span><span class="p">(</span><span class="mi">1</span><span class="p">){</span> <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
 
 </div>
 
@@ -276,12 +206,12 @@
   
 
 
-<time datetime="2012-11-22T17:18:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
+<time datetime="2013-01-06T17:22:00+08:00" pubdate data-updated="true">Jan 6<span>th</span>, 2013</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/mogilefs/'>Mogilefs</a>, <a class='category' href='/blog/categories/perl/'>Perl</a>
+    <a class='category' href='/blog/categories/php/'>Php</a>
   
 </span>
 
@@ -290,7 +220,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2012/11/22/time-hiresjie-shao/" data-via="" data-counturl="http://www.wanghd.com/blog/2012/11/22/time-hiresjie-shao/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2013/01/06/datehan-shu-de-wu-yong/" data-via="" data-counturl="http://www.wanghd.com/blog/2013/01/06/datehan-shu-de-wu-yong/" >Tweet</a>
   
   
   
@@ -307,14 +237,10 @@
     <ul class="pager">
       
       <li class="previous"><a class="basic-alignment left"
-        href="/blog/2012/11/22/mongodbshi-zhan/" title="Previous Post:
-        mongodb实战">&laquo; mongodb实战</a></li>
+        href="/blog/2013/01/04/jqueryzai-firefoxxia-wu-fa-autocomplete/" title="Previous Post:
+        jquery在firefox下无法autocomplete">&laquo; jquery在firefox下无法autocomplete</a></li>
       
       <li><a href="/blog/archives">文章归档</a></li>
-      
-      <li class="next"><a class="basic-alignment right" href="/blog/2012/11/22/mogilefsan-zhuang-pei-zhi/"
-        title="Next Post: MogileFS安装配置">MogileFS安装配置
-        &raquo;</a></li>
       
     </ul>
   </footer>
@@ -443,8 +369,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.wanghd.com/blog/2012/11/22/time-hiresjie-shao/';
-        var disqus_url = 'http://www.wanghd.com/blog/2012/11/22/time-hiresjie-shao/';
+        var disqus_identifier = 'http://www.wanghd.com/blog/2013/01/06/datehan-shu-de-wu-yong/';
+        var disqus_url = 'http://www.wanghd.com/blog/2013/01/06/datehan-shu-de-wu-yong/';
         var disqus_script = 'embed.js';
       
     (function () {

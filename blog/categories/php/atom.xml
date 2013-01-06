@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Php | 老虎的眼睛]]></title>
+  <link href="http://www.wanghd.com/blog/categories/php/atom.xml" rel="self"/>
+  <link href="http://www.wanghd.com/"/>
+  <updated>2013-01-06T17:37:42+08:00</updated>
+  <id>http://www.wanghd.com/</id>
+  <author>
+    <name><![CDATA[王惠达 huida wanghuida]]></name>
+    <email><![CDATA[wanghuida258@yahoo.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[date函数的误用]]></title>
+    <link href="http://www.wanghd.com/blog/2013/01/06/datehan-shu-de-wu-yong/"/>
+    <updated>2013-01-06T17:22:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/01/06/datehan-shu-de-wu-yong</id>
+    <content type="html"><![CDATA[<h3>需求：得到给定日期为一年中的第几周，并取得该周的年份</h3>
+
+<ul>
+<li>产生bug的写法</li>
+</ul>
+
+
+<p>```php
+&lt;?php
+$time_2012_12_31 = mktime(0,0,0,12,31,2012);
+$week_2012_12_31 = date('W',$time_2012_12_31);
+echo "2012-12-31: week is {$week_2012_12_31} \n";</p>
+
+<p>$error_year_2012_12_31 = date('Y',$time_2012_12_31);
+echo "2012-12-31: error year is {$error_year_2012_12_31} \n";</p>
+
+<h1>输出错误的结果</h1>
+
+<p>2012-12-31: week is 01
+2012-12-31: error year is 2012
+```</p>
+
+<ul>
+<li>正确的写法，统一采用ISO-8601标准</li>
+</ul>
+
+
+<p>```php
+&lt;?php
+$time_2012_12_31 = mktime(0,0,0,12,31,2012);
+$week_2012_12_31 = date('W',$time_2012_12_31);
+echo "2012-12-31: week is {$week_2012_12_31} \n";</p>
+
+<p>$year_2012_12_31 = date('o',$time_2012_12_31);
+echo "2012-12-31: year is {$year_2012_12_31} \n";</p>
+
+<h1>输出正确的结果</h1>
+
+<p>2012-12-31: week is 01
+2012-12-31: year is 2013
+```</p>
+]]></content>
+  </entry>
+  
+</feed>
