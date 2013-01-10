@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Share | 老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/blog/categories/share/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2013-01-08T09:41:24+08:00</updated>
+  <updated>2013-01-10T11:36:29+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,93 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[RTXLDAP教程]]></title>
+    <link href="http://www.wanghd.com/blog/2013/01/10/rtxldapjiao-cheng/"/>
+    <updated>2013-01-10T10:14:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/01/10/rtxldapjiao-cheng</id>
+    <content type="html"><![CDATA[<h3>名词解释</h3>
+
+<ol>
+<li>RTX: 腾讯出的企业沟通工具</li>
+<li>LDAP: 关于人或者其他信息的集中存储，微软的AD就是LDAP的一种</li>
+<li>RTXLDAP: 基于RTX的SDK开发出的第三方工具，可以同步LDAP用户，可以RTX与LDAP单点登陆。支持RTX最新版本</li>
+</ol>
+
+
+<!-- more -->
+
+
+<h3>配置使用</h3>
+
+<ul>
+<li>获取源码</li>
+</ul>
+
+
+<p><code>
+git clone git@github.com:wanghuida/RTXLDAP.git
+</code></p>
+
+<ul>
+<li>建议使用vs 2008打开</li>
+</ul>
+
+
+<p><img src="/images/post/rtxldap1.jpg" title="rtxldap1" alt="rtxldap1" /></p>
+
+<ul>
+<li>修改App.config配置文件</li>
+</ul>
+
+
+<p>```</p>
+
+<!-- 域 -->
+
+
+<p><add key="DomainName" value="192.168.1.100/DC=home,DC=net" /></p>
+
+<!-- 域用户,用来读取所有域用户信息 -->
+
+
+<p><add key="DomainUser" value="wanghuida" /></p>
+
+<!-- 域用户密码 -->
+
+
+<p><add key="DomainPwd" value="123456" /></p>
+
+<!-- RTX服务IP，建议在同一台,可以免去其他配置 -->
+
+
+<p><add key="RTXIP" value="127.0.0.1"/></p>
+
+<!-- RTX服务端口 -->
+
+
+<p><add key="RTXPort"  value="8006"/></p>
+
+<!-- 标识，随意修改，不重复即可 -->
+
+
+<p><add key="AppGUID" value="{193947E5-E990-4af8-A954-D358B385F099}"/></p>
+
+<!-- 标识，随意修改，不重复即可 -->
+
+
+<p><add key="AppName" value="WanghuidaRtxLdap"/>
+```</p>
+
+<ul>
+<li>F5启动调试</li>
+</ul>
+
+
+<p><img src="/images/post/rtxldap2.jpg" title="rtxldap2" alt="rtxldap2" /></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[jquery在firefox下无法autocomplete]]></title>
@@ -238,49 +325,6 @@ location / {</p>
 
 <p>}
 ```</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[硬盘安装CentOS]]></title>
-    <link href="http://www.wanghd.com/blog/2012/10/14/ying-pan-an-zhuang-centos/"/>
-    <updated>2012-10-14T21:48:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/10/14/ying-pan-an-zhuang-centos</id>
-    <content type="html"><![CDATA[<h4>下载diskgenuis进行分区和设置卷标</h4>
-
-<ul>
-<li>【C盘】，NTFS；安装的是win7</li>
-<li>【D盘】，卷标：REV，FAT32；</li>
-</ul>
-
-
-<h4>下载CentOS-6.2-i386-LiveCD.iso</h4>
-
-<ul>
-<li>把isolinux下的vmlinuz0和initrd0.img提取到C盘根目录下</li>
-<li>把centos 6.2 livecd解压到D盘根目录下;</li>
-</ul>
-
-
-<h4>下载EasyBCD进行boot设置</h4>
-
-<ul>
-<li>使用easybcd安装NeoGrub，配置menu.lst，内容如下：</li>
-</ul>
-
-
-<p>```
-title CentOS LiveCD</p>
-
-<h1>如果前面还有分区设置为root (hd0,1)，设置错误了也没关系，重启后会报错，按e调整，再按b去boot</h1>
-
-<p>root (hd0,0)
-kernel /vmlinuz0 root=live:LABEL=REV rootfstype=auto ro liveimg quiet rhgb
-initrd /initrd0.img
-boot
-```</p>
-
-<h4>重启后，选择新选项即可进入CentOS LiveCD环境。</h4>
 ]]></content>
   </entry>
   

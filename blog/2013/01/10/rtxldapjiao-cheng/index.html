@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>均方根 - 老虎的眼睛</title>
+  <title>RTXLDAP教程 - 老虎的眼睛</title>
   <meta name="author" content="王惠达 huida wanghuida">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.wanghd.com/blog/2012/08/15/jun-fang-gen">
+  <link rel="canonical" href="http://www.wanghd.com/blog/2013/01/10/rtxldapjiao-cheng">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/bootstrap/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/stylesheets/bootstrap/responsive.css" media="screen, projection" rel="stylesheet" type="text/css">
@@ -98,7 +98,7 @@
   
   <header class="page-header">
     
-      <h1 class="entry-title">均方根</h1>
+      <h1 class="entry-title">RTXLDAP教程</h1>
     
     
       <p class="meta">
@@ -114,7 +114,7 @@
   
 
 
-<time datetime="2012-08-15T16:46:00+08:00" pubdate data-updated="true">Aug 15<span>th</span>, 2012</time>
+<time datetime="2013-01-10T10:14:00+08:00" pubdate data-updated="true">Jan 10<span>th</span>, 2013</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -123,7 +123,81 @@
   </header>
 
 
-<div class="entry-content"><h3>未完待续</h3>
+<div class="entry-content"><h3>名词解释</h3>
+
+<ol>
+<li>RTX: 腾讯出的企业沟通工具</li>
+<li>LDAP: 关于人或者其他信息的集中存储，微软的AD就是LDAP的一种</li>
+<li>RTXLDAP: 基于RTX的SDK开发出的第三方工具，可以同步LDAP用户，可以RTX与LDAP单点登陆。支持RTX最新版本</li>
+</ol>
+
+
+<!-- more -->
+
+
+<h3>配置使用</h3>
+
+<ul>
+<li>获取源码</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git clone git@github.com:wanghuida/RTXLDAP.git</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>建议使用vs 2008打开</li>
+</ul>
+
+
+<p><img src="/images/post/rtxldap1.jpg" title="rtxldap1" alt="rtxldap1" /></p>
+
+<ul>
+<li>修改App.config配置文件</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;!-- 域 --&gt;
+</span><span class='line'>&lt;add key="DomainName" value="192.168.1.100/DC=home,DC=net" /&gt;
+</span><span class='line'>&lt;!-- 域用户,用来读取所有域用户信息 --&gt;
+</span><span class='line'>&lt;add key="DomainUser" value="wanghuida" /&gt;
+</span><span class='line'>&lt;!-- 域用户密码 --&gt;
+</span><span class='line'>&lt;add key="DomainPwd" value="123456" /&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;!-- RTX服务IP，建议在同一台,可以免去其他配置 --&gt;
+</span><span class='line'>&lt;add key="RTXIP" value="127.0.0.1"/&gt;
+</span><span class='line'>&lt;!-- RTX服务端口 --&gt;
+</span><span class='line'>&lt;add key="RTXPort"  value="8006"/&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;!-- 标识，随意修改，不重复即可 --&gt;
+</span><span class='line'>&lt;add key="AppGUID" value="{193947E5-E990-4af8-A954-D358B385F099}"/&gt;
+</span><span class='line'>&lt;!-- 标识，随意修改，不重复即可 --&gt;
+</span><span class='line'>&lt;add key="AppName" value="WanghuidaRtxLdap"/&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>F5启动调试</li>
+</ul>
+
+
+<p><img src="/images/post/rtxldap2.jpg" title="rtxldap2" alt="rtxldap2" /></p>
 </div>
 
 
@@ -146,7 +220,7 @@
   
 
 
-<time datetime="2012-08-15T16:46:00+08:00" pubdate data-updated="true">Aug 15<span>th</span>, 2012</time>
+<time datetime="2013-01-10T10:14:00+08:00" pubdate data-updated="true">Jan 10<span>th</span>, 2013</time>
       
 
 <span class="categories">
@@ -160,7 +234,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2012/08/15/jun-fang-gen/" data-via="" data-counturl="http://www.wanghd.com/blog/2012/08/15/jun-fang-gen/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2013/01/10/rtxldapjiao-cheng/" data-via="" data-counturl="http://www.wanghd.com/blog/2013/01/10/rtxldapjiao-cheng/" >Tweet</a>
   
   
   
@@ -177,14 +251,10 @@
     <ul class="pager">
       
       <li class="previous"><a class="basic-alignment left"
-        href="/blog/2012/08/08/vimsu-ji-biao/" title="Previous Post:
-        vim速记表">&laquo; vim速记表</a></li>
+        href="/blog/2013/01/06/datehan-shu-de-wu-yong/" title="Previous Post:
+        date函数的误用">&laquo; date函数的误用</a></li>
       
       <li><a href="/blog/archives">文章归档</a></li>
-      
-      <li class="next"><a class="basic-alignment right" href="/blog/2012/08/16/xian-cheng-chi/"
-        title="Next Post: 线程池">线程池
-        &raquo;</a></li>
       
     </ul>
   </footer>
@@ -314,8 +384,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.wanghd.com/blog/2012/08/15/jun-fang-gen/';
-        var disqus_url = 'http://www.wanghd.com/blog/2012/08/15/jun-fang-gen/';
+        var disqus_identifier = 'http://www.wanghd.com/blog/2013/01/10/rtxldapjiao-cheng/';
+        var disqus_url = 'http://www.wanghd.com/blog/2013/01/10/rtxldapjiao-cheng/';
         var disqus_script = 'embed.js';
       
     (function () {

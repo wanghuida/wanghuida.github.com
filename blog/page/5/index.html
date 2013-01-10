@@ -100,6 +100,44 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2012/08/08/vimsu-ji-biao/">Vim速记表</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-08T08:46:00+08:00" pubdate data-updated="true">Aug 8<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/08/08/vimsu-ji-biao/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="/images/post/vi-vim-cheat-sheet.gif" title="vim cheat" alt="VIM" /></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2012/08/01/weakhashmapzuo-yong-he-shi-li/">WeakHashMap作用和实例</a></h1>
     
     
@@ -926,77 +964,9 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2011/07/03/Mogilefs-Init/">MogileFS启动流程</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-07-03T05:59:00+08:00" pubdate data-updated="true">Jul 3<span>rd</span>, 2011</time>
-        
-         | <a href="/blog/2011/07/03/Mogilefs-Init/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>实例化MogileFS::Server并运行</h2>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="k">my</span> <span class="nv">$server</span><span class="p">;</span> <span class="c1"># server singleton</span>
-</span><span class='line'><span class="k">sub </span><span class="nf">server</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">my</span> <span class="p">(</span><span class="nv">$pkg</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">return</span> <span class="nv">$server</span> <span class="o">||=</span> <span class="nb">bless</span> <span class="p">{},</span> <span class="nv">$pkg</span><span class="p">;</span><span class="c1">#空就创建对象，有就返回，单例</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="nv">$server</span><span class="o">-&gt;</span><span class="n">run</span><span class="p">();</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>读取配置</h2>
-
-<blockquote><p>优先级，命令行>配置文件>默认配置</p></blockquote>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="nn">MogileFS::</span><span class="n">Config</span><span class="o">-&gt;</span><span class="n">load_config</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2011/07/03/Mogilefs-Init/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
+    
+    <li class="previous"><a href="/blog/page/6/">&larr; 其他文章</a></li>
     
     <li><a href="/blog/archives">文章归档</a></li>
     
@@ -1011,13 +981,13 @@
     <li class="nav-header">文章分类</li>
     <li class='category'><a href='/blog/categories/hadoop/'>Hadoop (4)</a></li>
 <li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
-<li class='category'><a href='/blog/categories/javascript/'>Javascript (1)</a></li>
+<li class='category'><a href='/blog/categories/javascript/'>Javascript (2)</a></li>
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
 <li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
 <li class='category'><a href='/blog/categories/php/'>Php (1)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (1)</a></li>
-<li class='category'><a href='/blog/categories/share/'>Share (14)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (15)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
 
   </ul>
@@ -1039,6 +1009,10 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2013/01/10/rtxldapjiao-cheng/">RTXLDAP教程</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/01/06/datehan-shu-de-wu-yong/">date函数的误用</a>
@@ -1074,10 +1048,6 @@
     
       <li class="post">
         <a href="/blog/2012/11/22/log4jjie-shao/">log4j介绍</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/22/redisshi-zhan/">redis实战</a>
       </li>
     
   </ul>

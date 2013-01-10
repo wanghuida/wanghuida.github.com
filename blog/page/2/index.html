@@ -100,6 +100,58 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2012/11/22/redisshi-zhan/">Redis实战</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-22T17:17:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/22/redisshi-zhan/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>redis是什么？</h3>
+
+<ul>
+<li>redis是一个开源的，先进的key-value存储服务器端</li>
+<li>value可以包含多种结构，比如strings, hashes, lists, sets ,sorted sets</li>
+<li>官方网址：<a href="http://redis.io">http://redis.io</a></li>
+<li><a href="/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/">freenode</a>的聊天室名称是#redis</li>
+</ul>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2012/11/22/redisshi-zhan/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2012/11/22/xiu-fu-mogilefsmu-lu-owner/">修复mogilefs目录owner</a></h1>
     
     
@@ -677,69 +729,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/10/16/mogilefsde-replicatefen-xi/">MogileFS的replicate进程分析</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-10-16T15:47:00+08:00" pubdate data-updated="true">Oct 16<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/10/16/mogilefsde-replicatefen-xi/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h4>基本流程</h4>
-
-<ol>
-<li>从replicate queue里获取需要处理数据,进行循环</li>
-<li>执行真正的【replicate操作】，操作时会锁住这个fid，然后返回结果【下面会对该操作具体分析】</li>
-<li>返回没问题，删除队列并释放锁</li>
-<li>返回failed_getting_lock说明正在处理了</li>
-<li>返回no_source说明file_on表上没有关于该文件的记录，nexttry设置为最大并释放锁</li>
-<li>返回too_happy说明devcount > mindevcount，会尝试删除多余的并释放锁（前提是文件存在，所以不会修复file_on有，文件丢失的情况）</li>
-<li>如果以上都不满足，nexttry根据规则增加，failcount递增并释放锁</li>
-</ol>
-
-
-<h4>replicate操作分析</h4>
-
-<ul>
-<li>简单说replicate操作就是取得合适的device进行复制，合适的意思是尽量避免同一个host的device，没办法才用同一个host的device，有错误就返回具体信息</li>
-<li>replicate操作才是真正的复制，代码比较多，但是不难理解（难点都会有注释）</li>
-</ul>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/10/16/mogilefsde-replicatefen-xi/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/3/">&larr; 其他文章</a></li>
@@ -757,13 +746,13 @@
     <li class="nav-header">文章分类</li>
     <li class='category'><a href='/blog/categories/hadoop/'>Hadoop (4)</a></li>
 <li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
-<li class='category'><a href='/blog/categories/javascript/'>Javascript (1)</a></li>
+<li class='category'><a href='/blog/categories/javascript/'>Javascript (2)</a></li>
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
 <li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
 <li class='category'><a href='/blog/categories/php/'>Php (1)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (1)</a></li>
-<li class='category'><a href='/blog/categories/share/'>Share (14)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (15)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
 
   </ul>
@@ -785,6 +774,10 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2013/01/10/rtxldapjiao-cheng/">RTXLDAP教程</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/01/06/datehan-shu-de-wu-yong/">date函数的误用</a>
@@ -820,10 +813,6 @@
     
       <li class="post">
         <a href="/blog/2012/11/22/log4jjie-shao/">log4j介绍</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/22/redisshi-zhan/">redis实战</a>
       </li>
     
   </ul>
