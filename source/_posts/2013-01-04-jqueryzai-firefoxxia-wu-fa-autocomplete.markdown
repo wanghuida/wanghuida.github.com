@@ -5,7 +5,7 @@ date: 2013-01-04 17:29
 comments: true
 sharing: true
 footer: true
-categories: [Share]
+categories: [Share,Javascript]
 ---
 
 #### jquery的autocomplete中文输入在firefox无法正常使用
