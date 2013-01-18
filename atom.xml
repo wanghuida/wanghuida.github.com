@@ -4,7 +4,7 @@
   <title><![CDATA[老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2013-01-10T11:36:29+08:00</updated>
+  <updated>2013-01-18T20:17:15+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,127 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[游览器缓存解析]]></title>
+    <link href="http://www.wanghd.com/blog/2013/01/18/you-lan-qi-huan-cun-jie-xi/"/>
+    <updated>2013-01-18T19:32:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/01/18/you-lan-qi-huan-cun-jie-xi</id>
+    <content type="html"><![CDATA[<h3>游览器缓存：可以通过如下四种方式进行设置</h3>
+
+<ol>
+<li>Expire: 直接设置过期时间(不做详细解释，用Cache-Control更好)</li>
+<li>Cache-Control: HTTP 1.1用Cache-Control代替Expire，Cache-Control比Expire更方便，功能更多。不需要访问服务器端</li>
+<li>Last-Modified: 用来设置最后更新时间。需要访问服务器端，如果没有更新直接使用304，节省网络流量和网络传输时间</li>
+<li>ETag: 用来设置唯一标识。需要访问服务器端，和last-modified一样</li>
+</ol>
+
+
+<!-- more -->
+
+
+<h3>Cache-Control</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
+</span><span class='line'><span class="nx">header</span><span class="p">(</span><span class="s2">&quot;Cache-Control: max-age=120, must-revalidate&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;cache cache&quot;</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img src="http://www.wanghd.com/images/post/cache-control.jpg" title="cache-control" alt="cache-control" /></p>
+
+<ul>
+<li>刷新(cmd + r)，强刷(shift + cmd + r)，都会访问服务器, 因为这两种方式游览器会绕过本地缓存。尝试打开一个新的tab访问，没有和服务器交互。</li>
+<li>windows用户的刷新(F5)，强刷(ctrl + F5)</li>
+</ul>
+
+
+<h3>Last-Modified</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$time</span> <span class="o">=</span> <span class="nb">strtotime</span><span class="p">(</span><span class="s1">&#39;2013-01-18&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">header</span><span class="p">(</span><span class="s2">&quot;Last-Modified: &quot;</span> <span class="o">.</span> <span class="nb">gmdate</span><span class="p">(</span><span class="s2">&quot;D, d M Y H:i:s&quot;</span><span class="p">,</span> <span class="nv">$time</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&quot; GMT&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$modified_since</span> <span class="o">=</span> <span class="nb">isset</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_IF_MODIFIED_SINCE&#39;</span><span class="p">])</span> <span class="o">?</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_IF_MODIFIED_SINCE&#39;</span><span class="p">]</span> <span class="o">:</span> <span class="k">false</span><span class="p">;</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nv">$modified_since</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$modified_since</span> <span class="o">=</span> <span class="nb">strtotime</span><span class="p">(</span><span class="nv">$modified_since</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nv">$time</span> <span class="o">==</span> <span class="nv">$modified_since</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">echo</span> <span class="s2">&quot;hit&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">echo</span> <span class="s2">&quot;no hit&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img src="http://www.wanghd.com/images/post/last-modified.jpg" title="last-modified" alt="last-modified" /></p>
+
+<p><img src="http://www.wanghd.com/images/post/last-modified-ret.jpg" title="last-modified-ret" alt="last-modified-ret" /></p>
+
+<ul>
+<li>第一次访问显示no hit，刷新则命中缓存显示hit(一般304处理，我这里只是举例)。强刷则会显示no hit，可见游览器的强刷是有特别用处的</li>
+</ul>
+
+
+<h3>ETag</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$etag</span> <span class="o">=</span> <span class="s1">&#39;test-etag&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$none_match</span> <span class="o">=</span> <span class="o">@</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_IF_NONE_MATCH&#39;</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nv">$none_match</span> <span class="o">==</span> <span class="nv">$etag</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">header</span><span class="p">(</span><span class="s2">&quot;HTTP/1.1 304 Not Modified&quot;</span><span class="p">,</span> <span class="k">true</span><span class="p">,</span> <span class="mi">304</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">exit</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">header</span><span class="p">(</span><span class="s2">&quot;ETag: </span><span class="si">{</span><span class="nv">$etag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;test ok!&quot;</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img src="http://www.wanghd.com/images/post/etag.jpg" title="etag" alt="etag" /></p>
+
+<p><img src="http://www.wanghd.com/images/post/etag304.jpg" title="etag304" alt="etag304" /></p>
+
+<ul>
+<li>第一次访问http返回200，显示test ok!。刷新http返回304，使用本地缓存，显示test ok!。强刷则绕过本地缓存，http返回200，可见和last-modified一样</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[RTXLDAP教程]]></title>
@@ -2092,165 +2213,6 @@
 <ul>
 <li>在游览器里查看下结果，输入localhost:50070</li>
 </ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[MogileFS详解]]></title>
-    <link href="http://www.wanghd.com/blog/2012/10/23/mogilefsxiang-jie/"/>
-    <updated>2012-10-23T22:48:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/10/23/mogilefsxiang-jie</id>
-    <content type="html"><![CDATA[<ul>
-<li>经过一个月的实际应用，我想是时候应该总结一下mogilefs的使用了，如果想和作者交流参考<a href="http://www.wanghd.com/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/">IRC教程</a></li>
-</ul>
-
-
-<h3>MogileFS简介</h3>
-
-<blockquote><p>MogileFS是一个<code>开源</code>的<code>分布式文件系统</code>，配合cdn和squid，性能非常好(<code>15亿</code>文件没问题，其他数据不方便透露)</p>
-
-<p>他由下面几个部分组成:</p></blockquote>
-
-<p><img src="http://www.wanghd.com/images/post/mogilefs-summary.jpg" title="mogilefs-summary" alt="mogilefs-summary" /></p>
-
-<ol>
-<li>memcache：用来缓存查询结果，降低db压力</li>
-<li>mogilefsd：就是tracker，用来接收请求并交给子进程(job)处理</li>
-<li>mogstored：监控磁盘状态和文件的实际存储</li>
-<li>client：支持perl，java，ruby，php，python</li>
-<li>mysql：存储记录</li>
-<li>util：日常维护管理的工具集</li>
-<li>telnet：监控tracker，实时调整job的工具</li>
-</ol>
-
-
-<!-- more -->
-
-
-<h3>Mogstored</h3>
-
-<blockquote><p>监控磁盘状态和文件的实际存储,启动mogstored会发现包含2个端口，默认的7501和7500</p>
-
-<blockquote><p>7501用来监控磁盘状态</p>
-
-<p>7500用来处理实际的文件存储</p></blockquote></blockquote>
-
-<p><img src="http://www.wanghd.com/images/post/mogilefs-mogstored.jpg" title="mogilefs-mogstored" alt="mogilefs-mogstored" /></p>
-
-<h4>问题总结</h4>
-
-<ul>
-<li>原本我一直以为mogstored自己实现了一套文件存储，但实际上不是。它使用的是WebDav，所以可以使用nginx代替默认的perlbal，实际用下来nginx更稳定</li>
-<li>WebDav：一种基于 HTTP 1.1协议的通信协议.它扩展了HTTP 1.1，在GET、POST、HEAD等几个HTTP标准方法以外添加了一些新的方法，例如PUT(新增)、DELETE(删除)、MKCOL(创建目录)</li>
-<li>在mogstored的使用上，犯过一个错误：直接使用root启动mogstored，那么创建的文件夹和文件都是属于root，导致delete job无法删除该文件（同事陈磊发现）</li>
-<li>文件存储规则：/dev-xx/0/123/456/789/0123456789.fid，fid不足十位补0，通过fid进行切割变为目录，即分散又效率</li>
-</ul>
-
-
-<h3>Mogilefsd</h3>
-
-<blockquote><p>主进程负责接受请求，分配任务给子进程执行,下面详细介绍一下他的子进程</p></blockquote>
-
-<ol>
-<li>query：处理主进程分配的请求，包括util和tool的指令</li>
-<li>delete：根据删除队列对文件进行删除操作</li>
-<li>replicate：复制文件直到满足mindevcount(文件复制几份)</li>
-<li>fsck：检查磁盘文件和数据库是否匹配，不匹配时进行补救</li>
-<li>monitor：监控子进程的状态，实时调整子进程个数</li>
-<li>reaper：监控dead的磁盘，及时补救，把文件加到replicate queue</li>
-<li>jobmaster：读取delete,replicate,rebalance,fsck队列，告诉主进程，主进程再交给对应的子进程处理</li>
-</ol>
-
-
-<h4>问题总结</h4>
-
-<ul>
-<li>query新建文件时，用剩余容量作权重，随机选择。所以新加入一块设备时，极有可能将成为热点设备，最好是一组设备一起加</li>
-<li>如果设备出现问题，直接格式化后直接使用会导致数据库记录还在，文件丢失，最终fsck和replicate队列堆积，正确的做法是把设备状态设置为dead，然后格式化用一个新的devid使用</li>
-<li>如果确定磁盘损坏，就一定要设置dead状态，reaper会自动补救</li>
-</ul>
-
-
-<h3>Memcache</h3>
-
-<blockquote><p>用来缓存查询结果，降低db压力，query内部存放<code>key对应的fid</code>和<code>fid对应的设备</code></p></blockquote>
-
-<h4>问题总结</h4>
-
-<ul>
-<li>db压力下不来的原因是客户端取得文件时没有设置noverify参数，如果确定要使用memcache就一定要设置noverify，否则不使用memcache</li>
-</ul>
-
-
-<h3>Mysql</h3>
-
-<blockquote><p>用来存储记录，当然也可以使用其他数据库</p></blockquote>
-
-<ol>
-<li>host表：存储主机信息</li>
-<li>device表：存储设备，一般单个device对应一块磁盘，也可以不这样</li>
-<li>domain表：定义域，单个域下key唯一</li>
-<li>class表：文件存放策略，包括份数，复制策略，校验和</li>
-<li>server_settings表：部分配置信息和job配置信息</li>
-<li>file表：文件信息</li>
-<li>file_on表：文件存放在哪些存储设备</li>
-<li>file_to_delete2表：删除队列表，升级后以前的不用了</li>
-<li>file_to_queue表：type=1是fsck队列，type=2是rebalance队列</li>
-<li>fsck_log表：fsck日志表，TYPE很多很诡异，参考<a href="http://www.wanghd.com/blog/2012/09/29/mogilefsde-fscktan-jiu/">fsk探究</a></li>
-<li>file_to_replicate表：复制队列</li>
-</ol>
-
-
-<h4>问题总结</h4>
-
-<ul>
-<li>怀疑file_on表会有慢查询，其实不会太慢，因为Innodb默认asc排序</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>#file_on的索引情况
-</span><span class='line'>PRIMARY KEY (`fid`,`devid`),KEY `devid` (`devid`)
-</span><span class='line'>#下面的语句是不会慢的
-</span><span class='line'>select * from file_on where devid = ? and fid &gt; ? order by fid asc limit 100</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>怀疑多个replicate队列同时操作同一个fid时是否会出现bug，其实不会，因为replicate使用mysql的get_lock(fid),release_lock(fid)</li>
-</ul>
-
-
-<h3>Utilities</h3>
-
-<ol>
-<li>mogadm：该工具直接管理mogilefs的主机、设备、域、类、从数据库、配置、fsck、rebalance</li>
-<li>mogstat：观察fsck,rebalance,replication,delete运行状况</li>
-<li>mogfiledebug：查看文件存储信息，也可以查file_on表</li>
-<li>mogfetch：导出指定的文件</li>
-<li>mogdelete：删除指定的文件</li>
-<li>mogrename：更改文件的key</li>
-<li>mogupload：插入一个文件</li>
-<li>moglistfids，moglistkeys：批量列出记录，自己写脚本时可以使用</li>
-</ol>
-
-
-<h3>Telnet</h3>
-
-<ol>
-<li>!version：显示mogilefs版本</li>
-<li>!recent：显示当前query执行时间（可做监控）</li>
-<li>!queue：显示等待执行的查询（可做监控）</li>
-<li>!stats：从tracker启动开始就记录的一些累加信息和实时信息，比如处理请求的总数、job队列当前记录数、当前等待执行的请求的个数等</li>
-<li>!watch：显示<code>警告</code>和<code>错误</code>信息（可做监控）</li>
-<li>!jobs：显示当前各个job的个数</li>
-<li>!want：<code>动态调整</code>job个数</li>
-<li>!to：不常用，向子进程发送消息，用来调试的</li>
-<li>!shutdown：关闭所有mogilefsd进程</li>
-</ol>
 
 ]]></content>
   </entry>

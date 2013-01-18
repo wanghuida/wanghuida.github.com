@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Php | 老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/blog/categories/php/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2013-01-10T11:36:29+08:00</updated>
+  <updated>2013-01-18T20:17:15+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,109 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[游览器缓存解析]]></title>
+    <link href="http://www.wanghd.com/blog/2013/01/18/you-lan-qi-huan-cun-jie-xi/"/>
+    <updated>2013-01-18T19:32:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/01/18/you-lan-qi-huan-cun-jie-xi</id>
+    <content type="html"><![CDATA[<h3>游览器缓存：可以通过如下四种方式进行设置</h3>
+
+<ol>
+<li>Expire: 直接设置过期时间(不做详细解释，用Cache-Control更好)</li>
+<li>Cache-Control: HTTP 1.1用Cache-Control代替Expire，Cache-Control比Expire更方便，功能更多。不需要访问服务器端</li>
+<li>Last-Modified: 用来设置最后更新时间。需要访问服务器端，如果没有更新直接使用304，节省网络流量和网络传输时间</li>
+<li>ETag: 用来设置唯一标识。需要访问服务器端，和last-modified一样</li>
+</ol>
+
+
+<!-- more -->
+
+
+<h3>Cache-Control</h3>
+
+<p><code>php
+&lt;?php
+header("Cache-Control: max-age=120, must-revalidate");
+echo "cache cache";  
+</code></p>
+
+<p><img src="/images/post/cache-control.jpg" title="cache-control" alt="cache-control" /></p>
+
+<ul>
+<li>刷新(cmd + r)，强刷(shift + cmd + r)，都会访问服务器, 因为这两种方式游览器会绕过本地缓存。尝试打开一个新的tab访问，没有和服务器交互。</li>
+<li>windows用户的刷新(F5)，强刷(ctrl + F5)</li>
+</ul>
+
+
+<h3>Last-Modified</h3>
+
+<p>```
+&lt;?php</p>
+
+<p>$time = strtotime('2013-01-18');
+header("Last-Modified: " . gmdate("D, d M Y H:i:s", $time) . " GMT");</p>
+
+<p>$modified_since = isset($<em>SERVER['HTTP_IF_MODIFIED_SINCE']) ? $</em>SERVER['HTTP_IF_MODIFIED_SINCE'] : false;
+if ($modified_since) {</p>
+
+<pre><code>$modified_since = strtotime($modified_since);
+</code></pre>
+
+<p>}</p>
+
+<p>if ($time == $modified_since) {</p>
+
+<pre><code>echo "hit"; 
+</code></pre>
+
+<p>} else {</p>
+
+<pre><code>echo "no hit";
+</code></pre>
+
+<p>}
+```</p>
+
+<p><img src="/images/post/last-modified.jpg" title="last-modified" alt="last-modified" /></p>
+
+<p><img src="/images/post/last-modified-ret.jpg" title="last-modified-ret" alt="last-modified-ret" /></p>
+
+<ul>
+<li>第一次访问显示no hit，刷新则命中缓存显示hit(一般304处理，我这里只是举例)。强刷则会显示no hit，可见游览器的强刷是有特别用处的</li>
+</ul>
+
+
+<h3>ETag</h3>
+
+<p>```
+&lt;?php</p>
+
+<p>$etag = 'test-etag';
+$none_match = @$_SERVER['HTTP_IF_NONE_MATCH'];</p>
+
+<p>if ($none_match == $etag) {</p>
+
+<pre><code>header("HTTP/1.1 304 Not Modified", true, 304); 
+exit;
+</code></pre>
+
+<p>}</p>
+
+<p>header("ETag: {$etag}");
+echo "test ok!";
+```</p>
+
+<p><img src="/images/post/etag.jpg" title="etag" alt="etag" /></p>
+
+<p><img src="/images/post/etag304.jpg" title="etag304" alt="etag304" /></p>
+
+<ul>
+<li>第一次访问http返回200，显示test ok!。刷新http返回304，使用本地缓存，显示test ok!。强刷则绕过本地缓存，http返回200，可见和last-modified一样</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[date函数的误用]]></title>

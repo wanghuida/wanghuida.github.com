@@ -100,6 +100,44 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2012/08/15/jun-fang-gen/">均方根</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-15T16:46:00+08:00" pubdate data-updated="true">Aug 15<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/08/15/jun-fang-gen/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>未完待续</h3>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2012/08/08/vimsu-ji-biao/">Vim速记表</a></h1>
     
     
@@ -883,87 +921,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2011/07/03/Mogilefs-ReadFile/">MogileFS读取文件的过程</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-07-03T05:59:00+08:00" pubdate data-updated="true">Jul 3<span>rd</span>, 2011</time>
-        
-         | <a href="/blog/2011/07/03/Mogilefs-ReadFile/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>客户端读取文件代码</h2>
-
-<blockquote><p>定义好domain和key就能获取文件内容</p></blockquote>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="c1">#!/usr/bin/perl</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">use</span> <span class="n">strict</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">warnings</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="nn">MogileFS::</span><span class="n">Client</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">my</span> <span class="nv">%new_opt</span> <span class="o">=</span> <span class="p">(</span>
-</span><span class='line'>    <span class="n">hosts</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s">&quot;127.0.0.1:7001&quot;</span><span class="p">],</span>
-</span><span class='line'>    <span class="n">domain</span> <span class="o">=&gt;</span> <span class="s">&quot;127.0.0.1::test&quot;</span><span class="p">,</span>
-</span><span class='line'><span class="p">);</span>
-</span><span class='line'><span class="k">my</span> <span class="nv">$mogc</span> <span class="o">=</span> <span class="nn">MogileFS::</span><span class="n">Client</span><span class="o">-&gt;</span><span class="k">new</span><span class="p">(</span><span class="nv">%new_opt</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">my</span> <span class="nv">$key</span> <span class="o">=</span> <span class="s">&quot;test_key_2&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="k">my</span> <span class="nv">$fd</span> <span class="o">=</span> <span class="nv">$mogc</span><span class="o">-&gt;</span><span class="n">read_file</span><span class="p">(</span><span class="nv">$key</span><span class="p">);</span>
-</span><span class='line'><span class="k">print</span> <span class="k">while</span><span class="sr">&lt;$fd&gt;</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2011/07/03/Mogilefs-ReadFile/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/6/">&larr; 其他文章</a></li>
@@ -985,7 +942,7 @@
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
 <li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
-<li class='category'><a href='/blog/categories/php/'>Php (1)</a></li>
+<li class='category'><a href='/blog/categories/php/'>Php (2)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (1)</a></li>
 <li class='category'><a href='/blog/categories/share/'>Share (15)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
@@ -1009,6 +966,10 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2013/01/18/you-lan-qi-huan-cun-jie-xi/">游览器缓存解析</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/01/10/rtxldapjiao-cheng/">RTXLDAP教程</a>
@@ -1044,10 +1005,6 @@
     
       <li class="post">
         <a href="/blog/2012/11/22/mongodbshi-zhan/">mongodb实战</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/22/log4jjie-shao/">log4j介绍</a>
       </li>
     
   </ul>

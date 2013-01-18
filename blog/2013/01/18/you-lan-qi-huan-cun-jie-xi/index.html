@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>mogilefs设备损坏处理流程 - 老虎的眼睛</title>
+  <title>游览器缓存解析 - 老虎的眼睛</title>
   <meta name="author" content="王惠达 huida wanghuida">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.wanghd.com/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng">
+  <link rel="canonical" href="http://www.wanghd.com/blog/2013/01/18/you-lan-qi-huan-cun-jie-xi">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/bootstrap/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/stylesheets/bootstrap/responsive.css" media="screen, projection" rel="stylesheet" type="text/css">
@@ -98,7 +98,7 @@
   
   <header class="page-header">
     
-      <h1 class="entry-title">Mogilefs设备损坏处理流程</h1>
+      <h1 class="entry-title">游览器缓存解析</h1>
     
     
       <p class="meta">
@@ -114,7 +114,7 @@
   
 
 
-<time datetime="2012-11-25T19:34:00+08:00" pubdate data-updated="true">Nov 25<span>th</span>, 2012</time>
+<time datetime="2013-01-18T19:32:00+08:00" pubdate data-updated="true">Jan 18<span>th</span>, 2013</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -123,49 +123,39 @@
   </header>
 
 
-<div class="entry-content"><ul>
-<li>这里单个dev对应一个磁盘,假设是sdb</li>
-<li>文件系统使用xfs</li>
-<li>mogstored使用nginx</li>
-</ul>
+<div class="entry-content"><h3>游览器缓存：可以通过如下四种方式进行设置</h3>
 
-
-<p>1.把磁盘标记为dead</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>mogadm device mark &lt;hostname&gt; &lt;devid&gt; &lt;status&gt;
-</span></code></pre></td></tr></table></div></figure>
-
-
+<ol>
+<li>Expire: 直接设置过期时间(不做详细解释，用Cache-Control更好)</li>
+<li>Cache-Control: HTTP 1.1用Cache-Control代替Expire，Cache-Control比Expire更方便，功能更多。不需要访问服务器端</li>
+<li>Last-Modified: 用来设置最后更新时间。需要访问服务器端，如果没有更新直接使用304，节省网络流量和网络传输时间</li>
+<li>ETag: 用来设置唯一标识。需要访问服务器端，和last-modified一样</li>
+</ol>
 
 
 <!-- more -->
 
 
-<p>2.格式化新磁盘或损坏的磁盘, 并挂到新的目录</p>
+<h3>Cache-Control</h3>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>mkfs.xfs -f -i <span class="nv">size</span><span class="o">=</span>512 -l <span class="nv">size</span><span class="o">=</span>128m,lazy-count<span class="o">=</span>1 -d <span class="nv">agcount</span><span class="o">=</span>16 /dev/sdb
-</span><span class='line'>
-</span><span class='line'>mkdir -p /var/mogdata/<span class="o">{</span>new-dev<span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>mount -t xfs -o noatime,noikeep,logbufs<span class="o">=</span>8 /var/mogdata/<span class="o">{</span>new-dev<span class="o">}</span> /dev/sdb
-</span><span class='line'>
-</span><span class='line'><span class="c">#增加到fstab</span>
-</span><span class='line'>vim /etc/fstab
-</span><span class='line'>/dev/sdb     /var/mogdata/<span class="o">{</span>new-dev<span class="o">}</span>    xfs    noatime,noikeep,logbufs<span class="o">=</span>8    0 0
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
+</span><span class='line'><span class="nx">header</span><span class="p">(</span><span class="s2">&quot;Cache-Control: max-age=120, must-revalidate&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;cache cache&quot;</span><span class="p">;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>3.配置nginx</p>
+<p><img src="/images/post/cache-control.jpg" title="cache-control" alt="cache-control" /></p>
+
+<ul>
+<li>刷新(cmd + r)，强刷(shift + cmd + r)，都会访问服务器, 因为这两种方式游览器会绕过本地缓存。尝试打开一个新的tab访问，没有和服务器交互。</li>
+<li>windows用户的刷新(F5)，强刷(ctrl + F5)</li>
+</ul>
+
+
+<h3>Last-Modified</h3>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -182,39 +172,69 @@
 <span class='line-number'>13</span>
 <span class='line-number'>14</span>
 <span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>chown -R mogile.daemon /var/mogdata/<span class="o">{</span>new-dev<span class="o">}</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
 </span><span class='line'>
-</span><span class='line'><span class="c">#建议注释掉损坏的location</span>
-</span><span class='line'>vim /etc/nginx/conf.d/<span class="o">{</span>xxx.conf<span class="o">}</span>
+</span><span class='line'><span class="nv">$time</span> <span class="o">=</span> <span class="nb">strtotime</span><span class="p">(</span><span class="s1">&#39;2013-01-18&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">header</span><span class="p">(</span><span class="s2">&quot;Last-Modified: &quot;</span> <span class="o">.</span> <span class="nb">gmdate</span><span class="p">(</span><span class="s2">&quot;D, d M Y H:i:s&quot;</span><span class="p">,</span> <span class="nv">$time</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&quot; GMT&quot;</span><span class="p">);</span>
 </span><span class='line'>
-</span><span class='line'>location /<span class="o">{</span>new-dev<span class="o">}</span>/ <span class="o">{</span>
-</span><span class='line'>    expires             max;
-</span><span class='line'>    root                /var/mogdata;
-</span><span class='line'>    client_max_body_size        20m;
-</span><span class='line'>    client_body_temp_path       /var/mogdata/<span class="o">{</span>new-dev<span class="o">}</span>/temp;
-</span><span class='line'>    dav_methods                 PUT DELETE MKCOL;
-</span><span class='line'>    create_full_put_path        on;
-</span><span class='line'>    dav_access                  user:rw group:r all:r;
-</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="nv">$modified_since</span> <span class="o">=</span> <span class="nb">isset</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_IF_MODIFIED_SINCE&#39;</span><span class="p">])</span> <span class="o">?</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_IF_MODIFIED_SINCE&#39;</span><span class="p">]</span> <span class="o">:</span> <span class="k">false</span><span class="p">;</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nv">$modified_since</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$modified_since</span> <span class="o">=</span> <span class="nb">strtotime</span><span class="p">(</span><span class="nv">$modified_since</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
 </span><span class='line'>
-</span><span class='line'>/etc/init.d/nginx reload
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nv">$time</span> <span class="o">==</span> <span class="nv">$modified_since</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">echo</span> <span class="s2">&quot;hit&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">echo</span> <span class="s2">&quot;no hit&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>4.增加一个新设备</p>
+<p><img src="/images/post/last-modified.jpg" title="last-modified" alt="last-modified" /></p>
+
+<p><img src="/images/post/last-modified-ret.jpg" title="last-modified-ret" alt="last-modified-ret" /></p>
+
+<ul>
+<li>第一次访问显示no hit，刷新则命中缓存显示hit(一般304处理，我这里只是举例)。强刷则会显示no hit，可见游览器的强刷是有特别用处的</li>
+</ul>
+
+
+<h3>ETag</h3>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>mogadm device add &lt;hostname&gt; &lt;devid&gt; <span class="o">[</span>opts<span class="o">]</span>        Add a device to a host.
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
 </span><span class='line'>
-</span><span class='line'>      &lt;devid&gt;              Numeric devid.  Never reuse these.
-</span><span class='line'>      &lt;hostname&gt;           Hostname to add a device
-</span><span class='line'>      --status<span class="o">=</span>s           One of <span class="s1">&#39;alive&#39;</span> or <span class="s1">&#39;down&#39;</span>.  Defaults to <span class="s1">&#39;alive&#39;</span>.
+</span><span class='line'><span class="nv">$etag</span> <span class="o">=</span> <span class="s1">&#39;test-etag&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$none_match</span> <span class="o">=</span> <span class="o">@</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_IF_NONE_MATCH&#39;</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nv">$none_match</span> <span class="o">==</span> <span class="nv">$etag</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">header</span><span class="p">(</span><span class="s2">&quot;HTTP/1.1 304 Not Modified&quot;</span><span class="p">,</span> <span class="k">true</span><span class="p">,</span> <span class="mi">304</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">exit</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">header</span><span class="p">(</span><span class="s2">&quot;ETag: </span><span class="si">{</span><span class="nv">$etag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;test ok!&quot;</span><span class="p">;</span>
 </span></code></pre></td></tr></table></div></figure>
+
+
+<p><img src="/images/post/etag.jpg" title="etag" alt="etag" /></p>
+
+<p><img src="/images/post/etag304.jpg" title="etag304" alt="etag304" /></p>
+
+<ul>
+<li>第一次访问http返回200，显示test ok!。刷新http返回304，使用本地缓存，显示test ok!。强刷则绕过本地缓存，http返回200，可见和last-modified一样</li>
+</ul>
 
 </div>
 
@@ -238,12 +258,12 @@
   
 
 
-<time datetime="2012-11-25T19:34:00+08:00" pubdate data-updated="true">Nov 25<span>th</span>, 2012</time>
+<time datetime="2013-01-18T19:32:00+08:00" pubdate data-updated="true">Jan 18<span>th</span>, 2013</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/mogilefs/'>Mogilefs</a>, <a class='category' href='/blog/categories/perl/'>Perl</a>
+    <a class='category' href='/blog/categories/php/'>Php</a>
   
 </span>
 
@@ -252,7 +272,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng/" data-via="" data-counturl="http://www.wanghd.com/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2013/01/18/you-lan-qi-huan-cun-jie-xi/" data-via="" data-counturl="http://www.wanghd.com/blog/2013/01/18/you-lan-qi-huan-cun-jie-xi/" >Tweet</a>
   
   
   
@@ -269,14 +289,10 @@
     <ul class="pager">
       
       <li class="previous"><a class="basic-alignment left"
-        href="/blog/2012/11/25/inotify/" title="Previous Post:
-        inotify,rsync统一化配置">&laquo; inotify,rsync统一化配置</a></li>
+        href="/blog/2013/01/10/rtxldapjiao-cheng/" title="Previous Post:
+        RTXLDAP教程">&laquo; RTXLDAP教程</a></li>
       
       <li><a href="/blog/archives">文章归档</a></li>
-      
-      <li class="next"><a class="basic-alignment right" href="/blog/2012/12/17/system-dot-out-dot-printlnluan-ma/"
-        title="Next Post: System.out.println 乱码">System.out.println 乱码
-        &raquo;</a></li>
       
     </ul>
   </footer>
@@ -406,8 +422,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.wanghd.com/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng/';
-        var disqus_url = 'http://www.wanghd.com/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng/';
+        var disqus_identifier = 'http://www.wanghd.com/blog/2013/01/18/you-lan-qi-huan-cun-jie-xi/';
+        var disqus_url = 'http://www.wanghd.com/blog/2013/01/18/you-lan-qi-huan-cun-jie-xi/';
         var disqus_script = 'embed.js';
       
     (function () {
