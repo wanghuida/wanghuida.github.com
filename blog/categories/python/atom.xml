@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Python | 老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/blog/categories/python/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2013-01-18T20:17:15+08:00</updated>
+  <updated>2013-02-01T14:30:21+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,110 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[flask nginx uwsgi 部署]]></title>
+    <link href="http://www.wanghd.com/blog/2013/02/01/flask-nginx-uwsgibu-shu/"/>
+    <updated>2013-02-01T14:10:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/02/01/flask-nginx-uwsgibu-shu</id>
+    <content type="html"><![CDATA[<h3>安装 uwsgi</h3>
+
+<p><code>
+$ brew install uwsgi
+</code></p>
+
+<h3>安装 nginx</h3>
+
+<p><code>
+$ brew install nginx
+</code></p>
+
+<h3>配置Flask环境</h3>
+
+<p><code>
+$ mkdir test
+$ cd test
+$ virtualevn sandbox
+$ . sandbox/bin/activate
+$ pip install Flask
+</code></p>
+
+<!-- more -->
+
+
+<h3>创建一个Flask项目</h3>
+
+<p>```
+$ touch test.py</p>
+
+<h1>内容如下</h1>
+
+<p>from flask import Flask</p>
+
+<p>app = Flask(<strong>name</strong>)</p>
+
+<p>@app.route('/')
+def hello():</p>
+
+<pre><code>return 'Hello World'
+</code></pre>
+
+<p>if <strong>name</strong> == '<strong>main</strong>':</p>
+
+<pre><code>app.run()
+</code></pre>
+
+<p>```</p>
+
+<h3>创建uwsgi配置文件</h3>
+
+<p>```
+$ touch test_config.xml</p>
+
+<p><uwsgi></p>
+
+<pre><code>&lt;pythonpath&gt;/Users/william/project/test&lt;/pythonpath&gt;
+&lt;module&gt;test&lt;/module&gt;
+&lt;callable&gt;app&lt;/callable&gt;
+&lt;socket&gt;/tmp/uwsgi.sock&lt;/socket&gt;
+&lt;master/&gt;
+&lt;processes&gt;4&lt;/processes&gt;
+&lt;memory-report/&gt;
+</code></pre>
+
+<p></uwsgi></p>
+
+<p>```</p>
+
+<h3>nginx 配置</h3>
+
+<p>```
+server {</p>
+
+<pre><code>listen 80;
+server_name www.test.com;
+
+location / {
+    include uwsgi_params;
+    uwsgi_pass unix:/tmp/uwsgi.sock; 
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<h3>启动服务</h3>
+
+<p>```
+sudo nginx -s reload</p>
+
+<h1>支持virtualenv, uswgi还可以--py-auto-reload</h1>
+
+<p>sudo uwsgi -x /Users/william/project/open-pmt/test_config.xml --virtualenv sandbox</p>
+
+<p>```</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[python 一周体验记]]></title>

@@ -100,6 +100,44 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2012/11/22/mongodbshi-zhan/">Mongodb实战</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-22T17:18:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/22/mongodbshi-zhan/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2012/11/22/log4jjie-shao/">Log4j介绍</a></h1>
     
     
@@ -625,82 +663,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/">安装配置hadoop</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-02T23:38:00+08:00" pubdate data-updated="true">Nov 2<span>nd</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>下载stable的hadoop</h3>
-
-<ul>
-<li>hadoop的版本比较多，建议下载<code>stable</code>的，现在是<code>hadoop-1.0.4</code></li>
-<li>提供一个<a href="http://hadoop.apache.org/releases.html#Download">下载链接</a></li>
-</ul>
-
-
-<h3>解压缩</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>tar -zxvf hadoop-1.0.4.tar.gz
-</span><span class='line'>cd hadoop-1.0.4</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>配置hadoop</h3>
-
-<blockquote><p>vim编辑conf/hadoop-env.sh，设置环境变量</p></blockquote>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>#如果是mac的话，请添加下面这句
-</span><span class='line'>export HADOOP_OPTS="-Djava.security.krb5.realm=OX.AC.UK 
-</span><span class='line'>    -Djava.security.krb5.kdc=kdc0.ox.ac.uk:kdc1.ox.ac.uk"
-</span><span class='line'>#配置JDK，mac的关系所以路径比较飘逸
-</span><span class='line'>export JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/3/">&larr; 其他文章</a></li>
@@ -723,7 +685,7 @@
 <li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
 <li class='category'><a href='/blog/categories/php/'>Php (2)</a></li>
-<li class='category'><a href='/blog/categories/python/'>Python (1)</a></li>
+<li class='category'><a href='/blog/categories/python/'>Python (2)</a></li>
 <li class='category'><a href='/blog/categories/share/'>Share (15)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
 
@@ -746,6 +708,10 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/01/flask-nginx-uwsgibu-shu/">flask nginx uwsgi 部署</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/01/18/you-lan-qi-huan-cun-jie-xi/">游览器缓存解析</a>
@@ -781,10 +747,6 @@
     
       <li class="post">
         <a href="/blog/2012/11/22/time-hiresjie-shao/">Time::HiRes介绍</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/22/mongodbshi-zhan/">mongodb实战</a>
       </li>
     
   </ul>

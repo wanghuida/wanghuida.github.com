@@ -100,6 +100,64 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2012/09/27/solrsheng-lue-ri-zhi/">显示solr省略的日志</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-09-27T13:54:00+08:00" pubdate data-updated="true">Sep 27<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/09/27/solrsheng-lue-ri-zhi/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>solr日志默认的效果</h3>
+
+<ul>
+<li>删除时默认只显示10条记录，其余的使用省略号代替</li>
+<li>一般情况下这样是比较好的，但是有时还是希望看到所有的信息</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>webapp=/solr path=/update params={wt=json} 
+</span><span class='line'>{delete=[11, 12, 13, 14, 15, 16, 17, 18, 19, 20... (100 deletes)]} 0 127</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2012/09/27/solrsheng-lue-ri-zhi/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2012/09/21/solrde-shu-zhi-cun-chu-he-fan-wei-cha-xun/">Solr的数值存储和范围查询</a></h1>
     
     
@@ -1199,91 +1257,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/08/16/xian-cheng-chi/">线程池</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-08-16T18:05:00+08:00" pubdate data-updated="true">Aug 16<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/08/16/xian-cheng-chi/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>为什么要使用线程池</h3>
-
-<ul>
-<li>为大量而短小的任务创建线程和销毁线程开销过大</li>
-<li>线程池可以重复使用线程，避免额外的创建和销毁开销</li>
-<li>通过队列和意外处理避免资源不足</li>
-<li>灵活调整线程池内线程的数量</li>
-</ul>
-
-
-<h3>线程池基本配置</h3>
-
-<ul>
-<li>corePoolSize: 池中的核心线程数</li>
-<li>maximumPoolSize: 池中的最大线程数（当核心线程用尽，工作队列已满时，开始创建线程）</li>
-<li>keepAliveTime: 大于核心线程数时，干掉空闲线程的最长等待时间</li>
-<li>unit: keepAliveTime的单位，例如秒，毫秒</li>
-<li>workQueue: 工作队列，线程根据工作队列来创建新线程去完成任务</li>
-<li>threadFactory: 用来定义线程中的属性、名称、守护程序状态、ThreadGroup 等等</li>
-<li>handler: 由于超出线程范围和队列容量而使执行被阻塞时所使用的处理程序</li>
-</ul>
-
-
-<h4>默认的handler</h4>
-
-<ul>
-<li>ThreadPoolExecutor.AbortPolicy: 直接抛出RejectedExecutionException</li>
-<li>ThreadPoolExecutor.CallerRunsPolicy: 再次尝试</li>
-<li>ThreadPoolExecutor.DiscardOldestPolicy: 放弃最旧的未处理任务</li>
-<li>ThreadPoolExecutor.DiscardPolicy: 直接丢弃</li>
-</ul>
-
-
-<h3>线程池基本逻辑</h3>
-
-<ul>
-<li>当池小于corePoolSize就新建线程，并处理任务</li>
-<li>当池等于corePoolSize，把请求放入workQueue中，池里的空闲线程就去从workQueue中取任务并处理</li>
-<li>当workQueue放不下新入的任务时，新建线程处理任务，如果池撑到了maximumPoolSize就用handler来做拒绝处理</li>
-<li>当池中线程数大于corePoolSize的时候，多余的线程会等待keepAliveTime长的时间，如果无请求可处理就自行销毁</li>
-</ul>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/08/16/xian-cheng-chi/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/5/">&larr; 其他文章</a></li>
@@ -1306,7 +1279,7 @@
 <li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
 <li class='category'><a href='/blog/categories/php/'>Php (2)</a></li>
-<li class='category'><a href='/blog/categories/python/'>Python (1)</a></li>
+<li class='category'><a href='/blog/categories/python/'>Python (2)</a></li>
 <li class='category'><a href='/blog/categories/share/'>Share (15)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
 
@@ -1329,6 +1302,10 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/01/flask-nginx-uwsgibu-shu/">flask nginx uwsgi 部署</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/01/18/you-lan-qi-huan-cun-jie-xi/">游览器缓存解析</a>
@@ -1364,10 +1341,6 @@
     
       <li class="post">
         <a href="/blog/2012/11/22/time-hiresjie-shao/">Time::HiRes介绍</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/22/mongodbshi-zhan/">mongodb实战</a>
       </li>
     
   </ul>
