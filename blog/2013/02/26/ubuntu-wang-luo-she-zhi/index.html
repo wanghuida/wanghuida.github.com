@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>mongodb实战 - 老虎的眼睛</title>
+  <title>ubuntu 网络设置 - 老虎的眼睛</title>
   <meta name="author" content="王惠达 huida wanghuida">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.wanghd.com/blog/2012/11/22/mongodbshi-zhan">
+  <link rel="canonical" href="http://www.wanghd.com/blog/2013/02/26/ubuntu-wang-luo-she-zhi">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/bootstrap/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/stylesheets/bootstrap/responsive.css" media="screen, projection" rel="stylesheet" type="text/css">
@@ -98,7 +98,7 @@
   
   <header class="page-header">
     
-      <h1 class="entry-title">Mongodb实战</h1>
+      <h1 class="entry-title">Ubuntu 网络设置</h1>
     
     
       <p class="meta">
@@ -114,7 +114,7 @@
   
 
 
-<time datetime="2012-11-22T17:18:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
+<time datetime="2013-02-26T15:22:00+08:00" pubdate data-updated="true">Feb 26<span>th</span>, 2013</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -123,7 +123,66 @@
   </header>
 
 
-<div class="entry-content">
+<div class="entry-content"><h3>ubuntu的网络设置涉及到如下文件：</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>/etc/network/interfaces # 网络接口配置，包括网络接口说明、IP地址、子网掩码、网关等
+</span><span class='line'>/etc/resolv.conf        # DNS服务器设置
+</span><span class='line'>/etc/hostname           # 主机名设置
+</span><span class='line'>/etc/hosts              # 域名解析映射
+</span><span class='line'>/etc/hosts.allow        # IP访问允许规则
+</span><span class='line'>/ect/hosts.deny         # IP访问禁止规则</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>修改网络配置文件后，要重启网络接口，使用命令：/etc/init.d/networking restart</li>
+<li>重启单个网口可以使用ifdown eth0,ifup eth0</li>
+</ul>
+
+
+<!-- more -->
+
+
+<h3>dhcp</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>vim /etc/network/interfaces
+</span><span class='line'>auto eth0               # 设置eth0开机自动加载
+</span><span class='line'>iface eth0 inet dhcp    # 定义网络接口eth0为Internet，DHCP方式。</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>static</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>auto eth0
+</span><span class='line'>iface eth inet static
+</span><span class='line'>address 192.168.0.110
+</span><span class='line'>gateway 192.168.0.1
+</span><span class='line'>netmask 255.255.255.0</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>dns</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>vim /etc/resolv.conf
+</span><span class='line'>
+</span><span class='line'>nameserver x.x.x.x  # 首要DNS服务器
+</span><span class='line'>nameserver x.x.x.x  # 备用DNS服务器</span></code></pre></td></tr></table></div></figure>
+
 </div>
 
 
@@ -146,15 +205,21 @@
   
 
 
-<time datetime="2012-11-22T17:18:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
+<time datetime="2013-02-26T15:22:00+08:00" pubdate data-updated="true">Feb 26<span>th</span>, 2013</time>
       
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/share/'>Share</a>
+  
+</span>
 
 
     </p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2012/11/22/mongodbshi-zhan/" data-via="" data-counturl="http://www.wanghd.com/blog/2012/11/22/mongodbshi-zhan/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2013/02/26/ubuntu-wang-luo-she-zhi/" data-via="" data-counturl="http://www.wanghd.com/blog/2013/02/26/ubuntu-wang-luo-she-zhi/" >Tweet</a>
   
   
   
@@ -171,14 +236,10 @@
     <ul class="pager">
       
       <li class="previous"><a class="basic-alignment left"
-        href="/blog/2012/11/22/log4jjie-shao/" title="Previous Post:
-        log4j介绍">&laquo; log4j介绍</a></li>
+        href="/blog/2013/02/26/fu-wu-qi-ji-chu-pei-zhi/" title="Previous Post:
+        ubuntu 服务器基础配置">&laquo; ubuntu 服务器基础配置</a></li>
       
       <li><a href="/blog/archives">文章归档</a></li>
-      
-      <li class="next"><a class="basic-alignment right" href="/blog/2012/11/22/time-hiresjie-shao/"
-        title="Next Post: Time::HiRes介绍">Time::HiRes介绍
-        &raquo;</a></li>
       
     </ul>
   </footer>
@@ -308,8 +369,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.wanghd.com/blog/2012/11/22/mongodbshi-zhan/';
-        var disqus_url = 'http://www.wanghd.com/blog/2012/11/22/mongodbshi-zhan/';
+        var disqus_identifier = 'http://www.wanghd.com/blog/2013/02/26/ubuntu-wang-luo-she-zhi/';
+        var disqus_url = 'http://www.wanghd.com/blog/2013/02/26/ubuntu-wang-luo-she-zhi/';
         var disqus_script = 'embed.js';
       
     (function () {

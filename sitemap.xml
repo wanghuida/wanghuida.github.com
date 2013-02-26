@@ -220,14 +220,22 @@
     </url>
     <url>
         <loc>http://www.wanghd.com/blog/2013/02/01/flask-nginx-uwsgibu-shu/</loc>
-        <lastmod>2013-02-01T14:29:33+08:00</lastmod>
+        <lastmod>2013-02-01T14:34:10+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://www.wanghd.com/blog/2013/02/26/fu-wu-qi-ji-chu-pei-zhi/</loc>
+        <lastmod>2013-02-26T15:17:00+08:00</lastmod>
+    </url>
+    <url>
+        <loc>http://www.wanghd.com/blog/2013/02/26/ubuntu-wang-luo-she-zhi/</loc>
+        <lastmod>2013-02-26T15:31:42+08:00</lastmod>
     </url>
     <url>
         <loc>http://www.wanghd.com/blog/archives/</loc>
-        <lastmod>2013-02-01T14:29:33+08:00</lastmod>
+        <lastmod>2013-02-26T15:31:42+08:00</lastmod>
     </url>
     <url>
         <loc>http://www.wanghd.com/</loc>
-        <lastmod>2013-02-01T14:29:33+08:00</lastmod>
+        <lastmod>2013-02-26T15:31:42+08:00</lastmod>
     </url>
 </urlset>

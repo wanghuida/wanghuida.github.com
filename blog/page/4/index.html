@@ -100,6 +100,175 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2012/09/29/mogilefsde-fscktan-jiu/">Mogilefs Fsck探究</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-09-29T15:13:00+08:00" pubdate data-updated="true">Sep 29<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/09/29/mogilefsde-fscktan-jiu/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>fsck的作用</h3>
+
+<ul>
+<li>检查mogilefs文件的健康程度，检查的维度有devcount,file_on表,文件长度，校验和（可选）</li>
+<li>如果文件丢失，通过路径尝试全设备扫描去查找该文件【只是通过路径去找】</li>
+</ul>
+
+
+<h3>使用fsck时，碰到的问题:队列保持不变，无法处理后续的文件</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>//启动fsck
+</span><span class='line'>mogadm fsck start  
+</span><span class='line'>//查看fsck状态，问题出现：进度不变,无法进一步检查文件
+</span><span class='line'>mogadm fsck status 
+</span><span class='line'>//查看数据库里的队列，发现队列一直保持，没有被处理
+</span><span class='line'>select count(*) from file_to_queue where type=1 （type=1代表fsck队列，type=2代表rebalance队列）;</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>结论（先给出结论，后面有具体的分析流程）</h3>
+
+<ul>
+<li>随意取得队列中的某一条记录的devcount等于3，过去操作造成的</li>
+<li>mindevcount却等于2，这会让fsck进行修复</li>
+<li>在修复时，发现3个设备中有一个设备是不可达的，状态也不是dead，返回无法处理，fsck不会把该记录从队列中删除，因为他期望你尽快修复该设备或者设置为dead</li>
+<li>解决方法有3个，第一种就是恢复或dead该设备【推荐】，第二种比较山寨,改代码删队列，第三种直接修改数据库,风险较大</li>
+</ul>
+
+
+<h3>mogadm fsck status详情</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>   Running: 运行状态 
+</span><span class='line'>    Status: 完成度
+</span><span class='line'>      Time: 执行时间
+</span><span class='line'>Check Type: 检查的策略【可以通过fsck_opt_policy_only修改】
+</span><span class='line'>
+</span><span class='line'>NOPA: file_on表里一个都没
+</span><span class='line'>POVI: 违反策略
+</span><span class='line'>MISS: 在某个设备上没有找到文件
+</span><span class='line'>BLEN: file表里的length和磁盘上的文件大小不匹配
+</span><span class='line'>GONE: 无法修复了
+</span><span class='line'>SRCH: 开始全设备扫描
+</span><span class='line'>FOND: 全设备扫描后找了该文件
+</span><span class='line'>REPL: 加入复制队列，复制一份文件
+</span><span class='line'>BCNT: file表里的devcount不正确</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2012/09/29/mogilefsde-fscktan-jiu/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2012/09/27/aho-corasicksuan-fa/">Aho-Corasick算法</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-09-27T14:10:00+08:00" pubdate data-updated="true">Sep 27<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/09/27/aho-corasicksuan-fa/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>aho-corasick算法优势</h3>
+
+<ul>
+<li>查找时无需回溯，性能相当好</li>
+<li>当需要查找或替换的词非常多时，生成的trie树可以方便缓存</li>
+</ul>
+
+
+<h3>学习方法</h3>
+
+<ul>
+<li>了解ac算法的基本思想</li>
+<li>阅读源码（看过php, java, perl的版本，还最推荐perl, 因为perl语法精炼,易于阅读）</li>
+<li>ac模拟器（见下面的flash，可以尝试操作一下）</li>
+</ul>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2012/09/27/aho-corasicksuan-fa/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2012/09/27/solrsheng-lue-ri-zhi/">显示solr省略的日志</a></h1>
     
     
@@ -1017,246 +1186,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/08/28/solrqi-dong-fen-xi/">Solr启动分析</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-08-28T08:34:00+08:00" pubdate data-updated="true">Aug 28<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/08/28/solrqi-dong-fen-xi/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>solr启动分析</h3>
-
-<p><img src="/images/post/solrstart.png" title="solr 启动分析" alt="solr 启动分析" /></p>
-
-<ol>
-<li>CoreContainer通过xpath加载solr.xml</li>
-<li>实例化CoreAdminHandler管理CoreContainer，提供reload,status等命令(status可以看到index-size)</li>
-<li>初始化CoreDescriptor，设置核心的配置文件、目录、属性文件</li>
-<li>读取solrconfig.xml，分析后设置到SolrConfig</li>
-<li>读取schema.xml，设置fieldTypes @FieldTypePluginLoader,fields @SchemaField,过滤器,分词器,主键</li>
-<li>构造SolrCore,设置数据目录和各种资源的初始化</li>
-<li>QuerySenderListener，默认2个事件firstSearcher和newSearcher</li>
-<li>IndexDeletionPolicy</li>
-<li>DefaultCodecFactory，4.0的功能，字段的编码器和解码器</li>
-<li>StandardDirectoryFactory，指向data/index/的Directory，用来生成Reader读取索引</li>
-<li>QueryResponseWriter，各种返回结果，例如json,xml</li>
-<li>QParserPlugin，请求分析插件,用以生成QParser，例如BoostQParserPlugin和DisMaxQParserPlugin等</li>
-<li>ValueSourceParser，初始化内置的函数，比如boost,abs,sin..等等</li>
-<li>SearchComponent，例如query,facet,mlt,stat,debug,get</li>
-<li>RequestHandlers，是根据url对应RequestHandler的映射</li>
-<li>DirectUpdateHandler2，commit数据的handler</li>
-<li>最后执行firstSearcher事件预热，注册第一个SolrIndexSearcher</li>
-</ol>
-
-
-<h3>solr package</h3>
-
-<ul>
-<li>org.apache.solr.analysis; 过滤器，分词器</li>
-<li>org.apache.solr.core; solr的核心包,例如CoreContainer,Config,SolrCore,SolrConfig,CachingDirectoryFactory,CoreDescriptor</li>
-<li>org.apache.solr.servlet; 与servlet有关,例如SolrDispatchFilter就属于该包</li>
-<li>org.apache.solr.handler; org.apache.solr.handler.component; 请求处理</li>
-<li>org.apache.solr.handler.admin; 处理用来管理的请求，例如CoreAdminHandler</li>
-<li>org.apache.solr.search; 与查询有关的类，例如缓存，查询分析，返回字段 SolrIndexSearcher</li>
-<li>org.apache.solr.schema; 字段类型，schema通知</li>
-<li>org.apache.solr.util.plugin; 为插件提供的一些工具，抽象和接口，例如AbstractPluginLoader</li>
-<li>org.apache.solr.util; 一些工具，例如FileUtils</li>
-<li>org.apache.solr.update; org.apache.solr.update.processor; 用来更新数据的，例如默认的DirectUpdateHandler2</li>
-<li>org.apache.solr.response;org.apache.solr.response.transform;用来返回数据(序列化,json,xml等数据)</li>
-<li>org.apache.solr.request; 请求相关的信息，例如SolrRequestInfo</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/08/24/jsmian-xiang-dui-xiang-shi-li/">Js面向对象实例</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-08-24T17:57:00+08:00" pubdate data-updated="true">Aug 24<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/08/24/jsmian-xiang-dui-xiang-shi-li/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nb">window</span><span class="p">){</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">staff</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span><span class="nx">phone</span><span class="p">){</span>
-</span><span class='line'>    <span class="k">return</span> <span class="k">new</span> <span class="nx">staff</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">init</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span><span class="nx">phone</span><span class="p">);</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'><span class="nx">staff</span><span class="p">.</span><span class="nx">fn</span> <span class="o">=</span> <span class="nx">staff</span><span class="p">.</span><span class="nx">prototype</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>    <span class="c1">//静态变量</span>
-</span><span class='line'>    <span class="nx">company</span><span class="o">:</span> <span class="s1">&#39;安居客&#39;</span><span class="p">,</span>
-</span><span class='line'>    <span class="c1">//构造函数</span>
-</span><span class='line'>    <span class="nx">init</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span><span class="nx">phone</span><span class="p">){</span>
-</span><span class='line'>        <span class="c1">//私有变量</span>
-</span><span class='line'>        <span class="kd">var</span> <span class="nx">cellphone</span> <span class="o">=</span> <span class="nx">phone</span><span class="p">;</span>
-</span><span class='line'>        <span class="c1">//公共变量</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">username</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
-</span><span class='line'>        <span class="c1">//公共方法</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">getPhone</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>            <span class="k">return</span> <span class="nx">cellphone</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">setPhone</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">phone</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">cellphone</span> <span class="o">=</span> <span class="nx">phone</span><span class="p">;</span>
-</span><span class='line'>            <span class="nx">_test_private_function</span><span class="p">();</span>
-</span><span class='line'>            <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="c1">//私有方法</span>
-</span><span class='line'>        <span class="kd">var</span> <span class="nx">_test_private_function</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;private function:&#39;</span> <span class="o">+</span> <span class="nx">cellphone</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="c1">//公共方法</span>
-</span><span class='line'>    <span class="nx">setName</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">name</span><span class="p">){</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">username</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="nx">setCompany</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">c_name</span><span class="p">){</span>
-</span><span class='line'>        <span class="nx">staff</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">company</span> <span class="o">=</span> <span class="nx">c_name</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'><span class="nx">staff</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">init</span><span class="p">.</span><span class="nx">prototype</span> <span class="o">=</span> <span class="nx">staff</span><span class="p">.</span><span class="nx">fn</span><span class="p">;</span>
-</span><span class='line'><span class="c1">//公共方法</span>
-</span><span class='line'><span class="nx">staff</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">getName</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">username</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="nx">staff</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">getCompany</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="nx">staff</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">company</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="nb">window</span><span class="p">.</span><span class="nx">s</span> <span class="o">=</span> <span class="nx">staff</span><span class="p">;</span>
-</span><span class='line'><span class="p">})(</span><span class="nb">window</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">staff1</span> <span class="o">=</span> <span class="nx">s</span><span class="p">(</span><span class="s1">&#39;王惠达1&#39;</span><span class="p">,</span><span class="s1">&#39;11111111&#39;</span><span class="p">);</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">staff2</span> <span class="o">=</span> <span class="nx">s</span><span class="p">(</span><span class="s1">&#39;王惠达2&#39;</span><span class="p">,</span><span class="s1">&#39;22222222&#39;</span><span class="p">);</span>
-</span><span class='line'><span class="c1">//test static argument</span>
-</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;s1:&#39;</span> <span class="o">+</span> <span class="nx">staff1</span><span class="p">.</span><span class="nx">setCompany</span><span class="p">(</span><span class="s1">&#39;瑞庭&#39;</span><span class="p">).</span><span class="nx">getCompany</span><span class="p">());</span>
-</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;s2:&#39;</span> <span class="o">+</span> <span class="nx">staff2</span><span class="p">.</span><span class="nx">getCompany</span><span class="p">());</span>
-</span><span class='line'><span class="c1">//test public argument</span>
-</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;s1:&#39;</span> <span class="o">+</span> <span class="nx">staff1</span><span class="p">.</span><span class="nx">setName</span><span class="p">(</span><span class="s1">&#39;王惠达&#39;</span><span class="p">).</span><span class="nx">getName</span><span class="p">());</span>
-</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;s2:&#39;</span> <span class="o">+</span> <span class="nx">staff2</span><span class="p">.</span><span class="nx">getName</span><span class="p">());</span>
-</span><span class='line'><span class="c1">//test private argument</span>
-</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;s1:&#39;</span> <span class="o">+</span> <span class="nx">staff1</span><span class="p">.</span><span class="nx">setPhone</span><span class="p">(</span><span class="s1">&#39;13712345678&#39;</span><span class="p">).</span><span class="nx">getPhone</span><span class="p">());</span>
-</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;s2:&#39;</span> <span class="o">+</span> <span class="nx">staff2</span><span class="p">.</span><span class="nx">getPhone</span><span class="p">());</span>
-</span><span class='line'><span class="c1">//报错：console.log(&#39;s2:&#39; + staff2.cellphone);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/5/">&larr; 其他文章</a></li>
@@ -1280,7 +1209,7 @@
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
 <li class='category'><a href='/blog/categories/php/'>Php (2)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (2)</a></li>
-<li class='category'><a href='/blog/categories/share/'>Share (15)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (17)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
 
   </ul>
@@ -1302,6 +1231,14 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/26/ubuntu-wang-luo-she-zhi/">ubuntu 网络设置</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/26/fu-wu-qi-ji-chu-pei-zhi/">ubuntu 服务器基础配置</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/02/01/flask-nginx-uwsgibu-shu/">flask nginx uwsgi 部署</a>
@@ -1333,14 +1270,6 @@
     
       <li class="post">
         <a href="/blog/2012/11/25/inotify/">inotify,rsync统一化配置</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/22/mogilefsan-zhuang-pei-zhi/">MogileFS安装配置</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/22/time-hiresjie-shao/">Time::HiRes介绍</a>
       </li>
     
   </ul>
