@@ -89,6 +89,6 @@ server {
 sudo nginx -s reload
 
 # 支持virtualenv, uswgi还可以--py-auto-reload
-sudo uwsgi -x /Users/william/project/open-pmt/test_config.xml --virtualenv sandbox 
+sudo uwsgi -x /Users/william/project/test/test_config.xml --virtualenv sandbox 
 
 ```
