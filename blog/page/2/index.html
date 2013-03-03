@@ -100,6 +100,377 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2013/01/10/rtxldapjiao-cheng/">RTXLDAP教程</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-10T10:14:00+08:00" pubdate data-updated="true">Jan 10<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/01/10/rtxldapjiao-cheng/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>名词解释</h3>
+
+<ol>
+<li>RTX: 腾讯出的企业沟通工具</li>
+<li>LDAP: 关于人或者其他信息的集中存储，微软的AD就是LDAP的一种</li>
+<li>RTXLDAP: 基于RTX的SDK开发出的第三方工具，可以同步LDAP用户，可以RTX与LDAP单点登陆。支持RTX最新版本</li>
+</ol>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2013/01/10/rtxldapjiao-cheng/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2013/01/06/datehan-shu-de-wu-yong/">Date函数的误用</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-06T17:22:00+08:00" pubdate data-updated="true">Jan 6<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/01/06/datehan-shu-de-wu-yong/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>需求：得到给定日期为一年中的第几周，并取得该周的年份</h3>
+
+<ul>
+<li>产生bug的写法</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
+</span><span class='line'><span class="nv">$time_2012_12_31</span> <span class="o">=</span> <span class="nb">mktime</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">31</span><span class="p">,</span><span class="mi">2012</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$week_2012_12_31</span> <span class="o">=</span> <span class="nb">date</span><span class="p">(</span><span class="s1">&#39;W&#39;</span><span class="p">,</span><span class="nv">$time_2012_12_31</span><span class="p">);</span>
+</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;2012-12-31: week is </span><span class="si">{</span><span class="nv">$week_2012_12_31</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$error_year_2012_12_31</span> <span class="o">=</span> <span class="nb">date</span><span class="p">(</span><span class="s1">&#39;Y&#39;</span><span class="p">,</span><span class="nv">$time_2012_12_31</span><span class="p">);</span>
+</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;2012-12-31: error year is </span><span class="si">{</span><span class="nv">$error_year_2012_12_31</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">#输出错误的结果</span>
+</span><span class='line'><span class="mi">2012</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="o">:</span> <span class="nx">week</span> <span class="nx">is</span> <span class="mo">01</span>
+</span><span class='line'><span class="mi">2012</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="o">:</span> <span class="nx">error</span> <span class="nx">year</span> <span class="nx">is</span> <span class="mi">2012</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>正确的写法，统一采用ISO-8601标准</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
+</span><span class='line'><span class="nv">$time_2012_12_31</span> <span class="o">=</span> <span class="nb">mktime</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">31</span><span class="p">,</span><span class="mi">2012</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$week_2012_12_31</span> <span class="o">=</span> <span class="nb">date</span><span class="p">(</span><span class="s1">&#39;W&#39;</span><span class="p">,</span><span class="nv">$time_2012_12_31</span><span class="p">);</span>
+</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;2012-12-31: week is </span><span class="si">{</span><span class="nv">$week_2012_12_31</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$year_2012_12_31</span> <span class="o">=</span> <span class="nb">date</span><span class="p">(</span><span class="s1">&#39;o&#39;</span><span class="p">,</span><span class="nv">$time_2012_12_31</span><span class="p">);</span>
+</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;2012-12-31: year is </span><span class="si">{</span><span class="nv">$year_2012_12_31</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">#输出正确的结果</span>
+</span><span class='line'><span class="mi">2012</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="o">:</span> <span class="nx">week</span> <span class="nx">is</span> <span class="mo">01</span>
+</span><span class='line'><span class="mi">2012</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="o">:</span> <span class="nx">year</span> <span class="nx">is</span> <span class="mi">2013</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2013/01/04/jqueryzai-firefoxxia-wu-fa-autocomplete/">Jquery在firefox下无法autocomplete</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-04T17:29:00+08:00" pubdate data-updated="true">Jan 4<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/01/04/jqueryzai-firefoxxia-wu-fa-autocomplete/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h4>jquery的autocomplete中文输入在firefox无法正常使用</h4>
+
+<ul>
+<li>firefox下用input事件触发keydown即可</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$('元素').bind('input', function(){
+</span><span class='line'>    $(this).trigger('keydown');
+</span><span class='line'>}).bind("keydown", function(event){
+</span><span class='line'>    事件
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2012/12/17/system-dot-out-dot-printlnluan-ma/">System.out.println 乱码</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-12-17T22:30:00+08:00" pubdate data-updated="true">Dec 17<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/12/17/system-dot-out-dot-printlnluan-ma/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>今天郁闷发现eclipse控制中文乱码</h3>
+
+<ul>
+<li>在网上找答案真心蛋疼，说啥的都有</li>
+<li>特此在这里记录一下</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Run Configurations... -&gt; Common选项卡 -&gt; Encoding区，选择Other UTF-8</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img src="/images/post/console-messy-code.jpg" title="console messy code" alt="console messy code" /></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng/">Mogilefs设备损坏处理流程</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-25T19:34:00+08:00" pubdate data-updated="true">Nov 25<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><ul>
+<li>这里单个dev对应一个磁盘,假设是sdb</li>
+<li>文件系统使用xfs</li>
+<li>mogstored使用nginx</li>
+</ul>
+
+
+<p>1.把磁盘标记为dead</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>mogadm device mark &lt;hostname&gt; &lt;devid&gt; &lt;status&gt;
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2012/11/25/inotify/">Inotify,rsync统一化配置</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-25T16:14:00+08:00" pubdate data-updated="true">Nov 25<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/25/inotify/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>为什么要统一化配置，手动改改不行？</h3>
+
+<ul>
+<li>假设有10台服务器，要改10次，错误和遗漏在所难免</li>
+<li>需要有一个地方备份配置</li>
+<li>也许还需要对配置文件进行版本控制</li>
+</ul>
+
+
+<h3>inotify+rsync改变这一切</h3>
+
+<ul>
+<li>inotify可以递归的监控文件是否有新建，修改等</li>
+<li>rsync用来同步</li>
+</ul>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2012/11/25/inotify/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2012/11/22/mogilefsan-zhuang-pei-zhi/">MogileFS安装配置</a></h1>
     
     
@@ -271,355 +642,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/22/redisshi-zhan/">Redis实战</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-22T17:17:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/22/redisshi-zhan/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>redis是什么？</h3>
-
-<ul>
-<li>redis是一个开源的，先进的key-value存储服务器端</li>
-<li>value可以包含多种结构，比如strings, hashes, lists, sets ,sorted sets</li>
-<li>官方网址：<a href="http://redis.io">http://redis.io</a></li>
-<li><a href="/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/">freenode</a>的聊天室名称是#redis</li>
-</ul>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/11/22/redisshi-zhan/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/22/xiu-fu-mogilefsmu-lu-owner/">修复mogilefs目录owner</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-22T17:16:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/22/xiu-fu-mogilefsmu-lu-owner/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>什么情况会导致mogilefs的数据目录owner不正确</h3>
-
-<ul>
-<li>直接使用root启动mogstored会导致增加的文件和文件夹为root</li>
-<li>重新用mogile启动mogstored后，mogile用户无法删除root的文件，最终delete队列无法处理</li>
-</ul>
-
-
-<h3>如何处理</h3>
-
-<ol>
-<li>直接chown -R，这是最直接的方法，如果1T的磁盘被这样操作，会10小时util为100</li>
-<li>自己写一个脚本慢处理，脚本思路如下</li>
-</ol>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/11/22/xiu-fu-mogilefsmu-lu-owner/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/10/an-zhuang-pei-zhi-hive/">安装配置hive</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-10T14:59:00+08:00" pubdate data-updated="true">Nov 10<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/10/an-zhuang-pei-zhi-hive/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><ul>
-<li>先安装hadoop请参考<a href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/">这篇文章</a></li>
-<li>hive介绍：通过类似于sql语句的方式去计算结果，数据都存放在hdfs</li>
-</ul>
-
-
-<h3>下载并解压hive</h3>
-
-<ul>
-<li>给个官方<a href="http://www.apache.org/dyn/closer.cgi/hive/">链接</a></li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>tar -xzvf hive-x.y.z.tar.gz
-</span><span class='line'>cd hive-x.y.z
-</span><span class='line'>PATH=$PATH:/Users/william/project/hadoop-1.0.4/bin:/Users/william/project/hive-0.8.1/bin
-</span><span class='line'>. ~/.bash_profile</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>直接在终端输入hive，然后输入show tables;然会OK，就行了</li>
-</ul>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/11/10/an-zhuang-pei-zhi-hive/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/08/perlfu-jin-cheng-jian-ting-zi-jin-cheng-gong-zuo-shi-li/">Perl父进程监听，子进程工作实例</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-08T22:15:00+08:00" pubdate data-updated="true">Nov 8<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/08/perlfu-jin-cheng-jian-ting-zi-jin-cheng-gong-zuo-shi-li/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><ol>
-<li>构造后台进程</li>
-<li>主进程监到连接，创建子进程接收消息并处理消息</li>
-<li>主进程继续监听，同时非阻塞的回收子进程</li>
-</ol>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/11/08/perlfu-jin-cheng-jian-ting-zi-jin-cheng-gong-zuo-shi-li/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/07/nginxfan-xiang-dai-li-zi-dong-urldecodewen-ti/">Nginx反向代理自动urldecode问题</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-07T16:40:00+08:00" pubdate data-updated="true">Nov 7<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/07/nginxfan-xiang-dai-li-zi-dong-urldecodewen-ti/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>今天妖孽了，发现nginx反向代理会自动urldecode</h3>
-
-<ul>
-<li>同事监控两个nginx的access_log，惊人的发现日志里的url不同</li>
-<li>去掉反斜杠就ok了，不太清楚nginx内部是如何处理的</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>location / {
-</span><span class='line'>    proxy_pass        http://localhost:8000/;
-</span><span class='line'>}
-</span><span class='line'>#修改为下面这样后，一切OK了
-</span><span class='line'>location / {
-</span><span class='line'>    proxy_pass        http://localhost:8000;
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/06/mogilefsshan-chu-dui-lie/">Mogilefs删除队列</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-06T19:31:00+08:00" pubdate data-updated="true">Nov 6<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/06/mogilefsshan-chu-dui-lie/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>遇到的问题</h3>
-
-<ul>
-<li>发现file_to_delete2队列表里有500万记录，奇怪这些文件为什么要删除？心里不踏实，寻找根源&#8230;</li>
-<li>在队列中随便拿一个fid，在file表里查竟然是空的，再找file_on表竟然有数据&#8230;</li>
-</ul>
-
-
-<h3>什么时候会插入fid到删除队列呢</h3>
-
-<ol>
-<li>cmd_create_close时，如果连接终端，文件大小等不正确，会增加到删除队列</li>
-<li>cmd_create_close时，如果同一domain下key已经存在，那么会去删除原有的文件(两份文件key相同，但是fid不同，我的问题就出在这)</li>
-<li>mogdelete工具会删除memcache和file表的文件记录，并运用删除队列删除磁盘上的文件和file_on表</li>
-<li>client调用delete方法，和mogdelete一样</li>
-</ol>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/11/06/mogilefsshan-chu-dui-lie/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/3/">&larr; 其他文章</a></li>
@@ -639,6 +661,7 @@
 <li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
 <li class='category'><a href='/blog/categories/javascript/'>Javascript (2)</a></li>
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
+<li class='category'><a href='/blog/categories/mysql/'>Mysql (6)</a></li>
 <li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
 <li class='category'><a href='/blog/categories/php/'>Php (2)</a></li>
@@ -667,6 +690,30 @@
     <li class="nav-header">最近更新</li>
     
       <li class="post">
+        <a href="/blog/2013/02/27/mysql-an-quan/">Mysql 安全</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/27/mysql-guan-li-yu-ju/">Mysql 管理语句</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/27/mysql-zhuang-tai-jian-cha/">Mysql 状态检查</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/27/mysql-zhu-cong-she-zhi/">Mysql 主从设置</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/27/mysql-you-hua-pei-zhi/">Mysql 优化配置</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/27/mysql-ri-zhi-fen-lei/">Mysql 日志分类</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/02/26/ubuntu-wang-luo-she-zhi/">ubuntu 网络设置</a>
       </li>
     
@@ -680,30 +727,6 @@
     
       <li class="post">
         <a href="/blog/2013/01/18/you-lan-qi-huan-cun-jie-xi/">游览器缓存解析</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/01/10/rtxldapjiao-cheng/">RTXLDAP教程</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/01/06/datehan-shu-de-wu-yong/">date函数的误用</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/01/04/jqueryzai-firefoxxia-wu-fa-autocomplete/">jquery在firefox下无法autocomplete</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/12/17/system-dot-out-dot-printlnluan-ma/">System.out.println 乱码</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng/">mogilefs设备损坏处理流程</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/25/inotify/">inotify,rsync统一化配置</a>
       </li>
     
   </ul>

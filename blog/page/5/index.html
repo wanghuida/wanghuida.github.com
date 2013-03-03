@@ -100,6 +100,662 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2012/09/20/shi-yong-jmxfen-xi-solrzhuang-tai/">使用JMX分析solr状态</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-09-20T14:25:00+08:00" pubdate data-updated="true">Sep 20<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/09/20/shi-yong-jmxfen-xi-solrzhuang-tai/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>开启JMX</h3>
+
+<ul>
+<li>在solrconfig.xml中添加,默认包含</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;jmx /&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>重启solr，设置启动参数</li>
+<li>扩展选项请参考<a href="http://www.oracle.com/technetwork/java/javase/tech/vmoptions-jsp-140102.html">官方文档</a></li>
+</ul>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2012/09/20/shi-yong-jmxfen-xi-solrzhuang-tai/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2012/09/18/xiang-liang-kong-jian-mo-xing/">向量空间模型</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-09-18T08:28:00+08:00" pubdate data-updated="true">Sep 18<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/09/18/xiang-liang-kong-jian-mo-xing/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>向量空间模型广泛使用在文档相似度（算score等等），下面举例描述这个模型：</h3>
+
+<ul>
+<li>假设有两个文档（可以把一个query想象成一个文档）,分别为d1,d2</li>
+<li>假设w1,w2,w3,w4为term</li>
+<li>下图为词频（词频就是在单个文档中出现的次数）,词频为ai,bi</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>-----------------------------------
+</span><span class='line'>      |  w1  |  w2  |  w3  |  w4  |
+</span><span class='line'>  d1  |  1   |      |  1   |      |
+</span><span class='line'>  d2  |  2   |  3   |  2   |  1   |
+</span><span class='line'>-----------------------------------</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>比较夹角公式，越接近越相似,(还需要向量的模公式,|x| = √x<sup>2)</sup></li>
+</ul>
+
+
+<p><img src="/images/post/vsm.png" title="vsm公式" alt="vsm公式" /></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sim(d1,d2) = ∑(ai*bi) / √(∑ai^2 * ∑bi^2)
+</span><span class='line'>           = 1*2+0*3+1*2+0*1 / √((1^2+0^2+1^2+0^2)*(2^2+3^2+2^2+1^2))
+</span><span class='line'>           = 4 / √(36)
+</span><span class='line'>           = 4 / 6
+</span><span class='line'>           = 2 / 3
+</span><span class='line'>           = 0.66666...</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>假设文章只有两维的话，那么空间图就可以画在一个平面直角坐标系当中，读者可以假想两篇只有两个词的文章画图进行理解。</li>
+<li>由公式可以看出计算量是很大的，要提高效率最好的方法就是减少term，俗称降纬</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2012/09/14/solrman-cha-xun-fen-xi/">Solr慢查询分析</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-09-14T13:35:00+08:00" pubdate data-updated="true">Sep 14<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/09/14/solrman-cha-xun-fen-xi/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>solr慢请求分析,第一种</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=560950&q=*:*&wt=json&rows=50} hits=863948 status=0 QTime=2752
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=756250&q=*:*&wt=json&rows=50} hits=863935 status=0 QTime=2472 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=315450&q=*:*&wt=json&rows=50} hits=863935 status=0 QTime=1183 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=557400&q=*:*&wt=json&rows=50} hits=863935 status=0 QTime=2020 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=315550&q=*:*&wt=json&rows=50} hits=863935 status=0 QTime=1061 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=756400&q=*:*&wt=json&rows=50} hits=863935 status=0 QTime=2252 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=315650&q=*:*&wt=json&rows=50} hits=863938 status=0 QTime=1068 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=557500&q=*:*&wt=json&rows=50} hits=863938 status=0 QTime=2012 
+</span><span class='line'>INFO: [] webapp=/solr path=/select/ params={fl=id&sort=quetime+asc&start=557550&q=*:*&wt=json&rows=50} hits=863938 status=0 QTime=2248 </span></code></pre></td></tr></table></div></figure>
+
+
+<h3>解决方案</h3>
+
+<ul>
+<li>请排除以上查询语句【或限制start】</li>
+</ul>
+
+
+<h3>solr慢请求分析,第二种</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>INFO: [] webapp=/solr path=/select params={mm=2&fl=score,*&sort=score+desc,quetime+desc&start=0&q=贷款+房子+能+不+买&bf=linear(rankscore,29.3246184,0)&qf=title^5+tags^1+bestanswerstr^2+description^1+normalanswerstr^1&wt=json&qt=dismax&fq=-cityid:14&fq=questatus:1+OR+questatus:2+OR+questatus:3+OR+questatus:6&rows=1} hits=317500 status=0 QTime=520 
+</span><span class='line'>INFO: [] webapp=/solr path=/select params={mm=2&fl=score,*&sort=score+desc,quetime+desc&start=0&q=集体+户口+好+好+不&qf=title^5+tags^1+bestanswerstr^2+description^1+normalanswerstr^1&wt=json&qt=dismax&fq=-cityid:12&fq=questatus:1+OR+questatus:2+OR+questatus:3+OR+questatus:6&rows=1} hits=287285 status=0 QTime=622 </span></code></pre></td></tr></table></div></figure>
+
+
+<h3>解决方案</h3>
+
+<ul>
+<li>dismax的mm=2间接使用了OR，建议用AND提高性能【实验中:我想用docfreq来做判断用AND还是OR】</li>
+<li>StopWord:通过solr/admin/luke?fl=normalanswerstr&amp;numTerms=100分析term,过滤掉没有意义的term,例如</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;int name="的"&gt;965396&lt;/int&gt;
+</span><span class='line'>&lt;int name="，"&gt;947429&lt;/int&gt;
+</span><span class='line'>&lt;int name="是"&gt;729063&lt;/int&gt;
+</span><span class='line'>&lt;int name="。"&gt;707417&lt;/int&gt;
+</span><span class='line'>&lt;int name="不"&gt;571925&lt;/int&gt;
+</span><span class='line'>&lt;int name="你"&gt;534142&lt;/int&gt;
+</span><span class='line'>&lt;int name="可以"&gt;525645&lt;/int&gt;
+</span><span class='line'>&lt;int name="就"&gt;460975&lt;/int&gt;
+</span><span class='line'>&lt;int name="有"&gt;443743&lt;/int&gt;
+</span><span class='line'>&lt;int name="了"&gt;437630&lt;/int&gt;
+</span><span class='line'>&lt;int name="要"&gt;372936&lt;/int&gt;
+</span><span class='line'>&lt;int name="！"&gt;342369&lt;/int&gt;
+</span><span class='line'>&lt;int name="好"&gt;331646&lt;/int&gt;
+</span><span class='line'>&lt;int name="在"&gt;324636&lt;/int&gt;
+</span><span class='line'>&lt;int name="一"&gt;279765&lt;/int&gt;
+</span><span class='line'>&lt;int name="个"&gt;269726&lt;/int&gt;
+</span><span class='line'>&lt;int name="能"&gt;233510&lt;/int&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>权重相同的放入同一个字段，也可以用CopyField，可以多加个系数</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2012/09/07/lucene-ru-men/">Lucene 入门</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-09-07T22:10:00+08:00" pubdate data-updated="true">Sep 7<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/09/07/lucene-ru-men/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>官方DEMO</h3>
+
+<ul>
+<li><a href="http://lucene.apache.org/core/4_0_0-BETA/demo/src-html/org/apache/lucene/demo/IndexFiles.html">IndexFiles</a></li>
+<li><a href="http://lucene.apache.org/core/4_0_0-BETA/demo/src-html/org/apache/lucene/demo/SearchFiles.html">SearchFiles</a></li>
+</ul>
+
+
+<h3>IndexFiles</h3>
+
+<ul>
+<li>在main()方法里分析命令行，然后初始化IndexWriter,打开Directory,初始化StandaryAnalyzer和IndexWriterConfig</li>
+<li>-index参数设置索引存放的地方，默认存放在index目录下</li>
+<li>-docs参数指定哪个目录下的文件被索引</li>
+<li>-update参数如果被设置，将不删除已经存在的索引，否则清楚后重新建立索引</li>
+<li>IndexWriter使用Directory存储索引信息,这里使用的是FSDirectory实现,其他的子类可以写入RAM,DB</li>
+<li>Analyzer用来分词(indexed tokens)也称为terms,也包括一些其他的处理，例如统一转换，同义词插入，过滤不需要的词等.现在用的StandaryAnalyzer的分词逻辑是Unicode Text Segmentation algorithm,统一转换成小写，过滤掉不要的词，例如a,an等很少被搜索的词语.不同的语言应该用不同的分析器，lucene已经提供了很多语言的分析器了</li>
+<li>IndexWriterConfig用来控制IndexWriter,例如设置OpenMode</li>
+<li>在IndexWriter初始化后，就来到了indexDocs()方法，这个递归函数爬取-docs下的所有文件来建立Document对象.Document包含3个域分别是文件内容，路径和创建时间.如果-update指定，那么就更新文档，否则删除索引目录后添加文档</li>
+</ul>
+
+
+<h3>SearchFiles</h3>
+
+<ul>
+<li>下面是一个简易版的文件查询,利用IndexSearcher,StandaryAnalyzer和QueryParser进行查找,QueryParser也需要StandaryAnalyzer对输入的内容进行分析，例如转换小写，过滤词等.QueryParser通过lucene解析语法生成的Query传递给IndexSearcher</li>
+<li>SearchFiles 用IndexSearcher.search(query,n) 返回得分最高的N条记录.</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">CustomSearch</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="nf">CustomSearch</span><span class="o">()</span> <span class="o">{}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="cm">/**</span>
+</span><span class='line'><span class="cm">   * @param args</span>
+</span><span class='line'><span class="cm">   */</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">String</span> <span class="n">index</span> <span class="o">=</span> <span class="s">&quot;index&quot;</span><span class="o">;</span>
+</span><span class='line'>    <span class="n">String</span> <span class="n">field</span> <span class="o">=</span> <span class="s">&quot;contents&quot;</span><span class="o">;</span>
+</span><span class='line'>    <span class="n">String</span> <span class="n">queryString</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">limit</span> <span class="o">=</span> <span class="mi">10</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">try</span><span class="o">{</span>
+</span><span class='line'>      <span class="n">IndexReader</span> <span class="n">reader</span> <span class="o">=</span> <span class="n">DirectoryReader</span><span class="o">.</span><span class="na">open</span><span class="o">(</span><span class="n">FSDirectory</span><span class="o">.</span><span class="na">open</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">index</span><span class="o">)));</span>
+</span><span class='line'>      <span class="n">IndexSearcher</span> <span class="n">searcher</span> <span class="o">=</span> <span class="k">new</span> <span class="n">IndexSearcher</span><span class="o">(</span><span class="n">reader</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">Analyzer</span> <span class="n">analyzer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StandardAnalyzer</span><span class="o">(</span><span class="n">Version</span><span class="o">.</span><span class="na">LUCENE_40</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">QueryParser</span> <span class="n">parser</span> <span class="o">=</span> <span class="k">new</span> <span class="n">QueryParser</span><span class="o">(</span><span class="n">Version</span><span class="o">.</span><span class="na">LUCENE_40</span><span class="o">,</span> <span class="n">field</span><span class="o">,</span> <span class="n">analyzer</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">BufferedReader</span> <span class="n">in</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BufferedReader</span><span class="o">(</span><span class="k">new</span> <span class="n">InputStreamReader</span><span class="o">(</span><span class="n">System</span><span class="o">.</span><span class="na">in</span><span class="o">,</span><span class="s">&quot;UTF-8&quot;</span><span class="o">));</span>
+</span><span class='line'>      <span class="k">if</span><span class="o">(</span><span class="n">queryString</span> <span class="o">==</span> <span class="kc">null</span><span class="o">){</span>
+</span><span class='line'>        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Enter query:&quot;</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">queryString</span> <span class="o">=</span> <span class="n">in</span><span class="o">.</span><span class="na">readLine</span><span class="o">();</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>      <span class="n">Query</span> <span class="n">query</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="n">queryString</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">printResult</span><span class="o">(</span><span class="n">in</span><span class="o">,</span> <span class="n">searcher</span><span class="o">,</span> <span class="n">query</span><span class="o">,</span> <span class="n">limit</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span><span class="k">catch</span><span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">){</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;can not open index directory!&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">exit</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">ParseException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;can not open index directory!&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">exit</span><span class="o">(</span><span class="mi">2</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">printResult</span><span class="o">(</span><span class="n">BufferedReader</span> <span class="n">in</span><span class="o">,</span><span class="n">IndexSearcher</span> <span class="n">searcher</span><span class="o">,</span><span class="n">Query</span> <span class="n">query</span><span class="o">,</span><span class="kt">int</span> <span class="n">limit</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">TopDocs</span> <span class="n">results</span> <span class="o">=</span> <span class="n">searcher</span><span class="o">.</span><span class="na">search</span><span class="o">(</span><span class="n">query</span><span class="o">,</span> <span class="n">limit</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">ScoreDoc</span><span class="o">[]</span> <span class="n">hits</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="na">scoreDocs</span><span class="o">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">totalHits</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="na">totalHits</span><span class="o">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">printHits</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">while</span><span class="o">(</span><span class="n">printHits</span> <span class="o">&lt;</span> <span class="n">totalHits</span><span class="o">){</span>
+</span><span class='line'>      <span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">hits</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++,</span><span class="n">printHits</span><span class="o">++){</span>
+</span><span class='line'>        <span class="n">Document</span> <span class="n">doc</span> <span class="o">=</span> <span class="n">searcher</span><span class="o">.</span><span class="na">doc</span><span class="o">(</span><span class="n">hits</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">doc</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">&quot;score=%s,id=%s,doc=%s,path=%s&quot;</span><span class="o">,</span><span class="n">hits</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">score</span><span class="o">,</span> <span class="n">printHits</span> <span class="o">+</span> <span class="mi">1</span><span class="o">,</span> <span class="n">hits</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">doc</span><span class="o">,</span> <span class="n">doc</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">&quot;path&quot;</span><span class="o">)</span> <span class="o">));</span>
+</span><span class='line'>        <span class="k">if</span><span class="o">(</span> <span class="o">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="o">)</span> <span class="o">==</span> <span class="n">limit</span> <span class="o">){</span>
+</span><span class='line'>          <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">();</span>
+</span><span class='line'>          <span class="n">results</span> <span class="o">=</span> <span class="n">searcher</span><span class="o">.</span><span class="na">searchAfter</span><span class="o">(</span><span class="n">hits</span><span class="o">[</span><span class="n">i</span><span class="o">],</span> <span class="n">query</span><span class="o">,</span> <span class="n">limit</span><span class="o">);</span>
+</span><span class='line'>          <span class="n">hits</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="na">scoreDocs</span><span class="o">;</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2012/08/30/chang-yong-ming-ling/">常用命令</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-30T13:14:00+08:00" pubdate data-updated="true">Aug 30<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/08/30/chang-yong-ming-ling/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>过滤记录</h3>
+
+<ul>
+<li>-l自动chomp，结果加$/</li>
+<li>-a自动分割</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>tail -f access-2012-08-30.log | grep -v <span class="s1">&#39;*&#39;</span> <span class="se">\ </span>
+</span><span class='line'>    | perl -w -lane <span class="s1">&#39;$a = $F[@F-1];print if $a &gt; 50000 &#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>获取URL内容</h3>
+
+<ul>
+<li>-I 获取头信息</li>
+<li>-x 通过哪台服务器</li>
+<li>-A 设置user agent,可以让log过滤更方便</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>curl -I -x 127.0.0.1  <span class="s2">&quot;http://test/abc.jpg&quot;</span> -A <span class="s2">&quot;huida&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>批量删除一天以前的文件</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>find /dev/shm/ -type f -mtime +1 | xargs rm
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>计算tcp连接数</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>su -
+</span><span class='line'>netstat -lant | wc -l
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>增加网关</h3>
+
+<ul>
+<li>mac版</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo route add -net 10.0.0.0/8 -interface ppp0
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>格式化和mount磁盘</h3>
+
+<ul>
+<li>xfs系统</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>/sbin/mkfs.xfs /dev/sdb
+</span><span class='line'>mount –t xfs /dev/sdb /data1
+</span><span class='line'>vim /etc/fstab
+</span><span class='line'>umount -l /tmp/
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>导出数据</h3>
+
+<ul>
+<li>-h -u -p表示主机，用户，密码</li>
+<li>-D表示数据库</li>
+<li>-e表示执行语句</li>
+<li>-N表示跳过列名, &#8211;skip-column-names</li>
+<li>-s表示用tab分割字段, &#8211;silent,Be more silent. Print results with a tab as separator, each row on new line.</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>mysql -h -u -p -Ns -Ddatabase -e <span class="s2">&quot;select * from ~~~ where ~~~&quot;</span> &gt; /tmp/fid
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>远程取得数据</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sftp
+</span><span class='line'>scp
+</span><span class='line'>rsync
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>查看系统状况</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>iostat -x 1
+</span><span class='line'>free -m
+</span><span class='line'>w
+</span><span class='line'>top
+</span><span class='line'>ping
+</span><span class='line'>lsof -i4TCP -P
+</span><span class='line'>netstat -lnp
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2012/08/29/solrcha-xun-guo-cheng/">Solr查询过程</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-29T16:25:00+08:00" pubdate data-updated="true">Aug 29<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/08/29/solrcha-xun-guo-cheng/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>solr查询分析</h3>
+
+<p><img src="/images/post/solrsearch.png" title="solr 查询分析" alt="solr 查询分析" /></p>
+
+<ol>
+<li>设置SolrQueryRequest,SolrQueryResponse</li>
+<li>在SolrRequestInfo里设置一个ThreadLocal<SolrRequestInfo>,set solrreq,solrresp</li>
+<li>通过url取得handler，例如/select就是使用SearchHandler</li>
+<li>handler抽象类里的handleRequest</li>
+<li>handler调用handleRequestBody开始处理请求，建立responseBuilder</li>
+<li>QueryComponent.prepare，设置returnFields，没有fl的情况下wantsAllFields，设置默认的LuceneQParser分析器，实例化SolrQueryParser</li>
+<li>QueryComponet.execute，取得关联的文档id，保存到resultCache</li>
+<li>writeResponse，如果id在DocumentCache里有就直接拿，否则通过reader去获得，再保存到DocumentCache</li>
+<li>输出结果到游览器</li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2012/08/28/solrqi-dong-fen-xi/">Solr启动分析</a></h1>
     
     
@@ -458,389 +1114,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/08/08/vimsu-ji-biao/">Vim速记表</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-08-08T08:46:00+08:00" pubdate data-updated="true">Aug 8<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/08/08/vimsu-ji-biao/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="/images/post/vi-vim-cheat-sheet.gif" title="vim cheat" alt="VIM" /></p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/08/01/weakhashmapzuo-yong-he-shi-li/">WeakHashMap作用和实例</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-08-01T21:48:00+08:00" pubdate data-updated="true">Aug 1<span>st</span>, 2012</time>
-        
-         | <a href="/blog/2012/08/01/weakhashmapzuo-yong-he-shi-li/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>在这里先预想了解一下WeakHashMap，结合后面的例子应该会更好理解</h3>
-
-<ul>
-<li>当存放在WeakHashMap里的对象，没有其他引用和使用，那么在GC时会自动释放。</li>
-</ul>
-
-
-<h3>下面用实例来更好的理解</h3>
-
-<ul>
-<li>测试一下保持引用会不会被自动释放</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">wanghuida</span><span class="o">.</span><span class="na">test</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">java.util.WeakHashMap</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">java.util.ArrayList</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Entry</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="cm">/**</span>
-</span><span class='line'><span class="cm">     * @param args</span>
-</span><span class='line'><span class="cm">     */</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="c1">// TODO Auto-generated method stub</span>
-</span><span class='line'>        <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">[]&gt;</span> <span class="n">templist</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">[]&gt;();</span>
-</span><span class='line'>        <span class="c1">//设的多一点，可以让GC真实发挥</span>
-</span><span class='line'>        <span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">1000000</span><span class="o">;</span> <span class="n">i</span><span class="o">++){</span>
-</span><span class='line'>            <span class="n">String</span><span class="o">[]</span> <span class="n">tempstr</span> <span class="o">=</span> <span class="k">new</span> <span class="n">String</span><span class="o">[</span><span class="mi">2</span><span class="o">];</span>
-</span><span class='line'>            <span class="n">templist</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">tempstr</span><span class="o">);</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">[],</span> <span class="n">String</span><span class="o">[]&gt;</span> <span class="n">map</span> <span class="o">=</span> <span class="k">new</span> <span class="n">WeakHashMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">[],</span> <span class="n">String</span><span class="o">[]&gt;();</span>
-</span><span class='line'>        <span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="o">;</span> <span class="n">i</span><span class="o">++){</span>
-</span><span class='line'>            <span class="n">map</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">templist</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">i</span><span class="o">),</span> <span class="k">new</span> <span class="n">String</span><span class="o">[</span><span class="mi">2</span><span class="o">]);</span>
-</span><span class='line'>            <span class="n">System</span><span class="o">.</span><span class="na">gc</span><span class="o">();</span>
-</span><span class='line'>            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">map</span><span class="o">.</span><span class="na">size</span><span class="o">());</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/08/01/weakhashmapzuo-yong-he-shi-li/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/07/27/java-volatileli-jie/">Java Volatile理解</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-07-27T21:55:00+08:00" pubdate data-updated="true">Jul 27<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/07/27/java-volatileli-jie/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>volatile的含义其实很好理解，希望配合图可以更加清晰的解释</h3>
-
-<p><img src="/images/post/volatile.jpg" title="volatile 图例说明" alt="volatile" /></p>
-
-<ul>
-<li>多个线程加载同一个对象时，会从主内存复制一个副本到线程工作内存</li>
-<li>如果对象没有volatile属性，只有write操作才会让主内存的对象得到修改（其他线程这时才有可能拿到最新的结果）</li>
-<li>如果对象有volatile属性，load,use,asign,store都会拿到实时的结果（因为会一直同步更新结果）</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/07/26/xdebug-500cuo-wu-xian-shi-200cheng-gong-de-bug/">Xdebug:500错误显示200成功的bug</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-07-26T16:15:00+08:00" pubdate data-updated="true">Jul 26<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/07/26/xdebug-500cuo-wu-xian-shi-200cheng-gong-de-bug/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>今天同事遇见一个诡异的问题</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">ini_set</span><span class="p">(</span><span class="s1">&#39;display_errors&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">#随便调用一个什么方法来产生错误</span>
-</span><span class='line'><span class="nx">abcd</span><span class="p">();</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>明显php错误，但是HTTP返回200</li>
-</ul>
-
-
-<h3>最终关闭加载xdebug一切正常了,返回500错误了</h3>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/07/22/python-zhou-ti-yan-ji/">Python 一周体验记</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-07-22T10:27:00+08:00" pubdate data-updated="true">Jul 22<span>nd</span>, 2012</time>
-        
-         | <a href="/blog/2012/07/22/python-zhou-ti-yan-ji/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>python可以快速上手</h3>
-
-<ul>
-<li>推荐官方的新手教程 <a href="http://docs.python.org/tutorial/">http://docs.python.org/tutorial/</a></li>
-</ul>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/07/22/python-zhou-ti-yan-ji/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/07/13/oauth-jie-shao/">OAuth 介绍</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-07-13T13:01:00+08:00" pubdate data-updated="true">Jul 13<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/07/13/oauth-jie-shao/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>在认证和授权的过程中涉及的三方包括：</h3>
-
-<ul>
-<li>服务提供方 (Service Provider)，用户使用服务提供方来存储受保护的资源，如照片，视频，联系人列表。</li>
-<li>用户 (User)，存放在服务提供方的受保护的资源的拥有者。</li>
-<li>客户端 (Client)，要访问服务提供方资源的第三方应用，通常是网站，如提供照片打印服务的网站。在认证过程之前，客户端要向服务提供者申请客户端标识。</li>
-</ul>
-
-
-<h3>使用OAuth进行认证和授权的过程如下所示:</h3>
-
-<ol>
-<li>用户访问客户端的网站，想操作用户存放在服务提供方的资源。</li>
-<li>客户端向服务提供方请求一个临时令牌 (Request Token)。</li>
-<li>服务提供方验证客户端的身份后，授予一个临时令牌。</li>
-<li>客户端获得临时令牌后，将用户引导至服务提供方的授权页面请求用户授权。在这个过程中将临时令牌和客户端的回调连接发送给服务提供方。</li>
-<li>用户在服务提供方的网页上输入用户名和密码，然后授权该客户端访问所请求的资源。</li>
-<li>授权成功后，服务提供方引导用户返回客户端的网页。</li>
-<li>客户端根据临时令牌从服务提供方那里获取访问令牌 (Access Token)。</li>
-<li>服务提供方根据临时令牌和用户的授权情况授予客户端访问令牌。</li>
-<li>客户端使用获取的访问令牌访问存放在服务提供方上的受保护的资源。</li>
-</ol>
-
-
-<h3>图例说明</h3>
-
-<p><img src="/images/post/oauth_flow.png" title="OAuth 图例说明" alt="OAuth" /></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/6/">&larr; 其他文章</a></li>
@@ -860,6 +1133,7 @@
 <li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
 <li class='category'><a href='/blog/categories/javascript/'>Javascript (2)</a></li>
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
+<li class='category'><a href='/blog/categories/mysql/'>Mysql (6)</a></li>
 <li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
 <li class='category'><a href='/blog/categories/php/'>Php (2)</a></li>
@@ -888,6 +1162,30 @@
     <li class="nav-header">最近更新</li>
     
       <li class="post">
+        <a href="/blog/2013/02/27/mysql-an-quan/">Mysql 安全</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/27/mysql-guan-li-yu-ju/">Mysql 管理语句</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/27/mysql-zhuang-tai-jian-cha/">Mysql 状态检查</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/27/mysql-zhu-cong-she-zhi/">Mysql 主从设置</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/27/mysql-you-hua-pei-zhi/">Mysql 优化配置</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/27/mysql-ri-zhi-fen-lei/">Mysql 日志分类</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/02/26/ubuntu-wang-luo-she-zhi/">ubuntu 网络设置</a>
       </li>
     
@@ -901,30 +1199,6 @@
     
       <li class="post">
         <a href="/blog/2013/01/18/you-lan-qi-huan-cun-jie-xi/">游览器缓存解析</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/01/10/rtxldapjiao-cheng/">RTXLDAP教程</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/01/06/datehan-shu-de-wu-yong/">date函数的误用</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/01/04/jqueryzai-firefoxxia-wu-fa-autocomplete/">jquery在firefox下无法autocomplete</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/12/17/system-dot-out-dot-printlnluan-ma/">System.out.println 乱码</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng/">mogilefs设备损坏处理流程</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/25/inotify/">inotify,rsync统一化配置</a>
       </li>
     
   </ul>

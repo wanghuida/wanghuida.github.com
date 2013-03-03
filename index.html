@@ -100,6 +100,627 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2013/02/27/mysql-an-quan/">Mysql 安全</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-27T14:57:00+08:00" pubdate data-updated="true">Feb 27<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/02/27/mysql-an-quan/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><ol>
+<li><p>如果客户端和服务器端的连接需要跨越并通过不可信任的网络，那么就需要使用SSH隧道来加密该连接的通信。一般情况下mysql不直接对外，只提供内部访问。</p></li>
+<li><p>用GRANT和REVOKE语句来控制对MySQL的访问。不要授予超过需求的权限。决不能为所有主机授权。</p></li>
+<li><p>不要让任何人(除了MySQL root账户)访问mysql数据库中的user表！这很关键。加密的密码才是MySQL中的真正的密码。</p></li>
+<li><p>不要将纯文本密码保存到数据库中。如果你的计算机有安全危险，入侵者可以获得所有的密码并使用它们。相反，应使用MD5()、SHA1()或单向哈希函数。</p></li>
+<li><p>不要从词典中选择密码。有专门的程序可以破解它们。</p></li>
+<li><p>试试从Internet使用nmap工具扫描端口。MySQL默认使用端口3306。或者telnet ip 3306。</p></li>
+<li><p>如果某个用户输入“; DROP DATABASE mysql;”等内容，应确保你的应用程序保持安全。</p></li>
+<li><p>一定要记住还应检查数字数据。如果当用户输入值234时，应用程序生成查询SELECT * FROM table WHERE ID=234，用户可以输入值234 OR 1=1使应用程序生成查询SELECT * FROM table WHERE ID=234 OR 1=1。结果是服务器查找表内的每个记录。</p></li>
+<li><p>学会使用tcpdump和strings工具。在大多数情况下，你可以使用下面的命令检查是否MySQL数据流未加密</p></li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>shell&gt; tcpdump -l -i eth0 -w - src or dst port 3306 | strings</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>对所有MySQL用户使用密码。</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>shell&gt; mysql -u root
+</span><span class='line'>mysql&gt; UPDATE mysql.user SET Password=PASSWORD('newpwd')
+</span><span class='line'>    -&gt; WHERE User='root';
+</span><span class='line'>mysql&gt; FLUSH PRIVILEGES;</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li><p>绝对不要作为Unix的root用户运行MySQL服务器。这样做非常危险，因为任何具有FILE权限的用户能够用root创建文件(例如，~root/.bashrc)。为了防止，mysqld拒绝用root运行，除非使用&#8211;user=root选项明显指定。</p></li>
+<li><p>确保mysqld运行时，只使用对数据库目录具有读或写权限的Unix用户来运行。</p></li>
+<li><p>不要将PROCESS或SUPER权限授给非管理用户。mysqladmin processlist的输出显示出当前执行的查询正文，如果另外的用户发出一个UPDATE user SET password=PASSWORD(&#8216;not_secure&#8217;)查询，被允许执行那个命令的任何用户可能看得到。 mysqld为有SUPER权限的用户专门保留一个额外的连接，因此即使所有普通连接被占用，MySQL root用户仍可以登录并检查服务器的活动。 可以使用SUPER权限来终止客户端连接，通过更改系统变量的值更改服务的器操作，并控制复制服务器。</p></li>
+<li><p>不要向非管理用户授予FILE权限。有这权限的任何用户能在拥有mysqld守护进程权限的文件系统那里写一个文件。</p></li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2013/02/27/mysql-guan-li-yu-ju/">Mysql 管理语句</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-27T14:53:00+08:00" pubdate data-updated="true">Feb 27<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/02/27/mysql-guan-li-yu-ju/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>创建用户，设置密码，赋予权限</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; grant all privileges on mmd.* to 'mmd'@'localhost' identified  by '123456';
+</span><span class='line'>mysql &gt; flush privileges;
+</span><span class='line'>mysql &gt; drop user
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'># mysql 5.5+默认本地连接，请修改bind_address为0.0.0.0才能支持网络连接
+</span><span class='line'>mysql &gt; grant select,update,insert,delete on mmd.* to 'mmd'@'%' identified  by '123456';
+</span><span class='line'>mysql &gt; flush privileges;
+</span><span class='line'>mysql &gt; show grants for 'mmd'@'%';
+</span><span class='line'>
+</span><span class='line'>mysql &gt; set password for 'mmd'@'%' = password('654321');</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>create 数据库，数据表</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; create table staff ( 
+</span><span class='line'>      &gt; id int not null auto_increment primary key, 
+</span><span class='line'>      &gt; username varchar(50) not null, 
+</span><span class='line'>      &gt; `desc` text 
+</span><span class='line'>      &gt; ) engine=innodb default character set=utf8;
+</span><span class='line'>
+</span><span class='line'>mysql &gt; insert into staff (id,username,`desc`) values (NULL,'王惠达','测试数据');
+</span><span class='line'>
+</span><span class='line'>mysql &gt; select * from staff;</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>修改表结构</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>msyql &gt; alter table staff modify username varchar(100) not null;
+</span><span class='line'>
+</span><span class='line'>mysql &gt; alter table staff add creation timestamp; 
+</span><span class='line'>
+</span><span class='line'>mysql &gt; alter table staff drop creation;</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>创建，删除 index</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; create index all_field on staff (id,username);
+</span><span class='line'>
+</span><span class='line'>mysql &gt; create index one_field on staff (username);
+</span><span class='line'>
+</span><span class='line'>mysql &gt; drop index one_field on staff;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>explain</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; explain select * from staff where username like '%惠达%'
+</span><span class='line'>
+</span><span class='line'>+----+-------------+-------+------+---------------+------+---------+------+------+-------------+
+</span><span class='line'>| id | select_type | table | type | possible_keys | key  | key_len | ref  | rows | Extra       |
+</span><span class='line'>+----+-------------+-------+------+---------------+------+---------+------+------+-------------+
+</span><span class='line'>|  1 | SIMPLE      | staff | ALL  | NULL          | NULL | NULL    | NULL |    1 | Using where |
+</span><span class='line'>+----+-------------+-------+------+---------------+------+---------+------+------+-------------+
+</span><span class='line'>1 row in set (0.00 sec)
+</span><span class='line'>
+</span><span class='line'>mysql &gt; explain select * from staff where id = 1;
+</span><span class='line'>
+</span><span class='line'>+----+-------------+-------+-------+-------------------+---------+---------+-------+------+-------+
+</span><span class='line'>| id | select_type | table | type  | possible_keys     | key     | key_len | ref   | rows | Extra |
+</span><span class='line'>+----+-------------+-------+-------+-------------------+---------+---------+-------+------+-------+
+</span><span class='line'>|  1 | SIMPLE      | staff | const | PRIMARY,all_field | PRIMARY | 4       | const |    1 |       |
+</span><span class='line'>+----+-------------+-------+-------+-------------------+---------+---------+-------+------+-------+
+</span><span class='line'>1 row in set (0.00 sec)
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2013/02/27/mysql-zhuang-tai-jian-cha/">Mysql 状态检查</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-27T14:52:00+08:00" pubdate data-updated="true">Feb 27<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/02/27/mysql-zhuang-tai-jian-cha/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>最简单的status</h3>
+
+<ul>
+<li>可以了解一下mysql基本的状态</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ mysql -u -p -h 
+</span><span class='line'>mysql &gt; status</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2013/02/27/mysql-zhuang-tai-jian-cha/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2013/02/27/mysql-zhu-cong-she-zhi/">Mysql 主从设置</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-27T14:52:00+08:00" pubdate data-updated="true">Feb 27<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/02/27/mysql-zhu-cong-she-zhi/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><ol>
+<li>设置同步账号</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; grant replication slave on *.* to 'backup'@'%' identified by '123456';
+</span><span class='line'>mysql &gt; flush privileges;</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>master 配置</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>server-id       = 1
+</span><span class='line'>log_bin         = /var/log/mysql/mysql-bin.log
+</span><span class='line'>max_binlog_size     = 100M
+</span><span class='line'>expire_logs_days    = 10
+</span><span class='line'>binlog_do_db        = mmd
+</span><span class='line'>
+</span><span class='line'>service mysql restart</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>slave 配置</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>server-id           = 2 
+</span><span class='line'>log_bin             = /var/log/mysql/mysql-bin.log
+</span><span class='line'>expire_logs_days    = 10
+</span><span class='line'>max_binlog_size     = 100M
+</span><span class='line'>replicate-do-db     = mmd 
+</span><span class='line'>read_only           = 1
+</span><span class='line'>
+</span><span class='line'>service mysql restart</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>同步现有数据</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># 强制读锁
+</span><span class='line'>mysql &gt; flush tables with read lock;
+</span><span class='line'># 导出数据,如果是myisam表的话，加上--lock-all-tables参数，如果是innodb表的话，加上--single-transaction参数。如果数据量很大，建议停服务生成数据快照
+</span><span class='line'>$ mysqldump -uroot -p63137246 --single-transaction mmd &gt; mmd.sql
+</span><span class='line'># 记录同步点
+</span><span class='line'>mysql &gt; show master status;
+</span><span class='line'>+------------------+----------+--------------+------------------+
+</span><span class='line'>| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB |
+</span><span class='line'>+------------------+----------+--------------+------------------+
+</span><span class='line'>| mysql-bin.000007 |      887 | mmd          |                  |
+</span><span class='line'>+------------------+----------+--------------+------------------+
+</span><span class='line'># 关闭读锁
+</span><span class='line'>mysql &gt; unlock tables;
+</span><span class='line'>
+</span><span class='line'>$ scp mmd.sql wanghuida@192.168.30.114:mmd.sql
+</span><span class='line'>$ mysql -uroot -p***** mmd &lt; mmd.sql</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>slave 同步设置</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; change master to
+</span><span class='line'>      &gt; master_host='192.168.30.113', 
+</span><span class='line'>      &gt; master_user='backup', 
+</span><span class='line'>      &gt; master_password='123456', 
+</span><span class='line'>      &gt; master_log_file='mysql-bin.000007', 
+</span><span class='line'>      &gt; master_log_pos=887;
+</span><span class='line'>
+</span><span class='line'>mysql &gt; start slave;</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li><p>附加配置</p></li>
+<li><p>注释：为了保证事务InnoDB复制设置的最大可能的耐受性和一致性，应在主服务器的my.cnf文件中使用innodb_flush_log_at_trx_commit=1和sync-binlog=1。这样每次提交都会写入日志文件，性能有一些损失</p></li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2013/02/27/mysql-you-hua-pei-zhi/">Mysql 优化配置</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-27T14:52:00+08:00" pubdate data-updated="true">Feb 27<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/02/27/mysql-you-hua-pei-zhi/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>cache_size</p>
+
+<p>max-connections</p>
+
+<p>thread_cache_size</p>
+
+<p>key_buffer_size
+buffer_size
+query_cache_limit
+query_cache_size</p>
+
+<p>query_cache_size</p>
+
+<p>query_cache_limit</p>
+
+<p>table_cache</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2013/02/27/mysql-ri-zhi-fen-lei/">Mysql 日志分类</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-27T14:52:00+08:00" pubdate data-updated="true">Feb 27<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/02/27/mysql-ri-zhi-fen-lei/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>general-log : 记录建立的客户端连接和执行的语句。</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># my.cnf 一般不会打开，耗io
+</span><span class='line'>general_log_file        = /var/log/mysql/mysql.log
+</span><span class='line'>
+</span><span class='line'># 当你怀疑在客户端发生了错误并想确切地知道该客户端发送给mysqld的语句时，该日志可能非常有用。
+</span><span class='line'># 一般都是临时打开
+</span><span class='line'>mysql &gt; show variables like '%general_log%';  
+</span><span class='line'>
+</span><span class='line'>+------------------+------------------------------+
+</span><span class='line'>| Variable_name    | Value                        |
+</span><span class='line'>+------------------+------------------------------+
+</span><span class='line'>| general_log      | OFF                          |
+</span><span class='line'>| general_log_file | /var/lib/mysql/idc08-002.log |
+</span><span class='line'>+------------------+------------------------------+
+</span><span class='line'>2 rows in set (0.00 sec)
+</span><span class='line'>
+</span><span class='line'>mysql &gt; SET GLOBAL general_log_file = '/tmp/mysql.log';
+</span><span class='line'>mysql &gt; SET GLOBAL general_log = 'ON';
+</span><span class='line'>
+</span><span class='line'># 已经可以监控请求语句了，用完要记得关闭</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>log-bin : 记录所有更改数据的语句。还用于复制。</h3>
+
+<ul>
+<li>接替日志: flush logs语句或执行mysqladmin flush-logs</li>
+<li>运行服务器时若启用二进制日志则性能大约慢1%。但是，二进制日志的好处，即用于恢复并允许设置复制超过了这个小小的性能损失。</li>
+<li>mysqld在每个二进制日志名后面添加一个数字扩展名。每次你启动服务器或刷新日志时该数字则增加。如果当前的日志大小达到max_binlog_size，还会自动创建新的二进制日志。如果你正使用大的事务，二进制日志还会超过max_binlog_size：事务全写入一个二进制日志中，绝对不要写入不同的二进制日志中。</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>log_bin             = /var/log/mysql/mysql-bin.log
+</span><span class='line'>max_binlog_size     = 100M
+</span><span class='line'>expire_logs_days    = 10
+</span><span class='line'>#binlog_do_db       = db1,db2,db3
+</span><span class='line'>#binlog_ignore_db   = include_database_name</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>slow-log : 记录所有执行时间超过long_query_time秒的所有查询或不使用索引的查询。</h3>
+
+<ul>
+<li>5.1以上的版本已经支持毫秒级</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>log_slow_queries = /var/log/mysql/mysql-slow.log
+</span><span class='line'>long_query_time = 0.5 </span></code></pre></td></tr></table></div></figure>
+
+
+<h3>error-log : 记录启动、运行或停止mysqld时出现的问题。</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># my.cnf
+</span><span class='line'>log_error = /var/log/mysql/error.log</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2013/02/26/ubuntu-wang-luo-she-zhi/">Ubuntu 网络设置</a></h1>
     
     
@@ -348,377 +969,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2013/01/10/rtxldapjiao-cheng/">RTXLDAP教程</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-01-10T10:14:00+08:00" pubdate data-updated="true">Jan 10<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/01/10/rtxldapjiao-cheng/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>名词解释</h3>
-
-<ol>
-<li>RTX: 腾讯出的企业沟通工具</li>
-<li>LDAP: 关于人或者其他信息的集中存储，微软的AD就是LDAP的一种</li>
-<li>RTXLDAP: 基于RTX的SDK开发出的第三方工具，可以同步LDAP用户，可以RTX与LDAP单点登陆。支持RTX最新版本</li>
-</ol>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2013/01/10/rtxldapjiao-cheng/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2013/01/06/datehan-shu-de-wu-yong/">Date函数的误用</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-01-06T17:22:00+08:00" pubdate data-updated="true">Jan 6<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/01/06/datehan-shu-de-wu-yong/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>需求：得到给定日期为一年中的第几周，并取得该周的年份</h3>
-
-<ul>
-<li>产生bug的写法</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
-</span><span class='line'><span class="nv">$time_2012_12_31</span> <span class="o">=</span> <span class="nb">mktime</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">31</span><span class="p">,</span><span class="mi">2012</span><span class="p">);</span>
-</span><span class='line'><span class="nv">$week_2012_12_31</span> <span class="o">=</span> <span class="nb">date</span><span class="p">(</span><span class="s1">&#39;W&#39;</span><span class="p">,</span><span class="nv">$time_2012_12_31</span><span class="p">);</span>
-</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;2012-12-31: week is </span><span class="si">{</span><span class="nv">$week_2012_12_31</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">$error_year_2012_12_31</span> <span class="o">=</span> <span class="nb">date</span><span class="p">(</span><span class="s1">&#39;Y&#39;</span><span class="p">,</span><span class="nv">$time_2012_12_31</span><span class="p">);</span>
-</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;2012-12-31: error year is </span><span class="si">{</span><span class="nv">$error_year_2012_12_31</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">#输出错误的结果</span>
-</span><span class='line'><span class="mi">2012</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="o">:</span> <span class="nx">week</span> <span class="nx">is</span> <span class="mo">01</span>
-</span><span class='line'><span class="mi">2012</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="o">:</span> <span class="nx">error</span> <span class="nx">year</span> <span class="nx">is</span> <span class="mi">2012</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>正确的写法，统一采用ISO-8601标准</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
-</span><span class='line'><span class="nv">$time_2012_12_31</span> <span class="o">=</span> <span class="nb">mktime</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">31</span><span class="p">,</span><span class="mi">2012</span><span class="p">);</span>
-</span><span class='line'><span class="nv">$week_2012_12_31</span> <span class="o">=</span> <span class="nb">date</span><span class="p">(</span><span class="s1">&#39;W&#39;</span><span class="p">,</span><span class="nv">$time_2012_12_31</span><span class="p">);</span>
-</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;2012-12-31: week is </span><span class="si">{</span><span class="nv">$week_2012_12_31</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">$year_2012_12_31</span> <span class="o">=</span> <span class="nb">date</span><span class="p">(</span><span class="s1">&#39;o&#39;</span><span class="p">,</span><span class="nv">$time_2012_12_31</span><span class="p">);</span>
-</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;2012-12-31: year is </span><span class="si">{</span><span class="nv">$year_2012_12_31</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">#输出正确的结果</span>
-</span><span class='line'><span class="mi">2012</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="o">:</span> <span class="nx">week</span> <span class="nx">is</span> <span class="mo">01</span>
-</span><span class='line'><span class="mi">2012</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="o">:</span> <span class="nx">year</span> <span class="nx">is</span> <span class="mi">2013</span>
-</span></code></pre></td></tr></table></div></figure>
-
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2013/01/04/jqueryzai-firefoxxia-wu-fa-autocomplete/">Jquery在firefox下无法autocomplete</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-01-04T17:29:00+08:00" pubdate data-updated="true">Jan 4<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/01/04/jqueryzai-firefoxxia-wu-fa-autocomplete/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h4>jquery的autocomplete中文输入在firefox无法正常使用</h4>
-
-<ul>
-<li>firefox下用input事件触发keydown即可</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$('元素').bind('input', function(){
-</span><span class='line'>    $(this).trigger('keydown');
-</span><span class='line'>}).bind("keydown", function(event){
-</span><span class='line'>    事件
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/12/17/system-dot-out-dot-printlnluan-ma/">System.out.println 乱码</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-12-17T22:30:00+08:00" pubdate data-updated="true">Dec 17<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/12/17/system-dot-out-dot-printlnluan-ma/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>今天郁闷发现eclipse控制中文乱码</h3>
-
-<ul>
-<li>在网上找答案真心蛋疼，说啥的都有</li>
-<li>特此在这里记录一下</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>Run Configurations... -&gt; Common选项卡 -&gt; Encoding区，选择Other UTF-8</span></code></pre></td></tr></table></div></figure>
-
-
-<p><img src="/images/post/console-messy-code.jpg" title="console messy code" alt="console messy code" /></p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng/">Mogilefs设备损坏处理流程</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-25T19:34:00+08:00" pubdate data-updated="true">Nov 25<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><ul>
-<li>这里单个dev对应一个磁盘,假设是sdb</li>
-<li>文件系统使用xfs</li>
-<li>mogstored使用nginx</li>
-</ul>
-
-
-<p>1.把磁盘标记为dead</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>mogadm device mark &lt;hostname&gt; &lt;devid&gt; &lt;status&gt;
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/25/inotify/">Inotify,rsync统一化配置</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-25T16:14:00+08:00" pubdate data-updated="true">Nov 25<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/25/inotify/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>为什么要统一化配置，手动改改不行？</h3>
-
-<ul>
-<li>假设有10台服务器，要改10次，错误和遗漏在所难免</li>
-<li>需要有一个地方备份配置</li>
-<li>也许还需要对配置文件进行版本控制</li>
-</ul>
-
-
-<h3>inotify+rsync改变这一切</h3>
-
-<ul>
-<li>inotify可以递归的监控文件是否有新建，修改等</li>
-<li>rsync用来同步</li>
-</ul>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/11/25/inotify/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/2/">&larr; 其他文章</a></li>
@@ -736,6 +986,7 @@
 <li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
 <li class='category'><a href='/blog/categories/javascript/'>Javascript (2)</a></li>
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
+<li class='category'><a href='/blog/categories/mysql/'>Mysql (6)</a></li>
 <li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
 <li class='category'><a href='/blog/categories/php/'>Php (2)</a></li>
@@ -764,6 +1015,30 @@
     <li class="nav-header">最近更新</li>
     
       <li class="post">
+        <a href="/blog/2013/02/27/mysql-an-quan/">Mysql 安全</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/27/mysql-guan-li-yu-ju/">Mysql 管理语句</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/27/mysql-zhuang-tai-jian-cha/">Mysql 状态检查</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/27/mysql-zhu-cong-she-zhi/">Mysql 主从设置</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/27/mysql-you-hua-pei-zhi/">Mysql 优化配置</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/27/mysql-ri-zhi-fen-lei/">Mysql 日志分类</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/02/26/ubuntu-wang-luo-she-zhi/">ubuntu 网络设置</a>
       </li>
     
@@ -777,30 +1052,6 @@
     
       <li class="post">
         <a href="/blog/2013/01/18/you-lan-qi-huan-cun-jie-xi/">游览器缓存解析</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/01/10/rtxldapjiao-cheng/">RTXLDAP教程</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/01/06/datehan-shu-de-wu-yong/">date函数的误用</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/01/04/jqueryzai-firefoxxia-wu-fa-autocomplete/">jquery在firefox下无法autocomplete</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/12/17/system-dot-out-dot-printlnluan-ma/">System.out.println 乱码</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng/">mogilefs设备损坏处理流程</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/25/inotify/">inotify,rsync统一化配置</a>
       </li>
     
   </ul>

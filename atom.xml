@@ -4,7 +4,7 @@
   <title><![CDATA[老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2013-02-26T17:59:36+08:00</updated>
+  <updated>2013-03-03T21:49:18+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,524 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Mysql 安全]]></title>
+    <link href="http://www.wanghd.com/blog/2013/02/27/mysql-an-quan/"/>
+    <updated>2013-02-27T14:57:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/02/27/mysql-an-quan</id>
+    <content type="html"><![CDATA[<ol>
+<li><p>如果客户端和服务器端的连接需要跨越并通过不可信任的网络，那么就需要使用SSH隧道来加密该连接的通信。一般情况下mysql不直接对外，只提供内部访问。</p></li>
+<li><p>用GRANT和REVOKE语句来控制对MySQL的访问。不要授予超过需求的权限。决不能为所有主机授权。</p></li>
+<li><p>不要让任何人(除了MySQL root账户)访问mysql数据库中的user表！这很关键。加密的密码才是MySQL中的真正的密码。</p></li>
+<li><p>不要将纯文本密码保存到数据库中。如果你的计算机有安全危险，入侵者可以获得所有的密码并使用它们。相反，应使用MD5()、SHA1()或单向哈希函数。</p></li>
+<li><p>不要从词典中选择密码。有专门的程序可以破解它们。</p></li>
+<li><p>试试从Internet使用nmap工具扫描端口。MySQL默认使用端口3306。或者telnet ip 3306。</p></li>
+<li><p>如果某个用户输入“; DROP DATABASE mysql;”等内容，应确保你的应用程序保持安全。</p></li>
+<li><p>一定要记住还应检查数字数据。如果当用户输入值234时，应用程序生成查询SELECT * FROM table WHERE ID=234，用户可以输入值234 OR 1=1使应用程序生成查询SELECT * FROM table WHERE ID=234 OR 1=1。结果是服务器查找表内的每个记录。</p></li>
+<li><p>学会使用tcpdump和strings工具。在大多数情况下，你可以使用下面的命令检查是否MySQL数据流未加密</p></li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>shell&gt; tcpdump -l -i eth0 -w - src or dst port 3306 | strings</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>对所有MySQL用户使用密码。</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>shell&gt; mysql -u root
+</span><span class='line'>mysql&gt; UPDATE mysql.user SET Password=PASSWORD('newpwd')
+</span><span class='line'>    -&gt; WHERE User='root';
+</span><span class='line'>mysql&gt; FLUSH PRIVILEGES;</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li><p>绝对不要作为Unix的root用户运行MySQL服务器。这样做非常危险，因为任何具有FILE权限的用户能够用root创建文件(例如，~root/.bashrc)。为了防止，mysqld拒绝用root运行，除非使用&#8211;user=root选项明显指定。</p></li>
+<li><p>确保mysqld运行时，只使用对数据库目录具有读或写权限的Unix用户来运行。</p></li>
+<li><p>不要将PROCESS或SUPER权限授给非管理用户。mysqladmin processlist的输出显示出当前执行的查询正文，如果另外的用户发出一个UPDATE user SET password=PASSWORD(&#8216;not_secure&#8217;)查询，被允许执行那个命令的任何用户可能看得到。 mysqld为有SUPER权限的用户专门保留一个额外的连接，因此即使所有普通连接被占用，MySQL root用户仍可以登录并检查服务器的活动。 可以使用SUPER权限来终止客户端连接，通过更改系统变量的值更改服务的器操作，并控制复制服务器。</p></li>
+<li><p>不要向非管理用户授予FILE权限。有这权限的任何用户能在拥有mysqld守护进程权限的文件系统那里写一个文件。</p></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Mysql 管理语句]]></title>
+    <link href="http://www.wanghd.com/blog/2013/02/27/mysql-guan-li-yu-ju/"/>
+    <updated>2013-02-27T14:53:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/02/27/mysql-guan-li-yu-ju</id>
+    <content type="html"><![CDATA[<h3>创建用户，设置密码，赋予权限</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; grant all privileges on mmd.* to 'mmd'@'localhost' identified  by '123456';
+</span><span class='line'>mysql &gt; flush privileges;
+</span><span class='line'>mysql &gt; drop user
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'># mysql 5.5+默认本地连接，请修改bind_address为0.0.0.0才能支持网络连接
+</span><span class='line'>mysql &gt; grant select,update,insert,delete on mmd.* to 'mmd'@'%' identified  by '123456';
+</span><span class='line'>mysql &gt; flush privileges;
+</span><span class='line'>mysql &gt; show grants for 'mmd'@'%';
+</span><span class='line'>
+</span><span class='line'>mysql &gt; set password for 'mmd'@'%' = password('654321');</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>create 数据库，数据表</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; create table staff ( 
+</span><span class='line'>      &gt; id int not null auto_increment primary key, 
+</span><span class='line'>      &gt; username varchar(50) not null, 
+</span><span class='line'>      &gt; `desc` text 
+</span><span class='line'>      &gt; ) engine=innodb default character set=utf8;
+</span><span class='line'>
+</span><span class='line'>mysql &gt; insert into staff (id,username,`desc`) values (NULL,'王惠达','测试数据');
+</span><span class='line'>
+</span><span class='line'>mysql &gt; select * from staff;</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>修改表结构</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>msyql &gt; alter table staff modify username varchar(100) not null;
+</span><span class='line'>
+</span><span class='line'>mysql &gt; alter table staff add creation timestamp; 
+</span><span class='line'>
+</span><span class='line'>mysql &gt; alter table staff drop creation;</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>创建，删除 index</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; create index all_field on staff (id,username);
+</span><span class='line'>
+</span><span class='line'>mysql &gt; create index one_field on staff (username);
+</span><span class='line'>
+</span><span class='line'>mysql &gt; drop index one_field on staff;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>explain</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; explain select * from staff where username like '%惠达%'
+</span><span class='line'>
+</span><span class='line'>+----+-------------+-------+------+---------------+------+---------+------+------+-------------+
+</span><span class='line'>| id | select_type | table | type | possible_keys | key  | key_len | ref  | rows | Extra       |
+</span><span class='line'>+----+-------------+-------+------+---------------+------+---------+------+------+-------------+
+</span><span class='line'>|  1 | SIMPLE      | staff | ALL  | NULL          | NULL | NULL    | NULL |    1 | Using where |
+</span><span class='line'>+----+-------------+-------+------+---------------+------+---------+------+------+-------------+
+</span><span class='line'>1 row in set (0.00 sec)
+</span><span class='line'>
+</span><span class='line'>mysql &gt; explain select * from staff where id = 1;
+</span><span class='line'>
+</span><span class='line'>+----+-------------+-------+-------+-------------------+---------+---------+-------+------+-------+
+</span><span class='line'>| id | select_type | table | type  | possible_keys     | key     | key_len | ref   | rows | Extra |
+</span><span class='line'>+----+-------------+-------+-------+-------------------+---------+---------+-------+------+-------+
+</span><span class='line'>|  1 | SIMPLE      | staff | const | PRIMARY,all_field | PRIMARY | 4       | const |    1 |       |
+</span><span class='line'>+----+-------------+-------+-------+-------------------+---------+---------+-------+------+-------+
+</span><span class='line'>1 row in set (0.00 sec)
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Mysql 状态检查]]></title>
+    <link href="http://www.wanghd.com/blog/2013/02/27/mysql-zhuang-tai-jian-cha/"/>
+    <updated>2013-02-27T14:52:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/02/27/mysql-zhuang-tai-jian-cha</id>
+    <content type="html"><![CDATA[<h3>最简单的status</h3>
+
+<ul>
+<li>可以了解一下mysql基本的状态</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ mysql -u -p -h 
+</span><span class='line'>mysql &gt; status</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!-- more -->
+
+
+<ul>
+<li>另外可以添加 -i 5 参数，让其每五秒自动刷新一次。</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysqladmin -uroot -p密码 status -i 5 </span></code></pre></td></tr></table></div></figure>
+
+
+<h3>查看mysql详细的状态信息</h3>
+
+<ul>
+<li>里面包含mysql所有的状态信息，分散在各处，很难理解，下会再推荐一个更有效的工具</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; show status; (session 级别的)
+</span><span class='line'>mysql &gt; show global status; (server 级别的, 一般都使用这个)</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>mysqlreport</h3>
+
+<ul>
+<li>官方网站: http://hackmysql.com/mysqlreport</li>
+<li>该工具使用方便，数据也很清晰，非常推荐使用该工具</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>./mysqlreport --host=10.0.1.111 --user=**** --password=****</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>更快速的查看mysql 表缓存</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; show open tables;</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>show processlist</h3>
+
+<ul>
+<li><p>当感觉到每个线程有问题时，可以使用这条命令看下情况</p></li>
+<li><p>案例：DBA通知我processlist里有很多空链接，我发现mysql链接都是持久化的。。并且没有关闭</p></li>
+</ul>
+
+
+<h3>show (session | global) variables</h3>
+
+<ul>
+<li>查看当前服务器配置变量</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># 很多情况下都不希望重启mysql服务，所以可以动态调整变量
+</span><span class='line'># 例如输出log
+</span><span class='line'>set global log=/tmp/query.log
+</span><span class='line'>
+</span><span class='line'># 希望重启后也会应用到，可以添加到my.cnf</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>show table status [from db] [like &#8216;%table%&#8217;]</h3>
+
+<ul>
+<li>显示具体某个表的状态信息</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Mysql 主从设置]]></title>
+    <link href="http://www.wanghd.com/blog/2013/02/27/mysql-zhu-cong-she-zhi/"/>
+    <updated>2013-02-27T14:52:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/02/27/mysql-zhu-cong-she-zhi</id>
+    <content type="html"><![CDATA[<ol>
+<li>设置同步账号</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; grant replication slave on *.* to 'backup'@'%' identified by '123456';
+</span><span class='line'>mysql &gt; flush privileges;</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>master 配置</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>server-id       = 1
+</span><span class='line'>log_bin         = /var/log/mysql/mysql-bin.log
+</span><span class='line'>max_binlog_size     = 100M
+</span><span class='line'>expire_logs_days    = 10
+</span><span class='line'>binlog_do_db        = mmd
+</span><span class='line'>
+</span><span class='line'>service mysql restart</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>slave 配置</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>server-id           = 2 
+</span><span class='line'>log_bin             = /var/log/mysql/mysql-bin.log
+</span><span class='line'>expire_logs_days    = 10
+</span><span class='line'>max_binlog_size     = 100M
+</span><span class='line'>replicate-do-db     = mmd 
+</span><span class='line'>read_only           = 1
+</span><span class='line'>
+</span><span class='line'>service mysql restart</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>同步现有数据</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># 强制读锁
+</span><span class='line'>mysql &gt; flush tables with read lock;
+</span><span class='line'># 导出数据,如果是myisam表的话，加上--lock-all-tables参数，如果是innodb表的话，加上--single-transaction参数。如果数据量很大，建议停服务生成数据快照
+</span><span class='line'>$ mysqldump -uroot -p63137246 --single-transaction mmd &gt; mmd.sql
+</span><span class='line'># 记录同步点
+</span><span class='line'>mysql &gt; show master status;
+</span><span class='line'>+------------------+----------+--------------+------------------+
+</span><span class='line'>| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB |
+</span><span class='line'>+------------------+----------+--------------+------------------+
+</span><span class='line'>| mysql-bin.000007 |      887 | mmd          |                  |
+</span><span class='line'>+------------------+----------+--------------+------------------+
+</span><span class='line'># 关闭读锁
+</span><span class='line'>mysql &gt; unlock tables;
+</span><span class='line'>
+</span><span class='line'>$ scp mmd.sql wanghuida@192.168.30.114:mmd.sql
+</span><span class='line'>$ mysql -uroot -p***** mmd &lt; mmd.sql</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>slave 同步设置</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; change master to
+</span><span class='line'>      &gt; master_host='192.168.30.113', 
+</span><span class='line'>      &gt; master_user='backup', 
+</span><span class='line'>      &gt; master_password='123456', 
+</span><span class='line'>      &gt; master_log_file='mysql-bin.000007', 
+</span><span class='line'>      &gt; master_log_pos=887;
+</span><span class='line'>
+</span><span class='line'>mysql &gt; start slave;</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li><p>附加配置</p></li>
+<li><p>注释：为了保证事务InnoDB复制设置的最大可能的耐受性和一致性，应在主服务器的my.cnf文件中使用innodb_flush_log_at_trx_commit=1和sync-binlog=1。这样每次提交都会写入日志文件，性能有一些损失</p></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Mysql 优化配置]]></title>
+    <link href="http://www.wanghd.com/blog/2013/02/27/mysql-you-hua-pei-zhi/"/>
+    <updated>2013-02-27T14:52:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/02/27/mysql-you-hua-pei-zhi</id>
+    <content type="html"><![CDATA[<p>cache_size</p>
+
+<p>max-connections</p>
+
+<p>thread_cache_size</p>
+
+<p>key_buffer_size
+buffer_size
+query_cache_limit
+query_cache_size</p>
+
+<p>query_cache_size</p>
+
+<p>query_cache_limit</p>
+
+<p>table_cache</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Mysql 日志分类]]></title>
+    <link href="http://www.wanghd.com/blog/2013/02/27/mysql-ri-zhi-fen-lei/"/>
+    <updated>2013-02-27T14:52:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/02/27/mysql-ri-zhi-fen-lei</id>
+    <content type="html"><![CDATA[<h3>general-log : 记录建立的客户端连接和执行的语句。</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># my.cnf 一般不会打开，耗io
+</span><span class='line'>general_log_file        = /var/log/mysql/mysql.log
+</span><span class='line'>
+</span><span class='line'># 当你怀疑在客户端发生了错误并想确切地知道该客户端发送给mysqld的语句时，该日志可能非常有用。
+</span><span class='line'># 一般都是临时打开
+</span><span class='line'>mysql &gt; show variables like '%general_log%';  
+</span><span class='line'>
+</span><span class='line'>+------------------+------------------------------+
+</span><span class='line'>| Variable_name    | Value                        |
+</span><span class='line'>+------------------+------------------------------+
+</span><span class='line'>| general_log      | OFF                          |
+</span><span class='line'>| general_log_file | /var/lib/mysql/idc08-002.log |
+</span><span class='line'>+------------------+------------------------------+
+</span><span class='line'>2 rows in set (0.00 sec)
+</span><span class='line'>
+</span><span class='line'>mysql &gt; SET GLOBAL general_log_file = '/tmp/mysql.log';
+</span><span class='line'>mysql &gt; SET GLOBAL general_log = 'ON';
+</span><span class='line'>
+</span><span class='line'># 已经可以监控请求语句了，用完要记得关闭</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>log-bin : 记录所有更改数据的语句。还用于复制。</h3>
+
+<ul>
+<li>接替日志: flush logs语句或执行mysqladmin flush-logs</li>
+<li>运行服务器时若启用二进制日志则性能大约慢1%。但是，二进制日志的好处，即用于恢复并允许设置复制超过了这个小小的性能损失。</li>
+<li>mysqld在每个二进制日志名后面添加一个数字扩展名。每次你启动服务器或刷新日志时该数字则增加。如果当前的日志大小达到max_binlog_size，还会自动创建新的二进制日志。如果你正使用大的事务，二进制日志还会超过max_binlog_size：事务全写入一个二进制日志中，绝对不要写入不同的二进制日志中。</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>log_bin             = /var/log/mysql/mysql-bin.log
+</span><span class='line'>max_binlog_size     = 100M
+</span><span class='line'>expire_logs_days    = 10
+</span><span class='line'>#binlog_do_db       = db1,db2,db3
+</span><span class='line'>#binlog_ignore_db   = include_database_name</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>slow-log : 记录所有执行时间超过long_query_time秒的所有查询或不使用索引的查询。</h3>
+
+<ul>
+<li>5.1以上的版本已经支持毫秒级</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>log_slow_queries = /var/log/mysql/mysql-slow.log
+</span><span class='line'>long_query_time = 0.5 </span></code></pre></td></tr></table></div></figure>
+
+
+<h3>error-log : 记录启动、运行或停止mysqld时出现的问题。</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># my.cnf
+</span><span class='line'>log_error = /var/log/mysql/error.log</span></code></pre></td></tr></table></div></figure>
+
+
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[ubuntu 网络设置]]></title>
@@ -1197,894 +1715,6 @@
     <updated>2012-11-22T17:18:00+08:00</updated>
     <id>http://www.wanghd.com/blog/2012/11/22/log4jjie-shao</id>
     <content type="html"><![CDATA[
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[redis实战]]></title>
-    <link href="http://www.wanghd.com/blog/2012/11/22/redisshi-zhan/"/>
-    <updated>2012-11-22T17:17:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/11/22/redisshi-zhan</id>
-    <content type="html"><![CDATA[<h3>redis是什么？</h3>
-
-<ul>
-<li>redis是一个开源的，先进的key-value存储服务器端</li>
-<li>value可以包含多种结构，比如strings, hashes, lists, sets ,sorted sets</li>
-<li>官方网址：<a href="http://redis.io">http://redis.io</a></li>
-<li><a href="http://www.wanghd.com/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/">freenode</a>的聊天室名称是#redis</li>
-</ul>
-
-
-<!-- more -->
-
-
-<h3>安装redis</h3>
-
-<ul>
-<li>mac下安装redis非常简单</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>brew install redis
-</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>linux下的安装步骤如下</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#下载，解压和编译</span>
-</span><span class='line'><span class="nv">$ </span>wget http://redis.googlecode.com/files/redis-2.6.5.tar.gz
-</span><span class='line'><span class="nv">$ </span>tar xzf redis-2.6.5.tar.gz
-</span><span class='line'><span class="nv">$ </span><span class="nb">cd </span>redis-2.6.5
-</span><span class='line'><span class="nv">$ </span>make
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>配置redis</h3>
-
-<ul>
-<li>redis的默认配置文件是redis.conf，里面有详细的注释</li>
-<li>下面是简单的单台redis配置</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#base</span>
-</span><span class='line'>daemonize yes                       <span class="c">#守护进程</span>
-</span><span class='line'>port 6379                           <span class="c">#监听端口</span>
-</span><span class='line'><span class="nb">bind </span>127.0.0.1                      <span class="c">#绑定的ip地址</span>
-</span><span class='line'>timeout 0                           <span class="c">#断开空闲的客户端时间</span>
-</span><span class='line'>loglevel notice                     <span class="c">#记录到错误日志的等级</span>
-</span><span class='line'>logfile /usr/local/log/redis.log    <span class="c">#记录的日志文件</span>
-</span><span class='line'>databases 16                        <span class="c">#可以选择的db个数</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">#rdb默认开启的持久化模式</span>
-</span><span class='line'>save 900 1                          <span class="c">#save &lt;秒&gt; &lt;改变个数&gt;             </span>
-</span><span class='line'>save 300 10
-</span><span class='line'>save 60 10000
-</span><span class='line'>stop-writes-on-bgsave-error yes     <span class="c">#当bgsave错误时停止rdb写入</span>
-</span><span class='line'>rdbcompression yes                  <span class="c">#采用LZF压缩</span>
-</span><span class='line'>rdbchecksum yes                     <span class="c">#校验和</span>
-</span><span class='line'>dbfilename dump.rdb                 <span class="c">#保存的文件名</span>
-</span><span class='line'>dir /usr/local/var/db/redis/        <span class="c">#保存的路径</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>启动redis server端</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>redis-server <span class="o">[</span>/path/to/redis.conf<span class="o">]</span>         <span class="c">#mac</span>
-</span><span class='line'><span class="nv">$ </span>src/redis-server <span class="o">[</span>/path/to/redis.conf<span class="o">]</span>     <span class="c">#linux</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>打开client端，并测试</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>redis-cli             <span class="c">#mac</span>
-</span><span class='line'><span class="nv">$ </span>src/redis-cli         <span class="c">#linux</span>
-</span><span class='line'>
-</span><span class='line'>redis&gt; <span class="nb">set </span>name wanghuida
-</span><span class='line'>OK
-</span><span class='line'>redis&gt; get name
-</span><span class='line'><span class="s2">&quot;wanghuida&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[修复mogilefs目录owner]]></title>
-    <link href="http://www.wanghd.com/blog/2012/11/22/xiu-fu-mogilefsmu-lu-owner/"/>
-    <updated>2012-11-22T17:16:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/11/22/xiu-fu-mogilefsmu-lu-owner</id>
-    <content type="html"><![CDATA[<h3>什么情况会导致mogilefs的数据目录owner不正确</h3>
-
-<ul>
-<li>直接使用root启动mogstored会导致增加的文件和文件夹为root</li>
-<li>重新用mogile启动mogstored后，mogile用户无法删除root的文件，最终delete队列无法处理</li>
-</ul>
-
-
-<h3>如何处理</h3>
-
-<ol>
-<li>直接chown -R，这是最直接的方法，如果1T的磁盘被这样操作，会10小时util为100</li>
-<li>自己写一个脚本慢处理，脚本思路如下</li>
-</ol>
-
-
-<!-- more -->
-
-
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="nb">package</span> <span class="n">MtChown</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">use</span> <span class="n">strict</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">warnings</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="nn">Data::</span><span class="n">Dumper</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">Carp</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="nn">Time::</span><span class="n">HiRes</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">sub </span><span class="nf">run</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">my</span> <span class="p">(</span><span class="nv">$dir</span><span class="p">,</span><span class="nv">$user</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nb">defined</span><span class="p">(</span><span class="nv">$dir</span><span class="p">)</span> <span class="o">||</span> <span class="o">!</span><span class="nb">defined</span><span class="p">(</span><span class="nv">$user</span><span class="p">)){</span>
-</span><span class='line'>        <span class="k">print</span> <span class="s">&quot;please set option [-D|--dir -u|--user]\n&quot;</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="nv">$dir</span> <span class="o">=~</span> <span class="sr">s/(.+)\/$/$1/i</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">croak</span><span class="p">(</span><span class="s">&quot;[$dir] isn&#39;t a directory or file&quot;</span><span class="p">)</span> <span class="k">unless</span> <span class="p">(</span><span class="o">-</span><span class="n">f</span> <span class="nv">$dir</span> <span class="ow">or</span> <span class="o">-</span><span class="n">d</span> <span class="nv">$dir</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">my</span> <span class="p">(</span><span class="nv">$login</span><span class="p">,</span><span class="nv">$pass</span><span class="p">,</span><span class="nv">$uid</span><span class="p">,</span><span class="nv">$gid</span><span class="p">)</span> <span class="o">=</span> <span class="nb">getpwnam</span><span class="p">(</span><span class="nv">$user</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">die</span> <span class="s">&quot;$user not in passwd file&quot;</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">carp</span><span class="p">(</span><span class="s">&quot;$uid,$gid&quot;</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">process</span><span class="p">(</span><span class="nv">$dir</span><span class="p">,</span><span class="nv">$uid</span><span class="p">,</span><span class="nv">$gid</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">sub </span><span class="nf">process</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">my</span> <span class="p">(</span><span class="nv">$dir</span><span class="p">,</span><span class="nv">$u</span><span class="p">,</span><span class="nv">$g</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="o">-</span><span class="n">d</span> <span class="nv">$dir</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nb">opendir</span><span class="p">(</span><span class="n">FILE</span><span class="p">,</span><span class="nv">$dir</span><span class="p">)</span> <span class="ow">or</span> <span class="n">croak</span><span class="p">(</span><span class="s">&quot;opendir error [$dir]&quot;</span><span class="p">);</span>
-</span><span class='line'>        <span class="k">my</span> <span class="nv">@files</span> <span class="o">=</span> <span class="nb">readdir</span><span class="p">(</span><span class="n">FILE</span><span class="p">);</span>
-</span><span class='line'>        <span class="nb">closedir</span><span class="p">(</span><span class="n">FILE</span><span class="p">);</span>
-</span><span class='line'>        <span class="k">foreach</span> <span class="p">(</span><span class="nv">@files</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="k">next</span> <span class="k">if</span> <span class="p">(</span><span class="nv">$_</span> <span class="ow">eq</span> <span class="s">&#39;.&#39;</span> <span class="o">||</span> <span class="nv">$_</span> <span class="ow">eq</span> <span class="s">&#39;..&#39;</span><span class="p">);</span>
-</span><span class='line'>            <span class="k">my</span> <span class="nv">$tmp_dir</span> <span class="o">=</span> <span class="s">&quot;$dir/$_&quot;</span><span class="p">;</span>
-</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="o">-</span><span class="n">d</span> <span class="nv">$tmp_dir</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="n">process</span><span class="p">(</span><span class="nv">$tmp_dir</span><span class="p">,</span><span class="nv">$u</span><span class="p">,</span><span class="nv">$g</span><span class="p">)</span>
-</span><span class='line'>            <span class="p">}</span><span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>                <span class="n">chowner</span><span class="p">(</span><span class="nv">$u</span><span class="p">,</span><span class="nv">$g</span><span class="p">,</span><span class="nv">$tmp_dir</span><span class="p">);</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="n">chowner</span><span class="p">(</span><span class="nv">$u</span><span class="p">,</span><span class="nv">$g</span><span class="p">,</span><span class="nv">$dir</span><span class="p">);</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">sub </span><span class="nf">chowner</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">my</span> <span class="p">(</span><span class="nv">$u</span><span class="p">,</span><span class="nv">$g</span><span class="p">,</span><span class="nv">$dir</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">my</span> <span class="p">(</span><span class="nv">$dev</span><span class="p">,</span><span class="nv">$ino</span><span class="p">,</span><span class="nv">$mode</span><span class="p">,</span><span class="nv">$nlink</span><span class="p">,</span><span class="nv">$uid</span><span class="p">,</span><span class="nv">$gid</span><span class="p">,</span><span class="nv">$rdev</span><span class="p">,</span><span class="nv">$size</span><span class="p">,</span><span class="nv">$atime</span><span class="p">,</span><span class="nv">$mtime</span><span class="p">,</span><span class="nv">$ctime</span><span class="p">,</span><span class="nv">$blksize</span><span class="p">,</span><span class="nv">$blocks</span><span class="p">)</span> <span class="o">=</span> <span class="nb">stat</span><span class="p">(</span><span class="nv">$dir</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="nv">$u</span> <span class="o">!=</span> <span class="nv">$uid</span> <span class="o">||</span> <span class="nv">$g</span> <span class="o">!=</span> <span class="nv">$gid</span><span class="p">){</span>
-</span><span class='line'>        <span class="k">my</span> <span class="nv">$ret</span> <span class="o">=</span> <span class="nb">chown</span> <span class="nv">$u</span><span class="p">,</span><span class="nv">$g</span><span class="p">,(</span><span class="nv">$dir</span><span class="p">);</span>
-</span><span class='line'>        <span class="nv">$ret</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="p">?</span> <span class="n">carp</span><span class="p">(</span><span class="s">&quot;chown [$u,$g,$dir] error&quot;</span><span class="p">)</span> <span class="p">:</span> <span class="n">carp</span><span class="p">(</span><span class="s">&quot;chown [$u,$g,$dir] success&quot;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$microsec</span> <span class="o">=</span> <span class="mi">50_000</span><span class="p">;</span>
-</span><span class='line'>    <span class="nn">Time::HiRes::</span><span class="n">usleep</span><span class="p">(</span><span class="nv">$microsec</span><span class="p">);</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="mi">1</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[安装配置hive]]></title>
-    <link href="http://www.wanghd.com/blog/2012/11/10/an-zhuang-pei-zhi-hive/"/>
-    <updated>2012-11-10T14:59:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/11/10/an-zhuang-pei-zhi-hive</id>
-    <content type="html"><![CDATA[<ul>
-<li>先安装hadoop请参考<a href="http://www.wanghd.com/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/">这篇文章</a></li>
-<li>hive介绍：通过类似于sql语句的方式去计算结果，数据都存放在hdfs</li>
-</ul>
-
-
-<h3>下载并解压hive</h3>
-
-<ul>
-<li>给个官方<a href="http://www.apache.org/dyn/closer.cgi/hive/">链接</a></li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>tar -xzvf hive-x.y.z.tar.gz
-</span><span class='line'>cd hive-x.y.z
-</span><span class='line'>PATH=$PATH:/Users/william/project/hadoop-1.0.4/bin:/Users/william/project/hive-0.8.1/bin
-</span><span class='line'>. ~/.bash_profile</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>直接在终端输入hive，然后输入show tables;然会OK，就行了</li>
-</ul>
-
-
-<!-- more -->
-
-
-<h3>创建测试表</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>create table test (id INT,name STRING);
-</span><span class='line'>create table test2 (id INT,name STRING) partitioned by (ds STRING);
-</span><span class='line'>create table result (id int,name string);</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>导入数据</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>load data local inpath '/Users/william/project/hive-0.8.1/examples/files/kv1.txt' overwrite into table test;
-</span><span class='line'>load data local inpath '/Users/william/project/hive-0.8.1/examples/files/kv2.txt' overwrite into table test2 partition (ds='2012-10-01');
-</span><span class='line'>load data local inpath '/Users/william/project/hive-0.8.1/examples/files/kv3.txt' overwrite into table test2 partition (ds='2012-10-02');</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>操作数据</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>select count(*) from test2 where ds='2012-10-01';
-</span><span class='line'>insert overwrite directory '/tmp/hdfs_out' select t.* from test2 t where t.ds='2012-10-01';
-</span><span class='line'>insert overwrite local directory '/tmp/local_out' select a.* from test a;
-</span><span class='line'>insert overwrite table result select a.* from test a where a.id &lt; 100;</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>换种风格操作数据</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>from test t                                                                 
-</span><span class='line'>    insert overwrite directory '/tmp/other_out' select t.* where t.id &lt; 60      
-</span><span class='line'>    insert overwrite local directory '/tmp/other_out2' select t.* where t.id &gt; 60;</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>还可以自己写脚本做数据转换器</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[perl父进程监听，子进程工作实例]]></title>
-    <link href="http://www.wanghd.com/blog/2012/11/08/perlfu-jin-cheng-jian-ting-zi-jin-cheng-gong-zuo-shi-li/"/>
-    <updated>2012-11-08T22:15:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/11/08/perlfu-jin-cheng-jian-ting-zi-jin-cheng-gong-zuo-shi-li</id>
-    <content type="html"><![CDATA[<ol>
-<li>构造后台进程</li>
-<li>主进程监到连接，创建子进程接收消息并处理消息</li>
-<li>主进程继续监听，同时非阻塞的回收子进程</li>
-</ol>
-
-
-<!-- more -->
-
-
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="c1">#!/usr/bin/perl</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">use</span> <span class="n">warnings</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">strict</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="nn">IO::</span><span class="n">Socket</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">Socket</span> <span class="sx">qw(SO_KEEPALIVE)</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="nn">IO::</span><span class="n">Poll</span><span class="p">;</span>
-</span><span class='line'><span class="c1">#POSIX标准是必须要的，否则waitpid会阻塞住</span>
-</span><span class='line'><span class="k">use</span> <span class="n">POSIX</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">Carp</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="n">Errno</span>  <span class="sx">qw(EINPROGRESS EWOULDBLOCK EISCONN ENOTSOCK</span>
-</span><span class='line'><span class="sx">              EPIPE EAGAIN EBADF ECONNRESET ENOPROTOOPT)</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="vg">$|</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'><span class="n">daemonize</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">my</span> <span class="nv">$server</span> <span class="o">=</span> <span class="nn">IO::Socket::</span><span class="n">INET</span><span class="o">-&gt;</span><span class="k">new</span><span class="p">(</span><span class="n">LocalAddr</span> <span class="o">=&gt;</span> <span class="s">&quot;0.0.0.0:5678&quot;</span><span class="p">,</span>
-</span><span class='line'>                                   <span class="n">Type</span>      <span class="o">=&gt;</span> <span class="n">SOCK_STREAM</span><span class="p">,</span>
-</span><span class='line'>                                   <span class="n">Proto</span>     <span class="o">=&gt;</span> <span class="s">&#39;tcp&#39;</span><span class="p">,</span>
-</span><span class='line'>                                   <span class="n">Blocking</span>  <span class="o">=&gt;</span> <span class="mi">0</span><span class="p">,</span>
-</span><span class='line'>                                   <span class="n">Reuse</span>     <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span>
-</span><span class='line'>                                   <span class="n">Listen</span>    <span class="o">=&gt;</span> <span class="mi">1024</span> <span class="p">)</span>
-</span><span class='line'>    <span class="ow">or</span> <span class="nb">die</span> <span class="s">&quot;Error creating socket: $@\n&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$server</span><span class="o">-&gt;</span><span class="n">sockopt</span><span class="p">(</span><span class="n">SO_KEEPALIVE</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">while</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">while</span><span class="p">(</span><span class="k">my</span> <span class="nv">$pid</span> <span class="o">=</span> <span class="nb">waitpid</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">WNOHANG</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="c1">#print &quot;child[$pid] closed\n&quot; if($pid &gt; 0);</span>
-</span><span class='line'>        <span class="k">last</span> <span class="k">unless</span> <span class="nv">$pid</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="k">my</span> <span class="nv">$csock</span> <span class="o">=</span> <span class="nv">$server</span><span class="o">-&gt;</span><span class="nb">accept</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">my</span> <span class="nv">$pid</span> <span class="o">=</span> <span class="nb">fork</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="nv">$pid</span><span class="p">){</span>
-</span><span class='line'>            <span class="nb">close</span><span class="p">(</span><span class="nv">$csock</span><span class="p">);</span>
-</span><span class='line'>            <span class="nb">undef</span> <span class="nv">$csock</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>            <span class="nv">$0</span> <span class="o">.=</span> <span class="s">&quot; [perl child]&quot;</span><span class="p">;</span>
-</span><span class='line'>            <span class="k">while</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="k">my</span> <span class="nv">$buf</span><span class="p">;</span>
-</span><span class='line'>                <span class="k">my</span> <span class="nv">$len</span> <span class="o">=</span> <span class="nb">sysread</span><span class="p">(</span><span class="nv">$csock</span><span class="p">,</span> <span class="nv">$buf</span><span class="p">,</span> <span class="mi">1048576</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-</span><span class='line'>                <span class="n">work</span><span class="p">(</span><span class="nv">$buf</span><span class="p">);</span>
-</span><span class='line'>                <span class="k">last</span> <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$len</span> <span class="o">&amp;&amp;</span> <span class="vg">$!</span> <span class="o">!=</span> <span class="n">EWOULDBLOCK</span><span class="p">);</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>            <span class="nb">exit</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">#子进程的工作</span>
-</span><span class='line'><span class="k">sub </span><span class="nf">work</span><span class="p">{</span>
-</span><span class='line'>    <span class="k">print</span> <span class="nv">@_</span><span class="o">.</span><span class="s">&quot;\n&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="k">sub </span><span class="nf">daemonize</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">my</span><span class="p">(</span><span class="nv">$pid</span><span class="p">,</span> <span class="nv">$sess_id</span><span class="p">,</span> <span class="nv">$i</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$pid</span> <span class="o">=</span> <span class="nb">fork</span><span class="p">)</span> <span class="p">{</span> <span class="nb">exit</span> <span class="mi">0</span><span class="p">;</span> <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">croak</span> <span class="s">&quot;Cannot detach from controlling terminal&quot;</span>
-</span><span class='line'>        <span class="k">unless</span> <span class="nv">$sess_id</span> <span class="o">=</span> <span class="nn">POSIX::</span><span class="n">setsid</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nv">$SIG</span><span class="p">{</span><span class="s">&#39;HUP&#39;</span><span class="p">}</span> <span class="o">=</span> <span class="s">&#39;IGNORE&#39;</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$pid</span> <span class="o">=</span> <span class="nb">fork</span><span class="p">)</span> <span class="p">{</span> <span class="nb">exit</span> <span class="mi">0</span><span class="p">;</span> <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nb">chdir</span> <span class="s">&quot;/&quot;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nb">umask</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[nginx反向代理自动urldecode问题]]></title>
-    <link href="http://www.wanghd.com/blog/2012/11/07/nginxfan-xiang-dai-li-zi-dong-urldecodewen-ti/"/>
-    <updated>2012-11-07T16:40:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/11/07/nginxfan-xiang-dai-li-zi-dong-urldecodewen-ti</id>
-    <content type="html"><![CDATA[<h3>今天妖孽了，发现nginx反向代理会自动urldecode</h3>
-
-<ul>
-<li>同事监控两个nginx的access_log，惊人的发现日志里的url不同</li>
-<li>去掉反斜杠就ok了，不太清楚nginx内部是如何处理的</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>location / {
-</span><span class='line'>    proxy_pass        http://localhost:8000/;
-</span><span class='line'>}
-</span><span class='line'>#修改为下面这样后，一切OK了
-</span><span class='line'>location / {
-</span><span class='line'>    proxy_pass        http://localhost:8000;
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[mogilefs删除队列]]></title>
-    <link href="http://www.wanghd.com/blog/2012/11/06/mogilefsshan-chu-dui-lie/"/>
-    <updated>2012-11-06T19:31:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/11/06/mogilefsshan-chu-dui-lie</id>
-    <content type="html"><![CDATA[<h3>遇到的问题</h3>
-
-<ul>
-<li>发现file_to_delete2队列表里有500万记录，奇怪这些文件为什么要删除？心里不踏实，寻找根源&#8230;</li>
-<li>在队列中随便拿一个fid，在file表里查竟然是空的，再找file_on表竟然有数据&#8230;</li>
-</ul>
-
-
-<h3>什么时候会插入fid到删除队列呢</h3>
-
-<ol>
-<li>cmd_create_close时，如果连接终端，文件大小等不正确，会增加到删除队列</li>
-<li>cmd_create_close时，如果同一domain下key已经存在，那么会去删除原有的文件(两份文件key相同，但是fid不同，我的问题就出在这)</li>
-<li>mogdelete工具会删除memcache和file表的文件记录，并运用删除队列删除磁盘上的文件和file_on表</li>
-<li>client调用delete方法，和mogdelete一样</li>
-</ol>
-
-
-<!-- more -->
-
-
-<h3>cmd_create_close逻辑</h3>
-
-<ul>
-<li>mogilefs上传文件的逻辑是先问tracker拿文件存储路径，然后上传文件到一个storage，最后调用cmd_create_close方法插入数据记录和replicate队列</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-<span class='line-number'>73</span>
-<span class='line-number'>74</span>
-<span class='line-number'>75</span>
-<span class='line-number'>76</span>
-<span class='line-number'>77</span>
-<span class='line-number'>78</span>
-<span class='line-number'>79</span>
-<span class='line-number'>80</span>
-<span class='line-number'>81</span>
-<span class='line-number'>82</span>
-<span class='line-number'>83</span>
-<span class='line-number'>84</span>
-<span class='line-number'>85</span>
-<span class='line-number'>86</span>
-<span class='line-number'>87</span>
-<span class='line-number'>88</span>
-<span class='line-number'>89</span>
-<span class='line-number'>90</span>
-<span class='line-number'>91</span>
-<span class='line-number'>92</span>
-<span class='line-number'>93</span>
-<span class='line-number'>94</span>
-<span class='line-number'>95</span>
-<span class='line-number'>96</span>
-<span class='line-number'>97</span>
-<span class='line-number'>98</span>
-<span class='line-number'>99</span>
-<span class='line-number'>100</span>
-<span class='line-number'>101</span>
-<span class='line-number'>102</span>
-<span class='line-number'>103</span>
-<span class='line-number'>104</span>
-<span class='line-number'>105</span>
-<span class='line-number'>106</span>
-<span class='line-number'>107</span>
-<span class='line-number'>108</span>
-<span class='line-number'>109</span>
-<span class='line-number'>110</span>
-<span class='line-number'>111</span>
-<span class='line-number'>112</span>
-<span class='line-number'>113</span>
-<span class='line-number'>114</span>
-<span class='line-number'>115</span>
-<span class='line-number'>116</span>
-<span class='line-number'>117</span>
-<span class='line-number'>118</span>
-<span class='line-number'>119</span>
-<span class='line-number'>120</span>
-<span class='line-number'>121</span>
-<span class='line-number'>122</span>
-<span class='line-number'>123</span>
-<span class='line-number'>124</span>
-<span class='line-number'>125</span>
-<span class='line-number'>126</span>
-<span class='line-number'>127</span>
-<span class='line-number'>128</span>
-<span class='line-number'>129</span>
-<span class='line-number'>130</span>
-<span class='line-number'>131</span>
-<span class='line-number'>132</span>
-<span class='line-number'>133</span>
-<span class='line-number'>134</span>
-<span class='line-number'>135</span>
-<span class='line-number'>136</span>
-<span class='line-number'>137</span>
-<span class='line-number'>138</span>
-<span class='line-number'>139</span>
-<span class='line-number'>140</span>
-<span class='line-number'>141</span>
-<span class='line-number'>142</span>
-<span class='line-number'>143</span>
-<span class='line-number'>144</span>
-<span class='line-number'>145</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="k">sub </span><span class="nf">cmd_create_close</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nn">MogileFS::Worker::</span><span class="n">Query</span> <span class="nv">$self</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$args</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1"># has to be filled out for some plugins</span>
-</span><span class='line'>    <span class="nv">$args</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">dmid</span><span class="p">}</span> <span class="o">=</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">check_domain</span><span class="p">(</span><span class="nv">$args</span><span class="p">)</span>
-</span><span class='line'>        <span class="ow">or</span> <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">err_line</span><span class="p">(</span><span class="s">&#39;domain_not_found&#39;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1"># call out to a hook that might modify the arguments for us</span>
-</span><span class='line'>    <span class="c1"># 调用插件用的钩子，一般是没的</span>
-</span><span class='line'>    <span class="nn">MogileFS::</span><span class="n">run_global_hook</span><span class="p">(</span><span class="s">&#39;cmd_create_close&#39;</span><span class="p">,</span> <span class="nv">$args</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1"># late validation of parameters</span>
-</span><span class='line'>    <span class="c1"># 设置下面使用的变量</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$dmid</span>  <span class="o">=</span> <span class="nv">$args</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">dmid</span><span class="p">};</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$key</span>   <span class="o">=</span> <span class="nv">$args</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">key</span><span class="p">};</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$fidid</span> <span class="o">=</span> <span class="nv">$args</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">fid</span><span class="p">}</span>    <span class="ow">or</span> <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">err_line</span><span class="p">(</span><span class="s">&quot;no_fid&quot;</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$devid</span> <span class="o">=</span> <span class="nv">$args</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">devid</span><span class="p">}</span>  <span class="ow">or</span> <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">err_line</span><span class="p">(</span><span class="s">&quot;no_devid&quot;</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$path</span>  <span class="o">=</span> <span class="nv">$args</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">path</span><span class="p">}</span>   <span class="ow">or</span> <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">err_line</span><span class="p">(</span><span class="s">&quot;no_path&quot;</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$checksum</span> <span class="o">=</span> <span class="nv">$args</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">checksum</span><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$checksum</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nv">$checksum</span> <span class="o">=</span> <span class="nb">eval</span> <span class="p">{</span> <span class="nn">MogileFS::</span><span class="n">Checksum</span><span class="o">-&gt;</span><span class="n">from_string</span><span class="p">(</span><span class="nv">$fidid</span><span class="p">,</span> <span class="nv">$checksum</span><span class="p">)</span> <span class="p">};</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">err_line</span><span class="p">(</span><span class="s">&quot;invalid_checksum_format&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="vg">$@</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1"># 初始化fid和dfid对象</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$fid</span>  <span class="o">=</span> <span class="nn">MogileFS::</span><span class="n">FID</span><span class="o">-&gt;</span><span class="k">new</span><span class="p">(</span><span class="nv">$fidid</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$dfid</span> <span class="o">=</span> <span class="nn">MogileFS::</span><span class="n">DevFID</span><span class="o">-&gt;</span><span class="k">new</span><span class="p">(</span><span class="nv">$devid</span><span class="p">,</span> <span class="nv">$fid</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1"># is the provided path what we&#39;d expect for this fid/devid?</span>
-</span><span class='line'>    <span class="c1"># 验证是否为伪造路径</span>
-</span><span class='line'>    <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">err_line</span><span class="p">(</span><span class="s">&quot;bogus_args&quot;</span><span class="p">)</span>
-</span><span class='line'>        <span class="k">unless</span> <span class="nv">$path</span> <span class="ow">eq</span> <span class="nv">$dfid</span><span class="o">-&gt;</span><span class="n">url</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$sto</span> <span class="o">=</span> <span class="nn">Mgd::</span><span class="n">get_store</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1"># find the temp file we&#39;re closing and making real.  If another worker</span>
-</span><span class='line'>    <span class="c1"># already has it, bail out---the client closed it twice.</span>
-</span><span class='line'>    <span class="c1"># this is racy, but the only expected use case is a client retrying.</span>
-</span><span class='line'>    <span class="c1"># should still be fixed better once more scalable locking is available.</span>
-</span><span class='line'>    <span class="c1"># 取得零时文件数据,并删除掉</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$trow</span> <span class="o">=</span> <span class="nv">$sto</span><span class="o">-&gt;</span><span class="n">delete_and_return_tempfile_row</span><span class="p">(</span><span class="nv">$fidid</span><span class="p">)</span> <span class="ow">or</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">err_line</span><span class="p">(</span><span class="s">&quot;no_temp_file&quot;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1"># Protect against leaving orphaned uploads.</span>
-</span><span class='line'>    <span class="c1"># 定义错误函数，可以看到$fid-&gt;delete会删除file表记录并插入删除队列</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$failed</span> <span class="o">=</span> <span class="k">sub </span><span class="p">{</span>
-</span><span class='line'>        <span class="nv">$dfid</span><span class="o">-&gt;</span><span class="n">add_to_db</span><span class="p">;</span>
-</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="nb">delete</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1"># 验证设备</span>
-</span><span class='line'>    <span class="k">unless</span> <span class="p">(</span><span class="nv">$trow</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">devids</span><span class="p">}</span> <span class="o">=~</span> <span class="sr">m/\b$devid\b/</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nv">$failed</span><span class="o">-&gt;</span><span class="p">();</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">err_line</span><span class="p">(</span><span class="s">&quot;invalid_destdev&quot;</span><span class="p">,</span> <span class="s">&quot;File uploaded to invalid dest $devid. Valid devices were: &quot;</span> <span class="o">.</span> <span class="nv">$trow</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">devids</span><span class="p">});</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1"># if a temp file is closed without a provided-key, that means to</span>
-</span><span class='line'>    <span class="c1"># delete it.</span>
-</span><span class='line'>    <span class="c1"># 验证key</span>
-</span><span class='line'>    <span class="k">unless</span> <span class="p">(</span><span class="nb">defined</span> <span class="nv">$key</span> <span class="o">&amp;&amp;</span> <span class="nb">length</span><span class="p">(</span><span class="nv">$key</span><span class="p">))</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nv">$failed</span><span class="o">-&gt;</span><span class="p">();</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">ok_line</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1"># get size of file and verify that it matches what we were given, if anything</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$httpfile</span> <span class="o">=</span> <span class="nn">MogileFS::</span><span class="n">HTTPFile</span><span class="o">-&gt;</span><span class="n">at</span><span class="p">(</span><span class="nv">$path</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$size</span> <span class="o">=</span> <span class="nv">$httpfile</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1"># size check is optional? Needs to support zero byte files.</span>
-</span><span class='line'>    <span class="c1"># 验证文件大小</span>
-</span><span class='line'>    <span class="nv">$args</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">size</span><span class="p">}</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">unless</span> <span class="nv">$args</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">size</span><span class="p">};</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">defined</span><span class="p">(</span><span class="nv">$size</span><span class="p">)</span> <span class="o">||</span> <span class="nv">$size</span> <span class="o">==</span> <span class="nn">MogileFS::HTTPFile::</span><span class="n">FILE_MISSING</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="c1"># storage node is unreachable or the file is missing</span>
-</span><span class='line'>        <span class="k">my</span> <span class="nv">$type</span>    <span class="o">=</span> <span class="nb">defined</span> <span class="nv">$size</span> <span class="p">?</span> <span class="s">&quot;missing&quot;</span> <span class="p">:</span> <span class="s">&quot;cantreach&quot;</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">my</span> <span class="nv">$lasterr</span> <span class="o">=</span> <span class="nn">MogileFS::Util::</span><span class="n">last_error</span><span class="p">();</span>
-</span><span class='line'>        <span class="nv">$failed</span><span class="o">-&gt;</span><span class="p">();</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">err_line</span><span class="p">(</span><span class="s">&quot;size_verify_error&quot;</span><span class="p">,</span> <span class="s">&quot;Expected: $args-&gt;{size}; actual: 0 ($type); path: $path; error: $lasterr&quot;</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$args</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">size</span><span class="p">}</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nv">$args</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">size</span><span class="p">}</span> <span class="o">!=</span> <span class="nv">$size</span><span class="p">))</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nv">$failed</span><span class="o">-&gt;</span><span class="p">();</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">err_line</span><span class="p">(</span><span class="s">&quot;size_mismatch&quot;</span><span class="p">,</span> <span class="s">&quot;Expected: $args-&gt;{size}; actual: $size; path: $path&quot;</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1"># checksum validation is optional as it can be very expensive</span>
-</span><span class='line'>    <span class="c1"># However, we /always/ verify it if the client wants us to, even</span>
-</span><span class='line'>    <span class="c1"># if the class does not enforce or store it.</span>
-</span><span class='line'>    <span class="c1"># 校验和</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$checksum</span> <span class="o">&amp;&amp;</span> <span class="nv">$args</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">checksumverify</span><span class="p">})</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">my</span> <span class="nv">$alg</span> <span class="o">=</span> <span class="nv">$checksum</span><span class="o">-&gt;</span><span class="n">hashname</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">my</span> <span class="nv">$actual</span> <span class="o">=</span> <span class="nv">$httpfile</span><span class="o">-&gt;</span><span class="n">digest</span><span class="p">(</span><span class="nv">$alg</span><span class="p">,</span> <span class="k">sub </span><span class="p">{</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">still_alive</span> <span class="p">});</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nv">$actual</span> <span class="ow">ne</span> <span class="nv">$checksum</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">checksum</span><span class="p">})</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nv">$failed</span><span class="o">-&gt;</span><span class="p">();</span>
-</span><span class='line'>            <span class="nv">$actual</span> <span class="o">=</span> <span class="s">&quot;$alg:&quot;</span> <span class="o">.</span> <span class="nb">unpack</span><span class="p">(</span><span class="s">&quot;H*&quot;</span><span class="p">,</span> <span class="nv">$actual</span><span class="p">);</span>
-</span><span class='line'>            <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">err_line</span><span class="p">(</span><span class="s">&quot;checksum_mismatch&quot;</span><span class="p">,</span>
-</span><span class='line'>                           <span class="s">&quot;Expected: $checksum; actual: $actual; path: $path&quot;</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="c1"># see if we have a fid for this key already</span>
-</span><span class='line'>    <span class="c1"># 关键的来了，如果在同一个domain下有相同的key，那么删除该文件的file表记录，并插入delete队列</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$old_fid</span> <span class="o">=</span> <span class="nn">MogileFS::</span><span class="n">FID</span><span class="o">-&gt;</span><span class="n">new_from_dmid_and_key</span><span class="p">(</span><span class="nv">$dmid</span><span class="p">,</span> <span class="nv">$key</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$old_fid</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="c1"># Fail if a file already exists for this fid.  Should never</span>
-</span><span class='line'>        <span class="c1"># happen, as it should not be possible to close a file twice.</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">err_line</span><span class="p">(</span><span class="s">&quot;fid_exists&quot;</span><span class="p">)</span>
-</span><span class='line'>            <span class="k">unless</span> <span class="nv">$old_fid</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">fidid</span><span class="p">}</span> <span class="o">!=</span> <span class="nv">$fidid</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="nv">$old_fid</span><span class="o">-&gt;</span><span class="nb">delete</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1"># TODO: check for EIO?</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1"># insert file_on row</span>
-</span><span class='line'>    <span class="c1"># 以上都没有问题，那么就确认保存文件到数据库</span>
-</span><span class='line'>    <span class="c1"># 保存到file_on表</span>
-</span><span class='line'>    <span class="nv">$dfid</span><span class="o">-&gt;</span><span class="n">add_to_db</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nv">$checksum</span><span class="o">-&gt;</span><span class="n">maybe_save</span><span class="p">(</span><span class="nv">$dmid</span><span class="p">,</span> <span class="nv">$trow</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">classid</span><span class="p">})</span> <span class="k">if</span> <span class="nv">$checksum</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1"># 保存到file表 </span>
-</span><span class='line'>    <span class="nv">$sto</span><span class="o">-&gt;</span><span class="n">replace_into_file</span><span class="p">(</span>
-</span><span class='line'>                            <span class="n">fidid</span>   <span class="o">=&gt;</span> <span class="nv">$fidid</span><span class="p">,</span>
-</span><span class='line'>                            <span class="n">dmid</span>    <span class="o">=&gt;</span> <span class="nv">$dmid</span><span class="p">,</span>
-</span><span class='line'>                            <span class="n">key</span>     <span class="o">=&gt;</span> <span class="nv">$key</span><span class="p">,</span>
-</span><span class='line'>                            <span class="nb">length</span>  <span class="o">=&gt;</span> <span class="nv">$size</span><span class="p">,</span>
-</span><span class='line'>                            <span class="n">classid</span> <span class="o">=&gt;</span> <span class="nv">$trow</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">classid</span><span class="p">},</span>
-</span><span class='line'>                            <span class="n">devcount</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span>
-</span><span class='line'>                            <span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1"># mark it as needing replicating:</span>
-</span><span class='line'>    <span class="c1"># 插入文件到replicate队列 </span>
-</span><span class='line'>    <span class="nv">$fid</span><span class="o">-&gt;</span><span class="n">enqueue_for_replication</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1"># call the hook - if this fails, we need to back the file out</span>
-</span><span class='line'>    <span class="c1"># 调用钩子</span>
-</span><span class='line'>    <span class="k">my</span> <span class="nv">$rv</span> <span class="o">=</span> <span class="nn">MogileFS::</span><span class="n">run_global_hook</span><span class="p">(</span><span class="s">&#39;file_stored&#39;</span><span class="p">,</span> <span class="nv">$args</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nb">defined</span> <span class="nv">$rv</span> <span class="o">&amp;&amp;</span> <span class="o">!</span> <span class="nv">$rv</span><span class="p">)</span> <span class="p">{</span> <span class="c1"># undef = no hooks, 1 = success, 0 = failure</span>
-</span><span class='line'>        <span class="nv">$fid</span><span class="o">-&gt;</span><span class="nb">delete</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">err_line</span><span class="p">(</span><span class="s">&quot;plugin_aborted&quot;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="c1"># all went well, we would&#39;ve hit condthrow on DB errors</span>
-</span><span class='line'>    <span class="c1"># 返回正确结果</span>
-</span><span class='line'>    <span class="k">return</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">ok_line</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>总结为什么会出现这种现象</h3>
-
-<ul>
-<li>当在同一个domain下，上传相同key的文件，之前的文件会被删除，但是两个文件的fid是不同的</li>
-<li>$fid->delete这个操作实际是删除memcache和file表数据，file_on表和磁盘上的文件交给队列来处理</li>
-<li>作者考虑到删除文件是比较耗时的操作，所以交给队列慢慢处理，才会导致file表里没数据，但是file_on上仍有数据</li>
-<li>如果可能，尽量避免上传相同的key，这样可以减少对db的读写操作(我准备优化)</li>
-</ul>
-
 ]]></content>
   </entry>
   
