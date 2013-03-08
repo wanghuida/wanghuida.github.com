@@ -24,6 +24,8 @@ mysql > show grants for 'mmd'@'%';
 mysql > set password for 'mmd'@'%' = password('654321');
 ```
 
+<!-- more -->
+
 ### create 数据库，数据表
 
 ```

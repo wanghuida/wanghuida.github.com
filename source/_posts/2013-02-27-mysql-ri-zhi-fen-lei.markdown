@@ -35,6 +35,8 @@ mysql > SET GLOBAL general_log = 'ON';
 # 已经可以监控请求语句了，用完要记得关闭
 ```
 
+<!-- more -->
+
 ### log-bin : 记录所有更改数据的语句。还用于复制。
 
 + 接替日志: flush logs语句或执行mysqladmin flush-logs

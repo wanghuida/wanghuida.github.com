@@ -8,14 +8,16 @@ footer: true
 categories: [Mysql]
 ---
 
-1. 设置同步账号
+### 设置同步账号
 
 ```
 mysql > grant replication slave on *.* to 'backup'@'%' identified by '123456';
 mysql > flush privileges;
 ```
 
-2. master 配置
+### master 配置
+
+<!-- more -->
 
 ```
 server-id       = 1
@@ -27,7 +29,7 @@ binlog_do_db        = mmd
 service mysql restart
 ```
 
-3. slave 配置
+### slave 配置
 
 ```
 server-id           = 2 
@@ -40,7 +42,7 @@ read_only           = 1
 service mysql restart
 ```
 
-4. 同步现有数据
+### 同步现有数据
 
 ```
 # 强制读锁
@@ -61,7 +63,7 @@ $ scp mmd.sql wanghuida@192.168.30.114:mmd.sql
 $ mysql -uroot -p***** mmd < mmd.sql
 ```
 
-5. slave 同步设置
+### slave 同步设置
 
 ```
 mysql > change master to
@@ -74,6 +76,6 @@ mysql > change master to
 mysql > start slave;
 ```
 
-6. 附加配置
+### 附加配置
 
 + 注释：为了保证事务InnoDB复制设置的最大可能的耐受性和一致性，应在主服务器的my.cnf文件中使用innodb_flush_log_at_trx_commit=1和sync-binlog=1。这样每次提交都会写入日志文件，性能有一些损失
