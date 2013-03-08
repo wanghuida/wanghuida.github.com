@@ -4,7 +4,7 @@
   <title><![CDATA[老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2013-03-03T21:49:18+08:00</updated>
+  <updated>2013-03-08T10:49:44+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -14,30 +14,141 @@
 
   
   <entry>
+    <title type="html"><![CDATA[sqlalchemy 自动创建表]]></title>
+    <link href="http://www.wanghd.com/blog/2013/03/05/sqlalchemy-zi-dong-chuang-jian-biao/"/>
+    <updated>2013-03-05T17:15:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/03/05/sqlalchemy-zi-dong-chuang-jian-biao</id>
+    <content type="html"><![CDATA[<h3>声明1个映射关系，然后如果没有表，那就自动创建</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c">#!/usr/bin/env python</span>
+</span><span class='line'><span class="c"># coding: utf-8</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">sqlalchemy</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Column</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">,</span> <span class="n">TIMESTAMP</span><span class="p">,</span> <span class="n">DECIMAL</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy.sql.expression</span> <span class="kn">import</span> <span class="n">text</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="kn">import</span> <span class="n">declarative_base</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span>
+</span><span class='line'><span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+</span><span class='line'>    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s">&#39;users&#39;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+</span><span class='line'>    <span class="n">fullname</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+</span><span class='line'>    <span class="n">password</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="n">server_default</span><span class="o">=</span><span class="n">text</span><span class="p">(</span><span class="s">&quot;123&quot;</span><span class="p">))</span>
+</span><span class='line'>    <span class="n">fid</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">server_default</span><span class="o">=</span><span class="n">text</span><span class="p">(</span><span class="s">&#39;1&#39;</span><span class="p">))</span>
+</span><span class='line'>    <span class="n">d</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DECIMAL</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">server_default</span><span class="o">=</span><span class="n">text</span><span class="p">(</span><span class="s">&#39;0.0&#39;</span><span class="p">))</span>
+</span><span class='line'>    <span class="n">creation</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</span><span class='line'>    <span class="c"># updated = Column(TIMESTAMP, nullable=False, server_default=text(&#39;current_timestamp on update current_timestamp&#39;))</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span class='line'>    <span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s">&#39;sqlite:///test.db&#39;</span><span class="p">,</span> <span class="n">echo</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!-- more -->
+
+
+<h3>自动生成语句执行</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="mi">2013</span><span class="o">-</span><span class="mo">03</span><span class="o">-</span><span class="mi">08</span> <span class="mi">10</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">42</span><span class="p">,</span><span class="mi">805</span> <span class="n">INFO</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">Engine</span>
+</span><span class='line'><span class="n">CREATE</span> <span class="n">TABLE</span> <span class="n">users</span> <span class="p">(</span>
+</span><span class='line'>    <span class="nb">id</span> <span class="n">INTEGER</span> <span class="n">NOT</span> <span class="n">NULL</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">name</span> <span class="n">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span>
+</span><span class='line'>    <span class="n">fullname</span> <span class="n">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>
+</span><span class='line'>    <span class="n">password</span> <span class="n">VARCHAR</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span> <span class="n">DEFAULT</span> <span class="mi">123</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">fid</span> <span class="n">INTEGER</span> <span class="n">DEFAULT</span> <span class="mi">1</span> <span class="n">NOT</span> <span class="n">NULL</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">d</span> <span class="n">DECIMAL</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="n">DEFAULT</span> <span class="mf">0.0</span> <span class="n">NOT</span> <span class="n">NULL</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">creation</span> <span class="n">DATETIME</span> <span class="n">NOT</span> <span class="n">NULL</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">PRIMARY</span> <span class="n">KEY</span> <span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+</span><span class='line'><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="mi">2013</span><span class="o">-</span><span class="mo">03</span><span class="o">-</span><span class="mi">08</span> <span class="mi">10</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">42</span><span class="p">,</span><span class="mi">805</span> <span class="n">INFO</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">Engine</span> <span class="p">()</span>
+</span><span class='line'><span class="mi">2013</span><span class="o">-</span><span class="mo">03</span><span class="o">-</span><span class="mi">08</span> <span class="mi">10</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">42</span><span class="p">,</span><span class="mi">808</span> <span class="n">INFO</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">Engine</span> <span class="n">COMMIT</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Mysql 安全]]></title>
     <link href="http://www.wanghd.com/blog/2013/02/27/mysql-an-quan/"/>
     <updated>2013-02-27T14:57:00+08:00</updated>
     <id>http://www.wanghd.com/blog/2013/02/27/mysql-an-quan</id>
-    <content type="html"><![CDATA[<ol>
-<li><p>如果客户端和服务器端的连接需要跨越并通过不可信任的网络，那么就需要使用SSH隧道来加密该连接的通信。一般情况下mysql不直接对外，只提供内部访问。</p></li>
+    <content type="html"><![CDATA[<ul>
+<li><p>如果客户端和服务器端的连接需要跨越并通过不可信任的网络，那么就需要使用SSH隧道来加密该连接的通信。一般情况下mysql不直接对外，只提供<code>内部访问</code>。</p></li>
 <li><p>用GRANT和REVOKE语句来控制对MySQL的访问。不要授予超过需求的权限。决不能为所有主机授权。</p></li>
-<li><p>不要让任何人(除了MySQL root账户)访问mysql数据库中的user表！这很关键。加密的密码才是MySQL中的真正的密码。</p></li>
-<li><p>不要将纯文本密码保存到数据库中。如果你的计算机有安全危险，入侵者可以获得所有的密码并使用它们。相反，应使用MD5()、SHA1()或单向哈希函数。</p></li>
+<li><p>不要让任何人(除了MySQL root账户)访问mysql数据库中的<code>user表</code>！这很关键。加密的密码才是MySQL中的真正的密码。</p></li>
+<li><p>不要将<code>纯文本密码</code>保存到数据库中。如果你的计算机有安全危险，入侵者可以获得所有的密码并使用它们。相反，应使用MD5()、SHA1()或单向哈希函数。</p></li>
 <li><p>不要从词典中选择密码。有专门的程序可以破解它们。</p></li>
+</ul>
+
+
+<!-- more -->
+
+
+<ul>
 <li><p>试试从Internet使用nmap工具扫描端口。MySQL默认使用端口3306。或者telnet ip 3306。</p></li>
-<li><p>如果某个用户输入“; DROP DATABASE mysql;”等内容，应确保你的应用程序保持安全。</p></li>
-<li><p>一定要记住还应检查数字数据。如果当用户输入值234时，应用程序生成查询SELECT * FROM table WHERE ID=234，用户可以输入值234 OR 1=1使应用程序生成查询SELECT * FROM table WHERE ID=234 OR 1=1。结果是服务器查找表内的每个记录。</p></li>
+<li><p>如果某个用户输入<code>; DROP DATABASE mysql;</code>等内容，应确保你的应用程序保持安全。</p></li>
+<li><p>一定要记住还应检查数字数据。如果当用户输入值234时，应用程序生成查询SELECT * FROM table WHERE ID=234，用户可以输入值<code>234 OR 1=1</code>使应用程序生成查询SELECT * FROM table WHERE ID=234 OR 1=1。结果是服务器查找表内的每个记录。</p></li>
 <li><p>学会使用tcpdump和strings工具。在大多数情况下，你可以使用下面的命令检查是否MySQL数据流未加密</p></li>
-</ol>
+</ul>
 
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>shell&gt; tcpdump -l -i eth0 -w - src or dst port 3306 | strings</span></code></pre></td></tr></table></div></figure>
 
 
-<ol>
+<ul>
 <li>对所有MySQL用户使用密码。</li>
-</ol>
+</ul>
 
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -50,12 +161,12 @@
 </span><span class='line'>mysql&gt; FLUSH PRIVILEGES;</span></code></pre></td></tr></table></div></figure>
 
 
-<ol>
+<ul>
 <li><p>绝对不要作为Unix的root用户运行MySQL服务器。这样做非常危险，因为任何具有FILE权限的用户能够用root创建文件(例如，~root/.bashrc)。为了防止，mysqld拒绝用root运行，除非使用&#8211;user=root选项明显指定。</p></li>
-<li><p>确保mysqld运行时，只使用对数据库目录具有读或写权限的Unix用户来运行。</p></li>
+<li><p>确保mysqld运行时，<code>只使用对数据库目录具有读或写权限的Unix用户来运行</code>。</p></li>
 <li><p>不要将PROCESS或SUPER权限授给非管理用户。mysqladmin processlist的输出显示出当前执行的查询正文，如果另外的用户发出一个UPDATE user SET password=PASSWORD(&#8216;not_secure&#8217;)查询，被允许执行那个命令的任何用户可能看得到。 mysqld为有SUPER权限的用户专门保留一个额外的连接，因此即使所有普通连接被占用，MySQL root用户仍可以登录并检查服务器的活动。 可以使用SUPER权限来终止客户端连接，通过更改系统变量的值更改服务的器操作，并控制复制服务器。</p></li>
 <li><p>不要向非管理用户授予FILE权限。有这权限的任何用户能在拥有mysqld守护进程权限的文件系统那里写一个文件。</p></li>
-</ol>
+</ul>
 
 ]]></content>
   </entry>
@@ -89,6 +200,11 @@
 </span><span class='line'>mysql &gt; show grants for 'mmd'@'%';
 </span><span class='line'>
 </span><span class='line'>mysql &gt; set password for 'mmd'@'%' = password('654321');</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!-- more -->
 
 
 <h3>create 数据库，数据表</h3>
@@ -289,10 +405,7 @@
     <link href="http://www.wanghd.com/blog/2013/02/27/mysql-zhu-cong-she-zhi/"/>
     <updated>2013-02-27T14:52:00+08:00</updated>
     <id>http://www.wanghd.com/blog/2013/02/27/mysql-zhu-cong-she-zhi</id>
-    <content type="html"><![CDATA[<ol>
-<li>设置同步账号</li>
-</ol>
-
+    <content type="html"><![CDATA[<h3>设置同步账号</h3>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -300,9 +413,11 @@
 </span><span class='line'>mysql &gt; flush privileges;</span></code></pre></td></tr></table></div></figure>
 
 
-<ol>
-<li>master 配置</li>
-</ol>
+<h3>master 配置</h3>
+
+<!-- more -->
+
+
 
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -321,10 +436,7 @@
 </span><span class='line'>service mysql restart</span></code></pre></td></tr></table></div></figure>
 
 
-<ol>
-<li>slave 配置</li>
-</ol>
-
+<h3>slave 配置</h3>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -344,10 +456,7 @@
 </span><span class='line'>service mysql restart</span></code></pre></td></tr></table></div></figure>
 
 
-<ol>
-<li>同步现有数据</li>
-</ol>
-
+<h3>同步现有数据</h3>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -383,10 +492,7 @@
 </span><span class='line'>$ mysql -uroot -p***** mmd &lt; mmd.sql</span></code></pre></td></tr></table></div></figure>
 
 
-<ol>
-<li>slave 同步设置</li>
-</ol>
-
+<h3>slave 同步设置</h3>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -406,10 +512,11 @@
 </span><span class='line'>mysql &gt; start slave;</span></code></pre></td></tr></table></div></figure>
 
 
-<ol>
-<li><p>附加配置</p></li>
-<li><p>注释：为了保证事务InnoDB复制设置的最大可能的耐受性和一致性，应在主服务器的my.cnf文件中使用innodb_flush_log_at_trx_commit=1和sync-binlog=1。这样每次提交都会写入日志文件，性能有一些损失</p></li>
-</ol>
+<h3>附加配置</h3>
+
+<ul>
+<li>注释：为了保证事务InnoDB复制设置的最大可能的耐受性和一致性，应在主服务器的my.cnf文件中使用innodb_flush_log_at_trx_commit=1和sync-binlog=1。这样每次提交都会写入日志文件，性能有一些损失</li>
+</ul>
 
 ]]></content>
   </entry>
@@ -483,6 +590,11 @@ query_cache_size</p>
 </span><span class='line'>mysql &gt; SET GLOBAL general_log = 'ON';
 </span><span class='line'>
 </span><span class='line'># 已经可以监控请求语句了，用完要记得关闭</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!-- more -->
 
 
 <h3>log-bin : 记录所有更改数据的语句。还用于复制。</h3>
@@ -1705,15 +1817,6 @@ query_cache_size</p>
     <link href="http://www.wanghd.com/blog/2012/11/22/mongodbshi-zhan/"/>
     <updated>2012-11-22T17:18:00+08:00</updated>
     <id>http://www.wanghd.com/blog/2012/11/22/mongodbshi-zhan</id>
-    <content type="html"><![CDATA[
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[log4j介绍]]></title>
-    <link href="http://www.wanghd.com/blog/2012/11/22/log4jjie-shao/"/>
-    <updated>2012-11-22T17:18:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/11/22/log4jjie-shao</id>
     <content type="html"><![CDATA[
 ]]></content>
   </entry>

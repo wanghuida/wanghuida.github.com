@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>MogileFS安装配置 - 老虎的眼睛</title>
+  <title>sqlalchemy 自动创建表 - 老虎的眼睛</title>
   <meta name="author" content="王惠达 huida wanghuida">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.wanghd.com/blog/2012/11/22/mogilefsan-zhuang-pei-zhi">
+  <link rel="canonical" href="http://www.wanghd.com/blog/2013/03/05/sqlalchemy-zi-dong-chuang-jian-biao">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/bootstrap/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/stylesheets/bootstrap/responsive.css" media="screen, projection" rel="stylesheet" type="text/css">
@@ -98,7 +98,7 @@
   
   <header class="page-header">
     
-      <h1 class="entry-title">MogileFS安装配置</h1>
+      <h1 class="entry-title">Sqlalchemy 自动创建表</h1>
     
     
       <p class="meta">
@@ -114,7 +114,7 @@
   
 
 
-<time datetime="2012-11-22T17:19:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
+<time datetime="2013-03-05T17:15:00+08:00" pubdate data-updated="true">Mar 5<span>th</span>, 2013</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -123,80 +123,7 @@
   </header>
 
 
-<div class="entry-content"><h3>基本介绍</h3>
-
-<ul>
-<li>mogilefs是一个分布式的文件系统解决方案</li>
-<li>特点是:无单点失效的问题，自动复制无需raid，easy的命名空间，自修复机制，成熟的管理工具，源码清晰推荐阅读</li>
-</ul>
-
-
-<!-- more -->
-
-
-<h3>安装基本组件</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>yum groupinstall <span class="s2">&quot;Development Tools&quot;</span>
-</span><span class='line'><span class="c">#cpan是perl的包管理工具</span>
-</span><span class='line'>yum install cpan
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>安装mogilefs</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#进入cpan,初始化直接自动就好</span>
-</span><span class='line'>cpan
-</span><span class='line'>&gt; install IO::AIO
-</span><span class='line'>&gt; install MogileFS::Client
-</span><span class='line'>&gt; install MogileFS::Utils
-</span><span class='line'><span class="c">#如果有问题直接用force install</span>
-</span><span class='line'>&gt; install MogileFS::Server
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>安装配置mysql</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#安装mysql</span>
-</span><span class='line'>yum install mysql mysql-server
-</span><span class='line'>mysqladmin -u root password 123456
-</span><span class='line'><span class="c">#进入mysql,新建mogile用户</span>
-</span><span class='line'>mysql -uroot -p123456
-</span><span class='line'>mysql&gt; create database mogilefs;
-</span><span class='line'>mysql&gt; grant all on mogilefs.* to mogile@localhost identified by <span class="s1">&#39;123456&#39;</span>;
-</span><span class='line'>mysql&gt; flush privileges;
-</span><span class='line'>
-</span><span class='line'><span class="c">#导入mogilefs表</span>
-</span><span class='line'>mogdbsetup --dbpass<span class="o">=</span>123456 --yes
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>mogilefs配置</h3>
-
-<ul>
-<li>mogilefsd配置</li>
-</ul>
-
+<div class="entry-content"><h3>声明1个映射关系，然后如果没有表，那就自动创建</h3>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -220,35 +147,47 @@
 <span class='line-number'>20</span>
 <span class='line-number'>21</span>
 <span class='line-number'>22</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#/etc/mogilefs是默认的配置路径，-c可以修改</span>
-</span><span class='line'>mkdir -p /etc/mogilefs
-</span><span class='line'><span class="nb">cd</span> /etc/mogilefs
-</span><span class='line'>vim mogilefsd.conf
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c">#!/usr/bin/env python</span>
+</span><span class='line'><span class="c"># coding: utf-8</span>
 </span><span class='line'>
-</span><span class='line'><span class="c">#内容如下</span>
-</span><span class='line'><span class="nv">pidfile</span> <span class="o">=</span> /tmp/mogilefsd.pid    <span class="c">#存放pid</span>
-</span><span class='line'><span class="nv">daemonize</span> <span class="o">=</span> 1                   <span class="c">#守护进程</span>
 </span><span class='line'>
-</span><span class='line'><span class="nv">db_dsn</span>  <span class="o">=</span> DBI:mysql:mogilefs:127.0.0.1  <span class="c">#数据库配置</span>
-</span><span class='line'><span class="nv">db_user</span> <span class="o">=</span> mogile
-</span><span class='line'><span class="nv">db_pass</span> <span class="o">=</span> 123456
+</span><span class='line'><span class="kn">import</span> <span class="nn">sqlalchemy</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Column</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">,</span> <span class="n">TIMESTAMP</span><span class="p">,</span> <span class="n">DECIMAL</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy.sql.expression</span> <span class="kn">import</span> <span class="n">text</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="kn">import</span> <span class="n">declarative_base</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span>
+</span><span class='line'><span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
 </span><span class='line'>
-</span><span class='line'><span class="nv">conf_port</span> <span class="o">=</span> 7001                <span class="c">#监听端口</span>
-</span><span class='line'><span class="nv">node_timeout</span> <span class="o">=</span> 2                <span class="c">#节点超时时间 </span>
-</span><span class='line'><span class="nv">rebalance_ignore_missing</span> <span class="o">=</span> 1    <span class="c">#rebalance时会删除文件，删除时如果找不到文件不报错直接跳过 </span>
+</span><span class='line'><span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+</span><span class='line'>    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s">&#39;users&#39;</span>
 </span><span class='line'>
-</span><span class='line'><span class="nv">query_jobs</span> <span class="o">=</span> 20                 <span class="c">#正真处理请求的job个数</span>
-</span><span class='line'><span class="nv">delete_jobs</span> <span class="o">=</span> 3                 <span class="c">#处理删除队列的job个数</span>
-</span><span class='line'><span class="nv">replicate_jobs</span> <span class="o">=</span> 5              <span class="c">#处理复制队列的job个数</span>
-</span><span class='line'><span class="nv">reaper_jobs</span> <span class="o">=</span> 1                 <span class="c">#设备设置为dead后，处理补救工作的job个数 </span>
-</span><span class='line'>                                <span class="c">#其实还有其他job，默认为1个</span>
+</span><span class='line'>    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+</span><span class='line'>    <span class="n">fullname</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+</span><span class='line'>    <span class="n">password</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="n">server_default</span><span class="o">=</span><span class="n">text</span><span class="p">(</span><span class="s">&quot;123&quot;</span><span class="p">))</span>
+</span><span class='line'>    <span class="n">fid</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">server_default</span><span class="o">=</span><span class="n">text</span><span class="p">(</span><span class="s">&#39;1&#39;</span><span class="p">))</span>
+</span><span class='line'>    <span class="n">d</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DECIMAL</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">server_default</span><span class="o">=</span><span class="n">text</span><span class="p">(</span><span class="s">&#39;0.0&#39;</span><span class="p">))</span>
+</span><span class='line'>    <span class="n">creation</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</span><span class='line'>    <span class="c"># updated = Column(TIMESTAMP, nullable=False, server_default=text(&#39;current_timestamp on update current_timestamp&#39;))</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span class='line'>    <span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s">&#39;sqlite:///test.db&#39;</span><span class="p">,</span> <span class="n">echo</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<ul>
-<li>mogstored配置</li>
-</ul>
 
+
+<!-- more -->
+
+
+<h3>自动生成语句执行</h3>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -263,57 +202,22 @@
 <span class='line-number'>11</span>
 <span class='line-number'>12</span>
 <span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#设置文件存储路径，不要忘记修改拥有者</span>
-</span><span class='line'>mkdir -p /var/mogdata
-</span><span class='line'>adduser --gid daemon mogile
-</span><span class='line'>chown mogile.daemon /var/mogdata
-</span><span class='line'>vim mogstored.conf
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="mi">2013</span><span class="o">-</span><span class="mo">03</span><span class="o">-</span><span class="mi">08</span> <span class="mi">10</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">42</span><span class="p">,</span><span class="mi">805</span> <span class="n">INFO</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">Engine</span>
+</span><span class='line'><span class="n">CREATE</span> <span class="n">TABLE</span> <span class="n">users</span> <span class="p">(</span>
+</span><span class='line'>    <span class="nb">id</span> <span class="n">INTEGER</span> <span class="n">NOT</span> <span class="n">NULL</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">name</span> <span class="n">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span>
+</span><span class='line'>    <span class="n">fullname</span> <span class="n">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>
+</span><span class='line'>    <span class="n">password</span> <span class="n">VARCHAR</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span> <span class="n">DEFAULT</span> <span class="mi">123</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">fid</span> <span class="n">INTEGER</span> <span class="n">DEFAULT</span> <span class="mi">1</span> <span class="n">NOT</span> <span class="n">NULL</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">d</span> <span class="n">DECIMAL</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="n">DEFAULT</span> <span class="mf">0.0</span> <span class="n">NOT</span> <span class="n">NULL</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">creation</span> <span class="n">DATETIME</span> <span class="n">NOT</span> <span class="n">NULL</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">PRIMARY</span> <span class="n">KEY</span> <span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+</span><span class='line'><span class="p">)</span>
 </span><span class='line'>
-</span><span class='line'><span class="c">#内容如下</span>
-</span><span class='line'><span class="nv">httplisten</span> <span class="o">=</span> 0.0.0.0:7500       <span class="c">#文件存储端口</span>
-</span><span class='line'><span class="nv">mgmtlisten</span> <span class="o">=</span> 0.0.0.0:7501       <span class="c">#监控磁盘状态端口</span>
-</span><span class='line'><span class="nv">docroot</span> <span class="o">=</span> /var/mogdata          <span class="c">#文件存储路径</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">pidfile</span> <span class="o">=</span> /tmp/mogstored.pid    <span class="c">#存储pid</span>
-</span><span class='line'><span class="nv">daemonize</span> <span class="o">=</span> 1                   <span class="c">#守护进程</span>
+</span><span class='line'><span class="mi">2013</span><span class="o">-</span><span class="mo">03</span><span class="o">-</span><span class="mi">08</span> <span class="mi">10</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">42</span><span class="p">,</span><span class="mi">805</span> <span class="n">INFO</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">Engine</span> <span class="p">()</span>
+</span><span class='line'><span class="mi">2013</span><span class="o">-</span><span class="mo">03</span><span class="o">-</span><span class="mi">08</span> <span class="mi">10</span><span class="p">:</span><span class="mo">05</span><span class="p">:</span><span class="mi">42</span><span class="p">,</span><span class="mi">808</span> <span class="n">INFO</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">Engine</span> <span class="n">COMMIT</span>
 </span></code></pre></td></tr></table></div></figure>
-
-
-<h3>启动mogilefs</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>vim /etc/security/limits.conf
-</span><span class='line'><span class="c">#内容如下，让mogile可以打开更多的连接数</span>
-</span><span class='line'>mogile soft nofile 65535
-</span><span class='line'>mogile hard nofile 65535
-</span><span class='line'>
-</span><span class='line'><span class="c">#切换用户启动</span>
-</span><span class='line'>su mogile -c <span class="s1">&#39;mogstored&#39;</span>
-</span><span class='line'>su mogile -c <span class="s1">&#39;mogilefsd&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">#验证已经启动成功</span>
-</span><span class='line'>ps auxf | grep mogile
-</span><span class='line'>mogadm check
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>已经安装好了，接来应该做点什么呢</h3>
-
-<ul>
-<li>学习mogadm指令，因为mogadm是必会工具</li>
-<li>试着client连接mogilefsd存储文件吧</li>
-</ul>
 
 </div>
 
@@ -337,21 +241,15 @@
   
 
 
-<time datetime="2012-11-22T17:19:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
+<time datetime="2013-03-05T17:15:00+08:00" pubdate data-updated="true">Mar 5<span>th</span>, 2013</time>
       
-
-<span class="categories">
-  
-    <a class='category' href='/blog/categories/mogilefs/'>Mogilefs</a>, <a class='category' href='/blog/categories/perl/'>Perl</a>
-  
-</span>
 
 
     </p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2012/11/22/mogilefsan-zhuang-pei-zhi/" data-via="" data-counturl="http://www.wanghd.com/blog/2012/11/22/mogilefsan-zhuang-pei-zhi/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2013/03/05/sqlalchemy-zi-dong-chuang-jian-biao/" data-via="" data-counturl="http://www.wanghd.com/blog/2013/03/05/sqlalchemy-zi-dong-chuang-jian-biao/" >Tweet</a>
   
   
   
@@ -368,14 +266,10 @@
     <ul class="pager">
       
       <li class="previous"><a class="basic-alignment left"
-        href="/blog/2012/11/22/time-hiresjie-shao/" title="Previous Post:
-        Time::HiRes介绍">&laquo; Time::HiRes介绍</a></li>
+        href="/blog/2013/02/27/mysql-an-quan/" title="Previous Post:
+        Mysql 安全">&laquo; Mysql 安全</a></li>
       
       <li><a href="/blog/archives">文章归档</a></li>
-      
-      <li class="next"><a class="basic-alignment right" href="/blog/2012/11/25/inotify/"
-        title="Next Post: inotify,rsync统一化配置">inotify,rsync统一化配置
-        &raquo;</a></li>
       
     </ul>
   </footer>
@@ -506,8 +400,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.wanghd.com/blog/2012/11/22/mogilefsan-zhuang-pei-zhi/';
-        var disqus_url = 'http://www.wanghd.com/blog/2012/11/22/mogilefsan-zhuang-pei-zhi/';
+        var disqus_identifier = 'http://www.wanghd.com/blog/2013/03/05/sqlalchemy-zi-dong-chuang-jian-biao/';
+        var disqus_url = 'http://www.wanghd.com/blog/2013/03/05/sqlalchemy-zi-dong-chuang-jian-biao/';
         var disqus_script = 'embed.js';
       
     (function () {

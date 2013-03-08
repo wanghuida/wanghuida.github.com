@@ -123,10 +123,7 @@
   </header>
 
 
-<div class="entry-content"><ol>
-<li>设置同步账号</li>
-</ol>
-
+<div class="entry-content"><h3>设置同步账号</h3>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -134,9 +131,11 @@
 </span><span class='line'>mysql &gt; flush privileges;</span></code></pre></td></tr></table></div></figure>
 
 
-<ol>
-<li>master 配置</li>
-</ol>
+<h3>master 配置</h3>
+
+<!-- more -->
+
+
 
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -155,10 +154,7 @@
 </span><span class='line'>service mysql restart</span></code></pre></td></tr></table></div></figure>
 
 
-<ol>
-<li>slave 配置</li>
-</ol>
-
+<h3>slave 配置</h3>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -178,10 +174,7 @@
 </span><span class='line'>service mysql restart</span></code></pre></td></tr></table></div></figure>
 
 
-<ol>
-<li>同步现有数据</li>
-</ol>
-
+<h3>同步现有数据</h3>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -217,10 +210,7 @@
 </span><span class='line'>$ mysql -uroot -p***** mmd &lt; mmd.sql</span></code></pre></td></tr></table></div></figure>
 
 
-<ol>
-<li>slave 同步设置</li>
-</ol>
-
+<h3>slave 同步设置</h3>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -240,10 +230,11 @@
 </span><span class='line'>mysql &gt; start slave;</span></code></pre></td></tr></table></div></figure>
 
 
-<ol>
-<li><p>附加配置</p></li>
-<li><p>注释：为了保证事务InnoDB复制设置的最大可能的耐受性和一致性，应在主服务器的my.cnf文件中使用innodb_flush_log_at_trx_commit=1和sync-binlog=1。这样每次提交都会写入日志文件，性能有一些损失</p></li>
-</ol>
+<h3>附加配置</h3>
+
+<ul>
+<li>注释：为了保证事务InnoDB复制设置的最大可能的耐受性和一致性，应在主服务器的my.cnf文件中使用innodb_flush_log_at_trx_commit=1和sync-binlog=1。这样每次提交都会写入日志文件，性能有一些损失</li>
+</ul>
 
 </div>
 
@@ -349,6 +340,10 @@
     <li class="nav-header">最近更新</li>
     
       <li class="post">
+        <a href="/blog/2013/03/05/sqlalchemy-zi-dong-chuang-jian-biao/">sqlalchemy 自动创建表</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/02/27/mysql-an-quan/">Mysql 安全</a>
       </li>
     
@@ -382,10 +377,6 @@
     
       <li class="post">
         <a href="/blog/2013/02/01/flask-nginx-uwsgibu-shu/">flask nginx uwsgi 部署</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/01/18/you-lan-qi-huan-cun-jie-xi/">游览器缓存解析</a>
       </li>
     
   </ul>
