@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Category: Hadoop - 老虎的眼睛</title>
+  <title>nginx 配置模板 - 老虎的眼睛</title>
   <meta name="author" content="王惠达 huida wanghuida">
 
   
-  <meta name="description" content="Category: Hadoop">
+  <meta name="description" content="王惠达博客 IT技术 php perl python java c ruby wanghuida blog lucene mogilefs">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.wanghd.comblog/categories/hadoop">
+  <link rel="canonical" href="http://www.wanghd.com/blog/2013/03/31/nginx-pei-zhi-mo-ban">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/bootstrap/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/stylesheets/bootstrap/responsive.css" media="screen, projection" rel="stylesheet" type="text/css">
@@ -93,86 +93,227 @@
   <div class="container">
     <div class="row-fluid">
       
-<article role="article" class="span9">
+<article class="hentry span9" role="article">
 
   
   <header class="page-header">
-    <h1 class="entry-title">Category: Hadoop</h1>
+    
+      <h1 class="entry-title">Nginx 配置模板</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-31T16:02:00+08:00" pubdate data-updated="true">Mar 31<span>st</span>, 2013</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
     
   </header>
+
+
+<div class="entry-content"><h3>nginx服务器端配置，可以适当调整:</h3>
+
+<ul>
+<li>调整fastcgi 和 lb 的配置</li>
+<li>上传文件大小</li>
+</ul>
+
+
+<!-- more -->
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>user  william wheel;
+</span><span class='line'># 与内核数量相等即可
+</span><span class='line'>worker_processes  4;
+</span><span class='line'>
+</span><span class='line'>error_log  /usr/local/log/nginx/error.log  notice;
+</span><span class='line'>pid        /usr/local/log/nginx/nginx.pid;
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>events {
+</span><span class='line'>    worker_connections  10240;
+</span><span class='line'>    use epoll;
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>http {
+</span><span class='line'>
+</span><span class='line'>    server_names_hash_bucket_size 64;
+</span><span class='line'>
+</span><span class='line'>    include       mime.types;
+</span><span class='line'>    default_type  application/octet-stream;
+</span><span class='line'>
+</span><span class='line'>    log_format  main '$request_time $upstream_response_time $remote_addr $request_length $upstream_addr  [$time_local] '
+</span><span class='line'>                      '$host "$request" $status $bytes_sent '
+</span><span class='line'>                      '"$http_referer" "$http_user_agent" "$gzip_ratio" "$http_x_forwarded_for" - "$server_addr"';
+</span><span class='line'>
+</span><span class='line'>    access_log  /usr/local/log/nginx/access.log  main;
+</span><span class='line'>
+</span><span class='line'>    # 单单作为lb可以关闭sendfile
+</span><span class='line'>    sendfile        on;
+</span><span class='line'>    tcp_nopush      on;
+</span><span class='line'>
+</span><span class='line'>    # 单单作为lb应该调低，例如5或10，避免空闲连接过多
+</span><span class='line'>    keepalive_timeout  20;
+</span><span class='line'>
+</span><span class='line'>    # 单单作为lb不要开启gzip
+</span><span class='line'>    gzip  on;
+</span><span class='line'>
+</span><span class='line'>    # 限制内容大小，如果上传文件比较大，可以调整
+</span><span class='line'>    client_max_body_size  2m;
+</span><span class='line'>    client_body_buffer_size 1m;
+</span><span class='line'>
+</span><span class='line'>    charset utf-8;
+</span><span class='line'>
+</span><span class='line'>    # 反向代理
+</span><span class='line'>    proxy_buffering  on;
+</span><span class='line'>    proxy_buffers 400 256k;
+</span><span class='line'>    proxy_set_header Host $host;
+</span><span class='line'>    proxy_set_header X-Real-IP $remote_addr;
+</span><span class='line'>    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+</span><span class='line'>
+</span><span class='line'>    # fastcgi
+</span><span class='line'>    fastcgi_connect_timeout 30;
+</span><span class='line'>    fastcgi_send_timeout 30;
+</span><span class='line'>    fastcgi_read_timeout 30;
+</span><span class='line'>    fastcgi_buffers 200 256k;
+</span><span class='line'>
+</span><span class='line'>    include /usr/local/etc/nginx/conf.d/*.conf;
+</span><span class='line'>}
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
   
-  <div id="blog-archives" class="category">
+
+<span class="byline author vcard">Posted by <span class="fn">王惠达 huida wanghuida</span></span>
+
+      
+
+
+
+
+
 
 
 
   
-  <h1>2012</h1>
-
-<article>
-  <div class="well">
-
-<h2><a href="/blog/2012/11/10/an-zhuang-pei-zhi-hive/">安装配置hive</a></h2>
-<time datetime="2012-11-10T14:59:00+08:00" pubdate><span class='month'>Nov</span> <span class='day'>10</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/hadoop/'>Hadoop</a>, <a class='category' href='/blog/categories/java/'>Java</a></span>
-</footer>
-
-</div>
-
-</article>
 
 
+<time datetime="2013-03-31T16:02:00+08:00" pubdate data-updated="true">Mar 31<span>st</span>, 2013</time>
+      
 
-<article>
-  <div class="well">
-
-<h2><a href="/blog/2012/11/04/bian-xie-hadoopde-map-reduce/">编写hadoop的Map-Reduce</a></h2>
-<time datetime="2012-11-04T21:12:00+08:00" pubdate><span class='month'>Nov</span> <span class='day'>04</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/hadoop/'>Hadoop</a>, <a class='category' href='/blog/categories/java/'>Java</a></span>
-</footer>
-
-</div>
-
-</article>
-
-
-
-<article>
-  <div class="well">
-
-<h2><a href="/blog/2012/11/03/eclipsepei-zhi-hadoopde-map-reducekai-fa-huan-jing/">eclipse配置hadoop的map-reduce开发环境</a></h2>
-<time datetime="2012-11-03T00:14:00+08:00" pubdate><span class='month'>Nov</span> <span class='day'>03</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/hadoop/'>Hadoop</a>, <a class='category' href='/blog/categories/java/'>Java</a></span>
-</footer>
-
-</div>
-
-</article>
-
-
-
-<article>
-  <div class="well">
-
-<h2><a href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/">安装配置hadoop</a></h2>
-<time datetime="2012-11-02T23:38:00+08:00" pubdate><span class='month'>Nov</span> <span class='day'>02</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/hadoop/'>Hadoop</a>, <a class='category' href='/blog/categories/java/'>Java</a></span>
-</footer>
-
-</div>
-
-</article>
-
-</div>
-
+<span class="categories">
   
+    <a class='category' href='/blog/categories/share/'>Share</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2013/03/31/nginx-pei-zhi-mo-ban/" data-via="" data-counturl="http://www.wanghd.com/blog/2013/03/31/nginx-pei-zhi-mo-ban/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    
+    <section>
+      <h1>Comments</h1>
+      <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+    </section>
+    
+    <ul class="pager">
+      
+      <li class="previous"><a class="basic-alignment left"
+        href="/blog/2013/03/27/ubuntu-xiu-fu-localecuo-wu/" title="Previous Post:
+        ubuntu 修复locale错误">&laquo; ubuntu 修复locale错误</a></li>
+      
+      <li><a href="/blog/archives">文章归档</a></li>
+      
+    </ul>
+  </footer>
 </article>
 
 <aside class="sidebar-nav span3">
@@ -299,7 +440,10 @@
       var disqus_shortname = 'wanghuida';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.wanghd.com/blog/2013/03/31/nginx-pei-zhi-mo-ban/';
+        var disqus_url = 'http://www.wanghd.com/blog/2013/03/31/nginx-pei-zhi-mo-ban/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Category: Hadoop - 老虎的眼睛</title>
+  <title>ubuntu 修复locale错误 - 老虎的眼睛</title>
   <meta name="author" content="王惠达 huida wanghuida">
 
   
-  <meta name="description" content="Category: Hadoop">
+  <meta name="description" content="王惠达博客 IT技术 php perl python java c ruby wanghuida blog lucene mogilefs">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.wanghd.comblog/categories/hadoop">
+  <link rel="canonical" href="http://www.wanghd.com/blog/2013/03/27/ubuntu-xiu-fu-localecuo-wu">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/bootstrap/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/stylesheets/bootstrap/responsive.css" media="screen, projection" rel="stylesheet" type="text/css">
@@ -93,86 +93,156 @@
   <div class="container">
     <div class="row-fluid">
       
-<article role="article" class="span9">
+<article class="hentry span9" role="article">
 
   
   <header class="page-header">
-    <h1 class="entry-title">Category: Hadoop</h1>
+    
+      <h1 class="entry-title">Ubuntu 修复locale错误</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-27T10:55:00+08:00" pubdate data-updated="true">Mar 27<span>th</span>, 2013</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
     
   </header>
+
+
+<div class="entry-content"><ul>
+<li>locale 配置错误：Cannot set LC_ALL to default locale: No such file or directory</li>
+</ul>
+
+
+<!-- more -->
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>root@server:~# locale
+</span><span class='line'>locale: Cannot set LC_ALL to default locale: No such file or directory
+</span><span class='line'>LANG=en_US.UTF-8
+</span><span class='line'>LANGUAGE=en_US:en
+</span><span class='line'>LC_CTYPE="en_US.UTF-8"
+</span><span class='line'>LC_NUMERIC=en_US
+</span><span class='line'>LC_TIME=en_US
+</span><span class='line'>LC_COLLATE="en_US.UTF-8"
+</span><span class='line'>LC_MONETARY=en_US
+</span><span class='line'>LC_MESSAGES="en_US.UTF-8"
+</span><span class='line'>LC_PAPER=en_US
+</span><span class='line'>LC_NAME=en_US
+</span><span class='line'>LC_ADDRESS=en_US
+</span><span class='line'>LC_TELEPHONE=en_US
+</span><span class='line'>LC_MEASUREMENT=en_US
+</span><span class='line'>LC_IDENTIFICATION=en_US
+</span><span class='line'>LC_ALL=</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>修复：重新生成配置</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo locale-gen en_US en_US.UTF-8
+</span><span class='line'>dpkg-reconfigure locales </span></code></pre></td></tr></table></div></figure>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
   
-  <div id="blog-archives" class="category">
+
+<span class="byline author vcard">Posted by <span class="fn">王惠达 huida wanghuida</span></span>
+
+      
+
+
+
+
+
 
 
 
   
-  <h1>2012</h1>
-
-<article>
-  <div class="well">
-
-<h2><a href="/blog/2012/11/10/an-zhuang-pei-zhi-hive/">安装配置hive</a></h2>
-<time datetime="2012-11-10T14:59:00+08:00" pubdate><span class='month'>Nov</span> <span class='day'>10</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/hadoop/'>Hadoop</a>, <a class='category' href='/blog/categories/java/'>Java</a></span>
-</footer>
-
-</div>
-
-</article>
 
 
+<time datetime="2013-03-27T10:55:00+08:00" pubdate data-updated="true">Mar 27<span>th</span>, 2013</time>
+      
 
-<article>
-  <div class="well">
-
-<h2><a href="/blog/2012/11/04/bian-xie-hadoopde-map-reduce/">编写hadoop的Map-Reduce</a></h2>
-<time datetime="2012-11-04T21:12:00+08:00" pubdate><span class='month'>Nov</span> <span class='day'>04</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/hadoop/'>Hadoop</a>, <a class='category' href='/blog/categories/java/'>Java</a></span>
-</footer>
-
-</div>
-
-</article>
-
-
-
-<article>
-  <div class="well">
-
-<h2><a href="/blog/2012/11/03/eclipsepei-zhi-hadoopde-map-reducekai-fa-huan-jing/">eclipse配置hadoop的map-reduce开发环境</a></h2>
-<time datetime="2012-11-03T00:14:00+08:00" pubdate><span class='month'>Nov</span> <span class='day'>03</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/hadoop/'>Hadoop</a>, <a class='category' href='/blog/categories/java/'>Java</a></span>
-</footer>
-
-</div>
-
-</article>
-
-
-
-<article>
-  <div class="well">
-
-<h2><a href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/">安装配置hadoop</a></h2>
-<time datetime="2012-11-02T23:38:00+08:00" pubdate><span class='month'>Nov</span> <span class='day'>02</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/hadoop/'>Hadoop</a>, <a class='category' href='/blog/categories/java/'>Java</a></span>
-</footer>
-
-</div>
-
-</article>
-
-</div>
-
+<span class="categories">
   
+    <a class='category' href='/blog/categories/share/'>Share</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2013/03/27/ubuntu-xiu-fu-localecuo-wu/" data-via="" data-counturl="http://www.wanghd.com/blog/2013/03/27/ubuntu-xiu-fu-localecuo-wu/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    
+    <section>
+      <h1>Comments</h1>
+      <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+    </section>
+    
+    <ul class="pager">
+      
+      <li class="previous"><a class="basic-alignment left"
+        href="/blog/2013/03/05/sqlalchemy-zi-dong-chuang-jian-biao/" title="Previous Post:
+        sqlalchemy 自动创建表">&laquo; sqlalchemy 自动创建表</a></li>
+      
+      <li><a href="/blog/archives">文章归档</a></li>
+      
+      <li class="next"><a class="basic-alignment right" href="/blog/2013/03/31/nginx-pei-zhi-mo-ban/"
+        title="Next Post: nginx 配置模板">nginx 配置模板
+        &raquo;</a></li>
+      
+    </ul>
+  </footer>
 </article>
 
 <aside class="sidebar-nav span3">
@@ -299,7 +369,10 @@
       var disqus_shortname = 'wanghuida';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.wanghd.com/blog/2013/03/27/ubuntu-xiu-fu-localecuo-wu/';
+        var disqus_url = 'http://www.wanghd.com/blog/2013/03/27/ubuntu-xiu-fu-localecuo-wu/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

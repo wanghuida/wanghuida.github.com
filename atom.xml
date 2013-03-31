@@ -4,7 +4,7 @@
   <title><![CDATA[老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2013-03-08T10:49:44+08:00</updated>
+  <updated>2013-03-31T16:14:03+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,209 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[nginx 配置模板]]></title>
+    <link href="http://www.wanghd.com/blog/2013/03/31/nginx-pei-zhi-mo-ban/"/>
+    <updated>2013-03-31T16:02:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/03/31/nginx-pei-zhi-mo-ban</id>
+    <content type="html"><![CDATA[<h3>nginx服务器端配置，可以适当调整:</h3>
+
+<ul>
+<li>调整fastcgi 和 lb 的配置</li>
+<li>上传文件大小</li>
+</ul>
+
+
+<!-- more -->
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>user  william wheel;
+</span><span class='line'># 与内核数量相等即可
+</span><span class='line'>worker_processes  4;
+</span><span class='line'>
+</span><span class='line'>error_log  /usr/local/log/nginx/error.log  notice;
+</span><span class='line'>pid        /usr/local/log/nginx/nginx.pid;
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>events {
+</span><span class='line'>    worker_connections  10240;
+</span><span class='line'>    use epoll;
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>http {
+</span><span class='line'>
+</span><span class='line'>    server_names_hash_bucket_size 64;
+</span><span class='line'>
+</span><span class='line'>    include       mime.types;
+</span><span class='line'>    default_type  application/octet-stream;
+</span><span class='line'>
+</span><span class='line'>    log_format  main '$request_time $upstream_response_time $remote_addr $request_length $upstream_addr  [$time_local] '
+</span><span class='line'>                      '$host "$request" $status $bytes_sent '
+</span><span class='line'>                      '"$http_referer" "$http_user_agent" "$gzip_ratio" "$http_x_forwarded_for" - "$server_addr"';
+</span><span class='line'>
+</span><span class='line'>    access_log  /usr/local/log/nginx/access.log  main;
+</span><span class='line'>
+</span><span class='line'>    # 单单作为lb可以关闭sendfile
+</span><span class='line'>    sendfile        on;
+</span><span class='line'>    tcp_nopush      on;
+</span><span class='line'>
+</span><span class='line'>    # 单单作为lb应该调低，例如5或10，避免空闲连接过多
+</span><span class='line'>    keepalive_timeout  20;
+</span><span class='line'>
+</span><span class='line'>    # 单单作为lb不要开启gzip
+</span><span class='line'>    gzip  on;
+</span><span class='line'>
+</span><span class='line'>    # 限制内容大小，如果上传文件比较大，可以调整
+</span><span class='line'>    client_max_body_size  2m;
+</span><span class='line'>    client_body_buffer_size 1m;
+</span><span class='line'>
+</span><span class='line'>    charset utf-8;
+</span><span class='line'>
+</span><span class='line'>    # 反向代理
+</span><span class='line'>    proxy_buffering  on;
+</span><span class='line'>    proxy_buffers 400 256k;
+</span><span class='line'>    proxy_set_header Host $host;
+</span><span class='line'>    proxy_set_header X-Real-IP $remote_addr;
+</span><span class='line'>    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+</span><span class='line'>
+</span><span class='line'>    # fastcgi
+</span><span class='line'>    fastcgi_connect_timeout 30;
+</span><span class='line'>    fastcgi_send_timeout 30;
+</span><span class='line'>    fastcgi_read_timeout 30;
+</span><span class='line'>    fastcgi_buffers 200 256k;
+</span><span class='line'>
+</span><span class='line'>    include /usr/local/etc/nginx/conf.d/*.conf;
+</span><span class='line'>}
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ubuntu 修复locale错误]]></title>
+    <link href="http://www.wanghd.com/blog/2013/03/27/ubuntu-xiu-fu-localecuo-wu/"/>
+    <updated>2013-03-27T10:55:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/03/27/ubuntu-xiu-fu-localecuo-wu</id>
+    <content type="html"><![CDATA[<ul>
+<li>locale 配置错误：Cannot set LC_ALL to default locale: No such file or directory</li>
+</ul>
+
+
+<!-- more -->
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>root@server:~# locale
+</span><span class='line'>locale: Cannot set LC_ALL to default locale: No such file or directory
+</span><span class='line'>LANG=en_US.UTF-8
+</span><span class='line'>LANGUAGE=en_US:en
+</span><span class='line'>LC_CTYPE="en_US.UTF-8"
+</span><span class='line'>LC_NUMERIC=en_US
+</span><span class='line'>LC_TIME=en_US
+</span><span class='line'>LC_COLLATE="en_US.UTF-8"
+</span><span class='line'>LC_MONETARY=en_US
+</span><span class='line'>LC_MESSAGES="en_US.UTF-8"
+</span><span class='line'>LC_PAPER=en_US
+</span><span class='line'>LC_NAME=en_US
+</span><span class='line'>LC_ADDRESS=en_US
+</span><span class='line'>LC_TELEPHONE=en_US
+</span><span class='line'>LC_MEASUREMENT=en_US
+</span><span class='line'>LC_IDENTIFICATION=en_US
+</span><span class='line'>LC_ALL=</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>修复：重新生成配置</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo locale-gen en_US en_US.UTF-8
+</span><span class='line'>dpkg-reconfigure locales </span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[sqlalchemy 自动创建表]]></title>
@@ -1670,154 +1873,6 @@ query_cache_size</p>
 <li>试着client连接mogilefsd存储文件吧</li>
 </ul>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Time::HiRes介绍]]></title>
-    <link href="http://www.wanghd.com/blog/2012/11/22/time-hiresjie-shao/"/>
-    <updated>2012-11-22T17:18:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/11/22/time-hiresjie-shao</id>
-    <content type="html"><![CDATA[<h3>Time::HiRes库介绍</h3>
-
-<ul>
-<li>HiRes是high resolution的简写，译为高分辨率</li>
-<li>HiRes其实是提供一些更高精度的alarm, sleep, gettimeofday, interval timers</li>
-</ul>
-
-
-<!-- more -->
-
-
-<h3>usleep，nanosleep实例</h3>
-
-<ul>
-<li>usleep参数是微妙</li>
-<li>nanosleep参数是纳秒</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="nn">Time::HiRes::</span><span class="n">usleep</span><span class="p">(</span><span class="mi">100_000</span><span class="p">);</span>
-</span><span class='line'><span class="k">print</span> <span class="s">&quot;100 milliseconds\n&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="nn">Time::HiRes::</span><span class="n">nanosleep</span><span class="p">(</span><span class="mi">1000_000_000</span><span class="p">);</span>
-</span><span class='line'><span class="k">print</span> <span class="s">&quot;1 seconds\n&quot;</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>ualarm实例</h3>
-
-<ul>
-<li>ualarm(0)会撤销警告信号</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="nb">eval</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nb">local</span> <span class="nv">$SIG</span><span class="p">{</span><span class="n">ALRM</span><span class="p">}</span> <span class="o">=</span> <span class="k">sub </span><span class="p">{</span> <span class="nb">die</span> <span class="s">&quot;receive signal\n&quot;</span> <span class="p">};</span>
-</span><span class='line'>    <span class="nn">Time::HiRes::</span><span class="n">ualarm</span> <span class="mi">1000_000</span><span class="p">;</span>
-</span><span class='line'>    <span class="nb">sleep</span> <span class="mi">2</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">print</span> <span class="s">&quot;never print&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">if</span><span class="p">(</span><span class="vg">$@</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">print</span> <span class="vg">$@</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="nb">eval</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nb">local</span> <span class="nv">$SIG</span><span class="p">{</span><span class="n">ALRM</span><span class="p">}</span> <span class="o">=</span> <span class="k">sub </span><span class="p">{</span> <span class="nb">die</span> <span class="s">&quot;receive signal\n&quot;</span> <span class="p">};</span>
-</span><span class='line'>    <span class="nn">Time::HiRes::</span><span class="n">ualarm</span> <span class="mi">2000_000</span><span class="p">;</span>
-</span><span class='line'>    <span class="nb">sleep</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>    <span class="nn">Time::HiRes::</span><span class="n">ualarm</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">#cancel alarm</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">if</span><span class="p">(</span><span class="vg">$@</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">print</span> <span class="vg">$@</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>    <span class="k">print</span> <span class="s">&quot;cancel alarm signal\n&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>tv_interval和gettimeofday实例</h3>
-
-<ul>
-<li>tv_interval返回两个gettimeofday引用相差的秒数</li>
-<li>省略tv_interval的第二个参数，会自动使用当前时间代替</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="k">my</span> <span class="nv">@start</span> <span class="o">=</span> <span class="nn">Time::HiRes::</span><span class="n">gettimeofday</span><span class="p">;</span>
-</span><span class='line'><span class="k">print</span> <span class="n">Dumper</span><span class="p">(</span><span class="o">\</span><span class="nv">@start</span><span class="p">);</span>
-</span><span class='line'><span class="nb">sleep</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
-</span><span class='line'><span class="k">my</span> <span class="nv">$diff</span> <span class="o">=</span> <span class="nn">Time::HiRes::</span><span class="n">tv_interval</span><span class="p">(</span><span class="o">\</span><span class="nv">@start</span><span class="p">);</span>
-</span><span class='line'><span class="k">print</span> <span class="s">&quot;$diff\n&quot;</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>setitimer实例</h3>
-
-<ol>
-<li>ITIMER_REAL: 真实时间</li>
-<li>ITIMER_VIRTUAL: 用户时间</li>
-<li><p>ITIMER_PROF: 系统时间</p></li>
-<li><p>getitimer可以取得setitimer还有多久开始执行</p></li>
-</ol>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="k">use</span> <span class="nn">Time::</span><span class="n">HiRes</span> <span class="sx">qw ( </span><span class="n">setitimer</span> <span class="n">ITIMER_VIRTUAL</span> <span class="nb">time</span> <span class="p">);</span>
-</span><span class='line'><span class="nv">$SIG</span><span class="p">{</span><span class="n">VTALRM</span><span class="p">}</span> <span class="o">=</span> <span class="k">sub </span><span class="p">{</span> <span class="k">print</span> <span class="nb">time</span><span class="p">,</span> <span class="s">&quot;\n&quot;</span> <span class="p">};</span>
-</span><span class='line'><span class="n">setitimer</span><span class="p">(</span><span class="n">ITIMER_VIRTUAL</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-</span><span class='line'><span class="k">while</span><span class="p">(</span><span class="mi">1</span><span class="p">){</span> <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[mongodb实战]]></title>
-    <link href="http://www.wanghd.com/blog/2012/11/22/mongodbshi-zhan/"/>
-    <updated>2012-11-22T17:18:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/11/22/mongodbshi-zhan</id>
-    <content type="html"><![CDATA[
 ]]></content>
   </entry>
   
