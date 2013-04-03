@@ -141,8 +141,16 @@
 
 <ul>
 <li>修改网络配置文件后，要重启网络接口，使用命令：/etc/init.d/networking restart</li>
-<li>重启单个网口可以使用ifdown eth0,ifup eth0</li>
+<li>重启单个网口可以使用ifdown eth0,ifup eth0, ifconfig</li>
 </ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>ifconfig eth1 192.168.0.204/24
+</span><span class='line'>ifconfig eth1 down/up</span></code></pre></td></tr></table></div></figure>
+
+
 
 
 <!-- more -->
@@ -165,11 +173,15 @@
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>auto eth0
 </span><span class='line'>iface eth inet static
 </span><span class='line'>address 192.168.0.110
 </span><span class='line'>gateway 192.168.0.1
-</span><span class='line'>netmask 255.255.255.0</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'>netmask 255.255.255.0
+</span><span class='line'>
+</span><span class='line'>dns-nameservers 8.8.8.8</span></code></pre></td></tr></table></div></figure>
 
 
 <h3>dns</h3>
@@ -178,7 +190,9 @@
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>vim /etc/resolv.conf
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># 最好不要改这个，重启后就没了
+</span><span class='line'>vim /etc/resolv.conf
 </span><span class='line'>
 </span><span class='line'>nameserver x.x.x.x  # 首要DNS服务器
 </span><span class='line'>nameserver x.x.x.x  # 备用DNS服务器</span></code></pre></td></tr></table></div></figure>
@@ -263,7 +277,7 @@
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
 <li class='category'><a href='/blog/categories/php/'>Php (2)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (2)</a></li>
-<li class='category'><a href='/blog/categories/share/'>Share (19)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (23)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
 
   </ul>
@@ -287,6 +301,22 @@
     <li class="nav-header">最近更新</li>
     
       <li class="post">
+        <a href="/blog/2013/04/03/ubuntu-routeming-ling/">ubuntu route命令</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/03/tcpdump-jian-ming-jiao-cheng/">tcpdump 简明教程</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/03/ibm-x3650-zhong-zhuang-xi-tong/">ibm x3650 重装系统</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/03/fu-wu-qi-zeng-jia-ci-pan/">ubuntu服务器增加磁盘</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/03/31/nginx-pei-zhi-mo-ban/">nginx 配置模板</a>
       </li>
     
@@ -308,22 +338,6 @@
     
       <li class="post">
         <a href="/blog/2013/02/27/mysql-zhuang-tai-jian-cha/">Mysql 状态检查</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/02/27/mysql-zhu-cong-she-zhi/">Mysql 主从设置</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/02/27/mysql-you-hua-pei-zhi/">Mysql 优化配置</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/02/27/mysql-ri-zhi-fen-lei/">Mysql 日志分类</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/02/26/ubuntu-wang-luo-she-zhi/">ubuntu 网络设置</a>
       </li>
     
   </ul>

@@ -4,7 +4,7 @@
   <title><![CDATA[老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2013-03-31T16:14:03+08:00</updated>
+  <updated>2013-04-03T19:13:24+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,386 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[ubuntu route命令]]></title>
+    <link href="http://www.wanghd.com/blog/2013/04/03/ubuntu-routeming-ling/"/>
+    <updated>2013-04-03T18:55:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/04/03/ubuntu-routeming-ling</id>
+    <content type="html"><![CDATA[<h3>route是非常常用的命令，作用是增加一条静态路由</h3>
+
+<ul>
+<li>以前觉得这条命令很难用，其实很简单～～</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># route 直接打印静态路由表 -n 选项代表把域名解析成ip
+</span><span class='line'>$ route -n</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>route 命令的基本格式</h3>
+
+<ul>
+<li>route 操作 目标地址 网关 设备</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># 例1: eth0发往192.168.0.0网段的数据，都交给192.168.0.1网关
+</span><span class='line'># add就是操作，-net 192.168.0.0/24 就是目标网段
+</span><span class='line'># gw 192.168.0.1 是网关，dev eth0就是设备
+</span><span class='line'>$ route add -net 192.168.0.0/24 gw 192.168.0.1 dev eth0
+</span><span class='line'>
+</span><span class='line'># 例2: eth0默认网段的数据，都交给192.168.0.1网关
+</span><span class='line'>$ route add default gw 192.168.0.1 dev eth0
+</span><span class='line'>
+</span><span class='line'># 例3: eth0发往192.168.0.105主机的数据，都交给192.168.0.1网关
+</span><span class='line'>$ route add -host 192.168.0.105 gw 192.168.0.1 dev eth0
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[tcpdump 简明教程]]></title>
+    <link href="http://www.wanghd.com/blog/2013/04/03/tcpdump-jian-ming-jiao-cheng/"/>
+    <updated>2013-04-03T16:10:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/04/03/tcpdump-jian-ming-jiao-cheng</id>
+    <content type="html"><![CDATA[<ul>
+<li>tcpdump作用很简单，就是抓取数据包。很常用的网络分析工具。对于理解tcp/ip协议也非常有帮助。</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># 请使用root用户，运行下面的命令捕获数据，你会发现数据包多的自己都不想看了
+</span><span class='line'>$ sudo tcpdump</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!-- more -->
+
+
+<ul>
+<li>tcpdump有很多选项，不过先不急着学选项。先能用起来才是关键，那先看几个<code>条件关键字</code>吧</li>
+</ul>
+
+
+<table class="table table-bordered" style="max-width:350px; margin-left:37px">
+<tbody>
+  <tr>
+    <td>host</td>
+    <td>可以是ip也可以是主机名</td>
+  </tr>
+  <tr>
+    <td>net</td>
+    <td>网段</td>
+  </tr>
+  <tr>
+    <td>port</td>
+    <td>端口</td>
+  </tr>
+  <tr>
+    <td>ip,tcp,icmp,udp</td>
+    <td>协议</td>
+  </tr>
+  <tr>
+    <td>src</td>
+    <td>来源</td>
+  </tr>
+  <tr>
+    <td>dst</td>
+    <td>目的地</td>
+  </tr>
+  <tr>
+    <td>and</td>
+    <td>同时满足</td>
+  </tr>
+  <tr>
+    <td>or</td>
+    <td>满足任何一个即可</td>
+  </tr>
+  <tr>
+    <td>not</td>
+    <td>非</td>
+  </tr>
+</tbody>
+</table>
+
+
+<ul>
+<li>学了那么多条件关键字，来几个例子用起来吧</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># 先学习几个简单的
+</span><span class='line'>$ sudo tcpdump host 192.168.0.145
+</span><span class='line'>$ sudo tcpdump src 192.168.0.145
+</span><span class='line'>$ sudo tcpdump dst 192.168.0.145
+</span><span class='line'>$ sudo tcpdump net 192.168.0.0/24
+</span><span class='line'>$ sudo tcpdump tcp
+</span><span class='line'>$ tcpdump port 80
+</span><span class='line'>
+</span><span class='line'># 组合起来用用
+</span><span class='line'>$ sudo tcpdump tcp and src host 192.168.0.145 and port 80
+</span><span class='line'>$ sudo tcpdump ip and not dst 192.168.0.145 and dst port 80
+</span><span class='line'>
+</span><span class='line'># 加上组，可以更加复杂一些
+</span><span class='line'>$ sudo tcpdump tcp and host 192.168.0.145 and \(port 80 or port 8080\)
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>感觉不错，加一点选项让tcpdump更加有用</li>
+</ul>
+
+
+<table class="table table-bordered" style="max-width:350px; margin-left:37px">
+<tbody>
+  <tr>
+    <td>-w file-name</td>
+    <td>将捕获到的数据写入文件</td>
+  </tr>
+  <tr>
+    <td>-i device-name</td>
+    <td>网络设备名，常用eth0</td>
+  </tr>
+  <tr>
+    <td>-n</td>
+    <td>不解析域名</td>
+  </tr>
+  <tr>
+    <td>-nn</td>
+    <td>不解析域名和端口</td>
+  </tr>
+  <tr>
+    <td>-X,-XX</td>
+    <td>用16进制和ascii显示包里的内容</td>
+  </tr>
+  <tr>
+    <td>-v,-vv,-vvv</td>
+    <td>越多越详细的头</td>
+  </tr>
+  <tr>
+    <td>-c number</td>
+    <td>捕获包的数量</td>
+  </tr>
+  <tr>
+    <td>-s number</td>
+    <td>获取多少内容, 0代表所有</td>
+  </tr>
+  <tr>
+    <td>-S</td>
+    <td>打印绝对的序列号</td>
+  </tr>
+</tbody>
+</table>
+
+
+<ul>
+<li>让选项和条件组合起来，发挥tcpdump强大威力</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ sudo tcpdump -vXSs 0 not dst port 8080 and \(dst net 10.0.0.0/8 or 192.168.0.0/24\)
+</span><span class='line'>
+</span><span class='line'># 一个http的数据包
+</span><span class='line'>17:55:51.846893 IP (tos 0x0, ttl 43, id 10976, offset 0, flags [DF], proto TCP (6), length 237)
+</span><span class='line'>    ec2-23-21-128-184.compute-1.amazonaws.com.http &gt; 192.168.0.145.60897: Flags [P.], cksum 0x5e78 (correct), seq 504653705:504653890, ack 894919854, win 27, options [nop,nop,TS val 222645590 ecr 909764515], length 185
+</span><span class='line'>    0x0000:  4500 00ed 2ae0 4000 2b06 cb24 1715 80b8  E...*.@.+..$....
+</span><span class='line'>    0x0010:  c0a8 0091 0050 ede1 1e14 6789 3557 64ae  .....P....g.5Wd.
+</span><span class='line'>    0x0020:  8018 001b 5e78 0000 0101 080a 0d45 4d56  ....^x.......EMV
+</span><span class='line'>    0x0030:  3639 e7a3 4854 5450 2f31 2e31 2032 3030  69..HTTP/1.1.200
+</span><span class='line'>    0x0040:  204f 4b0d 0a53 6572 7665 723a 206e 6769  .OK..Server:.ngi
+</span><span class='line'>    0x0050:  6e78 2f30 2e37 2e36 370d 0a44 6174 653a  nx/0.7.67..Date:
+</span><span class='line'>    0x0060:  2057 6564 2c20 3033 2041 7072 2032 3031  .Wed,.03.Apr.201
+</span><span class='line'>    0x0070:  3320 3039 3a35 353a 3531 2047 4d54 0d0a  3.09:55:51.GMT..
+</span><span class='line'>    0x0080:  436f 6e74 656e 742d 5479 7065 3a20 696d  Content-Type:.im
+</span><span class='line'>    0x0090:  6167 652f 6769 660d 0a43 6f6e 7465 6e74  age/gif..Content
+</span><span class='line'>    0x00a0:  2d4c 656e 6774 683a 2034 330d 0a43 6f6e  -Length:.43..Con
+</span><span class='line'>    0x00b0:  6e65 6374 696f 6e3a 2063 6c6f 7365 0d0a  nection:.close..
+</span><span class='line'>    0x00c0:  0d0a 4749 4638 3961 0100 0100 8001 0000  ..GIF89a........
+</span><span class='line'>    0x00d0:  0000 ffff ff21 f904 0100 0001 002c 0000  .....!.......,..
+</span><span class='line'>    0x00e0:  0000 0100 0100 0002 024c 0100 3b         .........L..;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>tcpdump还可以根据tcp里某些状态位进行过滤</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>tcpdump 'tcp[13] & 1!=0'</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<br />
+
+
+<ul>
+<li>附送tcp头信息图
+<img src="http://www.wanghd.com/images/post/tcp-header.jpg" title="tcp-header" alt="tcp-header" /></li>
+</ul>
+
+
+<br />
+
+
+<ul>
+<li>附送ip头信息图
+<img src="http://www.wanghd.com/images/post/ip-header.jpg" title="ip-header" alt="ip-header" /></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ibm x3650 重装系统]]></title>
+    <link href="http://www.wanghd.com/blog/2013/04/03/ibm-x3650-zhong-zhuang-xi-tong/"/>
+    <updated>2013-04-03T16:02:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/04/03/ibm-x3650-zhong-zhuang-xi-tong</id>
+    <content type="html"><![CDATA[<h3>从机房把5年前的x3650拖回来重装系统全过程</h3>
+
+<ul>
+<li><p>原本是freebsd，做了raid1。现在希望改成ubuntu，不做raid，因为提供mogilefs服务</p></li>
+<li><p>开机启动根据提示Ctrl + A进入raid管理</p></li>
+<li>删除raid退出</li>
+<li>开始安装ubuntu。。。发现找不到硬盘</li>
+<li>难道没有raid就不行？再进到raid管理</li>
+<li>进行硬盘初始化，然后创建raid使用简单卷Volume即可</li>
+<li>一路安装终于没有问题了</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ubuntu服务器增加磁盘]]></title>
+    <link href="http://www.wanghd.com/blog/2013/04/03/fu-wu-qi-zeng-jia-ci-pan/"/>
+    <updated>2013-04-03T11:57:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/04/03/fu-wu-qi-zeng-jia-ci-pan</id>
+    <content type="html"><![CDATA[<h3>显示硬盘分区</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo fdisk -lu
+</span><span class='line'>
+</span><span class='line'># 系统显示最下面显示：disk /dev/sdb doesn't contain a valid partition table</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>对sdb进行分区</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo fdisk /dev/sdb</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>按m显示帮助文档</li>
+<li>根据提示按n 添加一个新分区</li>
+<li>按e 添加扩展分区，接下去默认即可</li>
+<li>回到帮助文档，按p 显示分区结果</li>
+<li>按w 保存分区，并退出完成</li>
+<li>可以再fdisk -lu看看，结果已经不同了，硬盘认出来了</li>
+</ol>
+
+
+<!-- more -->
+
+
+<h3>格式化磁盘</h3>
+
+<ul>
+<li>-t 是文件系统类型</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo mkfs -t ext4 /dev/sdb</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>挂载磁盘</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo mount -t ext4  /data
+</span><span class='line'>
+</span><span class='line'># 查看结果，应该有记录了
+</span><span class='line'>sudo df -l</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>配置启动挂载</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo blkid /dev/sdb
+</span><span class='line'># 显示 /dev/sdb: UUID="cc6f31aa-9af3-4283-8e52-8d31f5ebbd36" TYPE="ext4"
+</span><span class='line'>
+</span><span class='line'>vim /etc/fstab
+</span><span class='line'># 添加一行
+</span><span class='line'>UUID=cc6f31aa-9af3-4283-8e52-8d31f5ebbd36 /data ext4 defaults 0 0</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>fstab里的pass 根目录应当获得最高的优先权 1, 其它所有需要被检查的设备设置为 2. 0 表示设备不会被 fsck 所检查。</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[nginx 配置模板]]></title>
@@ -869,8 +1249,16 @@ query_cache_size</p>
 
 <ul>
 <li>修改网络配置文件后，要重启网络接口，使用命令：/etc/init.d/networking restart</li>
-<li>重启单个网口可以使用ifdown eth0,ifup eth0</li>
+<li>重启单个网口可以使用ifdown eth0,ifup eth0, ifconfig</li>
 </ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>ifconfig eth1 192.168.0.204/24
+</span><span class='line'>ifconfig eth1 down/up</span></code></pre></td></tr></table></div></figure>
+
+
 
 
 <!-- more -->
@@ -893,11 +1281,15 @@ query_cache_size</p>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>auto eth0
 </span><span class='line'>iface eth inet static
 </span><span class='line'>address 192.168.0.110
 </span><span class='line'>gateway 192.168.0.1
-</span><span class='line'>netmask 255.255.255.0</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'>netmask 255.255.255.0
+</span><span class='line'>
+</span><span class='line'>dns-nameservers 8.8.8.8</span></code></pre></td></tr></table></div></figure>
 
 
 <h3>dns</h3>
@@ -906,7 +1298,9 @@ query_cache_size</p>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>vim /etc/resolv.conf
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># 最好不要改这个，重启后就没了
+</span><span class='line'>vim /etc/resolv.conf
 </span><span class='line'>
 </span><span class='line'>nameserver x.x.x.x  # 首要DNS服务器
 </span><span class='line'>nameserver x.x.x.x  # 备用DNS服务器</span></code></pre></td></tr></table></div></figure>
@@ -1467,411 +1861,6 @@ query_cache_size</p>
 </span><span class='line'>}).bind("keydown", function(event){
 </span><span class='line'>    事件
 </span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[System.out.println 乱码]]></title>
-    <link href="http://www.wanghd.com/blog/2012/12/17/system-dot-out-dot-printlnluan-ma/"/>
-    <updated>2012-12-17T22:30:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/12/17/system-dot-out-dot-printlnluan-ma</id>
-    <content type="html"><![CDATA[<h3>今天郁闷发现eclipse控制中文乱码</h3>
-
-<ul>
-<li>在网上找答案真心蛋疼，说啥的都有</li>
-<li>特此在这里记录一下</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>Run Configurations... -&gt; Common选项卡 -&gt; Encoding区，选择Other UTF-8</span></code></pre></td></tr></table></div></figure>
-
-
-<p><img src="http://www.wanghd.com/images/post/console-messy-code.jpg" title="console messy code" alt="console messy code" /></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[mogilefs设备损坏处理流程]]></title>
-    <link href="http://www.wanghd.com/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng/"/>
-    <updated>2012-11-25T19:34:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng</id>
-    <content type="html"><![CDATA[<ul>
-<li>这里单个dev对应一个磁盘,假设是sdb</li>
-<li>文件系统使用xfs</li>
-<li>mogstored使用nginx</li>
-</ul>
-
-
-<p>1.把磁盘标记为dead</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>mogadm device mark &lt;hostname&gt; &lt;devid&gt; &lt;status&gt;
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<!-- more -->
-
-
-<p>2.格式化新磁盘或损坏的磁盘, 并挂到新的目录</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>mkfs.xfs -f -i <span class="nv">size</span><span class="o">=</span>512 -l <span class="nv">size</span><span class="o">=</span>128m,lazy-count<span class="o">=</span>1 -d <span class="nv">agcount</span><span class="o">=</span>16 /dev/sdb
-</span><span class='line'>
-</span><span class='line'>mkdir -p /var/mogdata/<span class="o">{</span>new-dev<span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>mount -t xfs -o noatime,noikeep,logbufs<span class="o">=</span>8 /var/mogdata/<span class="o">{</span>new-dev<span class="o">}</span> /dev/sdb
-</span><span class='line'>
-</span><span class='line'><span class="c">#增加到fstab</span>
-</span><span class='line'>vim /etc/fstab
-</span><span class='line'>/dev/sdb     /var/mogdata/<span class="o">{</span>new-dev<span class="o">}</span>    xfs    noatime,noikeep,logbufs<span class="o">=</span>8    0 0
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>3.配置nginx</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>chown -R mogile.daemon /var/mogdata/<span class="o">{</span>new-dev<span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">#建议注释掉损坏的location</span>
-</span><span class='line'>vim /etc/nginx/conf.d/<span class="o">{</span>xxx.conf<span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>location /<span class="o">{</span>new-dev<span class="o">}</span>/ <span class="o">{</span>
-</span><span class='line'>    expires             max;
-</span><span class='line'>    root                /var/mogdata;
-</span><span class='line'>    client_max_body_size        20m;
-</span><span class='line'>    client_body_temp_path       /var/mogdata/<span class="o">{</span>new-dev<span class="o">}</span>/temp;
-</span><span class='line'>    dav_methods                 PUT DELETE MKCOL;
-</span><span class='line'>    create_full_put_path        on;
-</span><span class='line'>    dav_access                  user:rw group:r all:r;
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>/etc/init.d/nginx reload
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>4.增加一个新设备</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>mogadm device add &lt;hostname&gt; &lt;devid&gt; <span class="o">[</span>opts<span class="o">]</span>        Add a device to a host.
-</span><span class='line'>
-</span><span class='line'>      &lt;devid&gt;              Numeric devid.  Never reuse these.
-</span><span class='line'>      &lt;hostname&gt;           Hostname to add a device
-</span><span class='line'>      --status<span class="o">=</span>s           One of <span class="s1">&#39;alive&#39;</span> or <span class="s1">&#39;down&#39;</span>.  Defaults to <span class="s1">&#39;alive&#39;</span>.
-</span></code></pre></td></tr></table></div></figure>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[inotify,rsync统一化配置]]></title>
-    <link href="http://www.wanghd.com/blog/2012/11/25/inotify/"/>
-    <updated>2012-11-25T16:14:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/11/25/inotify</id>
-    <content type="html"><![CDATA[<h3>为什么要统一化配置，手动改改不行？</h3>
-
-<ul>
-<li>假设有10台服务器，要改10次，错误和遗漏在所难免</li>
-<li>需要有一个地方备份配置</li>
-<li>也许还需要对配置文件进行版本控制</li>
-</ul>
-
-
-<h3>inotify+rsync改变这一切</h3>
-
-<ul>
-<li>inotify可以递归的监控文件是否有新建，修改等</li>
-<li>rsync用来同步</li>
-</ul>
-
-
-<!-- more -->
-
-
-<h3>安装inotify</h3>
-
-<ul>
-<li>内核版本要Linux 2.6.13以上</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>wget --no-check-certificate https://github.com/downloads/rvoicilas/inotify-tools/inotify-tools-3.14.tar.gz
-</span><span class='line'>tar -zxvf inotify-tools-3.14.tar.gz
-</span><span class='line'><span class="nb">cd </span>inotify-tools-3.14
-</span><span class='line'>./configure
-</span><span class='line'>make
-</span><span class='line'>make install
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>测试脚本监控修改并自动同步</h3>
-
-<ul>
-<li>&#8211;exclude是用来排除隐藏文件</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#!/bin/sh</span>
-</span><span class='line'><span class="nv">ip</span><span class="o">=</span><span class="s2">&quot;192.168.30.1 192.168.30.2&quot;</span>
-</span><span class='line'><span class="nv">src</span><span class="o">=</span><span class="s2">&quot;/tmp/test&quot;</span>
-</span><span class='line'>inotifywait --exclude <span class="s1">&#39;/\.&#39;</span> -mrq -e close_write,delete,move <span class="nv">$src</span> | <span class="k">while </span><span class="nb">read </span>line
-</span><span class='line'><span class="k">do</span>
-</span><span class='line'><span class="k">    </span>sleep 1
-</span><span class='line'>    <span class="nb">echo</span> <span class="nv">$line</span>
-</span><span class='line'>    <span class="k">for </span>i in <span class="nv">$ip</span>
-</span><span class='line'>    <span class="k">do </span>
-</span><span class='line'><span class="k">        </span>rsync --exclude<span class="o">=</span><span class="s2">&quot;.*&quot;</span> -av --delete-after <span class="s2">&quot;$src/&quot;</span> -e ssh <span class="s2">&quot;$i:$src/&quot;</span>
-</span><span class='line'>    <span class="k">done</span>
-</span><span class='line'><span class="k">done</span>
-</span></code></pre></td></tr></table></div></figure>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[MogileFS安装配置]]></title>
-    <link href="http://www.wanghd.com/blog/2012/11/22/mogilefsan-zhuang-pei-zhi/"/>
-    <updated>2012-11-22T17:19:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/11/22/mogilefsan-zhuang-pei-zhi</id>
-    <content type="html"><![CDATA[<h3>基本介绍</h3>
-
-<ul>
-<li>mogilefs是一个分布式的文件系统解决方案</li>
-<li>特点是:无单点失效的问题，自动复制无需raid，easy的命名空间，自修复机制，成熟的管理工具，源码清晰推荐阅读</li>
-</ul>
-
-
-<!-- more -->
-
-
-<h3>安装基本组件</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>yum groupinstall <span class="s2">&quot;Development Tools&quot;</span>
-</span><span class='line'><span class="c">#cpan是perl的包管理工具</span>
-</span><span class='line'>yum install cpan
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>安装mogilefs</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#进入cpan,初始化直接自动就好</span>
-</span><span class='line'>cpan
-</span><span class='line'>&gt; install IO::AIO
-</span><span class='line'>&gt; install MogileFS::Client
-</span><span class='line'>&gt; install MogileFS::Utils
-</span><span class='line'><span class="c">#如果有问题直接用force install</span>
-</span><span class='line'>&gt; install MogileFS::Server
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>安装配置mysql</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#安装mysql</span>
-</span><span class='line'>yum install mysql mysql-server
-</span><span class='line'>mysqladmin -u root password 123456
-</span><span class='line'><span class="c">#进入mysql,新建mogile用户</span>
-</span><span class='line'>mysql -uroot -p123456
-</span><span class='line'>mysql&gt; create database mogilefs;
-</span><span class='line'>mysql&gt; grant all on mogilefs.* to mogile@localhost identified by <span class="s1">&#39;123456&#39;</span>;
-</span><span class='line'>mysql&gt; flush privileges;
-</span><span class='line'>
-</span><span class='line'><span class="c">#导入mogilefs表</span>
-</span><span class='line'>mogdbsetup --dbpass<span class="o">=</span>123456 --yes
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>mogilefs配置</h3>
-
-<ul>
-<li>mogilefsd配置</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#/etc/mogilefs是默认的配置路径，-c可以修改</span>
-</span><span class='line'>mkdir -p /etc/mogilefs
-</span><span class='line'><span class="nb">cd</span> /etc/mogilefs
-</span><span class='line'>vim mogilefsd.conf
-</span><span class='line'>
-</span><span class='line'><span class="c">#内容如下</span>
-</span><span class='line'><span class="nv">pidfile</span> <span class="o">=</span> /tmp/mogilefsd.pid    <span class="c">#存放pid</span>
-</span><span class='line'><span class="nv">daemonize</span> <span class="o">=</span> 1                   <span class="c">#守护进程</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">db_dsn</span>  <span class="o">=</span> DBI:mysql:mogilefs:127.0.0.1  <span class="c">#数据库配置</span>
-</span><span class='line'><span class="nv">db_user</span> <span class="o">=</span> mogile
-</span><span class='line'><span class="nv">db_pass</span> <span class="o">=</span> 123456
-</span><span class='line'>
-</span><span class='line'><span class="nv">conf_port</span> <span class="o">=</span> 7001                <span class="c">#监听端口</span>
-</span><span class='line'><span class="nv">node_timeout</span> <span class="o">=</span> 2                <span class="c">#节点超时时间 </span>
-</span><span class='line'><span class="nv">rebalance_ignore_missing</span> <span class="o">=</span> 1    <span class="c">#rebalance时会删除文件，删除时如果找不到文件不报错直接跳过 </span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">query_jobs</span> <span class="o">=</span> 20                 <span class="c">#正真处理请求的job个数</span>
-</span><span class='line'><span class="nv">delete_jobs</span> <span class="o">=</span> 3                 <span class="c">#处理删除队列的job个数</span>
-</span><span class='line'><span class="nv">replicate_jobs</span> <span class="o">=</span> 5              <span class="c">#处理复制队列的job个数</span>
-</span><span class='line'><span class="nv">reaper_jobs</span> <span class="o">=</span> 1                 <span class="c">#设备设置为dead后，处理补救工作的job个数 </span>
-</span><span class='line'>                                <span class="c">#其实还有其他job，默认为1个</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>mogstored配置</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#设置文件存储路径，不要忘记修改拥有者</span>
-</span><span class='line'>mkdir -p /var/mogdata
-</span><span class='line'>adduser --gid daemon mogile
-</span><span class='line'>chown mogile.daemon /var/mogdata
-</span><span class='line'>vim mogstored.conf
-</span><span class='line'>
-</span><span class='line'><span class="c">#内容如下</span>
-</span><span class='line'><span class="nv">httplisten</span> <span class="o">=</span> 0.0.0.0:7500       <span class="c">#文件存储端口</span>
-</span><span class='line'><span class="nv">mgmtlisten</span> <span class="o">=</span> 0.0.0.0:7501       <span class="c">#监控磁盘状态端口</span>
-</span><span class='line'><span class="nv">docroot</span> <span class="o">=</span> /var/mogdata          <span class="c">#文件存储路径</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">pidfile</span> <span class="o">=</span> /tmp/mogstored.pid    <span class="c">#存储pid</span>
-</span><span class='line'><span class="nv">daemonize</span> <span class="o">=</span> 1                   <span class="c">#守护进程</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>启动mogilefs</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>vim /etc/security/limits.conf
-</span><span class='line'><span class="c">#内容如下，让mogile可以打开更多的连接数</span>
-</span><span class='line'>mogile soft nofile 65535
-</span><span class='line'>mogile hard nofile 65535
-</span><span class='line'>
-</span><span class='line'><span class="c">#切换用户启动</span>
-</span><span class='line'>su mogile -c <span class="s1">&#39;mogstored&#39;</span>
-</span><span class='line'>su mogile -c <span class="s1">&#39;mogilefsd&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">#验证已经启动成功</span>
-</span><span class='line'>ps auxf | grep mogile
-</span><span class='line'>mogadm check
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>已经安装好了，接来应该做点什么呢</h3>
-
-<ul>
-<li>学习mogadm指令，因为mogadm是必会工具</li>
-<li>试着client连接mogilefsd存储文件吧</li>
-</ul>
 
 ]]></content>
   </entry>

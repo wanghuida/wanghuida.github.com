@@ -100,6 +100,269 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2013/02/27/mysql-zhu-cong-she-zhi/">Mysql 主从设置</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-27T14:52:00+08:00" pubdate data-updated="true">Feb 27<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/02/27/mysql-zhu-cong-she-zhi/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>设置同步账号</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; grant replication slave on *.* to 'backup'@'%' identified by '123456';
+</span><span class='line'>mysql &gt; flush privileges;</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>master 配置</h3>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2013/02/27/mysql-zhu-cong-she-zhi/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2013/02/27/mysql-you-hua-pei-zhi/">Mysql 优化配置</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-27T14:52:00+08:00" pubdate data-updated="true">Feb 27<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/02/27/mysql-you-hua-pei-zhi/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>cache_size</p>
+
+<p>max-connections</p>
+
+<p>thread_cache_size</p>
+
+<p>key_buffer_size
+buffer_size
+query_cache_limit
+query_cache_size</p>
+
+<p>query_cache_size</p>
+
+<p>query_cache_limit</p>
+
+<p>table_cache</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2013/02/27/mysql-ri-zhi-fen-lei/">Mysql 日志分类</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-27T14:52:00+08:00" pubdate data-updated="true">Feb 27<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/02/27/mysql-ri-zhi-fen-lei/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>general-log : 记录建立的客户端连接和执行的语句。</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># my.cnf 一般不会打开，耗io
+</span><span class='line'>general_log_file        = /var/log/mysql/mysql.log
+</span><span class='line'>
+</span><span class='line'># 当你怀疑在客户端发生了错误并想确切地知道该客户端发送给mysqld的语句时，该日志可能非常有用。
+</span><span class='line'># 一般都是临时打开
+</span><span class='line'>mysql &gt; show variables like '%general_log%';  
+</span><span class='line'>
+</span><span class='line'>+------------------+------------------------------+
+</span><span class='line'>| Variable_name    | Value                        |
+</span><span class='line'>+------------------+------------------------------+
+</span><span class='line'>| general_log      | OFF                          |
+</span><span class='line'>| general_log_file | /var/lib/mysql/idc08-002.log |
+</span><span class='line'>+------------------+------------------------------+
+</span><span class='line'>2 rows in set (0.00 sec)
+</span><span class='line'>
+</span><span class='line'>mysql &gt; SET GLOBAL general_log_file = '/tmp/mysql.log';
+</span><span class='line'>mysql &gt; SET GLOBAL general_log = 'ON';
+</span><span class='line'>
+</span><span class='line'># 已经可以监控请求语句了，用完要记得关闭</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2013/02/27/mysql-ri-zhi-fen-lei/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2013/02/26/ubuntu-wang-luo-she-zhi/">Ubuntu 网络设置</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-26T15:22:00+08:00" pubdate data-updated="true">Feb 26<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/02/26/ubuntu-wang-luo-she-zhi/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>ubuntu的网络设置涉及到如下文件：</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>/etc/network/interfaces # 网络接口配置，包括网络接口说明、IP地址、子网掩码、网关等
+</span><span class='line'>/etc/resolv.conf        # DNS服务器设置
+</span><span class='line'>/etc/hostname           # 主机名设置
+</span><span class='line'>/etc/hosts              # 域名解析映射
+</span><span class='line'>/etc/hosts.allow        # IP访问允许规则
+</span><span class='line'>/ect/hosts.deny         # IP访问禁止规则</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>修改网络配置文件后，要重启网络接口，使用命令：/etc/init.d/networking restart</li>
+<li>重启单个网口可以使用ifdown eth0,ifup eth0, ifconfig</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>ifconfig eth1 192.168.0.204/24
+</span><span class='line'>ifconfig eth1 down/up</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2013/02/26/ubuntu-wang-luo-she-zhi/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2013/02/26/fu-wu-qi-ji-chu-pei-zhi/">Ubuntu 服务器基础配置</a></h1>
     
     
@@ -488,223 +751,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/12/17/system-dot-out-dot-printlnluan-ma/">System.out.println 乱码</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-12-17T22:30:00+08:00" pubdate data-updated="true">Dec 17<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/12/17/system-dot-out-dot-printlnluan-ma/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>今天郁闷发现eclipse控制中文乱码</h3>
-
-<ul>
-<li>在网上找答案真心蛋疼，说啥的都有</li>
-<li>特此在这里记录一下</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>Run Configurations... -&gt; Common选项卡 -&gt; Encoding区，选择Other UTF-8</span></code></pre></td></tr></table></div></figure>
-
-
-<p><img src="/images/post/console-messy-code.jpg" title="console messy code" alt="console messy code" /></p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng/">Mogilefs设备损坏处理流程</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-25T19:34:00+08:00" pubdate data-updated="true">Nov 25<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><ul>
-<li>这里单个dev对应一个磁盘,假设是sdb</li>
-<li>文件系统使用xfs</li>
-<li>mogstored使用nginx</li>
-</ul>
-
-
-<p>1.把磁盘标记为dead</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>mogadm device mark &lt;hostname&gt; &lt;devid&gt; &lt;status&gt;
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/25/inotify/">Inotify,rsync统一化配置</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-25T16:14:00+08:00" pubdate data-updated="true">Nov 25<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/25/inotify/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>为什么要统一化配置，手动改改不行？</h3>
-
-<ul>
-<li>假设有10台服务器，要改10次，错误和遗漏在所难免</li>
-<li>需要有一个地方备份配置</li>
-<li>也许还需要对配置文件进行版本控制</li>
-</ul>
-
-
-<h3>inotify+rsync改变这一切</h3>
-
-<ul>
-<li>inotify可以递归的监控文件是否有新建，修改等</li>
-<li>rsync用来同步</li>
-</ul>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/11/25/inotify/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/22/mogilefsan-zhuang-pei-zhi/">MogileFS安装配置</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-22T17:19:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/22/mogilefsan-zhuang-pei-zhi/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>基本介绍</h3>
-
-<ul>
-<li>mogilefs是一个分布式的文件系统解决方案</li>
-<li>特点是:无单点失效的问题，自动复制无需raid，easy的命名空间，自修复机制，成熟的管理工具，源码清晰推荐阅读</li>
-</ul>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/11/22/mogilefsan-zhuang-pei-zhi/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/3/">&larr; 其他文章</a></li>
@@ -729,7 +775,7 @@
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
 <li class='category'><a href='/blog/categories/php/'>Php (2)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (2)</a></li>
-<li class='category'><a href='/blog/categories/share/'>Share (19)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (23)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
 
   </ul>
@@ -753,6 +799,22 @@
     <li class="nav-header">最近更新</li>
     
       <li class="post">
+        <a href="/blog/2013/04/03/ubuntu-routeming-ling/">ubuntu route命令</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/03/tcpdump-jian-ming-jiao-cheng/">tcpdump 简明教程</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/03/ibm-x3650-zhong-zhuang-xi-tong/">ibm x3650 重装系统</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/03/fu-wu-qi-zeng-jia-ci-pan/">ubuntu服务器增加磁盘</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/03/31/nginx-pei-zhi-mo-ban/">nginx 配置模板</a>
       </li>
     
@@ -774,22 +836,6 @@
     
       <li class="post">
         <a href="/blog/2013/02/27/mysql-zhuang-tai-jian-cha/">Mysql 状态检查</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/02/27/mysql-zhu-cong-she-zhi/">Mysql 主从设置</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/02/27/mysql-you-hua-pei-zhi/">Mysql 优化配置</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/02/27/mysql-ri-zhi-fen-lei/">Mysql 日志分类</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/02/26/ubuntu-wang-luo-she-zhi/">ubuntu 网络设置</a>
       </li>
     
   </ul>
