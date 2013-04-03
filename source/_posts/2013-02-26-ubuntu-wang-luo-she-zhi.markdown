@@ -8,6 +8,8 @@ footer: true
 categories: [Share]
 ---
 
+
+
 ### ubuntu的网络设置涉及到如下文件：
 
 ```
@@ -20,7 +22,12 @@ categories: [Share]
 ```
 
 + 修改网络配置文件后，要重启网络接口，使用命令：/etc/init.d/networking restart
-+ 重启单个网口可以使用ifdown eth0,ifup eth0
++ 重启单个网口可以使用ifdown eth0,ifup eth0, ifconfig
+
+```
+ifconfig eth1 192.168.0.204/24
+ifconfig eth1 down/up
+```
 
 <!-- more -->
 
@@ -41,11 +48,14 @@ iface eth inet static
 address 192.168.0.110
 gateway 192.168.0.1
 netmask 255.255.255.0
+
+dns-nameservers 8.8.8.8
 ```
 
 ### dns
 
 ```
+# 最好不要改这个，重启后就没了
 vim /etc/resolv.conf
 
 nameserver x.x.x.x  # 首要DNS服务器
