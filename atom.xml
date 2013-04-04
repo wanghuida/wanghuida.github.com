@@ -4,7 +4,7 @@
   <title><![CDATA[老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2013-04-03T19:13:24+08:00</updated>
+  <updated>2013-04-04T10:56:16+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,71 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[5分钟理解iptables]]></title>
+    <link href="http://www.wanghd.com/blog/2013/04/04/5fen-zhong-li-jie-iptables/"/>
+    <updated>2013-04-04T10:08:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/04/04/5fen-zhong-li-jie-iptables</id>
+    <content type="html"><![CDATA[<h3>iptables作用</h3>
+
+<ol>
+<li>过滤请求，根据条件决定通过或拒绝</li>
+<li>网络地址转换</li>
+<li>修改头信息</li>
+</ol>
+
+
+<h3>iptables的组成部分</h3>
+
+<ul>
+<li>table：根据类型分了3种，分别是filter,nat,mangle。filter用来过滤，nat用来地址转换，mangle用来改ttl之类的头信息【不常用】。</li>
+<li>chain：是指网络包处理的某个阶段，看下图：1.yes这条路线目的地址是本机。2.no这条路线目的地址是其他网段，需要转发。</li>
+</ul>
+
+
+<p><img src="http://www.wanghd.com/images/post/iptables.gif" title="iptables" alt="iptables" /></p>
+
+<!-- more -->
+
+
+<ul>
+<li>rule：用来判断哪些包需要处理，例如-p指定协议，-s指定源地址，-d指定目的地址，-i和-o定义输入输出的设备</li>
+<li>target：其实用target这个词很不好理解，我的理解是符合规则后的操作</li>
+</ul>
+
+
+<h3>iptables命令的语法</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ sudo iptables [table] [chain] [rule] [target]
+</span><span class='line'># table用-t表示，例如-t nat，-t fileter。如果不加-t 默认就是filter
+</span><span class='line'># chain前面需要加一个动词，例如-A INPUT意思是"添加 input链"，例如-I POSTROUTING 2意思是"插入 postrouting 到第二条记录"
+</span><span class='line'># rule上面已经解释过了
+</span><span class='line'># target可以是ACCEPT，DROP，SNAT，MASQUERADE等，代表满足规则的话，就执行这种操作</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>记录一些例子，并解释</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># 清空nat表里的记录
+</span><span class='line'>sudo iptables -F -t nat
+</span><span class='line'># 在filter表里增加一条都接收的记录 
+</span><span class='line'>sudo iptables -t filter -A INPUT -j ACCEPT
+</span><span class='line'># 更改从eth1出去的源地址为114.77.99.212，一般用在共享单个ip
+</span><span class='line'>sudo iptables -t nat -A POSTROUTING -o eth1 -j SNAT --to-source 114.77.99.212</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[ubuntu route命令]]></title>
@@ -1835,32 +1900,6 @@ query_cache_size</p>
 </span><span class='line'><span class="mi">2012</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="o">:</span> <span class="nx">week</span> <span class="nx">is</span> <span class="mo">01</span>
 </span><span class='line'><span class="mi">2012</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="o">:</span> <span class="nx">year</span> <span class="nx">is</span> <span class="mi">2013</span>
 </span></code></pre></td></tr></table></div></figure>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[jquery在firefox下无法autocomplete]]></title>
-    <link href="http://www.wanghd.com/blog/2013/01/04/jqueryzai-firefoxxia-wu-fa-autocomplete/"/>
-    <updated>2013-01-04T17:29:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/01/04/jqueryzai-firefoxxia-wu-fa-autocomplete</id>
-    <content type="html"><![CDATA[<h4>jquery的autocomplete中文输入在firefox无法正常使用</h4>
-
-<ul>
-<li>firefox下用input事件触发keydown即可</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$('元素').bind('input', function(){
-</span><span class='line'>    $(this).trigger('keydown');
-</span><span class='line'>}).bind("keydown", function(event){
-</span><span class='line'>    事件
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
 
 ]]></content>
   </entry>

@@ -100,6 +100,76 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2012/11/10/an-zhuang-pei-zhi-hive/">安装配置hive</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-10T14:59:00+08:00" pubdate data-updated="true">Nov 10<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/10/an-zhuang-pei-zhi-hive/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><ul>
+<li>先安装hadoop请参考<a href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/">这篇文章</a></li>
+<li>hive介绍：通过类似于sql语句的方式去计算结果，数据都存放在hdfs</li>
+</ul>
+
+
+<h3>下载并解压hive</h3>
+
+<ul>
+<li>给个官方<a href="http://www.apache.org/dyn/closer.cgi/hive/">链接</a></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>tar -xzvf hive-x.y.z.tar.gz
+</span><span class='line'>cd hive-x.y.z
+</span><span class='line'>PATH=$PATH:/Users/william/project/hadoop-1.0.4/bin:/Users/william/project/hive-0.8.1/bin
+</span><span class='line'>. ~/.bash_profile</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>直接在终端输入hive，然后输入show tables;然会OK，就行了</li>
+</ul>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2012/11/10/an-zhuang-pei-zhi-hive/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2012/11/08/perlfu-jin-cheng-jian-ting-zi-jin-cheng-gong-zuo-shi-li/">Perl父进程监听，子进程工作实例</a></h1>
     
     
@@ -687,55 +757,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/">IRC:irssi使用教程</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-10-13T23:39:00+08:00" pubdate data-updated="true">Oct 13<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>IRC是什么？</h3>
-
-<ul>
-<li>IRC（Internet Relay Chat的缩写，“因特网中继聊天”）是一种通过网络的即时聊天方式。其主要用于群体聊天，但同样也可以用于个人对个人的聊天。</li>
-</ul>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/5/">&larr; 其他文章</a></li>
@@ -760,7 +781,7 @@
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
 <li class='category'><a href='/blog/categories/php/'>Php (2)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (2)</a></li>
-<li class='category'><a href='/blog/categories/share/'>Share (23)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (24)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
 
   </ul>
@@ -782,6 +803,10 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/04/5fen-zhong-li-jie-iptables/">5分钟理解iptables</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/04/03/ubuntu-routeming-ling/">ubuntu route命令</a>
@@ -817,10 +842,6 @@
     
       <li class="post">
         <a href="/blog/2013/02/27/mysql-guan-li-yu-ju/">Mysql 管理语句</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/02/27/mysql-zhuang-tai-jian-cha/">Mysql 状态检查</a>
       </li>
     
   </ul>

@@ -100,6 +100,63 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2013/02/27/mysql-zhuang-tai-jian-cha/">Mysql 状态检查</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-27T14:52:00+08:00" pubdate data-updated="true">Feb 27<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/02/27/mysql-zhuang-tai-jian-cha/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>最简单的status</h3>
+
+<ul>
+<li>可以了解一下mysql基本的状态</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ mysql -u -p -h 
+</span><span class='line'>mysql &gt; status</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2013/02/27/mysql-zhuang-tai-jian-cha/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2013/02/27/mysql-zhu-cong-she-zhi/">Mysql 主从设置</a></h1>
     
     
@@ -696,61 +753,6 @@ query_cache_size</p>
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2013/01/04/jqueryzai-firefoxxia-wu-fa-autocomplete/">Jquery在firefox下无法autocomplete</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-01-04T17:29:00+08:00" pubdate data-updated="true">Jan 4<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/01/04/jqueryzai-firefoxxia-wu-fa-autocomplete/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h4>jquery的autocomplete中文输入在firefox无法正常使用</h4>
-
-<ul>
-<li>firefox下用input事件触发keydown即可</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$('元素').bind('input', function(){
-</span><span class='line'>    $(this).trigger('keydown');
-</span><span class='line'>}).bind("keydown", function(event){
-</span><span class='line'>    事件
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/3/">&larr; 其他文章</a></li>
@@ -775,7 +777,7 @@ query_cache_size</p>
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
 <li class='category'><a href='/blog/categories/php/'>Php (2)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (2)</a></li>
-<li class='category'><a href='/blog/categories/share/'>Share (23)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (24)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
 
   </ul>
@@ -797,6 +799,10 @@ query_cache_size</p>
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/04/5fen-zhong-li-jie-iptables/">5分钟理解iptables</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/04/03/ubuntu-routeming-ling/">ubuntu route命令</a>
@@ -832,10 +838,6 @@ query_cache_size</p>
     
       <li class="post">
         <a href="/blog/2013/02/27/mysql-guan-li-yu-ju/">Mysql 管理语句</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/02/27/mysql-zhuang-tai-jian-cha/">Mysql 状态检查</a>
       </li>
     
   </ul>
