@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Mysql | 老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/blog/categories/mysql/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2013-04-04T10:56:16+08:00</updated>
+  <updated>2013-04-10T11:14:00+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,204 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[主从切换]]></title>
+    <link href="http://www.wanghd.com/blog/2013/04/07/zhu-cong-qie-huan/"/>
+    <updated>2013-04-07T20:32:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/04/07/zhu-cong-qie-huan</id>
+    <content type="html"><![CDATA[<h3>1个master，1个slave1，1个slave2，关闭master，让slave1做master，slave2同步新master</h3>
+
+<ul>
+<li>slave1开启同步账号</li>
+</ul>
+
+
+<p><code>
+mysql &gt; grant replication slave on *.* to 'backup'@'192.168.0.152' identified by '123456';
+mysql &gt; grant replication slave on *.* to 'backup'@'192.168.0.153' identified by '123456';
+mysql &gt; flush privileges;
+</code></p>
+
+<ul>
+<li>锁住master的写</li>
+</ul>
+
+
+<p>```
+mysql > flush tables with read lock;</p>
+
+<h1>关闭锁的命令：unlock tables;</h1>
+
+<p>```</p>
+
+<!-- more -->
+
+
+<ul>
+<li>查看slave1和slave2的同步状态</li>
+</ul>
+
+
+<p>```
+mysql > show processlist;</p>
+
+<h1>确保 Slave has read all relay log; waiting for the slave I/O thread to update it</h1>
+
+<p>```</p>
+
+<ul>
+<li>修改slave1的配置，并重启</li>
+</ul>
+
+
+<p>```
+bind-address = 0.0.0.0</p>
+
+<p>$ sudo service mysql restart
+```</p>
+
+<ul>
+<li>停止slave1的slave，设置为master</li>
+</ul>
+
+
+<p><code>
+mysql &gt; stop slave;
+mysql &gt; reset master;
+</code></p>
+
+<ul>
+<li>停止slave2的slave，重新设置master</li>
+</ul>
+
+
+<p>```
+mysql > stop slave;</p>
+
+<p>mysql > change master to</p>
+
+<pre><code>  &gt; master_host = '192.168.0.151',
+  &gt; master_user = 'backup',
+  &gt; master_password = '123456';
+</code></pre>
+
+<p>mysql> start slave;
+```</p>
+
+<ul>
+<li>测试是否成功
+<code>
+mysql &gt; create table `test` ( id int not null auto_increment, `name` varchar(100) not null, primary key (`id`) );
+mysql &gt; drop table test;
+</code></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[克隆 slave]]></title>
+    <link href="http://www.wanghd.com/blog/2013/04/07/ke-long-slave/"/>
+    <updated>2013-04-07T17:54:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/04/07/ke-long-slave</id>
+    <content type="html"><![CDATA[<h3>已经有一台master 和 一台slave1，从slave1上克隆一个slave2</h3>
+
+<ul>
+<li>关闭slave1 的 io_thread，那么slave1就不会读取master的bin-log了，也不会写自己的relay-log了</li>
+</ul>
+
+
+<p><code>
+mysql&gt; stop slave io_thread
+</code></p>
+
+<ul>
+<li>查看slave1 的 processlist，确保sql_thread在等待io_thread</li>
+</ul>
+
+
+<p>```
+mysql> show processlist\G;</p>
+
+<h1>显示如下结果，可以继续操作</h1>
+
+<p>State: Slave has read all relay log; waiting for the slave I/O thread to update it
+```</p>
+
+<!-- more -->
+
+
+<ul>
+<li>停止slave1的slave, 导出数据，并复制数据到slave2【如果数据大可以压缩】</li>
+</ul>
+
+
+<p>```
+mysql> stop slave</p>
+
+<p>$ mysqldump -uroot -p mmd > mmd.sql</p>
+
+<p>$ scp mmd.sql wanghuida@192.168.100.100:mmd.sql
+```</p>
+
+<ul>
+<li>slave2 创建数据库，并导入数据</li>
+</ul>
+
+
+<p><code>
+$ mysqladmin -uroot -p create mmd
+$ mysql -uroot -p mmd &lt; mmd.sql
+</code></p>
+
+<ul>
+<li>修改 slave2 配置， 并重启</li>
+</ul>
+
+
+<p>```
+$ vim /etc/mysql/my.cnf</p>
+
+<p>server-id       = 3
+log_bin         = /var/log/mysql/mysql-bin.log
+expire_logs_days    = 10
+max_binlog_size     = 100M
+replicate-do-db     = mmd
+read_only           = 1</p>
+
+<p>$ /etc/init.d/mysqld restart</p>
+
+<p>```</p>
+
+<ul>
+<li>查看slave1上的从状态</li>
+</ul>
+
+
+<p><code>
+mysql&gt; show slave status\G;
+</code></p>
+
+<ul>
+<li>设置slave2 的主从同步配置，再启动就可以了</li>
+</ul>
+
+
+<p>```
+mysql> change master to</p>
+
+<pre><code>master_host = '192.168.100.153', 
+master_user = 'backup', 
+master_password = '123456', 
+master_log_file = 'mysql-bin.000016', 
+master_log_pos = 115910;
+</code></pre>
+
+<p>mysql> start slave
+```</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Mysql 安全]]></title>
@@ -245,123 +443,6 @@ mysql &gt; show open tables;
 <li>显示具体某个表的状态信息</li>
 </ul>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Mysql 主从设置]]></title>
-    <link href="http://www.wanghd.com/blog/2013/02/27/mysql-zhu-cong-she-zhi/"/>
-    <updated>2013-02-27T14:52:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/02/27/mysql-zhu-cong-she-zhi</id>
-    <content type="html"><![CDATA[<h3>设置同步账号</h3>
-
-<p><code>
-mysql &gt; grant replication slave on *.* to 'backup'@'%' identified by '123456';
-mysql &gt; flush privileges;
-</code></p>
-
-<h3>master 配置</h3>
-
-<!-- more -->
-
-
-<p>```
-server-id       = 1
-log_bin         = /var/log/mysql/mysql-bin.log
-max_binlog_size     = 100M
-expire_logs_days    = 10
-binlog_do_db        = mmd</p>
-
-<p>service mysql restart
-```</p>
-
-<h3>slave 配置</h3>
-
-<p>```
-server-id           = 2
-log_bin             = /var/log/mysql/mysql-bin.log
-expire_logs_days    = 10
-max_binlog_size     = 100M
-replicate-do-db     = mmd
-read_only           = 1</p>
-
-<p>service mysql restart
-```</p>
-
-<h3>同步现有数据</h3>
-
-<p>```</p>
-
-<h1>强制读锁</h1>
-
-<p>mysql > flush tables with read lock;</p>
-
-<h1>导出数据,如果是myisam表的话，加上--lock-all-tables参数，如果是innodb表的话，加上--single-transaction参数。如果数据量很大，建议停服务生成数据快照</h1>
-
-<p>$ mysqldump -uroot -p63137246 --single-transaction mmd > mmd.sql</p>
-
-<h1>记录同步点</h1>
-
-<p>mysql > show master status;
-+------------------+----------+--------------+------------------+
-| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB |
-+------------------+----------+--------------+------------------+
-| mysql-bin.000007 |      887 | mmd          |                  |
-+------------------+----------+--------------+------------------+</p>
-
-<h1>关闭读锁</h1>
-
-<p>mysql > unlock tables;</p>
-
-<p>$ scp mmd.sql wanghuida@192.168.30.114:mmd.sql
-$ mysql -uroot -p***** mmd &lt; mmd.sql
-```</p>
-
-<h3>slave 同步设置</h3>
-
-<p>```
-mysql > change master to</p>
-
-<pre><code>  &gt; master_host='192.168.30.113', 
-  &gt; master_user='backup', 
-  &gt; master_password='123456', 
-  &gt; master_log_file='mysql-bin.000007', 
-  &gt; master_log_pos=887;
-</code></pre>
-
-<p>mysql > start slave;
-```</p>
-
-<h3>附加配置</h3>
-
-<ul>
-<li>注释：为了保证事务InnoDB复制设置的最大可能的耐受性和一致性，应在主服务器的my.cnf文件中使用innodb_flush_log_at_trx_commit=1和sync-binlog=1。这样每次提交都会写入日志文件，性能有一些损失</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Mysql 优化配置]]></title>
-    <link href="http://www.wanghd.com/blog/2013/02/27/mysql-you-hua-pei-zhi/"/>
-    <updated>2013-02-27T14:52:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/02/27/mysql-you-hua-pei-zhi</id>
-    <content type="html"><![CDATA[<p>cache_size</p>
-
-<p>max-connections</p>
-
-<p>thread_cache_size</p>
-
-<p>key_buffer_size
-buffer_size
-query_cache_limit
-query_cache_size</p>
-
-<p>query_cache_size</p>
-
-<p>query_cache_limit</p>
-
-<p>table_cache</p>
 ]]></content>
   </entry>
   

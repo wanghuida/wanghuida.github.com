@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>nginx反向代理自动urldecode问题 - 老虎的眼睛</title>
+  <title>克隆 slave - 老虎的眼睛</title>
   <meta name="author" content="王惠达 huida wanghuida">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.wanghd.com/blog/2012/11/07/nginxfan-xiang-dai-li-zi-dong-urldecodewen-ti">
+  <link rel="canonical" href="http://www.wanghd.com/blog/2013/04/07/ke-long-slave">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/bootstrap/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/stylesheets/bootstrap/responsive.css" media="screen, projection" rel="stylesheet" type="text/css">
@@ -98,7 +98,7 @@
   
   <header class="page-header">
     
-      <h1 class="entry-title">Nginx反向代理自动urldecode问题</h1>
+      <h1 class="entry-title">克隆 Slave</h1>
     
     
       <p class="meta">
@@ -114,7 +114,7 @@
   
 
 
-<time datetime="2012-11-07T16:40:00+08:00" pubdate data-updated="true">Nov 7<span>th</span>, 2012</time>
+<time datetime="2013-04-07T17:54:00+08:00" pubdate data-updated="true">Apr 7<span>th</span>, 2013</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -123,11 +123,67 @@
   </header>
 
 
-<div class="entry-content"><h3>今天妖孽了，发现nginx反向代理会自动urldecode</h3>
+<div class="entry-content"><h3>已经有一台master 和 一台slave1，从slave1上克隆一个slave2</h3>
 
 <ul>
-<li>同事监控两个nginx的access_log，惊人的发现日志里的url不同</li>
-<li>去掉反斜杠就ok了，不太清楚nginx内部是如何处理的</li>
+<li>关闭slave1 的 io_thread，那么slave1就不会读取master的bin-log了，也不会写自己的relay-log了</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql&gt; stop slave io_thread</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>查看slave1 的 processlist，确保sql_thread在等待io_thread</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql&gt; show processlist\G;
+</span><span class='line'>
+</span><span class='line'># 显示如下结果，可以继续操作
+</span><span class='line'>State: Slave has read all relay log; waiting for the slave I/O thread to update it</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!-- more -->
+
+
+<ul>
+<li>停止slave1的slave, 导出数据，并复制数据到slave2【如果数据大可以压缩】</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql&gt; stop slave
+</span><span class='line'>
+</span><span class='line'>$ mysqldump -uroot -p mmd &gt; mmd.sql
+</span><span class='line'>
+</span><span class='line'>$ scp mmd.sql wanghuida@192.168.100.100:mmd.sql</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>slave2 创建数据库，并导入数据</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ mysqladmin -uroot -p create mmd
+</span><span class='line'>$ mysql -uroot -p mmd &lt; mmd.sql</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>修改 slave2 配置， 并重启</li>
 </ul>
 
 
@@ -138,13 +194,52 @@
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>location / {
-</span><span class='line'>    proxy_pass        http://localhost:8000/;
-</span><span class='line'>}
-</span><span class='line'>#修改为下面这样后，一切OK了
-</span><span class='line'>location / {
-</span><span class='line'>    proxy_pass        http://localhost:8000;
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ vim /etc/mysql/my.cnf
+</span><span class='line'>
+</span><span class='line'>server-id       = 3
+</span><span class='line'>log_bin         = /var/log/mysql/mysql-bin.log
+</span><span class='line'>expire_logs_days    = 10
+</span><span class='line'>max_binlog_size     = 100M
+</span><span class='line'>replicate-do-db     = mmd
+</span><span class='line'>read_only           = 1
+</span><span class='line'>
+</span><span class='line'>$ /etc/init.d/mysqld restart
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>查看slave1上的从状态</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql&gt; show slave status\G;</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>设置slave2 的主从同步配置，再启动就可以了</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql&gt; change master to 
+</span><span class='line'>    master_host = '192.168.100.153', 
+</span><span class='line'>    master_user = 'backup', 
+</span><span class='line'>    master_password = '123456', 
+</span><span class='line'>    master_log_file = 'mysql-bin.000016', 
+</span><span class='line'>    master_log_pos = 115910;
+</span><span class='line'>
+</span><span class='line'>mysql&gt; start slave</span></code></pre></td></tr></table></div></figure>
 
 </div>
 
@@ -168,12 +263,12 @@
   
 
 
-<time datetime="2012-11-07T16:40:00+08:00" pubdate data-updated="true">Nov 7<span>th</span>, 2012</time>
+<time datetime="2013-04-07T17:54:00+08:00" pubdate data-updated="true">Apr 7<span>th</span>, 2013</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/share/'>Share</a>
+    <a class='category' href='/blog/categories/mysql/'>Mysql</a>
   
 </span>
 
@@ -182,7 +277,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2012/11/07/nginxfan-xiang-dai-li-zi-dong-urldecodewen-ti/" data-via="" data-counturl="http://www.wanghd.com/blog/2012/11/07/nginxfan-xiang-dai-li-zi-dong-urldecodewen-ti/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2013/04/07/ke-long-slave/" data-via="" data-counturl="http://www.wanghd.com/blog/2013/04/07/ke-long-slave/" >Tweet</a>
   
   
   
@@ -199,13 +294,13 @@
     <ul class="pager">
       
       <li class="previous"><a class="basic-alignment left"
-        href="/blog/2012/11/06/mogilefsshan-chu-dui-lie/" title="Previous Post:
-        mogilefs删除队列">&laquo; mogilefs删除队列</a></li>
+        href="/blog/2013/04/04/5fen-zhong-li-jie-iptables/" title="Previous Post:
+        5分钟理解iptables">&laquo; 5分钟理解iptables</a></li>
       
       <li><a href="/blog/archives">文章归档</a></li>
       
-      <li class="next"><a class="basic-alignment right" href="/blog/2012/11/08/perlfu-jin-cheng-jian-ting-zi-jin-cheng-gong-zuo-shi-li/"
-        title="Next Post: perl父进程监听，子进程工作实例">perl父进程监听，子进程工作实例
+      <li class="next"><a class="basic-alignment right" href="/blog/2013/04/07/zhu-cong-qie-huan/"
+        title="Next Post: 主从切换">主从切换
         &raquo;</a></li>
       
     </ul>
@@ -337,8 +432,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.wanghd.com/blog/2012/11/07/nginxfan-xiang-dai-li-zi-dong-urldecodewen-ti/';
-        var disqus_url = 'http://www.wanghd.com/blog/2012/11/07/nginxfan-xiang-dai-li-zi-dong-urldecodewen-ti/';
+        var disqus_identifier = 'http://www.wanghd.com/blog/2013/04/07/ke-long-slave/';
+        var disqus_url = 'http://www.wanghd.com/blog/2013/04/07/ke-long-slave/';
         var disqus_script = 'embed.js';
       
     (function () {

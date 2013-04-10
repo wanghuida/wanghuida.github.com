@@ -100,6 +100,148 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2013/04/07/zhu-cong-qie-huan/">主从切换</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-07T20:32:00+08:00" pubdate data-updated="true">Apr 7<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/04/07/zhu-cong-qie-huan/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>1个master，1个slave1，1个slave2，关闭master，让slave1做master，slave2同步新master</h3>
+
+<ul>
+<li>slave1开启同步账号</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; grant replication slave on *.* to 'backup'@'192.168.0.152' identified by '123456';
+</span><span class='line'>mysql &gt; grant replication slave on *.* to 'backup'@'192.168.0.153' identified by '123456';
+</span><span class='line'>mysql &gt; flush privileges;</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>锁住master的写</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; flush tables with read lock;
+</span><span class='line'>
+</span><span class='line'># 关闭锁的命令：unlock tables;</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2013/04/07/zhu-cong-qie-huan/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2013/04/07/ke-long-slave/">克隆 Slave</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-07T17:54:00+08:00" pubdate data-updated="true">Apr 7<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/04/07/ke-long-slave/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>已经有一台master 和 一台slave1，从slave1上克隆一个slave2</h3>
+
+<ul>
+<li>关闭slave1 的 io_thread，那么slave1就不会读取master的bin-log了，也不会写自己的relay-log了</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql&gt; stop slave io_thread</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>查看slave1 的 processlist，确保sql_thread在等待io_thread</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql&gt; show processlist\G;
+</span><span class='line'>
+</span><span class='line'># 显示如下结果，可以继续操作
+</span><span class='line'>State: Slave has read all relay log; waiting for the slave I/O thread to update it</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2013/04/07/ke-long-slave/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2013/04/04/5fen-zhong-li-jie-iptables/">5分钟理解iptables</a></h1>
     
     
@@ -607,127 +749,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2013/02/27/mysql-an-quan/">Mysql 安全</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-02-27T14:57:00+08:00" pubdate data-updated="true">Feb 27<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/02/27/mysql-an-quan/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><ul>
-<li><p>如果客户端和服务器端的连接需要跨越并通过不可信任的网络，那么就需要使用SSH隧道来加密该连接的通信。一般情况下mysql不直接对外，只提供<code>内部访问</code>。</p></li>
-<li><p>用GRANT和REVOKE语句来控制对MySQL的访问。不要授予超过需求的权限。决不能为所有主机授权。</p></li>
-<li><p>不要让任何人(除了MySQL root账户)访问mysql数据库中的<code>user表</code>！这很关键。加密的密码才是MySQL中的真正的密码。</p></li>
-<li><p>不要将<code>纯文本密码</code>保存到数据库中。如果你的计算机有安全危险，入侵者可以获得所有的密码并使用它们。相反，应使用MD5()、SHA1()或单向哈希函数。</p></li>
-<li><p>不要从词典中选择密码。有专门的程序可以破解它们。</p></li>
-</ul>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2013/02/27/mysql-an-quan/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2013/02/27/mysql-guan-li-yu-ju/">Mysql 管理语句</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-02-27T14:53:00+08:00" pubdate data-updated="true">Feb 27<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/02/27/mysql-guan-li-yu-ju/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>创建用户，设置密码，赋予权限</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; grant all privileges on mmd.* to 'mmd'@'localhost' identified  by '123456';
-</span><span class='line'>mysql &gt; flush privileges;
-</span><span class='line'>mysql &gt; drop user
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'># mysql 5.5+默认本地连接，请修改bind_address为0.0.0.0才能支持网络连接
-</span><span class='line'>mysql &gt; grant select,update,insert,delete on mmd.* to 'mmd'@'%' identified  by '123456';
-</span><span class='line'>mysql &gt; flush privileges;
-</span><span class='line'>mysql &gt; show grants for 'mmd'@'%';
-</span><span class='line'>
-</span><span class='line'>mysql &gt; set password for 'mmd'@'%' = password('654321');</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2013/02/27/mysql-guan-li-yu-ju/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/2/">&larr; 其他文章</a></li>
@@ -745,7 +766,7 @@
 <li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
 <li class='category'><a href='/blog/categories/javascript/'>Javascript (2)</a></li>
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
-<li class='category'><a href='/blog/categories/mysql/'>Mysql (6)</a></li>
+<li class='category'><a href='/blog/categories/mysql/'>Mysql (8)</a></li>
 <li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
 <li class='category'><a href='/blog/categories/php/'>Php (2)</a></li>
@@ -772,6 +793,14 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/07/zhu-cong-qie-huan/">主从切换</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/07/ke-long-slave/">克隆 slave</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/04/04/5fen-zhong-li-jie-iptables/">5分钟理解iptables</a>
@@ -803,14 +832,6 @@
     
       <li class="post">
         <a href="/blog/2013/03/05/sqlalchemy-zi-dong-chuang-jian-biao/">sqlalchemy 自动创建表</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/02/27/mysql-an-quan/">Mysql 安全</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/02/27/mysql-guan-li-yu-ju/">Mysql 管理语句</a>
       </li>
     
   </ul>

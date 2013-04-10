@@ -4,7 +4,7 @@
   <title><![CDATA[老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2013-04-04T10:56:16+08:00</updated>
+  <updated>2013-04-10T11:14:00+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,243 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[主从切换]]></title>
+    <link href="http://www.wanghd.com/blog/2013/04/07/zhu-cong-qie-huan/"/>
+    <updated>2013-04-07T20:32:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/04/07/zhu-cong-qie-huan</id>
+    <content type="html"><![CDATA[<h3>1个master，1个slave1，1个slave2，关闭master，让slave1做master，slave2同步新master</h3>
+
+<ul>
+<li>slave1开启同步账号</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; grant replication slave on *.* to 'backup'@'192.168.0.152' identified by '123456';
+</span><span class='line'>mysql &gt; grant replication slave on *.* to 'backup'@'192.168.0.153' identified by '123456';
+</span><span class='line'>mysql &gt; flush privileges;</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>锁住master的写</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; flush tables with read lock;
+</span><span class='line'>
+</span><span class='line'># 关闭锁的命令：unlock tables;</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!-- more -->
+
+
+<ul>
+<li>查看slave1和slave2的同步状态</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; show processlist;
+</span><span class='line'>
+</span><span class='line'># 确保 Slave has read all relay log; waiting for the slave I/O thread to update it</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>修改slave1的配置，并重启</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>bind-address = 0.0.0.0
+</span><span class='line'>
+</span><span class='line'>$ sudo service mysql restart</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>停止slave1的slave，设置为master</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; stop slave;
+</span><span class='line'>mysql &gt; reset master;</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>停止slave2的slave，重新设置master</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; stop slave;
+</span><span class='line'>
+</span><span class='line'>mysql &gt; change master to
+</span><span class='line'>      &gt; master_host = '192.168.0.151',
+</span><span class='line'>      &gt; master_user = 'backup',
+</span><span class='line'>      &gt; master_password = '123456';
+</span><span class='line'>
+</span><span class='line'>mysql&gt; start slave;</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>测试是否成功</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; create table `test` ( id int not null auto_increment, `name` varchar(100) not null, primary key (`id`) );
+</span><span class='line'>mysql &gt; drop table test;</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[克隆 slave]]></title>
+    <link href="http://www.wanghd.com/blog/2013/04/07/ke-long-slave/"/>
+    <updated>2013-04-07T17:54:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/04/07/ke-long-slave</id>
+    <content type="html"><![CDATA[<h3>已经有一台master 和 一台slave1，从slave1上克隆一个slave2</h3>
+
+<ul>
+<li>关闭slave1 的 io_thread，那么slave1就不会读取master的bin-log了，也不会写自己的relay-log了</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql&gt; stop slave io_thread</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>查看slave1 的 processlist，确保sql_thread在等待io_thread</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql&gt; show processlist\G;
+</span><span class='line'>
+</span><span class='line'># 显示如下结果，可以继续操作
+</span><span class='line'>State: Slave has read all relay log; waiting for the slave I/O thread to update it</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!-- more -->
+
+
+<ul>
+<li>停止slave1的slave, 导出数据，并复制数据到slave2【如果数据大可以压缩】</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql&gt; stop slave
+</span><span class='line'>
+</span><span class='line'>$ mysqldump -uroot -p mmd &gt; mmd.sql
+</span><span class='line'>
+</span><span class='line'>$ scp mmd.sql wanghuida@192.168.100.100:mmd.sql</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>slave2 创建数据库，并导入数据</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ mysqladmin -uroot -p create mmd
+</span><span class='line'>$ mysql -uroot -p mmd &lt; mmd.sql</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>修改 slave2 配置， 并重启</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ vim /etc/mysql/my.cnf
+</span><span class='line'>
+</span><span class='line'>server-id       = 3
+</span><span class='line'>log_bin         = /var/log/mysql/mysql-bin.log
+</span><span class='line'>expire_logs_days    = 10
+</span><span class='line'>max_binlog_size     = 100M
+</span><span class='line'>replicate-do-db     = mmd
+</span><span class='line'>read_only           = 1
+</span><span class='line'>
+</span><span class='line'>$ /etc/init.d/mysqld restart
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>查看slave1上的从状态</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql&gt; show slave status\G;</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>设置slave2 的主从同步配置，再启动就可以了</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql&gt; change master to 
+</span><span class='line'>    master_host = '192.168.100.153', 
+</span><span class='line'>    master_user = 'backup', 
+</span><span class='line'>    master_password = '123456', 
+</span><span class='line'>    master_log_file = 'mysql-bin.000016', 
+</span><span class='line'>    master_log_pos = 115910;
+</span><span class='line'>
+</span><span class='line'>mysql&gt; start slave</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[5分钟理解iptables]]></title>
@@ -1748,158 +1985,6 @@ query_cache_size</p>
 <ul>
 <li>第一次访问http返回200，显示test ok!。刷新http返回304，使用本地缓存，显示test ok!。强刷则绕过本地缓存，http返回200，可见和last-modified一样</li>
 </ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[RTXLDAP教程]]></title>
-    <link href="http://www.wanghd.com/blog/2013/01/10/rtxldapjiao-cheng/"/>
-    <updated>2013-01-10T10:14:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/01/10/rtxldapjiao-cheng</id>
-    <content type="html"><![CDATA[<h3>名词解释</h3>
-
-<ol>
-<li>RTX: 腾讯出的企业沟通工具</li>
-<li>LDAP: 关于人或者其他信息的集中存储，微软的AD就是LDAP的一种</li>
-<li>RTXLDAP: 基于RTX的SDK开发出的第三方工具，可以同步LDAP用户，可以RTX与LDAP单点登陆。支持RTX最新版本</li>
-</ol>
-
-
-<!-- more -->
-
-
-<h3>配置使用</h3>
-
-<ul>
-<li>获取源码</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>git clone git@github.com:wanghuida/RTXLDAP.git</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>建议使用vs 2008打开</li>
-</ul>
-
-
-<p><img src="http://www.wanghd.com/images/post/rtxldap1.jpg" title="rtxldap1" alt="rtxldap1" /></p>
-
-<ul>
-<li>修改App.config配置文件</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;!-- 域 --&gt;
-</span><span class='line'>&lt;add key="DomainName" value="192.168.1.100/DC=home,DC=net" /&gt;
-</span><span class='line'>&lt;!-- 域用户,用来读取所有域用户信息 --&gt;
-</span><span class='line'>&lt;add key="DomainUser" value="wanghuida" /&gt;
-</span><span class='line'>&lt;!-- 域用户密码 --&gt;
-</span><span class='line'>&lt;add key="DomainPwd" value="123456" /&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;!-- RTX服务IP，建议在同一台,可以免去其他配置 --&gt;
-</span><span class='line'>&lt;add key="RTXIP" value="127.0.0.1"/&gt;
-</span><span class='line'>&lt;!-- RTX服务端口 --&gt;
-</span><span class='line'>&lt;add key="RTXPort"  value="8006"/&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;!-- 标识，随意修改，不重复即可 --&gt;
-</span><span class='line'>&lt;add key="AppGUID" value="{193947E5-E990-4af8-A954-D358B385F099}"/&gt;
-</span><span class='line'>&lt;!-- 标识，随意修改，不重复即可 --&gt;
-</span><span class='line'>&lt;add key="AppName" value="WanghuidaRtxLdap"/&gt;</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>F5启动调试</li>
-</ul>
-
-
-<p><img src="http://www.wanghd.com/images/post/rtxldap2.jpg" title="rtxldap2" alt="rtxldap2" /></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[date函数的误用]]></title>
-    <link href="http://www.wanghd.com/blog/2013/01/06/datehan-shu-de-wu-yong/"/>
-    <updated>2013-01-06T17:22:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/01/06/datehan-shu-de-wu-yong</id>
-    <content type="html"><![CDATA[<h3>需求：得到给定日期为一年中的第几周，并取得该周的年份</h3>
-
-<ul>
-<li>产生bug的写法</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
-</span><span class='line'><span class="nv">$time_2012_12_31</span> <span class="o">=</span> <span class="nb">mktime</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">31</span><span class="p">,</span><span class="mi">2012</span><span class="p">);</span>
-</span><span class='line'><span class="nv">$week_2012_12_31</span> <span class="o">=</span> <span class="nb">date</span><span class="p">(</span><span class="s1">&#39;W&#39;</span><span class="p">,</span><span class="nv">$time_2012_12_31</span><span class="p">);</span>
-</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;2012-12-31: week is </span><span class="si">{</span><span class="nv">$week_2012_12_31</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">$error_year_2012_12_31</span> <span class="o">=</span> <span class="nb">date</span><span class="p">(</span><span class="s1">&#39;Y&#39;</span><span class="p">,</span><span class="nv">$time_2012_12_31</span><span class="p">);</span>
-</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;2012-12-31: error year is </span><span class="si">{</span><span class="nv">$error_year_2012_12_31</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">#输出错误的结果</span>
-</span><span class='line'><span class="mi">2012</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="o">:</span> <span class="nx">week</span> <span class="nx">is</span> <span class="mo">01</span>
-</span><span class='line'><span class="mi">2012</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="o">:</span> <span class="nx">error</span> <span class="nx">year</span> <span class="nx">is</span> <span class="mi">2012</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>正确的写法，统一采用ISO-8601标准</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
-</span><span class='line'><span class="nv">$time_2012_12_31</span> <span class="o">=</span> <span class="nb">mktime</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">31</span><span class="p">,</span><span class="mi">2012</span><span class="p">);</span>
-</span><span class='line'><span class="nv">$week_2012_12_31</span> <span class="o">=</span> <span class="nb">date</span><span class="p">(</span><span class="s1">&#39;W&#39;</span><span class="p">,</span><span class="nv">$time_2012_12_31</span><span class="p">);</span>
-</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;2012-12-31: week is </span><span class="si">{</span><span class="nv">$week_2012_12_31</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">$year_2012_12_31</span> <span class="o">=</span> <span class="nb">date</span><span class="p">(</span><span class="s1">&#39;o&#39;</span><span class="p">,</span><span class="nv">$time_2012_12_31</span><span class="p">);</span>
-</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;2012-12-31: year is </span><span class="si">{</span><span class="nv">$year_2012_12_31</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">#输出正确的结果</span>
-</span><span class='line'><span class="mi">2012</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="o">:</span> <span class="nx">week</span> <span class="nx">is</span> <span class="mo">01</span>
-</span><span class='line'><span class="mi">2012</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="o">:</span> <span class="nx">year</span> <span class="nx">is</span> <span class="mi">2013</span>
-</span></code></pre></td></tr></table></div></figure>
 
 ]]></content>
   </entry>
