@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Javascript | 老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/blog/categories/javascript/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2013-04-10T11:14:00+08:00</updated>
+  <updated>2013-05-23T12:49:46+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,83 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[jquery validation]]></title>
+    <link href="http://www.wanghd.com/blog/2013/05/23/jquery-validation/"/>
+    <updated>2013-05-23T12:41:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/05/23/jquery-validation</id>
+    <content type="html"><![CDATA[<h3>表单验证在网站开发中是肯定有的，还好jquery在这方面已经做的很好了</h3>
+
+<ul>
+<li>自定义一种验证类型</li>
+</ul>
+
+
+<p>```javascript
+jQuery.validator.addMethod(</p>
+
+<pre><code>"cellphone",
+function(value, element) {
+    return this.optional(element) || /^1\d{10}$/.test(value);
+},
+"请输入有效的手机号码"
+</code></pre>
+
+<p>);
+```</p>
+
+<!-- more -->
+
+
+<ul>
+<li>定义规则和错误显示</li>
+</ul>
+
+
+<p>```javascript
+$('#form').validate({</p>
+
+<pre><code>rules: {
+    nickname: "required",
+    email: {
+        required: true,
+        email: true
+    },
+    password: {
+        required: true,
+        minlength: 6,
+    }
+},
+messages: {
+    nickname: "请输入昵称",
+    email: {
+        required: "请输入邮箱",
+        email: "请输入有效的邮箱"
+    },
+    password: {
+        required: "请输入密码",
+        minlength: "密码的长度不能小于6位"
+    }
+},
+errorElement: "div",
+wrapper: "div",
+errorPlacement: function(error, element) {
+    element.parent().after(error);
+},
+highlight: function(element, errorClass) {
+    $(element).parent().css('border', '1px solid red');
+},
+unhighlight: function(element, errorClass) {
+    $(element).parent().css('border', '1px solid #777');
+},
+submitHandler: function() { alert("Submitted!") }
+</code></pre>
+
+<p>});
+```</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[jquery在firefox下无法autocomplete]]></title>

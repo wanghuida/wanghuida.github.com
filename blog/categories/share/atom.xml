@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Share | 老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/blog/categories/share/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2013-04-10T11:14:16+08:00</updated>
+  <updated>2013-05-23T12:49:46+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,111 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[jquery validation]]></title>
+    <link href="http://www.wanghd.com/blog/2013/05/23/jquery-validation/"/>
+    <updated>2013-05-23T12:41:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/05/23/jquery-validation</id>
+    <content type="html"><![CDATA[<h3>表单验证在网站开发中是肯定有的，还好jquery在这方面已经做的很好了</h3>
+
+<ul>
+<li>自定义一种验证类型</li>
+</ul>
+
+
+<p>```javascript
+jQuery.validator.addMethod(</p>
+
+<pre><code>"cellphone",
+function(value, element) {
+    return this.optional(element) || /^1\d{10}$/.test(value);
+},
+"请输入有效的手机号码"
+</code></pre>
+
+<p>);
+```</p>
+
+<!-- more -->
+
+
+<ul>
+<li>定义规则和错误显示</li>
+</ul>
+
+
+<p>```javascript
+$('#form').validate({</p>
+
+<pre><code>rules: {
+    nickname: "required",
+    email: {
+        required: true,
+        email: true
+    },
+    password: {
+        required: true,
+        minlength: 6,
+    }
+},
+messages: {
+    nickname: "请输入昵称",
+    email: {
+        required: "请输入邮箱",
+        email: "请输入有效的邮箱"
+    },
+    password: {
+        required: "请输入密码",
+        minlength: "密码的长度不能小于6位"
+    }
+},
+errorElement: "div",
+wrapper: "div",
+errorPlacement: function(error, element) {
+    element.parent().after(error);
+},
+highlight: function(element, errorClass) {
+    $(element).parent().css('border', '1px solid red');
+},
+unhighlight: function(element, errorClass) {
+    $(element).parent().css('border', '1px solid #777');
+},
+submitHandler: function() { alert("Submitted!") }
+</code></pre>
+
+<p>});
+```</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[英文Ubuntu安装中文包]]></title>
+    <link href="http://www.wanghd.com/blog/2013/05/02/ying-wen-ubuntuan-zhuang-zhong-wen-bao/"/>
+    <updated>2013-05-02T18:07:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/05/02/ying-wen-ubuntuan-zhuang-zhong-wen-bao</id>
+    <content type="html"><![CDATA[<h3>查看系统内安装的locale：</h3>
+
+<p>```
+locale -a</p>
+
+<h1>如果没有“zh-CN.UTF-8”，则表示系统内没有安装中文locale。这会导致“LC_CTYPE: cannot change locale (zh_CN.UTF-8)”的警告。</h1>
+
+<p>```</p>
+
+<h3>输入以下命令安装：</h3>
+
+<p><code>
+cd /usr/share/locales
+sudo ./install-language-pack zh_CN
+</code></p>
+
+<ul>
+<li>然后重开终端，就可以发现中文locale已经安装完毕，警告已经不再出现了。</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[5分钟理解iptables]]></title>
@@ -325,101 +430,6 @@ tcpdump 'tcp[13] &amp; 1!=0'
 <ul>
 <li>附送ip头信息图
 <img src="/images/post/ip-header.jpg" title="ip-header" alt="ip-header" /></li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[ibm x3650 重装系统]]></title>
-    <link href="http://www.wanghd.com/blog/2013/04/03/ibm-x3650-zhong-zhuang-xi-tong/"/>
-    <updated>2013-04-03T16:02:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/04/03/ibm-x3650-zhong-zhuang-xi-tong</id>
-    <content type="html"><![CDATA[<h3>从机房把5年前的x3650拖回来重装系统全过程</h3>
-
-<ul>
-<li><p>原本是freebsd，做了raid1。现在希望改成ubuntu，不做raid，因为提供mogilefs服务</p></li>
-<li><p>开机启动根据提示Ctrl + A进入raid管理</p></li>
-<li>删除raid退出</li>
-<li>开始安装ubuntu。。。发现找不到硬盘</li>
-<li>难道没有raid就不行？再进到raid管理</li>
-<li>进行硬盘初始化，然后创建raid使用简单卷Volume即可</li>
-<li>一路安装终于没有问题了</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[ubuntu服务器增加磁盘]]></title>
-    <link href="http://www.wanghd.com/blog/2013/04/03/fu-wu-qi-zeng-jia-ci-pan/"/>
-    <updated>2013-04-03T11:57:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/04/03/fu-wu-qi-zeng-jia-ci-pan</id>
-    <content type="html"><![CDATA[<h3>显示硬盘分区</h3>
-
-<p>```
-sudo fdisk -lu</p>
-
-<h1>系统显示最下面显示：disk /dev/sdb doesn't contain a valid partition table</h1>
-
-<p>```</p>
-
-<h3>对sdb进行分区</h3>
-
-<p><code>
-sudo fdisk /dev/sdb
-</code></p>
-
-<ol>
-<li>按m显示帮助文档</li>
-<li>根据提示按n 添加一个新分区</li>
-<li>按e 添加扩展分区，接下去默认即可</li>
-<li>回到帮助文档，按p 显示分区结果</li>
-<li>按w 保存分区，并退出完成</li>
-<li>可以再fdisk -lu看看，结果已经不同了，硬盘认出来了</li>
-</ol>
-
-
-<!-- more -->
-
-
-<h3>格式化磁盘</h3>
-
-<ul>
-<li>-t 是文件系统类型</li>
-</ul>
-
-
-<p><code>
-sudo mkfs -t ext4 /dev/sdb
-</code></p>
-
-<h3>挂载磁盘</h3>
-
-<p>```
-sudo mount -t ext4  /data</p>
-
-<h1>查看结果，应该有记录了</h1>
-
-<p>sudo df -l
-```</p>
-
-<h3>配置启动挂载</h3>
-
-<p>```
-sudo blkid /dev/sdb</p>
-
-<h1>显示 /dev/sdb: UUID="cc6f31aa-9af3-4283-8e52-8d31f5ebbd36" TYPE="ext4"</h1>
-
-<p>vim /etc/fstab</p>
-
-<h1>添加一行</h1>
-
-<p>UUID=cc6f31aa-9af3-4283-8e52-8d31f5ebbd36 /data ext4 defaults 0 0
-```</p>
-
-<ul>
-<li>fstab里的pass 根目录应当获得最高的优先权 1, 其它所有需要被检查的设备设置为 2. 0 表示设备不会被 fsck 所检查。</li>
 </ul>
 
 ]]></content>

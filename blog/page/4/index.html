@@ -100,6 +100,82 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2012/11/22/mongodbshi-zhan/">Mongodb实战</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-22T17:18:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/22/mongodbshi-zhan/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2012/11/22/log4jjie-shao/">Log4j介绍</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-22T17:18:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/22/log4jjie-shao/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2012/11/22/redisshi-zhan/">Redis实战</a></h1>
     
     
@@ -587,148 +663,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/">安装配置hadoop</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-02T23:38:00+08:00" pubdate data-updated="true">Nov 2<span>nd</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>下载stable的hadoop</h3>
-
-<ul>
-<li>hadoop的版本比较多，建议下载<code>stable</code>的，现在是<code>hadoop-1.0.4</code></li>
-<li>提供一个<a href="http://hadoop.apache.org/releases.html#Download">下载链接</a></li>
-</ul>
-
-
-<h3>解压缩</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>tar -zxvf hadoop-1.0.4.tar.gz
-</span><span class='line'>cd hadoop-1.0.4</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>配置hadoop</h3>
-
-<blockquote><p>vim编辑conf/hadoop-env.sh，设置环境变量</p></blockquote>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>#如果是mac的话，请添加下面这句
-</span><span class='line'>export HADOOP_OPTS="-Djava.security.krb5.realm=OX.AC.UK 
-</span><span class='line'>    -Djava.security.krb5.kdc=kdc0.ox.ac.uk:kdc1.ox.ac.uk"
-</span><span class='line'>#配置JDK，mac的关系所以路径比较飘逸
-</span><span class='line'>export JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/10/23/mogilefsxiang-jie/">MogileFS详解</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-10-23T22:48:00+08:00" pubdate data-updated="true">Oct 23<span>rd</span>, 2012</time>
-        
-         | <a href="/blog/2012/10/23/mogilefsxiang-jie/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><ul>
-<li>经过一个月的实际应用，我想是时候应该总结一下mogilefs的使用了，如果想和作者交流参考<a href="/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/">IRC教程</a></li>
-</ul>
-
-
-<h3>MogileFS简介</h3>
-
-<blockquote><p>MogileFS是一个<code>开源</code>的<code>分布式文件系统</code>，配合cdn和squid，性能非常好(<code>15亿</code>文件没问题，其他数据不方便透露)</p>
-
-<p>他由下面几个部分组成:</p></blockquote>
-
-<p><img src="/images/post/mogilefs-summary.jpg" title="mogilefs-summary" alt="mogilefs-summary" /></p>
-
-<ol>
-<li>memcache：用来缓存查询结果，降低db压力</li>
-<li>mogilefsd：就是tracker，用来接收请求并交给子进程(job)处理</li>
-<li>mogstored：监控磁盘状态和文件的实际存储</li>
-<li>client：支持perl，java，ruby，php，python</li>
-<li>mysql：存储记录</li>
-<li>util：日常维护管理的工具集</li>
-<li>telnet：监控tracker，实时调整job的工具</li>
-</ol>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/10/23/mogilefsxiang-jie/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/5/">&larr; 其他文章</a></li>
@@ -746,14 +680,14 @@
     <li class="nav-header">文章分类</li>
     <li class='category'><a href='/blog/categories/hadoop/'>Hadoop (4)</a></li>
 <li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
-<li class='category'><a href='/blog/categories/javascript/'>Javascript (2)</a></li>
+<li class='category'><a href='/blog/categories/javascript/'>Javascript (3)</a></li>
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
 <li class='category'><a href='/blog/categories/mysql/'>Mysql (8)</a></li>
 <li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
 <li class='category'><a href='/blog/categories/php/'>Php (2)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (2)</a></li>
-<li class='category'><a href='/blog/categories/share/'>Share (24)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (26)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
 
   </ul>
@@ -775,6 +709,14 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/23/jquery-validation/">jquery validation</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/02/ying-wen-ubuntuan-zhuang-zhong-wen-bao/">英文Ubuntu安装中文包</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/04/07/zhu-cong-qie-huan/">主从切换</a>
@@ -806,14 +748,6 @@
     
       <li class="post">
         <a href="/blog/2013/03/31/nginx-pei-zhi-mo-ban/">nginx 配置模板</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/03/27/ubuntu-xiu-fu-localecuo-wu/">ubuntu 修复locale错误</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/03/05/sqlalchemy-zi-dong-chuang-jian-biao/">sqlalchemy 自动创建表</a>
       </li>
     
   </ul>

@@ -4,7 +4,7 @@
   <title><![CDATA[老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2013-04-10T11:14:00+08:00</updated>
+  <updated>2013-05-23T12:49:46+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,150 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[jquery validation]]></title>
+    <link href="http://www.wanghd.com/blog/2013/05/23/jquery-validation/"/>
+    <updated>2013-05-23T12:41:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/05/23/jquery-validation</id>
+    <content type="html"><![CDATA[<h3>表单验证在网站开发中是肯定有的，还好jquery在这方面已经做的很好了</h3>
+
+<ul>
+<li>自定义一种验证类型</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">jQuery</span><span class="p">.</span><span class="nx">validator</span><span class="p">.</span><span class="nx">addMethod</span><span class="p">(</span>
+</span><span class='line'>    <span class="s2">&quot;cellphone&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="kd">function</span><span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">element</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">optional</span><span class="p">(</span><span class="nx">element</span><span class="p">)</span> <span class="o">||</span> <span class="sr">/^1\d{10}$/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="s2">&quot;请输入有效的手机号码&quot;</span>
+</span><span class='line'><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!-- more -->
+
+
+<ul>
+<li>定义规则和错误显示</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#form&#39;</span><span class="p">).</span><span class="nx">validate</span><span class="p">({</span>
+</span><span class='line'>    <span class="nx">rules</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">nickname</span><span class="o">:</span> <span class="s2">&quot;required&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="nx">email</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">required</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+</span><span class='line'>            <span class="nx">email</span><span class="o">:</span> <span class="kc">true</span>
+</span><span class='line'>        <span class="p">},</span>
+</span><span class='line'>        <span class="nx">password</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">required</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+</span><span class='line'>            <span class="nx">minlength</span><span class="o">:</span> <span class="mi">6</span><span class="p">,</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="nx">messages</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">nickname</span><span class="o">:</span> <span class="s2">&quot;请输入昵称&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="nx">email</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">required</span><span class="o">:</span> <span class="s2">&quot;请输入邮箱&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="nx">email</span><span class="o">:</span> <span class="s2">&quot;请输入有效的邮箱&quot;</span>
+</span><span class='line'>        <span class="p">},</span>
+</span><span class='line'>        <span class="nx">password</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">required</span><span class="o">:</span> <span class="s2">&quot;请输入密码&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="nx">minlength</span><span class="o">:</span> <span class="s2">&quot;密码的长度不能小于6位&quot;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="nx">errorElement</span><span class="o">:</span> <span class="s2">&quot;div&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">wrapper</span><span class="o">:</span> <span class="s2">&quot;div&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">errorPlacement</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">element</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">element</span><span class="p">.</span><span class="nx">parent</span><span class="p">().</span><span class="nx">after</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="nx">highlight</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">element</span><span class="p">,</span> <span class="nx">errorClass</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">$</span><span class="p">(</span><span class="nx">element</span><span class="p">).</span><span class="nx">parent</span><span class="p">().</span><span class="nx">css</span><span class="p">(</span><span class="s1">&#39;border&#39;</span><span class="p">,</span> <span class="s1">&#39;1px solid red&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="nx">unhighlight</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">element</span><span class="p">,</span> <span class="nx">errorClass</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">$</span><span class="p">(</span><span class="nx">element</span><span class="p">).</span><span class="nx">parent</span><span class="p">().</span><span class="nx">css</span><span class="p">(</span><span class="s1">&#39;border&#39;</span><span class="p">,</span> <span class="s1">&#39;1px solid #777&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="nx">submitHandler</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="nx">alert</span><span class="p">(</span><span class="s2">&quot;Submitted!&quot;</span><span class="p">)</span> <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[英文Ubuntu安装中文包]]></title>
+    <link href="http://www.wanghd.com/blog/2013/05/02/ying-wen-ubuntuan-zhuang-zhong-wen-bao/"/>
+    <updated>2013-05-02T18:07:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/05/02/ying-wen-ubuntuan-zhuang-zhong-wen-bao</id>
+    <content type="html"><![CDATA[<h3>查看系统内安装的locale：</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>locale -a
+</span><span class='line'># 如果没有“zh-CN.UTF-8”，则表示系统内没有安装中文locale。这会导致“LC_CTYPE: cannot change locale (zh_CN.UTF-8)”的警告。</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>输入以下命令安装：</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cd /usr/share/locales 
+</span><span class='line'>sudo ./install-language-pack zh_CN</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>然后重开终端，就可以发现中文locale已经安装完毕，警告已经不再出现了。</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[主从切换]]></title>
@@ -1731,260 +1875,6 @@ query_cache_size</p>
 </span><span class='line'>cd ssh
 </span><span class='line'>touch authorized_keys
 </span><span class='line'># 增加pub key进去就可以了</span></code></pre></td></tr></table></div></figure>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[flask nginx uwsgi 部署]]></title>
-    <link href="http://www.wanghd.com/blog/2013/02/01/flask-nginx-uwsgibu-shu/"/>
-    <updated>2013-02-01T14:10:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/02/01/flask-nginx-uwsgibu-shu</id>
-    <content type="html"><![CDATA[<h3>安装 uwsgi</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ brew install uwsgi</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>安装 nginx</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ brew install nginx </span></code></pre></td></tr></table></div></figure>
-
-
-<h3>配置Flask环境</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ mkdir test
-</span><span class='line'>$ cd test
-</span><span class='line'>$ virtualevn sandbox
-</span><span class='line'>$ . sandbox/bin/activate
-</span><span class='line'>$ pip install Flask</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<!-- more -->
-
-
-<h3>创建一个Flask项目</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ touch test.py
-</span><span class='line'>
-</span><span class='line'># 内容如下
-</span><span class='line'>
-</span><span class='line'>from flask import Flask
-</span><span class='line'>
-</span><span class='line'>app = Flask(__name__)
-</span><span class='line'>
-</span><span class='line'>@app.route('/')
-</span><span class='line'>def hello():
-</span><span class='line'>    return 'Hello World'
-</span><span class='line'>
-</span><span class='line'>if __name__ == '__main__':
-</span><span class='line'>    app.run()
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>创建uwsgi配置文件</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ touch test_config.xml
-</span><span class='line'>
-</span><span class='line'>&lt;uwsgi&gt;
-</span><span class='line'>    &lt;pythonpath&gt;/Users/william/project/test&lt;/pythonpath&gt;
-</span><span class='line'>    &lt;module&gt;test&lt;/module&gt;
-</span><span class='line'>    &lt;callable&gt;app&lt;/callable&gt;
-</span><span class='line'>    &lt;socket&gt;/tmp/uwsgi.sock&lt;/socket&gt;
-</span><span class='line'>    &lt;master/&gt;
-</span><span class='line'>    &lt;processes&gt;4&lt;/processes&gt;
-</span><span class='line'>    &lt;memory-report/&gt;
-</span><span class='line'>&lt;/uwsgi&gt;
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>nginx 配置</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>server {
-</span><span class='line'>    listen 80;
-</span><span class='line'>    server_name www.test.com;
-</span><span class='line'>
-</span><span class='line'>    location / {
-</span><span class='line'>        include uwsgi_params;
-</span><span class='line'>        uwsgi_pass unix:/tmp/uwsgi.sock; 
-</span><span class='line'>    }
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>启动服务</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sudo nginx -s reload
-</span><span class='line'>
-</span><span class='line'># 支持virtualenv, uswgi还可以--py-auto-reload
-</span><span class='line'>sudo uwsgi -x /Users/william/project/test/test_config.xml --virtualenv sandbox 
-</span></code></pre></td></tr></table></div></figure>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[游览器缓存解析]]></title>
-    <link href="http://www.wanghd.com/blog/2013/01/18/you-lan-qi-huan-cun-jie-xi/"/>
-    <updated>2013-01-18T19:32:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/01/18/you-lan-qi-huan-cun-jie-xi</id>
-    <content type="html"><![CDATA[<h3>游览器缓存：可以通过如下四种方式进行设置</h3>
-
-<ol>
-<li>Expire: 直接设置过期时间(不做详细解释，用Cache-Control更好)</li>
-<li>Cache-Control: HTTP 1.1用Cache-Control代替Expire，Cache-Control比Expire更方便，功能更多。不需要访问服务器端</li>
-<li>Last-Modified: 用来设置最后更新时间。需要访问服务器端，如果没有更新直接使用304，节省网络流量和网络传输时间</li>
-<li>ETag: 用来设置唯一标识。需要访问服务器端，和last-modified一样</li>
-</ol>
-
-
-<!-- more -->
-
-
-<h3>Cache-Control</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
-</span><span class='line'><span class="nx">header</span><span class="p">(</span><span class="s2">&quot;Cache-Control: max-age=120, must-revalidate&quot;</span><span class="p">);</span>
-</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;cache cache&quot;</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><img src="http://www.wanghd.com/images/post/cache-control.jpg" title="cache-control" alt="cache-control" /></p>
-
-<ul>
-<li>刷新(cmd + r)，强刷(shift + cmd + r)，都会访问服务器, 因为这两种方式游览器会绕过本地缓存。尝试打开一个新的tab访问，没有和服务器交互。</li>
-<li>windows用户的刷新(F5)，强刷(ctrl + F5)</li>
-</ul>
-
-
-<h3>Last-Modified</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">$time</span> <span class="o">=</span> <span class="nb">strtotime</span><span class="p">(</span><span class="s1">&#39;2013-01-18&#39;</span><span class="p">);</span>
-</span><span class='line'><span class="nx">header</span><span class="p">(</span><span class="s2">&quot;Last-Modified: &quot;</span> <span class="o">.</span> <span class="nb">gmdate</span><span class="p">(</span><span class="s2">&quot;D, d M Y H:i:s&quot;</span><span class="p">,</span> <span class="nv">$time</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&quot; GMT&quot;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">$modified_since</span> <span class="o">=</span> <span class="nb">isset</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_IF_MODIFIED_SINCE&#39;</span><span class="p">])</span> <span class="o">?</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_IF_MODIFIED_SINCE&#39;</span><span class="p">]</span> <span class="o">:</span> <span class="k">false</span><span class="p">;</span>
-</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nv">$modified_since</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nv">$modified_since</span> <span class="o">=</span> <span class="nb">strtotime</span><span class="p">(</span><span class="nv">$modified_since</span><span class="p">);</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nv">$time</span> <span class="o">==</span> <span class="nv">$modified_since</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">echo</span> <span class="s2">&quot;hit&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">echo</span> <span class="s2">&quot;no hit&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><img src="http://www.wanghd.com/images/post/last-modified.jpg" title="last-modified" alt="last-modified" /></p>
-
-<p><img src="http://www.wanghd.com/images/post/last-modified-ret.jpg" title="last-modified-ret" alt="last-modified-ret" /></p>
-
-<ul>
-<li>第一次访问显示no hit，刷新则命中缓存显示hit(一般304处理，我这里只是举例)。强刷则会显示no hit，可见游览器的强刷是有特别用处的</li>
-</ul>
-
-
-<h3>ETag</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">$etag</span> <span class="o">=</span> <span class="s1">&#39;test-etag&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$none_match</span> <span class="o">=</span> <span class="o">@</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_IF_NONE_MATCH&#39;</span><span class="p">];</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nv">$none_match</span> <span class="o">==</span> <span class="nv">$etag</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">header</span><span class="p">(</span><span class="s2">&quot;HTTP/1.1 304 Not Modified&quot;</span><span class="p">,</span> <span class="k">true</span><span class="p">,</span> <span class="mi">304</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">exit</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">header</span><span class="p">(</span><span class="s2">&quot;ETag: </span><span class="si">{</span><span class="nv">$etag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">);</span>
-</span><span class='line'><span class="k">echo</span> <span class="s2">&quot;test ok!&quot;</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><img src="http://www.wanghd.com/images/post/etag.jpg" title="etag" alt="etag" /></p>
-
-<p><img src="http://www.wanghd.com/images/post/etag304.jpg" title="etag304" alt="etag304" /></p>
-
-<ul>
-<li>第一次访问http返回200，显示test ok!。刷新http返回304，使用本地缓存，显示test ok!。强刷则绕过本地缓存，http返回200，可见和last-modified一样</li>
-</ul>
 
 ]]></content>
   </entry>

@@ -100,6 +100,128 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2013/02/01/flask-nginx-uwsgibu-shu/">Flask Nginx Uwsgi 部署</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-01T14:10:00+08:00" pubdate data-updated="true">Feb 1<span>st</span>, 2013</time>
+        
+         | <a href="/blog/2013/02/01/flask-nginx-uwsgibu-shu/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>安装 uwsgi</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ brew install uwsgi</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>安装 nginx</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ brew install nginx </span></code></pre></td></tr></table></div></figure>
+
+
+<h3>配置Flask环境</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ mkdir test
+</span><span class='line'>$ cd test
+</span><span class='line'>$ virtualevn sandbox
+</span><span class='line'>$ . sandbox/bin/activate
+</span><span class='line'>$ pip install Flask</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2013/02/01/flask-nginx-uwsgibu-shu/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2013/01/18/you-lan-qi-huan-cun-jie-xi/">游览器缓存解析</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-18T19:32:00+08:00" pubdate data-updated="true">Jan 18<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/01/18/you-lan-qi-huan-cun-jie-xi/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>游览器缓存：可以通过如下四种方式进行设置</h3>
+
+<ol>
+<li>Expire: 直接设置过期时间(不做详细解释，用Cache-Control更好)</li>
+<li>Cache-Control: HTTP 1.1用Cache-Control代替Expire，Cache-Control比Expire更方便，功能更多。不需要访问服务器端</li>
+<li>Last-Modified: 用来设置最后更新时间。需要访问服务器端，如果没有更新直接使用304，节省网络流量和网络传输时间</li>
+<li>ETag: 用来设置唯一标识。需要访问服务器端，和last-modified一样</li>
+</ol>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2013/01/18/you-lan-qi-huan-cun-jie-xi/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2013/01/10/rtxldapjiao-cheng/">RTXLDAP教程</a></h1>
     
     
@@ -566,82 +688,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/22/mongodbshi-zhan/">Mongodb实战</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-22T17:18:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/22/mongodbshi-zhan/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content">
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/22/log4jjie-shao/">Log4j介绍</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-22T17:18:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/22/log4jjie-shao/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content">
-</div>
-  
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/4/">&larr; 其他文章</a></li>
@@ -659,14 +705,14 @@
     <li class="nav-header">文章分类</li>
     <li class='category'><a href='/blog/categories/hadoop/'>Hadoop (4)</a></li>
 <li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
-<li class='category'><a href='/blog/categories/javascript/'>Javascript (2)</a></li>
+<li class='category'><a href='/blog/categories/javascript/'>Javascript (3)</a></li>
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
 <li class='category'><a href='/blog/categories/mysql/'>Mysql (8)</a></li>
 <li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
 <li class='category'><a href='/blog/categories/php/'>Php (2)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (2)</a></li>
-<li class='category'><a href='/blog/categories/share/'>Share (24)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (26)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
 
   </ul>
@@ -688,6 +734,14 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/23/jquery-validation/">jquery validation</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/02/ying-wen-ubuntuan-zhuang-zhong-wen-bao/">英文Ubuntu安装中文包</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/04/07/zhu-cong-qie-huan/">主从切换</a>
@@ -719,14 +773,6 @@
     
       <li class="post">
         <a href="/blog/2013/03/31/nginx-pei-zhi-mo-ban/">nginx 配置模板</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/03/27/ubuntu-xiu-fu-localecuo-wu/">ubuntu 修复locale错误</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/03/05/sqlalchemy-zi-dong-chuang-jian-biao/">sqlalchemy 自动创建表</a>
       </li>
     
   </ul>
