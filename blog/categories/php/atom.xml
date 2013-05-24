@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Php | 老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/blog/categories/php/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2013-05-24T14:24:02+08:00</updated>
+  <updated>2013-05-24T15:34:03+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,80 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[yii 隐藏index.php RESTful nginx配置]]></title>
+    <link href="http://www.wanghd.com/blog/2013/05/24/yii-yin-cang-index-dot-php/"/>
+    <updated>2013-05-24T14:36:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/05/24/yii-yin-cang-index-dot-php</id>
+    <content type="html"><![CDATA[<ol>
+<li>默认yii不使用RESTful的url，比如: index.php/news/list?category=12</li>
+<li><p>通过简单的配置可以美化url，比如：/news/list/category/12</p></li>
+<li><p>修改main.php配置</p></li>
+</ol>
+
+
+<p>```php
+&lt;?php</p>
+
+<p>'components' => array (</p>
+
+<pre><code>'urlManager'=&gt;array(
+    'urlFormat'=&gt;'path',
+    'showScriptName'=&gt;false,
+    'rules'=&gt;array(),
+),
+</code></pre>
+
+<p>)</p>
+
+<p>```</p>
+
+<ul>
+<li>修改nginx.php配置</li>
+</ul>
+
+
+<!-- more -->
+
+
+<p>```
+server {</p>
+
+<pre><code>listen          11111;
+index           index-test.php index.html;
+root            /xxxxxx/xxxxx/project/yii-test;
+charset         utf-8;
+
+client_max_body_size 20m;
+
+# 是否存在文件，不存在就rewrite index-test.php，生产应该是index.php
+location / {
+    if (!-e $request_filename){
+        rewrite ^/(.*) /index-test.php last;
+    }
+}
+
+# 缓存资源文件
+location ~* \.(js|css|png|jpg|jpeg|gif|ico|swf)$ {
+    expires 24h;
+}
+
+# 定义path_info，并交给fpm处理
+location ~ \.php {
+    fastcgi_split_path_info     ^(.+\.php)(/.*)$;
+    fastcgi_param               PATH_INFO                               $fastcgi_script_name;
+    include                     /usr/local/etc/nginx/fastcgi.conf;
+    fastcgi_pass                127.0.0.1:10001;
+    fastcgi_index               index-test.php;
+    expires                     off;
+}
+</code></pre>
+
+<p>}
+```</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[yii 用户验证]]></title>

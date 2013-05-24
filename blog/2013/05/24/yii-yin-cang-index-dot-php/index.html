@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>ubuntu 服务器基础配置 - 老虎的眼睛</title>
+  <title>yii 隐藏index.php RESTful nginx配置 - 老虎的眼睛</title>
   <meta name="author" content="王惠达 huida wanghuida">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.wanghd.com/blog/2013/02/26/fu-wu-qi-ji-chu-pei-zhi">
+  <link rel="canonical" href="http://www.wanghd.com/blog/2013/05/24/yii-yin-cang-index-dot-php">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/bootstrap/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/stylesheets/bootstrap/responsive.css" media="screen, projection" rel="stylesheet" type="text/css">
@@ -98,7 +98,7 @@
   
   <header class="page-header">
     
-      <h1 class="entry-title">Ubuntu 服务器基础配置</h1>
+      <h1 class="entry-title">Yii 隐藏index.php RESTful Nginx配置</h1>
     
     
       <p class="meta">
@@ -114,7 +114,7 @@
   
 
 
-<time datetime="2013-02-26T12:58:00+08:00" pubdate data-updated="true">Feb 26<span>th</span>, 2013</time>
+<time datetime="2013-05-24T14:36:00+08:00" pubdate data-updated="true">May 24<span>th</span>, 2013</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -123,9 +123,14 @@
   </header>
 
 
-<div class="entry-content"><h3>配置.profile</h3>
+<div class="entry-content"><ol>
+<li>默认yii不使用RESTful的url，比如: index.php/news/list?category=12</li>
+<li><p>通过简单的配置可以美化url，比如：/news/list/category/12</p></li>
+<li><p>修改main.php配置</p></li>
+</ol>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -134,26 +139,29 @@
 <span class='line-number'>7</span>
 <span class='line-number'>8</span>
 <span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>export EDITOR=vim
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
 </span><span class='line'>
-</span><span class='line'># set terminal color
-</span><span class='line'>PS1='\[\e[1;32m\]\u\[\e[m\]@' # user
-</span><span class='line'>PS1=$PS1'\[\e[1;31m\]\h\[\e[m\] ' # host
-</span><span class='line'>PS1=$PS1'\[\e[1;34m\]\W\[\e[m\] ' # wd
-</span><span class='line'>#PS1=$PS1'\[\e[1;33m\]$(__ruby_version)\[\e[m\] ' # rvm version
-</span><span class='line'>#PS1=$PS1'\[\e[1;32m\]$(__git_ps1)\[\e[m\] ' # git
-</span><span class='line'>export PS1 
+</span><span class='line'><span class="s1">&#39;components&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span> <span class="p">(</span>
+</span><span class='line'>    <span class="s1">&#39;urlManager&#39;</span><span class="o">=&gt;</span><span class="k">array</span><span class="p">(</span>
+</span><span class='line'>        <span class="s1">&#39;urlFormat&#39;</span><span class="o">=&gt;</span><span class="s1">&#39;path&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;showScriptName&#39;</span><span class="o">=&gt;</span><span class="k">false</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;rules&#39;</span><span class="o">=&gt;</span><span class="k">array</span><span class="p">(),</span>
+</span><span class='line'>    <span class="p">),</span>
+</span><span class='line'><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
+<ul>
+<li>修改nginx.php配置</li>
+</ul>
 
 
 <!-- more -->
 
 
-<h3>配置.vimrc</h3>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -177,68 +185,45 @@
 <span class='line-number'>22</span>
 <span class='line-number'>23</span>
 <span class='line-number'>24</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>set nocompatible
-</span><span class='line'>set backspace=2
-</span><span class='line'> 
-</span><span class='line'>set nu
-</span><span class='line'>syntax on
-</span><span class='line'> 
-</span><span class='line'>set autoindent
-</span><span class='line'>set softtabstop=4
-</span><span class='line'>set tabstop=4
-</span><span class='line'>set shiftwidth=4
-</span><span class='line'>set expandtab
-</span><span class='line'> 
-</span><span class='line'>set showmatch
-</span><span class='line'>set ruler
-</span><span class='line'> 
-</span><span class='line'>filetype plugin on
-</span><span class='line'>set laststatus=2
-</span><span class='line'>set encoding=utf-8
-</span><span class='line'>set hlsearch
-</span><span class='line'>set showcmd
-</span><span class='line'> 
-</span><span class='line'>set scrolloff=4
-</span><span class='line'>set ignorecase smartcase
-</span><span class='line'> </span></code></pre></td></tr></table></div></figure>
-
-
-<h3>配置sudo</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>visudo 
-</span><span class='line'># 请放在最下面
-</span><span class='line'>wanghuida   ALL=(ALL) NOPASSWD:ALL</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>配置ssh</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apt-get install ssh
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">server {</span>
+</span><span class='line'><span class="x">    listen          11111;</span>
+</span><span class='line'><span class="x">    index           index-test.php index.html;</span>
+</span><span class='line'><span class="x">    root            /xxxxxx/xxxxx/project/yii-test;</span>
+</span><span class='line'><span class="x">    charset         utf-8;</span>
 </span><span class='line'>
-</span><span class='line'>sudo vim /etc/ssh/sshd_config
-</span><span class='line'>PasswordAuthentication no
+</span><span class='line'><span class="x">    client_max_body_size 20m;</span>
 </span><span class='line'>
-</span><span class='line'>sudo /etc/init.d/ssh restart
+</span><span class='line'><span class="x">    # 是否存在文件，不存在就rewrite index-test.php，生产应该是index.php</span>
+</span><span class='line'><span class="x">    location / {</span>
+</span><span class='line'><span class="x">        if (!-e $request_filename){</span>
+</span><span class='line'><span class="x">            rewrite ^/(.*) /index-test.php last;</span>
+</span><span class='line'><span class="x">        }</span>
+</span><span class='line'><span class="x">    }</span>
 </span><span class='line'>
-</span><span class='line'>mkdir .ssh
-</span><span class='line'>chmod 700 .ssh
-</span><span class='line'>cd ssh
-</span><span class='line'>touch authorized_keys
-</span><span class='line'># 增加pub key进去就可以了</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'><span class="x">    # 缓存资源文件</span>
+</span><span class='line'><span class="x">    location ~* \.(js|css|png|jpg|jpeg|gif|ico|swf)$ {</span>
+</span><span class='line'><span class="x">        expires 24h;</span>
+</span><span class='line'><span class="x">    }</span>
+</span><span class='line'>
+</span><span class='line'><span class="x">    # 定义path_info，并交给fpm处理</span>
+</span><span class='line'><span class="x">    location ~ \.php {</span>
+</span><span class='line'><span class="x">        fastcgi_split_path_info     ^(.+\.php)(/.*)$;</span>
+</span><span class='line'><span class="x">        fastcgi_param               PATH_INFO                               $fastcgi_script_name;</span>
+</span><span class='line'><span class="x">        include                     /usr/local/etc/nginx/fastcgi.conf;</span>
+</span><span class='line'><span class="x">        fastcgi_pass                127.0.0.1:10001;</span>
+</span><span class='line'><span class="x">        fastcgi_index               index-test.php;</span>
+</span><span class='line'><span class="x">        expires                     off;</span>
+</span><span class='line'><span class="x">    }</span>
+</span><span class='line'>
+</span><span class='line'><span class="x">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
 </div>
 
@@ -262,12 +247,12 @@
   
 
 
-<time datetime="2013-02-26T12:58:00+08:00" pubdate data-updated="true">Feb 26<span>th</span>, 2013</time>
+<time datetime="2013-05-24T14:36:00+08:00" pubdate data-updated="true">May 24<span>th</span>, 2013</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/share/'>Share</a>
+    <a class='category' href='/blog/categories/php/'>Php</a>
   
 </span>
 
@@ -276,7 +261,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2013/02/26/fu-wu-qi-ji-chu-pei-zhi/" data-via="" data-counturl="http://www.wanghd.com/blog/2013/02/26/fu-wu-qi-ji-chu-pei-zhi/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2013/05/24/yii-yin-cang-index-dot-php/" data-via="" data-counturl="http://www.wanghd.com/blog/2013/05/24/yii-yin-cang-index-dot-php/" >Tweet</a>
   
   
   
@@ -293,14 +278,10 @@
     <ul class="pager">
       
       <li class="previous"><a class="basic-alignment left"
-        href="/blog/2013/02/01/flask-nginx-uwsgibu-shu/" title="Previous Post:
-        flask nginx uwsgi 部署">&laquo; flask nginx uwsgi 部署</a></li>
+        href="/blog/2013/05/24/yii-yong-hu-yan-zheng/" title="Previous Post:
+        yii 用户验证">&laquo; yii 用户验证</a></li>
       
       <li><a href="/blog/archives">文章归档</a></li>
-      
-      <li class="next"><a class="basic-alignment right" href="/blog/2013/02/26/ubuntu-wang-luo-she-zhi/"
-        title="Next Post: ubuntu 网络设置">ubuntu 网络设置
-        &raquo;</a></li>
       
     </ul>
   </footer>
@@ -431,8 +412,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.wanghd.com/blog/2013/02/26/fu-wu-qi-ji-chu-pei-zhi/';
-        var disqus_url = 'http://www.wanghd.com/blog/2013/02/26/fu-wu-qi-ji-chu-pei-zhi/';
+        var disqus_identifier = 'http://www.wanghd.com/blog/2013/05/24/yii-yin-cang-index-dot-php/';
+        var disqus_url = 'http://www.wanghd.com/blog/2013/05/24/yii-yin-cang-index-dot-php/';
         var disqus_script = 'embed.js';
       
     (function () {

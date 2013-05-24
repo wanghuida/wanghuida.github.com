@@ -4,7 +4,7 @@
   <title><![CDATA[老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2013-05-24T14:24:02+08:00</updated>
+  <updated>2013-05-24T15:34:03+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,116 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[yii 隐藏index.php RESTful nginx配置]]></title>
+    <link href="http://www.wanghd.com/blog/2013/05/24/yii-yin-cang-index-dot-php/"/>
+    <updated>2013-05-24T14:36:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/05/24/yii-yin-cang-index-dot-php</id>
+    <content type="html"><![CDATA[<ol>
+<li>默认yii不使用RESTful的url，比如: index.php/news/list?category=12</li>
+<li><p>通过简单的配置可以美化url，比如：/news/list/category/12</p></li>
+<li><p>修改main.php配置</p></li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">&#39;components&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span> <span class="p">(</span>
+</span><span class='line'>    <span class="s1">&#39;urlManager&#39;</span><span class="o">=&gt;</span><span class="k">array</span><span class="p">(</span>
+</span><span class='line'>        <span class="s1">&#39;urlFormat&#39;</span><span class="o">=&gt;</span><span class="s1">&#39;path&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;showScriptName&#39;</span><span class="o">=&gt;</span><span class="k">false</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;rules&#39;</span><span class="o">=&gt;</span><span class="k">array</span><span class="p">(),</span>
+</span><span class='line'>    <span class="p">),</span>
+</span><span class='line'><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>修改nginx.php配置</li>
+</ul>
+
+
+<!-- more -->
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">server {</span>
+</span><span class='line'><span class="x">    listen          11111;</span>
+</span><span class='line'><span class="x">    index           index-test.php index.html;</span>
+</span><span class='line'><span class="x">    root            /xxxxxx/xxxxx/project/yii-test;</span>
+</span><span class='line'><span class="x">    charset         utf-8;</span>
+</span><span class='line'>
+</span><span class='line'><span class="x">    client_max_body_size 20m;</span>
+</span><span class='line'>
+</span><span class='line'><span class="x">    # 是否存在文件，不存在就rewrite index-test.php，生产应该是index.php</span>
+</span><span class='line'><span class="x">    location / {</span>
+</span><span class='line'><span class="x">        if (!-e $request_filename){</span>
+</span><span class='line'><span class="x">            rewrite ^/(.*) /index-test.php last;</span>
+</span><span class='line'><span class="x">        }</span>
+</span><span class='line'><span class="x">    }</span>
+</span><span class='line'>
+</span><span class='line'><span class="x">    # 缓存资源文件</span>
+</span><span class='line'><span class="x">    location ~* \.(js|css|png|jpg|jpeg|gif|ico|swf)$ {</span>
+</span><span class='line'><span class="x">        expires 24h;</span>
+</span><span class='line'><span class="x">    }</span>
+</span><span class='line'>
+</span><span class='line'><span class="x">    # 定义path_info，并交给fpm处理</span>
+</span><span class='line'><span class="x">    location ~ \.php {</span>
+</span><span class='line'><span class="x">        fastcgi_split_path_info     ^(.+\.php)(/.*)$;</span>
+</span><span class='line'><span class="x">        fastcgi_param               PATH_INFO                               $fastcgi_script_name;</span>
+</span><span class='line'><span class="x">        include                     /usr/local/etc/nginx/fastcgi.conf;</span>
+</span><span class='line'><span class="x">        fastcgi_pass                127.0.0.1:10001;</span>
+</span><span class='line'><span class="x">        fastcgi_index               index-test.php;</span>
+</span><span class='line'><span class="x">        expires                     off;</span>
+</span><span class='line'><span class="x">    }</span>
+</span><span class='line'>
+</span><span class='line'><span class="x">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[yii 用户验证]]></title>
@@ -2014,104 +2124,6 @@ query_cache_size</p>
 <p>query_cache_limit</p>
 
 <p>table_cache</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Mysql 日志分类]]></title>
-    <link href="http://www.wanghd.com/blog/2013/02/27/mysql-ri-zhi-fen-lei/"/>
-    <updated>2013-02-27T14:52:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/02/27/mysql-ri-zhi-fen-lei</id>
-    <content type="html"><![CDATA[<h3>general-log : 记录建立的客户端连接和执行的语句。</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'># my.cnf 一般不会打开，耗io
-</span><span class='line'>general_log_file        = /var/log/mysql/mysql.log
-</span><span class='line'>
-</span><span class='line'># 当你怀疑在客户端发生了错误并想确切地知道该客户端发送给mysqld的语句时，该日志可能非常有用。
-</span><span class='line'># 一般都是临时打开
-</span><span class='line'>mysql &gt; show variables like '%general_log%';  
-</span><span class='line'>
-</span><span class='line'>+------------------+------------------------------+
-</span><span class='line'>| Variable_name    | Value                        |
-</span><span class='line'>+------------------+------------------------------+
-</span><span class='line'>| general_log      | OFF                          |
-</span><span class='line'>| general_log_file | /var/lib/mysql/idc08-002.log |
-</span><span class='line'>+------------------+------------------------------+
-</span><span class='line'>2 rows in set (0.00 sec)
-</span><span class='line'>
-</span><span class='line'>mysql &gt; SET GLOBAL general_log_file = '/tmp/mysql.log';
-</span><span class='line'>mysql &gt; SET GLOBAL general_log = 'ON';
-</span><span class='line'>
-</span><span class='line'># 已经可以监控请求语句了，用完要记得关闭</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<!-- more -->
-
-
-<h3>log-bin : 记录所有更改数据的语句。还用于复制。</h3>
-
-<ul>
-<li>接替日志: flush logs语句或执行mysqladmin flush-logs</li>
-<li>运行服务器时若启用二进制日志则性能大约慢1%。但是，二进制日志的好处，即用于恢复并允许设置复制超过了这个小小的性能损失。</li>
-<li>mysqld在每个二进制日志名后面添加一个数字扩展名。每次你启动服务器或刷新日志时该数字则增加。如果当前的日志大小达到max_binlog_size，还会自动创建新的二进制日志。如果你正使用大的事务，二进制日志还会超过max_binlog_size：事务全写入一个二进制日志中，绝对不要写入不同的二进制日志中。</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>log_bin             = /var/log/mysql/mysql-bin.log
-</span><span class='line'>max_binlog_size     = 100M
-</span><span class='line'>expire_logs_days    = 10
-</span><span class='line'>#binlog_do_db       = db1,db2,db3
-</span><span class='line'>#binlog_ignore_db   = include_database_name</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>slow-log : 记录所有执行时间超过long_query_time秒的所有查询或不使用索引的查询。</h3>
-
-<ul>
-<li>5.1以上的版本已经支持毫秒级</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>log_slow_queries = /var/log/mysql/mysql-slow.log
-</span><span class='line'>long_query_time = 0.5 </span></code></pre></td></tr></table></div></figure>
-
-
-<h3>error-log : 记录启动、运行或停止mysqld时出现的问题。</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'># my.cnf
-</span><span class='line'>log_error = /var/log/mysql/error.log</span></code></pre></td></tr></table></div></figure>
-
-
-
 ]]></content>
   </entry>
   
