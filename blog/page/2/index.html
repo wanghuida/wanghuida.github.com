@@ -100,6 +100,124 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2013/04/03/fu-wu-qi-zeng-jia-ci-pan/">Ubuntu服务器增加磁盘</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-03T11:57:00+08:00" pubdate data-updated="true">Apr 3<span>rd</span>, 2013</time>
+        
+         | <a href="/blog/2013/04/03/fu-wu-qi-zeng-jia-ci-pan/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>显示硬盘分区</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo fdisk -lu
+</span><span class='line'>
+</span><span class='line'># 系统显示最下面显示：disk /dev/sdb doesn't contain a valid partition table</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>对sdb进行分区</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo fdisk /dev/sdb</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>按m显示帮助文档</li>
+<li>根据提示按n 添加一个新分区</li>
+<li>按e 添加扩展分区，接下去默认即可</li>
+<li>回到帮助文档，按p 显示分区结果</li>
+<li>按w 保存分区，并退出完成</li>
+<li>可以再fdisk -lu看看，结果已经不同了，硬盘认出来了</li>
+</ol>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2013/04/03/fu-wu-qi-zeng-jia-ci-pan/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2013/03/31/nginx-pei-zhi-mo-ban/">Nginx 配置模板</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-31T16:02:00+08:00" pubdate data-updated="true">Mar 31<span>st</span>, 2013</time>
+        
+         | <a href="/blog/2013/03/31/nginx-pei-zhi-mo-ban/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>nginx服务器端配置，可以适当调整:</h3>
+
+<ul>
+<li>调整fastcgi 和 lb 的配置</li>
+<li>上传文件大小</li>
+</ul>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2013/03/31/nginx-pei-zhi-mo-ban/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2013/03/27/ubuntu-xiu-fu-localecuo-wu/">Ubuntu 修复locale错误</a></h1>
     
     
@@ -614,145 +732,6 @@ query_cache_size</p>
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2013/02/26/ubuntu-wang-luo-she-zhi/">Ubuntu 网络设置</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-02-26T15:22:00+08:00" pubdate data-updated="true">Feb 26<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/02/26/ubuntu-wang-luo-she-zhi/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>ubuntu的网络设置涉及到如下文件：</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>/etc/network/interfaces # 网络接口配置，包括网络接口说明、IP地址、子网掩码、网关等
-</span><span class='line'>/etc/resolv.conf        # DNS服务器设置
-</span><span class='line'>/etc/hostname           # 主机名设置
-</span><span class='line'>/etc/hosts              # 域名解析映射
-</span><span class='line'>/etc/hosts.allow        # IP访问允许规则
-</span><span class='line'>/ect/hosts.deny         # IP访问禁止规则</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>修改网络配置文件后，要重启网络接口，使用命令：/etc/init.d/networking restart</li>
-<li>重启单个网口可以使用ifdown eth0,ifup eth0, ifconfig</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>ifconfig eth1 192.168.0.204/24
-</span><span class='line'>ifconfig eth1 down/up</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2013/02/26/ubuntu-wang-luo-she-zhi/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2013/02/26/fu-wu-qi-ji-chu-pei-zhi/">Ubuntu 服务器基础配置</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-02-26T12:58:00+08:00" pubdate data-updated="true">Feb 26<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/02/26/fu-wu-qi-ji-chu-pei-zhi/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>配置.profile</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>export EDITOR=vim
-</span><span class='line'>
-</span><span class='line'># set terminal color
-</span><span class='line'>PS1='\[\e[1;32m\]\u\[\e[m\]@' # user
-</span><span class='line'>PS1=$PS1'\[\e[1;31m\]\h\[\e[m\] ' # host
-</span><span class='line'>PS1=$PS1'\[\e[1;34m\]\W\[\e[m\] ' # wd
-</span><span class='line'>#PS1=$PS1'\[\e[1;33m\]$(__ruby_version)\[\e[m\] ' # rvm version
-</span><span class='line'>#PS1=$PS1'\[\e[1;32m\]$(__git_ps1)\[\e[m\] ' # git
-</span><span class='line'>export PS1 
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2013/02/26/fu-wu-qi-ji-chu-pei-zhi/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/3/">&larr; 其他文章</a></li>
@@ -775,7 +754,7 @@ query_cache_size</p>
 <li class='category'><a href='/blog/categories/mysql/'>Mysql (8)</a></li>
 <li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
-<li class='category'><a href='/blog/categories/php/'>Php (2)</a></li>
+<li class='category'><a href='/blog/categories/php/'>Php (4)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (2)</a></li>
 <li class='category'><a href='/blog/categories/share/'>Share (26)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
@@ -799,6 +778,14 @@ query_cache_size</p>
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/24/yii-yong-hu-yan-zheng/">yii 用户验证</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/23/yii-ri-zhi/">yii 文件日志</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/05/23/jquery-validation/">jquery validation</a>
@@ -830,14 +817,6 @@ query_cache_size</p>
     
       <li class="post">
         <a href="/blog/2013/04/03/ibm-x3650-zhong-zhuang-xi-tong/">ibm x3650 重装系统</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/04/03/fu-wu-qi-zeng-jia-ci-pan/">ubuntu服务器增加磁盘</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/03/31/nginx-pei-zhi-mo-ban/">nginx 配置模板</a>
       </li>
     
   </ul>

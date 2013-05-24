@@ -100,6 +100,106 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2012/11/22/mogilefsan-zhuang-pei-zhi/">MogileFS安装配置</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-22T17:19:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/22/mogilefsan-zhuang-pei-zhi/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>基本介绍</h3>
+
+<ul>
+<li>mogilefs是一个分布式的文件系统解决方案</li>
+<li>特点是:无单点失效的问题，自动复制无需raid，easy的命名空间，自修复机制，成熟的管理工具，源码清晰推荐阅读</li>
+</ul>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2012/11/22/mogilefsan-zhuang-pei-zhi/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2012/11/22/time-hiresjie-shao/">Time::HiRes介绍</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-22T17:18:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/22/time-hiresjie-shao/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>Time::HiRes库介绍</h3>
+
+<ul>
+<li>HiRes是high resolution的简写，译为高分辨率</li>
+<li>HiRes其实是提供一些更高精度的alarm, sleep, gettimeofday, interval timers</li>
+</ul>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2012/11/22/time-hiresjie-shao/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2012/11/22/mongodbshi-zhan/">Mongodb实战</a></h1>
     
     
@@ -520,149 +620,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/04/bian-xie-hadoopde-map-reduce/">编写hadoop的Map-Reduce</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-04T21:12:00+08:00" pubdate data-updated="true">Nov 4<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/04/bian-xie-hadoopde-map-reduce/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>创建map-reduce项目</h3>
-
-<ul>
-<li>安装hadoop请参考<a href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/">这篇文章</a></li>
-<li>安装hadoop-plugin请参考<a href="/blog/2012/11/03/eclipsepei-zhi-hadoopde-map-reducekai-fa-huan-jing/">这篇文章</a></li>
-</ul>
-
-
-<p><img src="/images/post/new-mapred.png" title="new-mapred" alt="new-mapred" /></p>
-
-<h3>创建测试数据</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>cd /tmp
-</span><span class='line'>mkdir input
-</span><span class='line'>echo "hello world baby huida" &gt; t1.txt
-</span><span class='line'>echo "world baby baby markdown" &gt; t2.txt
-</span><span class='line'>
-</span><span class='line'>bin/hadoop fs -put /tmp/input input
-</span><span class='line'>bin/hadoop fs -ls</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/11/04/bian-xie-hadoopde-map-reduce/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/03/eclipsepei-zhi-hadoopde-map-reducekai-fa-huan-jing/">Eclipse配置hadoop的map-reduce开发环境</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-03T00:14:00+08:00" pubdate data-updated="true">Nov 3<span>rd</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/03/eclipsepei-zhi-hadoopde-map-reducekai-fa-huan-jing/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>生成eclipse环境</h3>
-
-<ul>
-<li>安装hadoop请参考<a href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/">这篇文章</a></li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>cd hadoop-1.0.4
-</span><span class='line'>
-</span><span class='line'>#肯定会遇到诸多问题
-</span><span class='line'>ant eclipse </span></code></pre></td></tr></table></div></figure>
-
-
-<blockquote><p>问题1：configure: error: C++ preprocessor &#8220;/lib/cpp&#8221; fails sanity check</p>
-
-<blockquote><p>mac没有安装Xcode的command tool</p></blockquote>
-
-<p>问题2：can&#8217;t exec &#8220;glibtoolize&#8221;</p>
-
-<blockquote><p>brew install autoconf automake libtool</p></blockquote>
-
-<p>问题3: .eclipse.templates does not exist</p>
-
-<blockquote><p>自己在hadoop-1.0.4下创建一个mkdir .eclipse.templates</p></blockquote></blockquote>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/11/03/eclipsepei-zhi-hadoopde-map-reducekai-fa-huan-jing/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/5/">&larr; 其他文章</a></li>
@@ -685,7 +642,7 @@
 <li class='category'><a href='/blog/categories/mysql/'>Mysql (8)</a></li>
 <li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
-<li class='category'><a href='/blog/categories/php/'>Php (2)</a></li>
+<li class='category'><a href='/blog/categories/php/'>Php (4)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (2)</a></li>
 <li class='category'><a href='/blog/categories/share/'>Share (26)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
@@ -709,6 +666,14 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/24/yii-yong-hu-yan-zheng/">yii 用户验证</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/23/yii-ri-zhi/">yii 文件日志</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/05/23/jquery-validation/">jquery validation</a>
@@ -740,14 +705,6 @@
     
       <li class="post">
         <a href="/blog/2013/04/03/ibm-x3650-zhong-zhuang-xi-tong/">ibm x3650 重装系统</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/04/03/fu-wu-qi-zeng-jia-ci-pan/">ubuntu服务器增加磁盘</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/03/31/nginx-pei-zhi-mo-ban/">nginx 配置模板</a>
       </li>
     
   </ul>

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Php | 老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/blog/categories/php/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2013-05-23T12:49:46+08:00</updated>
+  <updated>2013-05-24T14:24:02+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,314 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[yii 用户验证]]></title>
+    <link href="http://www.wanghd.com/blog/2013/05/24/yii-yong-hu-yan-zheng/"/>
+    <updated>2013-05-24T12:39:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/05/24/yii-yong-hu-yan-zheng</id>
+    <content type="html"><![CDATA[<ol>
+<li>yii用户验证其实很简单，但是网络上的文章都写的不够详细【包括官方的】</li>
+<li>先介绍一下基于session的用户验证</li>
+<li>用cookie让用户可以保持状态，再介绍一下安全性</li>
+</ol>
+
+
+<!-- more -->
+
+
+<ul>
+<li>main.php 配置登录页面</li>
+</ul>
+
+
+<p>```php
+&lt;?php</p>
+
+<p>'components' => array (</p>
+
+<pre><code>'user' =&gt; array (
+    'loginUrl' =&gt; array('user/login'),
+),
+</code></pre>
+
+<p>)
+```</p>
+
+<ul>
+<li>在控制器中增加权限控制和规则</li>
+</ul>
+
+
+<p>```php
+&lt;?php</p>
+
+<p>class UserController extends CController
+{</p>
+
+<pre><code># 让控制器加入到权限控制
+public function filters()
+{
+    return array(
+        'accessControl',
+    );
+}
+
+# 让edit,view这2个action访客无法直接使用，跳转到登录界面
+public function accessRules()
+{
+    return array(
+        array('deny',
+            'actions'=&gt;array('edit', 'view'),
+            'users'=&gt;array('?'),
+        ),
+    );
+}
+
+public function actionEdit() { var_dump('edit'); }
+public function actionView() { var_dump('view'); }
+</code></pre>
+
+<p>}</p>
+
+<p>```</p>
+
+<ul>
+<li>创建继承CUserIdentity的用户标识类给登录时使用</li>
+</ul>
+
+
+<p>```php
+&lt;?php</p>
+
+<p>class UserIdentity extends CUserIdentity
+{</p>
+
+<pre><code>protected $_id;
+
+public function authenticate()
+{
+    /*
+        这里可以写判断是否有用户的逻辑
+
+        需要存储到session里的数据可以这样写
+        $this-&gt;setState('nickname', $member-&gt;nickname);
+    */
+    $this-&gt;_id = $member-&gt;user_id;
+    return true;
+}
+
+public function getId()
+{
+    return $this-&gt;_id;
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<ul>
+<li>用户登陆的控制器</li>
+</ul>
+
+
+<p>```php
+&lt;?php</p>
+
+<p>class UserController extends Controller
+{</p>
+
+<pre><code>private $req;
+
+private $user;
+
+public function actionLogin()
+{
+    $this-&gt;req = Yii::app()-&gt;request;
+    $this-&gt;user = Yii::app()-&gt;user;
+
+    $reason = '';
+    if ($this-&gt;req-&gt;isPostRequest) {
+
+        $email = $this-&gt;req-&gt;getPost('email','');
+        $password = $this-&gt;req-&gt;getPost('password','');
+
+        $identity = new UserIdentity($email, $password);
+        if($identity-&gt;authenticate()) {
+            $this-&gt;user-&gt;login($identity);
+            $this-&gt;redirect($this-&gt;user-&gt;returnUrl);
+        } else {
+            $reason = $identity-&gt;errorMessage;
+        }
+    }
+    $this-&gt;render('/login', array('reason'=&gt;$reason));
+}
+</code></pre>
+
+<p>}</p>
+
+<p>```</p>
+
+<hr />
+
+
+<ul>
+<li>增加登录cookie保持用户登录状态，改完赶紧尝试一下吧</li>
+</ul>
+
+
+<p>```php
+&lt;?php</p>
+
+<h1>修改main.php,允许自动登录</h1>
+
+<p>'user' => array (</p>
+
+<pre><code>'allowAutoLogin' =&gt; true,
+'loginUrl' =&gt; array('user/login'),
+</code></pre>
+
+<p>),</p>
+
+<h1>修改UserController设置7天有效期</h1>
+
+<p>$this->user->login($identity, 86400);
+```</p>
+
+<ul>
+<li>不经问自己：这样的cookie安全吗？会不会被利用？</li>
+</ul>
+
+
+<p>```
+1. 不应该把敏感信息保存到state里，比如密码
+2. yii内部有cookie校验机制，改动的cookie是无法生效的，可以看下/protected/runtime/state.bin（这就是验证随机的key）
+3. 想要知道yii内部生成key源码可以参考 CSecurityManager</p>
+
+<p>protected function generateRandomKey()
+{</p>
+
+<pre><code>return sprintf('%08x%08x%08x%08x',mt_rand(),mt_rand(),mt_rand(),mt_rand());
+</code></pre>
+
+<p>}
+```</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[yii 文件日志]]></title>
+    <link href="http://www.wanghd.com/blog/2013/05/23/yii-ri-zhi/"/>
+    <updated>2013-05-23T15:12:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/05/23/yii-ri-zhi</id>
+    <content type="html"><![CDATA[<ul>
+<li>yii的文件日志默认在runtime下的application.log</li>
+</ul>
+
+
+<!-- more -->
+
+
+<ul>
+<li>yii配置文件日志和记录等级</li>
+</ul>
+
+
+<p>```php
+&lt;?php</p>
+
+<h1>main.php配置文件, 生产环境只记录error和warning</h1>
+
+<p>'components' => array (</p>
+
+<pre><code>'log'=&gt;array(
+    'class'=&gt;'CLogRouter',
+    'routes'=&gt;array(
+        array(
+            'class'=&gt;'CFileLogRoute',
+            'levels'=&gt;'error, warning',
+        ),
+    ),
+),
+</code></pre>
+
+<p>)</p>
+
+<h1>test.php配置文件，线下测试所有的都记录下来</h1>
+
+<p>'components' => array (</p>
+
+<pre><code>'log'=&gt;array(
+    'class'=&gt;'CLogRouter',
+    'routes'=&gt;array(
+        array(
+            'class'=&gt;'CFileLogRoute',
+            #trace内容很多，一般不开启，用info足够了
+            'levels'=&gt;'info, profile, error, warning',
+        ),
+    ),
+),
+</code></pre>
+
+<p>)</p>
+
+<h1>记录日志, 1.log信息,2.等级,3.分类（分类自定义）</h1>
+
+<p>Yii::log('info调试信息', CLogger::LEVEL_INFO, 'test.info');
+Yii::log('profile调试信息', CLogger::LEVEL_PROFILE, 'test.profile');
+Yii::log('warning调试信息', CLogger::LEVEL_WARNING, 'test.warning');
+Yii::log('error调试信息', CLogger::LEVEL_ERROR, 'test.error');
+```</p>
+
+<ul>
+<li>服务器异常错误，显示错误页面，这样的错误会记录到日志中（因为属于error, warning）</li>
+</ul>
+
+
+<p>```php
+&lt;?php</p>
+
+<h1>在main.php中配置errorHandler，统一处理异常</h1>
+
+<p>'components' => array (</p>
+
+<pre><code>'errorHandler' =&gt; array(
+    'errorAction'=&gt;'site/error',
+),
+</code></pre>
+
+<p>)</p>
+
+<h1>在Site控制器里增加error的action，处理错误</h1>
+
+<p>class SiteController extends Controller
+{</p>
+
+<pre><code>public function actionIndex()
+{
+    # 产生一个异常
+    throw new CHttpException(500, '调用接口失败');
+    $this-&gt;render('/index');
+}
+
+public function actionError()
+{
+    $error = Yii::app()-&gt;errorHandler-&gt;error;
+    $params = array();
+    if($error) {
+        $params['code'] = $error['code'];
+        $params['msg'] = $error['message'];
+        $params['json'] = json_encode($error);
+        $params['is_debug'] = YII_DEBUG;
+    }
+    $this-&gt;render('/error', $params);
+}
+</code></pre>
+
+<p>}
+```</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[游览器缓存解析]]></title>

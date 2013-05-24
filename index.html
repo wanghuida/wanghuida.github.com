@@ -100,6 +100,102 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2013/05/24/yii-yong-hu-yan-zheng/">Yii 用户验证</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-05-24T12:39:00+08:00" pubdate data-updated="true">May 24<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/05/24/yii-yong-hu-yan-zheng/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><ol>
+<li>yii用户验证其实很简单，但是网络上的文章都写的不够详细【包括官方的】</li>
+<li>先介绍一下基于session的用户验证</li>
+<li>用cookie让用户可以保持状态，再介绍一下安全性</li>
+</ol>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2013/05/24/yii-yong-hu-yan-zheng/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2013/05/23/yii-ri-zhi/">Yii 文件日志</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-05-23T15:12:00+08:00" pubdate data-updated="true">May 23<span>rd</span>, 2013</time>
+        
+         | <a href="/blog/2013/05/23/yii-ri-zhi/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><ul>
+<li>yii的文件日志默认在runtime下的application.log</li>
+</ul>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2013/05/23/yii-ri-zhi/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2013/05/23/jquery-validation/">Jquery Validation</a></h1>
     
     
@@ -606,124 +702,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2013/04/03/fu-wu-qi-zeng-jia-ci-pan/">Ubuntu服务器增加磁盘</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-04-03T11:57:00+08:00" pubdate data-updated="true">Apr 3<span>rd</span>, 2013</time>
-        
-         | <a href="/blog/2013/04/03/fu-wu-qi-zeng-jia-ci-pan/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>显示硬盘分区</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sudo fdisk -lu
-</span><span class='line'>
-</span><span class='line'># 系统显示最下面显示：disk /dev/sdb doesn't contain a valid partition table</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>对sdb进行分区</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sudo fdisk /dev/sdb</span></code></pre></td></tr></table></div></figure>
-
-
-<ol>
-<li>按m显示帮助文档</li>
-<li>根据提示按n 添加一个新分区</li>
-<li>按e 添加扩展分区，接下去默认即可</li>
-<li>回到帮助文档，按p 显示分区结果</li>
-<li>按w 保存分区，并退出完成</li>
-<li>可以再fdisk -lu看看，结果已经不同了，硬盘认出来了</li>
-</ol>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2013/04/03/fu-wu-qi-zeng-jia-ci-pan/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2013/03/31/nginx-pei-zhi-mo-ban/">Nginx 配置模板</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-03-31T16:02:00+08:00" pubdate data-updated="true">Mar 31<span>st</span>, 2013</time>
-        
-         | <a href="/blog/2013/03/31/nginx-pei-zhi-mo-ban/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>nginx服务器端配置，可以适当调整:</h3>
-
-<ul>
-<li>调整fastcgi 和 lb 的配置</li>
-<li>上传文件大小</li>
-</ul>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2013/03/31/nginx-pei-zhi-mo-ban/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/2/">&larr; 其他文章</a></li>
@@ -744,7 +722,7 @@
 <li class='category'><a href='/blog/categories/mysql/'>Mysql (8)</a></li>
 <li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
-<li class='category'><a href='/blog/categories/php/'>Php (2)</a></li>
+<li class='category'><a href='/blog/categories/php/'>Php (4)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (2)</a></li>
 <li class='category'><a href='/blog/categories/share/'>Share (26)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
@@ -768,6 +746,14 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/24/yii-yong-hu-yan-zheng/">yii 用户验证</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/23/yii-ri-zhi/">yii 文件日志</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/05/23/jquery-validation/">jquery validation</a>
@@ -799,14 +785,6 @@
     
       <li class="post">
         <a href="/blog/2013/04/03/ibm-x3650-zhong-zhuang-xi-tong/">ibm x3650 重装系统</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/04/03/fu-wu-qi-zeng-jia-ci-pan/">ubuntu服务器增加磁盘</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/03/31/nginx-pei-zhi-mo-ban/">nginx 配置模板</a>
       </li>
     
   </ul>
