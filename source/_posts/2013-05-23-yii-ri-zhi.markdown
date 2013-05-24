@@ -1,0 +1,89 @@
+---
+layout: post
+title: "yii 文件日志"
+date: 2013-05-23 15:12
+comments: true
+sharing: true
+footer: true
+categories: [Php]
+---
+
++ yii的文件日志默认在runtime下的application.log
+
+<!-- more -->
+
++ yii配置文件日志和记录等级
+
+```php
+<?php
+# main.php配置文件, 生产环境只记录error和warning
+'components' => array (
+    'log'=>array(
+        'class'=>'CLogRouter',
+        'routes'=>array(
+            array(
+                'class'=>'CFileLogRoute',
+                'levels'=>'error, warning',
+            ),
+        ),
+    ),
+)
+
+# test.php配置文件，线下测试所有的都记录下来
+'components' => array (
+    'log'=>array(
+        'class'=>'CLogRouter',
+        'routes'=>array(
+            array(
+                'class'=>'CFileLogRoute',
+                #trace内容很多，一般不开启，用info足够了
+                'levels'=>'info, profile, error, warning',
+            ),
+        ),
+    ),
+)
+
+# 记录日志, 1.log信息,2.等级,3.分类（分类自定义）
+Yii::log('info调试信息', CLogger::LEVEL_INFO, 'test.info');
+Yii::log('profile调试信息', CLogger::LEVEL_PROFILE, 'test.profile');
+Yii::log('warning调试信息', CLogger::LEVEL_WARNING, 'test.warning');
+Yii::log('error调试信息', CLogger::LEVEL_ERROR, 'test.error');
+```
+
++ 服务器异常错误，显示错误页面，这样的错误会记录到日志中（因为属于error, warning）
+
+```php
+<?php
+# 在main.php中配置errorHandler，统一处理异常
+'components' => array (
+    'errorHandler' => array(
+        'errorAction'=>'site/error',
+    ),
+)
+
+# 在Site控制器里增加error的action，处理错误
+class SiteController extends Controller
+{
+
+    public function actionIndex()
+    {
+        # 产生一个异常
+        throw new CHttpException(500, '调用接口失败');
+        $this->render('/index');
+    }
+
+    public function actionError()
+    {
+        $error = Yii::app()->errorHandler->error;
+        $params = array();
+        if($error) {
+            $params['code'] = $error['code'];
+            $params['msg'] = $error['message'];
+            $params['json'] = json_encode($error);
+            $params['is_debug'] = YII_DEBUG;
+        }
+        $this->render('/error', $params);
+    }
+}
+```
+
