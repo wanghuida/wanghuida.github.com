@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>flask nginx uwsgi 部署 - 老虎的眼睛</title>
+  <title>sqlalchemy 定义模型 - 老虎的眼睛</title>
   <meta name="author" content="王惠达 huida wanghuida">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.wanghd.com/blog/2013/02/01/flask-nginx-uwsgibu-shu">
+  <link rel="canonical" href="http://www.wanghd.com/blog/2013/05/24/sqlalchemy-ding-yi-mo-xing">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/bootstrap/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/stylesheets/bootstrap/responsive.css" media="screen, projection" rel="stylesheet" type="text/css">
@@ -98,7 +98,7 @@
   
   <header class="page-header">
     
-      <h1 class="entry-title">Flask Nginx Uwsgi 部署</h1>
+      <h1 class="entry-title">Sqlalchemy 定义模型</h1>
     
     
       <p class="meta">
@@ -114,7 +114,7 @@
   
 
 
-<time datetime="2013-02-01T14:10:00+08:00" pubdate data-updated="true">Feb 1<span>st</span>, 2013</time>
+<time datetime="2013-05-24T17:04:00+08:00" pubdate data-updated="true">May 24<span>th</span>, 2013</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -123,40 +123,15 @@
   </header>
 
 
-<div class="entry-content"><h3>安装 uwsgi</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ brew install uwsgi</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>安装 nginx</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ brew install nginx </span></code></pre></td></tr></table></div></figure>
+<div class="entry-content"><ol>
+<li>下面是一个基本的模型，对应db的一张表</li>
+<li>nullable 代表是否可以为空</li>
+<li>server_default 代表默认值</li>
+<li>常用类型：Integer, String, DateTime, TIMESTAMP, DECIMAL</li>
+</ol>
 
 
-<h3>配置Flask环境</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ mkdir test
-</span><span class='line'>$ cd test
-</span><span class='line'>$ virtualevn sandbox
-</span><span class='line'>$ . sandbox/bin/activate
-</span><span class='line'>$ pip install Flask</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<!-- more -->
-
-
-<h3>创建一个Flask项目</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -170,82 +145,28 @@
 <span class='line-number'>12</span>
 <span class='line-number'>13</span>
 <span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ touch test.py
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c">#!/usr/bin/env python</span>
+</span><span class='line'><span class="c"># coding: utf-8</span>
 </span><span class='line'>
-</span><span class='line'># 内容如下
+</span><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy.sql.expression</span> <span class="kn">import</span> <span class="n">text</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Column</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">,</span> <span class="n">TIMESTAMP</span><span class="p">,</span> <span class="n">DECIMAL</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="kn">import</span> <span class="n">declarative_base</span>
+</span><span class='line'><span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
 </span><span class='line'>
-</span><span class='line'>from flask import Flask
+</span><span class='line'><span class="k">class</span> <span class="nc">Member</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+</span><span class='line'>    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s">&#39;tbl_member&#39;</span>
 </span><span class='line'>
-</span><span class='line'>app = Flask(__name__)
+</span><span class='line'>    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">ext_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">server_default</span><span class="o">=</span><span class="n">text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="mi">0</span><span class="p">)))</span>
+</span><span class='line'>    <span class="n">username</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">64</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">my_desc</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span>
 </span><span class='line'>
-</span><span class='line'>@app.route('/')
-</span><span class='line'>def hello():
-</span><span class='line'>    return 'Hello World'
-</span><span class='line'>
-</span><span class='line'>if __name__ == '__main__':
-</span><span class='line'>    app.run()
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>创建uwsgi配置文件</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ touch test_config.xml
-</span><span class='line'>
-</span><span class='line'>&lt;uwsgi&gt;
-</span><span class='line'>    &lt;pythonpath&gt;/Users/william/project/test&lt;/pythonpath&gt;
-</span><span class='line'>    &lt;module&gt;test&lt;/module&gt;
-</span><span class='line'>    &lt;callable&gt;app&lt;/callable&gt;
-</span><span class='line'>    &lt;socket&gt;/tmp/uwsgi.sock&lt;/socket&gt;
-</span><span class='line'>    &lt;master/&gt;
-</span><span class='line'>    &lt;processes&gt;4&lt;/processes&gt;
-</span><span class='line'>    &lt;memory-report/&gt;
-</span><span class='line'>&lt;/uwsgi&gt;
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>nginx 配置</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>server {
-</span><span class='line'>    listen 80;
-</span><span class='line'>    server_name www.test.com;
-</span><span class='line'>
-</span><span class='line'>    location / {
-</span><span class='line'>        include uwsgi_params;
-</span><span class='line'>        uwsgi_pass unix:/tmp/uwsgi.sock; 
-</span><span class='line'>    }
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>启动服务</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sudo nginx -s reload
-</span><span class='line'>
-</span><span class='line'># 支持virtualenv, uswgi还可以--py-auto-reload
-</span><span class='line'>sudo uwsgi -x /Users/william/project/test/test_config.xml --virtualenv sandbox 
+</span><span class='line'>    <span class="n">createtime</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">modifytime</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">TIMESTAMP</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">server_default</span><span class="o">=</span><span class="n">text</span><span class="p">(</span><span class="s">&#39;CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP&#39;</span><span class="p">))</span>
 </span></code></pre></td></tr></table></div></figure>
 
 </div>
@@ -270,7 +191,7 @@
   
 
 
-<time datetime="2013-02-01T14:10:00+08:00" pubdate data-updated="true">Feb 1<span>st</span>, 2013</time>
+<time datetime="2013-05-24T17:04:00+08:00" pubdate data-updated="true">May 24<span>th</span>, 2013</time>
       
 
 <span class="categories">
@@ -284,7 +205,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2013/02/01/flask-nginx-uwsgibu-shu/" data-via="" data-counturl="http://www.wanghd.com/blog/2013/02/01/flask-nginx-uwsgibu-shu/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2013/05/24/sqlalchemy-ding-yi-mo-xing/" data-via="" data-counturl="http://www.wanghd.com/blog/2013/05/24/sqlalchemy-ding-yi-mo-xing/" >Tweet</a>
   
   
   
@@ -301,13 +222,13 @@
     <ul class="pager">
       
       <li class="previous"><a class="basic-alignment left"
-        href="/blog/2013/01/18/you-lan-qi-huan-cun-jie-xi/" title="Previous Post:
-        游览器缓存解析">&laquo; 游览器缓存解析</a></li>
+        href="/blog/2013/05/24/yii-yin-cang-index-dot-php/" title="Previous Post:
+        yii 隐藏index.php RESTful nginx配置">&laquo; yii 隐藏index.php RESTful nginx配置</a></li>
       
       <li><a href="/blog/archives">文章归档</a></li>
       
-      <li class="next"><a class="basic-alignment right" href="/blog/2013/02/26/fu-wu-qi-ji-chu-pei-zhi/"
-        title="Next Post: ubuntu 服务器基础配置">ubuntu 服务器基础配置
+      <li class="next"><a class="basic-alignment right" href="/blog/2013/05/29/sysdescr-unknown-object-identifier-sub-id-not-found-top-sysdescr/"
+        title="Next Post: 解决 sysDescr: Unknown Object Identifier (Sub-id not found: (top)  sysDescr)">解决 sysDescr: Unknown Object Identifier (Sub-id not found: (top)  sysDescr)
         &raquo;</a></li>
       
     </ul>
@@ -439,8 +360,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.wanghd.com/blog/2013/02/01/flask-nginx-uwsgibu-shu/';
-        var disqus_url = 'http://www.wanghd.com/blog/2013/02/01/flask-nginx-uwsgibu-shu/';
+        var disqus_identifier = 'http://www.wanghd.com/blog/2013/05/24/sqlalchemy-ding-yi-mo-xing/';
+        var disqus_url = 'http://www.wanghd.com/blog/2013/05/24/sqlalchemy-ding-yi-mo-xing/';
         var disqus_script = 'embed.js';
       
     (function () {

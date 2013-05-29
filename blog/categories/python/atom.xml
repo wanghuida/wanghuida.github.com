@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Python | 老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/blog/categories/python/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2013-05-24T15:34:03+08:00</updated>
+  <updated>2013-05-29T12:05:33+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,47 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[sqlalchemy 定义模型]]></title>
+    <link href="http://www.wanghd.com/blog/2013/05/24/sqlalchemy-ding-yi-mo-xing/"/>
+    <updated>2013-05-24T17:04:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/05/24/sqlalchemy-ding-yi-mo-xing</id>
+    <content type="html"><![CDATA[<ol>
+<li>下面是一个基本的模型，对应db的一张表</li>
+<li>nullable 代表是否可以为空</li>
+<li>server_default 代表默认值</li>
+<li>常用类型：Integer, String, DateTime, TIMESTAMP, DECIMAL</li>
+</ol>
+
+
+<p>```python</p>
+
+<h1>!/usr/bin/env python</h1>
+
+<h1>coding: utf-8</h1>
+
+<p>from sqlalchemy.sql.expression import text
+from sqlalchemy import Column, Integer, String, DateTime, TIMESTAMP, DECIMAL
+from sqlalchemy.ext.declarative import declarative_base
+Base = declarative_base()</p>
+
+<p>class Member(Base):</p>
+
+<pre><code>__tablename__ = 'tbl_member'
+
+id = Column(Integer, primary_key=True)
+ext_id = Column(Integer, nullable=False, server_default=text(str(0)))
+username = Column(String(64), nullable=False)
+my_desc = Column(Text)
+
+createtime = Column(DateTime, nullable=False)
+modifytime = Column(TIMESTAMP, nullable=False, server_default=text('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))
+</code></pre>
+
+<p>```</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[flask nginx uwsgi 部署]]></title>
