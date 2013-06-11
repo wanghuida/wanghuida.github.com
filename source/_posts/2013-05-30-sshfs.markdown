@@ -1,0 +1,19 @@
+---
+layout: post
+title: "sshfs"
+date: 2013-05-30 16:57
+comments: true
+sharing: true
+footer: true
+categories: [Share]
+---
+
+
++ 今天看到sshfs可以像mount一样挂上磁盘非常方便记录一下
+
+
+```
+
+sshfs user@hostname:path mount_point
+
+```
