@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Share | 老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/blog/categories/share/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2013-05-29T12:05:33+08:00</updated>
+  <updated>2013-07-02T13:40:08+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,130 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[浮动居中]]></title>
+    <link href="http://www.wanghd.com/blog/2013/06/27/fu-dong-ju-zhong/"/>
+    <updated>2013-06-27T10:52:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/06/27/fu-dong-ju-zhong</id>
+    <content type="html"><![CDATA[<ul>
+<li><p>对于定宽的非浮动元素我们可以用 margin:0 auto; 进行水平居中，对于不定宽的浮动元素我们也有一个常用的技巧解决它的水平居中问题。分解如下：</p></li>
+<li><p>HTML 部分：</p></li>
+</ul>
+
+
+<p>```</p>
+
+<div class="test">
+    <p>浮动的</p>
+    <p>居中的</p>
+</div>
+
+
+<p>```</p>
+
+<ul>
+<li>CSS 部分：</li>
+</ul>
+
+
+<p>```
+.test{</p>
+
+<pre><code>float:left;
+position:relative;
+left:50%;
+</code></pre>
+
+<p>}
+p{</p>
+
+<pre><code>float:left;
+position:relative;
+right:50%;
+</code></pre>
+
+<p>}
+```</p>
+
+<ul>
+<li>这样看来就很简单了吧，父元素和子元素同时左浮动，然后父元素相对左移动50%，再然后子元素相对右移动50%，或者子元素相对左移动-50%也就可以了。如此简单如此神奇。</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[sshfs]]></title>
+    <link href="http://www.wanghd.com/blog/2013/05/30/sshfs/"/>
+    <updated>2013-05-30T16:57:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/05/30/sshfs</id>
+    <content type="html"><![CDATA[<ul>
+<li>今天看到sshfs可以像mount一样挂上磁盘非常方便记录一下</li>
+</ul>
+
+
+<p>```</p>
+
+<p>sshfs user@hostname:path mount_point</p>
+
+<p>```</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[cacti spine的安装配置]]></title>
+    <link href="http://www.wanghd.com/blog/2013/05/29/cacti-spinede-an-zhuang-pei-zhi/"/>
+    <updated>2013-05-29T15:35:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/05/29/cacti-spinede-an-zhuang-pei-zhi</id>
+    <content type="html"><![CDATA[<ul>
+<li>cacti官方有详细的配置流程，这里只是翻译和错误的解决</li>
+</ul>
+
+
+<p>```bash
+wget http://www.cacti.net/downloads/spine/cacti-spine-0.8.8a.tar.gz
+tar -zxvf cacti-spine-0.8.8a.tar.gz
+cd cacti-spine-0.8.8a/</p>
+
+<p>./configure</p>
+
+<h1>configure: error: Cannot find MySQL headers.  Use --with-mysql= to specify non-default path.</h1>
+
+<h1>下载安装mysqlclient开发包</h1>
+
+<p>sudo apt-get install libmysqlclient-dev</p>
+
+<p>./configure</p>
+
+<h1>configure: error: Cannot find SNMP headers.  Use --with-snmp= to specify non-default path.</h1>
+
+<h1>下载安装snmp开发包</h1>
+
+<p>sudo apt-cache search snmp | grep dev
+sudo apt-get install libsnmp-dev</p>
+
+<p>./configure
+make
+make install
+```</p>
+
+<ul>
+<li>搞定配置文件</li>
+</ul>
+
+
+<p><code>
+cp /usr/local/spine/etc/spine.conf.dist /usr/local/spine/etc/spine.conf
+</code></p>
+
+<ul>
+<li><p>admin登录cacti页面, 选择Settings的Paths选项卡，输入完整的spine路径[Alternate Poller Path]</p></li>
+<li><p>点击Settings的Poller选项卡，从Poller Type里选择spine</p></li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[解决 sysDescr: Unknown Object Identifier (Sub-id not found: (top)  sysDescr)]]></title>
@@ -136,149 +260,6 @@ submitHandler: function() { alert("Submitted!") }
 
 <p>});
 ```</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[英文Ubuntu安装中文包]]></title>
-    <link href="http://www.wanghd.com/blog/2013/05/02/ying-wen-ubuntuan-zhuang-zhong-wen-bao/"/>
-    <updated>2013-05-02T18:07:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/05/02/ying-wen-ubuntuan-zhuang-zhong-wen-bao</id>
-    <content type="html"><![CDATA[<h3>查看系统内安装的locale：</h3>
-
-<p>```
-locale -a</p>
-
-<h1>如果没有“zh-CN.UTF-8”，则表示系统内没有安装中文locale。这会导致“LC_CTYPE: cannot change locale (zh_CN.UTF-8)”的警告。</h1>
-
-<p>```</p>
-
-<h3>输入以下命令安装：</h3>
-
-<p><code>
-cd /usr/share/locales
-sudo ./install-language-pack zh_CN
-</code></p>
-
-<ul>
-<li>然后重开终端，就可以发现中文locale已经安装完毕，警告已经不再出现了。</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[5分钟理解iptables]]></title>
-    <link href="http://www.wanghd.com/blog/2013/04/04/5fen-zhong-li-jie-iptables/"/>
-    <updated>2013-04-04T10:08:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/04/04/5fen-zhong-li-jie-iptables</id>
-    <content type="html"><![CDATA[<h3>iptables作用</h3>
-
-<ol>
-<li>过滤请求，根据条件决定通过或拒绝</li>
-<li>网络地址转换</li>
-<li>修改头信息</li>
-</ol>
-
-
-<h3>iptables的组成部分</h3>
-
-<ul>
-<li>table：根据类型分了3种，分别是filter,nat,mangle。filter用来过滤，nat用来地址转换，mangle用来改ttl之类的头信息【不常用】。</li>
-<li>chain：是指网络包处理的某个阶段，看下图：1.yes这条路线目的地址是本机。2.no这条路线目的地址是其他网段，需要转发。</li>
-</ul>
-
-
-<p><img src="/images/post/iptables.gif" title="iptables" alt="iptables" /></p>
-
-<!-- more -->
-
-
-<ul>
-<li>rule：用来判断哪些包需要处理，例如-p指定协议，-s指定源地址，-d指定目的地址，-i和-o定义输入输出的设备</li>
-<li>target：其实用target这个词很不好理解，我的理解是符合规则后的操作</li>
-</ul>
-
-
-<h3>iptables命令的语法</h3>
-
-<p>```
-$ sudo iptables [table] [chain] [rule] [target]</p>
-
-<h1>table用-t表示，例如-t nat，-t fileter。如果不加-t 默认就是filter</h1>
-
-<h1>chain前面需要加一个动词，例如-A INPUT意思是"添加 input链"，例如-I POSTROUTING 2意思是"插入 postrouting 到第二条记录"</h1>
-
-<h1>rule上面已经解释过了</h1>
-
-<h1>target可以是ACCEPT，DROP，SNAT，MASQUERADE等，代表满足规则的话，就执行这种操作</h1>
-
-<p>```</p>
-
-<h3>记录一些例子，并解释</h3>
-
-<p>```</p>
-
-<h1>清空nat表里的记录</h1>
-
-<p>sudo iptables -F -t nat</p>
-
-<h1>在filter表里增加一条都接收的记录</h1>
-
-<p>sudo iptables -t filter -A INPUT -j ACCEPT</p>
-
-<h1>更改从eth1出去的源地址为114.77.99.212，一般用在共享单个ip</h1>
-
-<p>sudo iptables -t nat -A POSTROUTING -o eth1 -j SNAT --to-source 114.77.99.212
-```</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[ubuntu route命令]]></title>
-    <link href="http://www.wanghd.com/blog/2013/04/03/ubuntu-routeming-ling/"/>
-    <updated>2013-04-03T18:55:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/04/03/ubuntu-routeming-ling</id>
-    <content type="html"><![CDATA[<h3>route是非常常用的命令，作用是增加一条静态路由</h3>
-
-<ul>
-<li>以前觉得这条命令很难用，其实很简单～～</li>
-</ul>
-
-
-<p>```</p>
-
-<h1>route 直接打印静态路由表 -n 选项代表把域名解析成ip</h1>
-
-<p>$ route -n
-```</p>
-
-<h3>route 命令的基本格式</h3>
-
-<ul>
-<li>route 操作 目标地址 网关 设备</li>
-</ul>
-
-
-<p>```</p>
-
-<h1>例1: eth0发往192.168.0.0网段的数据，都交给192.168.0.1网关</h1>
-
-<h1>add就是操作，-net 192.168.0.0/24 就是目标网段</h1>
-
-<h1>gw 192.168.0.1 是网关，dev eth0就是设备</h1>
-
-<p>$ route add -net 192.168.0.0/24 gw 192.168.0.1 dev eth0</p>
-
-<h1>例2: eth0默认网段的数据，都交给192.168.0.1网关</h1>
-
-<p>$ route add default gw 192.168.0.1 dev eth0</p>
-
-<h1>例3: eth0发往192.168.0.105主机的数据，都交给192.168.0.1网关</h1>
-
-<p>$ route add -host 192.168.0.105 gw 192.168.0.1 dev eth0</p>
-
-<p>```</p>
 ]]></content>
   </entry>
   

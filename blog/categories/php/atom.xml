@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Php | 老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/blog/categories/php/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2013-05-29T12:05:33+08:00</updated>
+  <updated>2013-07-02T13:40:08+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,77 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[php图片处理ubuntu配置]]></title>
+    <link href="http://www.wanghd.com/blog/2013/07/02/phptu-pian-chu-li-ubuntupei-zhi/"/>
+    <updated>2013-07-02T10:08:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/07/02/phptu-pian-chu-li-ubuntupei-zhi</id>
+    <content type="html"><![CDATA[<ul>
+<li>安装imagemagick 和图片库</li>
+</ul>
+
+
+<p>```
+sudo apt-get install libpng12-0 libpng12-dev libpng3
+sudo apt-get install libtiff4 libtiff4-dev libtiffxx0c2
+sudo apt-get install libjasper-dev libjpeg-dev
+sudo apt-get install imagemagick</p>
+
+<h1>显示 imagemagick 支持的图片类型</h1>
+
+<p>convert -list format
+convert -list configure
+```</p>
+
+<!-- more -->
+
+
+<ul>
+<li>安装 php和php模块</li>
+</ul>
+
+
+<p><code>
+sudo apt-get install php5 php5-curl php5-gd php5-mysql php5-fpm php5-imagick php5-xcache php5-cli php5-common php5-mcrypt
+</code></p>
+
+<ul>
+<li>配置xcache</li>
+</ul>
+
+
+<p><code>
+xcache.size  =  64M
+xcache.count =  8
+xcache.slots =  16K
+</code></p>
+
+<ul>
+<li>配置fpm里的php.ini</li>
+</ul>
+
+
+<p><code>
+error_log = /tmp/php-error.log
+post_max_size = 20M
+upload_max_filesize = 20M
+date.timezone = PRC
+</code></p>
+
+<ul>
+<li><p>配置fpm
+<code>
+user = ***
+group = ***
+listen = 127.0.0.1:10001
+pm.max_children = 16
+</code></p></li>
+<li><p>安装配置nginx请参考<a href="/blog/2013/03/31/nginx-pei-zhi-mo-ban/">这篇文章</a></p></li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[yii 隐藏index.php RESTful nginx配置]]></title>
@@ -495,55 +566,6 @@ echo "test ok!";
 <li>第一次访问http返回200，显示test ok!。刷新http返回304，使用本地缓存，显示test ok!。强刷则绕过本地缓存，http返回200，可见和last-modified一样</li>
 </ul>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[date函数的误用]]></title>
-    <link href="http://www.wanghd.com/blog/2013/01/06/datehan-shu-de-wu-yong/"/>
-    <updated>2013-01-06T17:22:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/01/06/datehan-shu-de-wu-yong</id>
-    <content type="html"><![CDATA[<h3>需求：得到给定日期为一年中的第几周，并取得该周的年份</h3>
-
-<ul>
-<li>产生bug的写法</li>
-</ul>
-
-
-<p>```php
-&lt;?php
-$time_2012_12_31 = mktime(0,0,0,12,31,2012);
-$week_2012_12_31 = date('W',$time_2012_12_31);
-echo "2012-12-31: week is {$week_2012_12_31} \n";</p>
-
-<p>$error_year_2012_12_31 = date('Y',$time_2012_12_31);
-echo "2012-12-31: error year is {$error_year_2012_12_31} \n";</p>
-
-<h1>输出错误的结果</h1>
-
-<p>2012-12-31: week is 01
-2012-12-31: error year is 2012
-```</p>
-
-<ul>
-<li>正确的写法，统一采用ISO-8601标准</li>
-</ul>
-
-
-<p>```php
-&lt;?php
-$time_2012_12_31 = mktime(0,0,0,12,31,2012);
-$week_2012_12_31 = date('W',$time_2012_12_31);
-echo "2012-12-31: week is {$week_2012_12_31} \n";</p>
-
-<p>$year_2012_12_31 = date('o',$time_2012_12_31);
-echo "2012-12-31: year is {$year_2012_12_31} \n";</p>
-
-<h1>输出正确的结果</h1>
-
-<p>2012-12-31: week is 01
-2012-12-31: year is 2013
-```</p>
 ]]></content>
   </entry>
   

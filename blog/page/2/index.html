@@ -100,6 +100,266 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2013/05/02/ying-wen-ubuntuan-zhuang-zhong-wen-bao/">英文Ubuntu安装中文包</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-05-02T18:07:00+08:00" pubdate data-updated="true">May 2<span>nd</span>, 2013</time>
+        
+         | <a href="/blog/2013/05/02/ying-wen-ubuntuan-zhuang-zhong-wen-bao/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>查看系统内安装的locale：</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>locale -a
+</span><span class='line'># 如果没有“zh-CN.UTF-8”，则表示系统内没有安装中文locale。这会导致“LC_CTYPE: cannot change locale (zh_CN.UTF-8)”的警告。</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>输入以下命令安装：</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cd /usr/share/locales 
+</span><span class='line'>sudo ./install-language-pack zh_CN</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>然后重开终端，就可以发现中文locale已经安装完毕，警告已经不再出现了。</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2013/04/07/zhu-cong-qie-huan/">主从切换</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-07T20:32:00+08:00" pubdate data-updated="true">Apr 7<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/04/07/zhu-cong-qie-huan/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>1个master，1个slave1，1个slave2，关闭master，让slave1做master，slave2同步新master</h3>
+
+<ul>
+<li>slave1开启同步账号</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; grant replication slave on *.* to 'backup'@'192.168.0.152' identified by '123456';
+</span><span class='line'>mysql &gt; grant replication slave on *.* to 'backup'@'192.168.0.153' identified by '123456';
+</span><span class='line'>mysql &gt; flush privileges;</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>锁住master的写</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; flush tables with read lock;
+</span><span class='line'>
+</span><span class='line'># 关闭锁的命令：unlock tables;</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2013/04/07/zhu-cong-qie-huan/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2013/04/07/ke-long-slave/">克隆 Slave</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-07T17:54:00+08:00" pubdate data-updated="true">Apr 7<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/04/07/ke-long-slave/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>已经有一台master 和 一台slave1，从slave1上克隆一个slave2</h3>
+
+<ul>
+<li>关闭slave1 的 io_thread，那么slave1就不会读取master的bin-log了，也不会写自己的relay-log了</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql&gt; stop slave io_thread</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>查看slave1 的 processlist，确保sql_thread在等待io_thread</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mysql&gt; show processlist\G;
+</span><span class='line'>
+</span><span class='line'># 显示如下结果，可以继续操作
+</span><span class='line'>State: Slave has read all relay log; waiting for the slave I/O thread to update it</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2013/04/07/ke-long-slave/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2013/04/04/5fen-zhong-li-jie-iptables/">5分钟理解iptables</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-04T10:08:00+08:00" pubdate data-updated="true">Apr 4<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/04/04/5fen-zhong-li-jie-iptables/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>iptables作用</h3>
+
+<ol>
+<li>过滤请求，根据条件决定通过或拒绝</li>
+<li>网络地址转换</li>
+<li>修改头信息</li>
+</ol>
+
+
+<h3>iptables的组成部分</h3>
+
+<ul>
+<li>table：根据类型分了3种，分别是filter,nat,mangle。filter用来过滤，nat用来地址转换，mangle用来改ttl之类的头信息【不常用】。</li>
+<li>chain：是指网络包处理的某个阶段，看下图：1.yes这条路线目的地址是本机。2.no这条路线目的地址是其他网段，需要转发。</li>
+</ul>
+
+
+<p><img src="/images/post/iptables.gif" title="iptables" alt="iptables" /></p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2013/04/04/5fen-zhong-li-jie-iptables/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2013/04/03/ubuntu-routeming-ling/">Ubuntu Route命令</a></h1>
     
     
@@ -443,287 +703,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2013/03/05/sqlalchemy-zi-dong-chuang-jian-biao/">Sqlalchemy 自动创建表</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-03-05T17:15:00+08:00" pubdate data-updated="true">Mar 5<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/03/05/sqlalchemy-zi-dong-chuang-jian-biao/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>声明1个映射关系，然后如果没有表，那就自动创建</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c">#!/usr/bin/env python</span>
-</span><span class='line'><span class="c"># coding: utf-8</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">sqlalchemy</span>
-</span><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Column</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">,</span> <span class="n">TIMESTAMP</span><span class="p">,</span> <span class="n">DECIMAL</span>
-</span><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy.sql.expression</span> <span class="kn">import</span> <span class="n">text</span>
-</span><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="kn">import</span> <span class="n">declarative_base</span>
-</span><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span>
-</span><span class='line'><span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
-</span><span class='line'>    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s">&#39;users&#39;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-</span><span class='line'>    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
-</span><span class='line'>    <span class="n">fullname</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
-</span><span class='line'>    <span class="n">password</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="n">server_default</span><span class="o">=</span><span class="n">text</span><span class="p">(</span><span class="s">&quot;123&quot;</span><span class="p">))</span>
-</span><span class='line'>    <span class="n">fid</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">server_default</span><span class="o">=</span><span class="n">text</span><span class="p">(</span><span class="s">&#39;1&#39;</span><span class="p">))</span>
-</span><span class='line'>    <span class="n">d</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DECIMAL</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">server_default</span><span class="o">=</span><span class="n">text</span><span class="p">(</span><span class="s">&#39;0.0&#39;</span><span class="p">))</span>
-</span><span class='line'>    <span class="n">creation</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
-</span><span class='line'>    <span class="c"># updated = Column(TIMESTAMP, nullable=False, server_default=text(&#39;current_timestamp on update current_timestamp&#39;))</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
-</span><span class='line'>    <span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s">&#39;sqlite:///test.db&#39;</span><span class="p">,</span> <span class="n">echo</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-</span><span class='line'>    <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2013/03/05/sqlalchemy-zi-dong-chuang-jian-biao/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2013/02/27/mysql-an-quan/">Mysql 安全</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-02-27T14:57:00+08:00" pubdate data-updated="true">Feb 27<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/02/27/mysql-an-quan/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><ul>
-<li><p>如果客户端和服务器端的连接需要跨越并通过不可信任的网络，那么就需要使用SSH隧道来加密该连接的通信。一般情况下mysql不直接对外，只提供<code>内部访问</code>。</p></li>
-<li><p>用GRANT和REVOKE语句来控制对MySQL的访问。不要授予超过需求的权限。决不能为所有主机授权。</p></li>
-<li><p>不要让任何人(除了MySQL root账户)访问mysql数据库中的<code>user表</code>！这很关键。加密的密码才是MySQL中的真正的密码。</p></li>
-<li><p>不要将<code>纯文本密码</code>保存到数据库中。如果你的计算机有安全危险，入侵者可以获得所有的密码并使用它们。相反，应使用MD5()、SHA1()或单向哈希函数。</p></li>
-<li><p>不要从词典中选择密码。有专门的程序可以破解它们。</p></li>
-</ul>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2013/02/27/mysql-an-quan/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2013/02/27/mysql-guan-li-yu-ju/">Mysql 管理语句</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-02-27T14:53:00+08:00" pubdate data-updated="true">Feb 27<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/02/27/mysql-guan-li-yu-ju/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>创建用户，设置密码，赋予权限</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; grant all privileges on mmd.* to 'mmd'@'localhost' identified  by '123456';
-</span><span class='line'>mysql &gt; flush privileges;
-</span><span class='line'>mysql &gt; drop user
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'># mysql 5.5+默认本地连接，请修改bind_address为0.0.0.0才能支持网络连接
-</span><span class='line'>mysql &gt; grant select,update,insert,delete on mmd.* to 'mmd'@'%' identified  by '123456';
-</span><span class='line'>mysql &gt; flush privileges;
-</span><span class='line'>mysql &gt; show grants for 'mmd'@'%';
-</span><span class='line'>
-</span><span class='line'>mysql &gt; set password for 'mmd'@'%' = password('654321');</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2013/02/27/mysql-guan-li-yu-ju/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2013/02/27/mysql-zhuang-tai-jian-cha/">Mysql 状态检查</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-02-27T14:52:00+08:00" pubdate data-updated="true">Feb 27<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/02/27/mysql-zhuang-tai-jian-cha/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>最简单的status</h3>
-
-<ul>
-<li>可以了解一下mysql基本的状态</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ mysql -u -p -h 
-</span><span class='line'>mysql &gt; status</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2013/02/27/mysql-zhuang-tai-jian-cha/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/3/">&larr; 其他文章</a></li>
@@ -746,9 +725,9 @@
 <li class='category'><a href='/blog/categories/mysql/'>Mysql (8)</a></li>
 <li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
-<li class='category'><a href='/blog/categories/php/'>Php (5)</a></li>
+<li class='category'><a href='/blog/categories/php/'>Php (6)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (3)</a></li>
-<li class='category'><a href='/blog/categories/share/'>Share (27)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (30)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
 
   </ul>
@@ -772,6 +751,22 @@
     <li class="nav-header">最近更新</li>
     
       <li class="post">
+        <a href="/blog/2013/07/02/phptu-pian-chu-li-ubuntupei-zhi/">php图片处理ubuntu配置</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/06/27/fu-dong-ju-zhong/">浮动居中</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/30/sshfs/">sshfs</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/29/cacti-spinede-an-zhuang-pei-zhi/">cacti spine的安装配置</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/05/29/sysdescr-unknown-object-identifier-sub-id-not-found-top-sysdescr/">解决 sysDescr: Unknown Object Identifier (Sub-id not found: (top)  sysDescr)</a>
       </li>
     
@@ -793,22 +788,6 @@
     
       <li class="post">
         <a href="/blog/2013/05/23/jquery-validation/">jquery validation</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/05/02/ying-wen-ubuntuan-zhuang-zhong-wen-bao/">英文Ubuntu安装中文包</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/04/07/zhu-cong-qie-huan/">主从切换</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/04/07/ke-long-slave/">克隆 slave</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/04/04/5fen-zhong-li-jie-iptables/">5分钟理解iptables</a>
       </li>
     
   </ul>

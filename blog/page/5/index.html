@@ -100,6 +100,224 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2012/11/22/log4jjie-shao/">Log4j介绍</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-22T17:18:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/22/log4jjie-shao/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2012/11/22/redisshi-zhan/">Redis实战</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-22T17:17:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/22/redisshi-zhan/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>redis是什么？</h3>
+
+<ul>
+<li>redis是一个开源的，先进的key-value存储服务器端</li>
+<li>value可以包含多种结构，比如strings, hashes, lists, sets ,sorted sets</li>
+<li>官方网址：<a href="http://redis.io">http://redis.io</a></li>
+<li><a href="/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/">freenode</a>的聊天室名称是#redis</li>
+</ul>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2012/11/22/redisshi-zhan/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2012/11/22/xiu-fu-mogilefsmu-lu-owner/">修复mogilefs目录owner</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-22T17:16:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/22/xiu-fu-mogilefsmu-lu-owner/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>什么情况会导致mogilefs的数据目录owner不正确</h3>
+
+<ul>
+<li>直接使用root启动mogstored会导致增加的文件和文件夹为root</li>
+<li>重新用mogile启动mogstored后，mogile用户无法删除root的文件，最终delete队列无法处理</li>
+</ul>
+
+
+<h3>如何处理</h3>
+
+<ol>
+<li>直接chown -R，这是最直接的方法，如果1T的磁盘被这样操作，会10小时util为100</li>
+<li>自己写一个脚本慢处理，脚本思路如下</li>
+</ol>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2012/11/22/xiu-fu-mogilefsmu-lu-owner/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2012/11/10/an-zhuang-pei-zhi-hive/">安装配置hive</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-10T14:59:00+08:00" pubdate data-updated="true">Nov 10<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/10/an-zhuang-pei-zhi-hive/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><ul>
+<li>先安装hadoop请参考<a href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/">这篇文章</a></li>
+<li>hive介绍：通过类似于sql语句的方式去计算结果，数据都存放在hdfs</li>
+</ul>
+
+
+<h3>下载并解压hive</h3>
+
+<ul>
+<li>给个官方<a href="http://www.apache.org/dyn/closer.cgi/hive/">链接</a></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>tar -xzvf hive-x.y.z.tar.gz
+</span><span class='line'>cd hive-x.y.z
+</span><span class='line'>PATH=$PATH:/Users/william/project/hadoop-1.0.4/bin:/Users/william/project/hive-0.8.1/bin
+</span><span class='line'>. ~/.bash_profile</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>直接在终端输入hive，然后输入show tables;然会OK，就行了</li>
+</ul>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2012/11/10/an-zhuang-pei-zhi-hive/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2012/11/08/perlfu-jin-cheng-jian-ting-zi-jin-cheng-gong-zuo-shi-li/">Perl父进程监听，子进程工作实例</a></h1>
     
     
@@ -483,259 +701,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/10/23/mogilefsxiang-jie/">MogileFS详解</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-10-23T22:48:00+08:00" pubdate data-updated="true">Oct 23<span>rd</span>, 2012</time>
-        
-         | <a href="/blog/2012/10/23/mogilefsxiang-jie/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><ul>
-<li>经过一个月的实际应用，我想是时候应该总结一下mogilefs的使用了，如果想和作者交流参考<a href="/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/">IRC教程</a></li>
-</ul>
-
-
-<h3>MogileFS简介</h3>
-
-<blockquote><p>MogileFS是一个<code>开源</code>的<code>分布式文件系统</code>，配合cdn和squid，性能非常好(<code>15亿</code>文件没问题，其他数据不方便透露)</p>
-
-<p>他由下面几个部分组成:</p></blockquote>
-
-<p><img src="/images/post/mogilefs-summary.jpg" title="mogilefs-summary" alt="mogilefs-summary" /></p>
-
-<ol>
-<li>memcache：用来缓存查询结果，降低db压力</li>
-<li>mogilefsd：就是tracker，用来接收请求并交给子进程(job)处理</li>
-<li>mogstored：监控磁盘状态和文件的实际存储</li>
-<li>client：支持perl，java，ruby，php，python</li>
-<li>mysql：存储记录</li>
-<li>util：日常维护管理的工具集</li>
-<li>telnet：监控tracker，实时调整job的工具</li>
-</ol>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/10/23/mogilefsxiang-jie/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/10/16/mogilefsde-replicatefen-xi/">MogileFS的replicate进程分析</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-10-16T15:47:00+08:00" pubdate data-updated="true">Oct 16<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/10/16/mogilefsde-replicatefen-xi/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h4>基本流程</h4>
-
-<ol>
-<li>从replicate queue里获取需要处理数据,进行循环</li>
-<li>执行真正的【replicate操作】，操作时会锁住这个fid，然后返回结果【下面会对该操作具体分析】</li>
-<li>返回没问题，删除队列并释放锁</li>
-<li>返回failed_getting_lock说明正在处理了</li>
-<li>返回no_source说明file_on表上没有关于该文件的记录，nexttry设置为最大并释放锁</li>
-<li>返回too_happy说明devcount > mindevcount，会尝试删除多余的并释放锁（前提是文件存在，所以不会修复file_on有，文件丢失的情况）</li>
-<li>如果以上都不满足，nexttry根据规则增加，failcount递增并释放锁</li>
-</ol>
-
-
-<h4>replicate操作分析</h4>
-
-<ul>
-<li>简单说replicate操作就是取得合适的device进行复制，合适的意思是尽量避免同一个host的device，没办法才用同一个host的device，有错误就返回具体信息</li>
-<li>replicate操作才是真正的复制，代码比较多，但是不难理解（难点都会有注释）</li>
-</ul>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/10/16/mogilefsde-replicatefen-xi/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/10/14/ying-pan-an-zhuang-centos/">硬盘安装CentOS</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-10-14T21:48:00+08:00" pubdate data-updated="true">Oct 14<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/10/14/ying-pan-an-zhuang-centos/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h4>下载diskgenuis进行分区和设置卷标</h4>
-
-<ul>
-<li>【C盘】，NTFS；安装的是win7</li>
-<li>【D盘】，卷标：REV，FAT32；</li>
-</ul>
-
-
-<h4>下载CentOS-6.2-i386-LiveCD.iso</h4>
-
-<ul>
-<li>把isolinux下的vmlinuz0和initrd0.img提取到C盘根目录下</li>
-<li>把centos 6.2 livecd解压到D盘根目录下;</li>
-</ul>
-
-
-<h4>下载EasyBCD进行boot设置</h4>
-
-<ul>
-<li>使用easybcd安装NeoGrub，配置menu.lst，内容如下：</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>title CentOS LiveCD
-</span><span class='line'>#如果前面还有分区设置为root (hd0,1)，设置错误了也没关系，重启后会报错，按e调整，再按b去boot
-</span><span class='line'>root (hd0,0) 
-</span><span class='line'>kernel /vmlinuz0 root=live:LABEL=REV rootfstype=auto ro liveimg quiet rhgb 
-</span><span class='line'>initrd /initrd0.img
-</span><span class='line'>boot</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>重启后，选择新选项即可进入CentOS LiveCD环境。</h4>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/">IRC:irssi使用教程</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-10-13T23:39:00+08:00" pubdate data-updated="true">Oct 13<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>IRC是什么？</h3>
-
-<ul>
-<li>IRC（Internet Relay Chat的缩写，“因特网中继聊天”）是一种通过网络的即时聊天方式。其主要用于群体聊天，但同样也可以用于个人对个人的聊天。</li>
-</ul>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/6/">&larr; 其他文章</a></li>
@@ -758,9 +723,9 @@
 <li class='category'><a href='/blog/categories/mysql/'>Mysql (8)</a></li>
 <li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
-<li class='category'><a href='/blog/categories/php/'>Php (5)</a></li>
+<li class='category'><a href='/blog/categories/php/'>Php (6)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (3)</a></li>
-<li class='category'><a href='/blog/categories/share/'>Share (27)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (30)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
 
   </ul>
@@ -784,6 +749,22 @@
     <li class="nav-header">最近更新</li>
     
       <li class="post">
+        <a href="/blog/2013/07/02/phptu-pian-chu-li-ubuntupei-zhi/">php图片处理ubuntu配置</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/06/27/fu-dong-ju-zhong/">浮动居中</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/30/sshfs/">sshfs</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/29/cacti-spinede-an-zhuang-pei-zhi/">cacti spine的安装配置</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/05/29/sysdescr-unknown-object-identifier-sub-id-not-found-top-sysdescr/">解决 sysDescr: Unknown Object Identifier (Sub-id not found: (top)  sysDescr)</a>
       </li>
     
@@ -805,22 +786,6 @@
     
       <li class="post">
         <a href="/blog/2013/05/23/jquery-validation/">jquery validation</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/05/02/ying-wen-ubuntuan-zhuang-zhong-wen-bao/">英文Ubuntu安装中文包</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/04/07/zhu-cong-qie-huan/">主从切换</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/04/07/ke-long-slave/">克隆 slave</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/04/04/5fen-zhong-li-jie-iptables/">5分钟理解iptables</a>
       </li>
     
   </ul>
