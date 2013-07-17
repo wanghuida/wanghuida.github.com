@@ -100,6 +100,153 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2012/11/03/eclipsepei-zhi-hadoopde-map-reducekai-fa-huan-jing/">Eclipse配置hadoop的map-reduce开发环境</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-03T00:14:00+08:00" pubdate data-updated="true">Nov 3<span>rd</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/03/eclipsepei-zhi-hadoopde-map-reducekai-fa-huan-jing/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>生成eclipse环境</h3>
+
+<ul>
+<li>安装hadoop请参考<a href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/">这篇文章</a></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cd hadoop-1.0.4
+</span><span class='line'>
+</span><span class='line'>#肯定会遇到诸多问题
+</span><span class='line'>ant eclipse </span></code></pre></td></tr></table></div></figure>
+
+
+<blockquote><p>问题1：configure: error: C++ preprocessor &#8220;/lib/cpp&#8221; fails sanity check</p>
+
+<blockquote><p>mac没有安装Xcode的command tool</p></blockquote>
+
+<p>问题2：can&#8217;t exec &#8220;glibtoolize&#8221;</p>
+
+<blockquote><p>brew install autoconf automake libtool</p></blockquote>
+
+<p>问题3: .eclipse.templates does not exist</p>
+
+<blockquote><p>自己在hadoop-1.0.4下创建一个mkdir .eclipse.templates</p></blockquote></blockquote>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2012/11/03/eclipsepei-zhi-hadoopde-map-reducekai-fa-huan-jing/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/">安装配置hadoop</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-02T23:38:00+08:00" pubdate data-updated="true">Nov 2<span>nd</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>下载stable的hadoop</h3>
+
+<ul>
+<li>hadoop的版本比较多，建议下载<code>stable</code>的，现在是<code>hadoop-1.0.4</code></li>
+<li>提供一个<a href="http://hadoop.apache.org/releases.html#Download">下载链接</a></li>
+</ul>
+
+
+<h3>解压缩</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>tar -zxvf hadoop-1.0.4.tar.gz
+</span><span class='line'>cd hadoop-1.0.4</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>配置hadoop</h3>
+
+<blockquote><p>vim编辑conf/hadoop-env.sh，设置环境变量</p></blockquote>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#如果是mac的话，请添加下面这句
+</span><span class='line'>export HADOOP_OPTS="-Djava.security.krb5.realm=OX.AC.UK 
+</span><span class='line'>    -Djava.security.krb5.kdc=kdc0.ox.ac.uk:kdc1.ox.ac.uk"
+</span><span class='line'>#配置JDK，mac的关系所以路径比较飘逸
+</span><span class='line'>export JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2012/10/23/mogilefsxiang-jie/">MogileFS详解</a></h1>
     
     
@@ -845,123 +992,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/09/27/aho-corasicksuan-fa/">Aho-Corasick算法</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-09-27T14:10:00+08:00" pubdate data-updated="true">Sep 27<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/09/27/aho-corasicksuan-fa/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>aho-corasick算法优势</h3>
-
-<ul>
-<li>查找时无需回溯，性能相当好</li>
-<li>当需要查找或替换的词非常多时，生成的trie树可以方便缓存</li>
-</ul>
-
-
-<h3>学习方法</h3>
-
-<ul>
-<li>了解ac算法的基本思想</li>
-<li>阅读源码（看过php, java, perl的版本，还最推荐perl, 因为perl语法精炼,易于阅读）</li>
-<li>ac模拟器（见下面的flash，可以尝试操作一下）</li>
-</ul>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/09/27/aho-corasicksuan-fa/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/09/27/solrsheng-lue-ri-zhi/">显示solr省略的日志</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-09-27T13:54:00+08:00" pubdate data-updated="true">Sep 27<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/09/27/solrsheng-lue-ri-zhi/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>solr日志默认的效果</h3>
-
-<ul>
-<li>删除时默认只显示10条记录，其余的使用省略号代替</li>
-<li>一般情况下这样是比较好的，但是有时还是希望看到所有的信息</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>webapp=/solr path=/update params={wt=json} 
-</span><span class='line'>{delete=[11, 12, 13, 14, 15, 16, 17, 18, 19, 20... (100 deletes)]} 0 127</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/09/27/solrsheng-lue-ri-zhi/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/7/">&larr; 其他文章</a></li>
@@ -984,9 +1014,9 @@
 <li class='category'><a href='/blog/categories/mysql/'>Mysql (8)</a></li>
 <li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
-<li class='category'><a href='/blog/categories/php/'>Php (6)</a></li>
+<li class='category'><a href='/blog/categories/php/'>Php (7)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (3)</a></li>
-<li class='category'><a href='/blog/categories/share/'>Share (30)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (31)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
 
   </ul>
@@ -1008,6 +1038,14 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/17/chuang-ye-gong-si-de-yun-wei-gong-zuo/">创业公司的运维工作</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/15/cutycapt-htmlye-mian-sheng-cheng-tu-pian-fen-xiang-wei-bo/">CutyCapt html页面生成图片 分享微博</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/07/02/phptu-pian-chu-li-ubuntupei-zhi/">php图片处理ubuntu配置</a>
@@ -1039,14 +1077,6 @@
     
       <li class="post">
         <a href="/blog/2013/05/24/yii-yong-hu-yan-zheng/">yii 用户验证</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/05/23/yii-ri-zhi/">yii 文件日志</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/05/23/jquery-validation/">jquery validation</a>
       </li>
     
   </ul>

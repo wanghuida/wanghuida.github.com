@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Share | 老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/blog/categories/share/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2013-07-02T13:40:08+08:00</updated>
+  <updated>2013-07-17T14:12:47+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -14,54 +14,152 @@
 
   
   <entry>
-    <title type="html"><![CDATA[浮动居中]]></title>
-    <link href="http://www.wanghd.com/blog/2013/06/27/fu-dong-ju-zhong/"/>
-    <updated>2013-06-27T10:52:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/06/27/fu-dong-ju-zhong</id>
+    <title type="html"><![CDATA[创业公司的运维工作]]></title>
+    <link href="http://www.wanghd.com/blog/2013/07/17/chuang-ye-gong-si-de-yun-wei-gong-zuo/"/>
+    <updated>2013-07-17T13:04:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/07/17/chuang-ye-gong-si-de-yun-wei-gong-zuo</id>
+    <content type="html"><![CDATA[<h3>创业公司的运维工作应该尽可能简单，不用追求全自动化，但必要的工作还是要做的。</h3>
+
+<br />
+
+
+<h3>安全管理</h3>
+
+<ol>
+<li>有权限的员工登录服务器需要使用<em>key</em>通过跳板机，再进入线上服务器</li>
+<li>外部的请求，需要通过<em>lb</em>转发才能访问，内部服务器无法直接提供服务</li>
+<li>内部的服务器访问外网需要通过proxy</li>
+<li>内部服务器保存操作记录</li>
+<li>加强ddos防护</li>
+<li>端口和ip的限制</li>
+</ol>
+
+
+<p>```</p>
+
+<pre><code>       +------+  +---------+        +-----+                                                 
+       |  lb  |  |  proxy  |        | ssh |                                                 
+       +------+  +---------+        +-----+                                                 
+          |           ^                |                                                    
+          v           |                |                                                   
+      +--------------------------------|---+                                               
+      |                                |   |                                                
+      |         internal server     &lt;--+   |                                                
+      |                                    |                                                
+      +------------------------------------+                                               
+</code></pre>
+
+<p>```</p>
+
+<!-- more -->
+
+
+<h3>服务器 (ubuntu)</h3>
+
+<ol>
+<li>服务器上架下架，硬件故障（其实创业公司托管还不如用云服务）</li>
+<li>常用软件安装，更新，配置</li>
+</ol>
+
+
+<h3>数据库管理 (mysql)</h3>
+
+<ol>
+<li>日志管理：2进制日志，错误日志，慢请求日志</li>
+<li>优化性能：读写分离，优化慢查询</li>
+<li>冷备，热备</li>
+<li>安全：限制访问ip, 权限最小化</li>
+</ol>
+
+
+<h3>监控报警 (cacti nagios)</h3>
+
+<ol>
+<li>指定报警处理人</li>
+<li>添加报警，添加监控</li>
+<li>监控和报警本身状态的维护</li>
+</ol>
+
+
+<h3>图片服务 (mogilefs squid php memcache mysql)</h3>
+
+<ol>
+<li>图片备份，必须存储2份以上</li>
+<li>图片服务优化</li>
+<li>图片服务日志分析，统计数据</li>
+</ol>
+
+
+<h3>信息更新</h3>
+
+<ol>
+<li>记录每台服务器上处理的job</li>
+<li>记录每台服务器上提供的服务</li>
+<li>其他重要信息</li>
+</ol>
+
+
+<h3>其他数据备份</h3>
+
+<ol>
+<li>svn,git备份</li>
+<li>crontab 备份（有过-r直接删除的经验。。。）</li>
+<li>一些重要配置的备份</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[CutyCapt html页面生成图片 分享微博]]></title>
+    <link href="http://www.wanghd.com/blog/2013/07/15/cutycapt-htmlye-mian-sheng-cheng-tu-pian-fen-xiang-wei-bo/"/>
+    <updated>2013-07-15T16:47:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/07/15/cutycapt-htmlye-mian-sheng-cheng-tu-pian-fen-xiang-wei-bo</id>
     <content type="html"><![CDATA[<ul>
-<li><p>对于定宽的非浮动元素我们可以用 margin:0 auto; 进行水平居中，对于不定宽的浮动元素我们也有一个常用的技巧解决它的水平居中问题。分解如下：</p></li>
-<li><p>HTML 部分：</p></li>
-</ul>
-
-
-<p>```</p>
-
-<div class="test">
-    <p>浮动的</p>
-    <p>居中的</p>
-</div>
-
-
-<p>```</p>
-
-<ul>
-<li>CSS 部分：</li>
+<li><p>CutyCapt一个用Qt Webkit把html页面生成图片的工具</p></li>
+<li><p>Mac下安装使用</p></li>
 </ul>
 
 
 <p>```
-.test{</p>
+brew install cuty_capt</p>
 
-<pre><code>float:left;
-position:relative;
-left:50%;
+<p>CutyCapt --private-browsing=off --min-width=640 --min-height=440 \</p>
+
+<pre><code>--url="http://meimeidou.cn/diySubject/detail/key/1366957139/magnify/1" --out="/tmp/img.png"
 </code></pre>
 
-<p>}
-p{</p>
-
-<pre><code>float:left;
-position:relative;
-right:50%;
-</code></pre>
-
-<p>}
-```</p>
+<p>```</p>
 
 <ul>
-<li>这样看来就很简单了吧，父元素和子元素同时左浮动，然后父元素相对左移动50%，再然后子元素相对右移动50%，或者子元素相对左移动-50%也就可以了。如此简单如此神奇。</li>
+<li>Ubuntu生产环境下安装使用</li>
 </ul>
 
+
+<p>```</p>
+
+<h1>xvfb是一个虚拟的X windows</h1>
+
+<p>sudo apt-get install xvfb
+sudo apt-get install cutycapt</p>
+
+<h1>搞一个中文字体，雅黑就不错，可以自己找也可以联系我</h1>
+
+<p>scp msyh.ttf idc01-002:/tmp
+sudo cp /tmp/msyh.ttf /usr/share/fonts/truetype/</p>
+
+<h1>如果缺少icu48可以装下</h1>
+
+<p>sudo apt-get install libicu48</p>
+
+<h1>生成图片</h1>
+
+<p>xvfb-run --server-args="-screen 0, 1024x768x24" cutycapt --private-browsing=off --min-width=640 --min-height=440 \</p>
+
+<pre><code>--url="http://meimeidou.cn/diySubject/detail/key/1366957139/magnify/1" --out="/tmp/img.png"
+</code></pre>
+
+<p>```</p>
 ]]></content>
   </entry>
   
@@ -183,83 +281,6 @@ sudo apt-get install snmp-mibs-downloader</p>
 <p>snmpwalk -v 2c -c public 127.0.0.1 sysDescr</p>
 
 <p>```</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[jquery validation]]></title>
-    <link href="http://www.wanghd.com/blog/2013/05/23/jquery-validation/"/>
-    <updated>2013-05-23T12:41:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/05/23/jquery-validation</id>
-    <content type="html"><![CDATA[<h3>表单验证在网站开发中是肯定有的，还好jquery在这方面已经做的很好了</h3>
-
-<ul>
-<li>自定义一种验证类型</li>
-</ul>
-
-
-<p>```javascript
-jQuery.validator.addMethod(</p>
-
-<pre><code>"cellphone",
-function(value, element) {
-    return this.optional(element) || /^1\d{10}$/.test(value);
-},
-"请输入有效的手机号码"
-</code></pre>
-
-<p>);
-```</p>
-
-<!-- more -->
-
-
-<ul>
-<li>定义规则和错误显示</li>
-</ul>
-
-
-<p>```javascript
-$('#form').validate({</p>
-
-<pre><code>rules: {
-    nickname: "required",
-    email: {
-        required: true,
-        email: true
-    },
-    password: {
-        required: true,
-        minlength: 6,
-    }
-},
-messages: {
-    nickname: "请输入昵称",
-    email: {
-        required: "请输入邮箱",
-        email: "请输入有效的邮箱"
-    },
-    password: {
-        required: "请输入密码",
-        minlength: "密码的长度不能小于6位"
-    }
-},
-errorElement: "div",
-wrapper: "div",
-errorPlacement: function(error, element) {
-    element.parent().after(error);
-},
-highlight: function(element, errorClass) {
-    $(element).parent().css('border', '1px solid red');
-},
-unhighlight: function(element, errorClass) {
-    $(element).parent().css('border', '1px solid #777');
-},
-submitHandler: function() { alert("Submitted!") }
-</code></pre>
-
-<p>});
-```</p>
 ]]></content>
   </entry>
   

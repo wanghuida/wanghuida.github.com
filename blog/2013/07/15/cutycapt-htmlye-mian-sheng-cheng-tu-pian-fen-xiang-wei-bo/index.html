@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Mysql 状态检查 - 老虎的眼睛</title>
+  <title>CutyCapt html页面生成图片 分享微博 - 老虎的眼睛</title>
   <meta name="author" content="王惠达 huida wanghuida">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.wanghd.com/blog/2013/02/27/mysql-zhuang-tai-jian-cha">
+  <link rel="canonical" href="http://www.wanghd.com/blog/2013/07/15/cutycapt-htmlye-mian-sheng-cheng-tu-pian-fen-xiang-wei-bo">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/bootstrap/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/stylesheets/bootstrap/responsive.css" media="screen, projection" rel="stylesheet" type="text/css">
@@ -98,7 +98,7 @@
   
   <header class="page-header">
     
-      <h1 class="entry-title">Mysql 状态检查</h1>
+      <h1 class="entry-title">CutyCapt Html页面生成图片 分享微博</h1>
     
     
       <p class="meta">
@@ -114,7 +114,7 @@
   
 
 
-<time datetime="2013-02-27T14:52:00+08:00" pubdate data-updated="true">Feb 27<span>th</span>, 2013</time>
+<time datetime="2013-07-15T16:47:00+08:00" pubdate data-updated="true">Jul 15<span>th</span>, 2013</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -123,76 +123,24 @@
   </header>
 
 
-<div class="entry-content"><h3>最简单的status</h3>
-
-<ul>
-<li>可以了解一下mysql基本的状态</li>
+<div class="entry-content"><ul>
+<li><p>CutyCapt一个用Qt Webkit把html页面生成图片的工具</p></li>
+<li><p>Mac下安装使用</p></li>
 </ul>
 
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ mysql -u -p -h 
-</span><span class='line'>mysql &gt; status</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<!-- more -->
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>brew install cuty_capt
+</span><span class='line'>
+</span><span class='line'>CutyCapt --private-browsing=off --min-width=640 --min-height=440 \
+</span><span class='line'>    --url="http://meimeidou.cn/diySubject/detail/key/1366957139/magnify/1" --out="/tmp/img.png"</span></code></pre></td></tr></table></div></figure>
 
 
 <ul>
-<li>另外可以添加 -i 5 参数，让其每五秒自动刷新一次。</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>mysqladmin -uroot -p密码 status -i 5 </span></code></pre></td></tr></table></div></figure>
-
-
-<h3>查看mysql详细的状态信息</h3>
-
-<ul>
-<li>里面包含mysql所有的状态信息，分散在各处，很难理解，下会再推荐一个更有效的工具</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; show status; (session 级别的)
-</span><span class='line'>mysql &gt; show global status; (server 级别的, 一般都使用这个)</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>mysqlreport</h3>
-
-<ul>
-<li>官方网站: http://hackmysql.com/mysqlreport</li>
-<li>该工具使用方便，数据也很清晰，非常推荐使用该工具</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>./mysqlreport --host=10.0.1.111 --user=**** --password=****</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>更快速的查看mysql 表缓存</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; show open tables;</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>show processlist</h3>
-
-<ul>
-<li><p>当感觉到每个线程有问题时，可以使用这条命令看下情况</p></li>
-<li><p>案例：DBA通知我processlist里有很多空链接，我发现mysql链接都是持久化的。。并且没有关闭</p></li>
-</ul>
-
-
-<h3>show (session | global) variables</h3>
-
-<ul>
-<li>查看当前服务器配置变量</li>
+<li>Ubuntu生产环境下安装使用</li>
 </ul>
 
 
@@ -201,18 +149,30 @@
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'># 很多情况下都不希望重启mysql服务，所以可以动态调整变量
-</span><span class='line'># 例如输出log
-</span><span class='line'>set global log=/tmp/query.log
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># xvfb是一个虚拟的X windows
+</span><span class='line'>sudo apt-get install xvfb
+</span><span class='line'>sudo apt-get install cutycapt
 </span><span class='line'>
-</span><span class='line'># 希望重启后也会应用到，可以添加到my.cnf</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>show table status [from db] [like &#8216;%table%&#8217;]</h3>
-
-<ul>
-<li>显示具体某个表的状态信息</li>
-</ul>
+</span><span class='line'># 搞一个中文字体，雅黑就不错，可以自己找也可以联系我
+</span><span class='line'>scp msyh.ttf idc01-002:/tmp
+</span><span class='line'>sudo cp /tmp/msyh.ttf /usr/share/fonts/truetype/
+</span><span class='line'>
+</span><span class='line'># 如果缺少icu48可以装下
+</span><span class='line'>sudo apt-get install libicu48
+</span><span class='line'>
+</span><span class='line'># 生成图片
+</span><span class='line'>xvfb-run --server-args="-screen 0, 1024x768x24" cutycapt --private-browsing=off --min-width=640 --min-height=440 \
+</span><span class='line'>    --url="http://meimeidou.cn/diySubject/detail/key/1366957139/magnify/1" --out="/tmp/img.png"
+</span></code></pre></td></tr></table></div></figure>
 
 </div>
 
@@ -236,12 +196,12 @@
   
 
 
-<time datetime="2013-02-27T14:52:00+08:00" pubdate data-updated="true">Feb 27<span>th</span>, 2013</time>
+<time datetime="2013-07-15T16:47:00+08:00" pubdate data-updated="true">Jul 15<span>th</span>, 2013</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/mysql/'>Mysql</a>
+    <a class='category' href='/blog/categories/share/'>Share</a>
   
 </span>
 
@@ -250,7 +210,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2013/02/27/mysql-zhuang-tai-jian-cha/" data-via="" data-counturl="http://www.wanghd.com/blog/2013/02/27/mysql-zhuang-tai-jian-cha/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2013/07/15/cutycapt-htmlye-mian-sheng-cheng-tu-pian-fen-xiang-wei-bo/" data-via="" data-counturl="http://www.wanghd.com/blog/2013/07/15/cutycapt-htmlye-mian-sheng-cheng-tu-pian-fen-xiang-wei-bo/" >Tweet</a>
   
   
   
@@ -267,13 +227,13 @@
     <ul class="pager">
       
       <li class="previous"><a class="basic-alignment left"
-        href="/blog/2013/02/27/mysql-zhu-cong-she-zhi/" title="Previous Post:
-        Mysql 主从设置">&laquo; Mysql 主从设置</a></li>
+        href="/blog/2013/07/02/phptu-pian-chu-li-ubuntupei-zhi/" title="Previous Post:
+        php图片处理ubuntu配置">&laquo; php图片处理ubuntu配置</a></li>
       
       <li><a href="/blog/archives">文章归档</a></li>
       
-      <li class="next"><a class="basic-alignment right" href="/blog/2013/02/27/mysql-guan-li-yu-ju/"
-        title="Next Post: Mysql 管理语句">Mysql 管理语句
+      <li class="next"><a class="basic-alignment right" href="/blog/2013/07/17/chuang-ye-gong-si-de-yun-wei-gong-zuo/"
+        title="Next Post: 创业公司的运维工作">创业公司的运维工作
         &raquo;</a></li>
       
     </ul>
@@ -405,8 +365,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.wanghd.com/blog/2013/02/27/mysql-zhuang-tai-jian-cha/';
-        var disqus_url = 'http://www.wanghd.com/blog/2013/02/27/mysql-zhuang-tai-jian-cha/';
+        var disqus_identifier = 'http://www.wanghd.com/blog/2013/07/15/cutycapt-htmlye-mian-sheng-cheng-tu-pian-fen-xiang-wei-bo/';
+        var disqus_url = 'http://www.wanghd.com/blog/2013/07/15/cutycapt-htmlye-mian-sheng-cheng-tu-pian-fen-xiang-wei-bo/';
         var disqus_script = 'embed.js';
       
     (function () {

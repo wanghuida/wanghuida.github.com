@@ -100,6 +100,121 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2013/05/23/yii-ri-zhi/">Yii 文件日志</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-05-23T15:12:00+08:00" pubdate data-updated="true">May 23<span>rd</span>, 2013</time>
+        
+         | <a href="/blog/2013/05/23/yii-ri-zhi/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><ul>
+<li>yii的文件日志默认在runtime下的application.log</li>
+</ul>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2013/05/23/yii-ri-zhi/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2013/05/23/jquery-validation/">Jquery Validation</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-05-23T12:41:00+08:00" pubdate data-updated="true">May 23<span>rd</span>, 2013</time>
+        
+         | <a href="/blog/2013/05/23/jquery-validation/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>表单验证在网站开发中是肯定有的，还好jquery在这方面已经做的很好了</h3>
+
+<ul>
+<li>自定义一种验证类型</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">jQuery</span><span class="p">.</span><span class="nx">validator</span><span class="p">.</span><span class="nx">addMethod</span><span class="p">(</span>
+</span><span class='line'>    <span class="s2">&quot;cellphone&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="kd">function</span><span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">element</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">optional</span><span class="p">(</span><span class="nx">element</span><span class="p">)</span> <span class="o">||</span> <span class="sr">/^1\d{10}$/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="s2">&quot;请输入有效的手机号码&quot;</span>
+</span><span class='line'><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2013/05/23/jquery-validation/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2013/05/02/ying-wen-ubuntuan-zhuang-zhong-wen-bao/">英文Ubuntu安装中文包</a></h1>
     
     
@@ -606,103 +721,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2013/03/31/nginx-pei-zhi-mo-ban/">Nginx 配置模板</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-03-31T16:02:00+08:00" pubdate data-updated="true">Mar 31<span>st</span>, 2013</time>
-        
-         | <a href="/blog/2013/03/31/nginx-pei-zhi-mo-ban/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>nginx服务器端配置，可以适当调整:</h3>
-
-<ul>
-<li>调整fastcgi 和 lb 的配置</li>
-<li>上传文件大小</li>
-</ul>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2013/03/31/nginx-pei-zhi-mo-ban/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2013/03/27/ubuntu-xiu-fu-localecuo-wu/">Ubuntu 修复locale错误</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-03-27T10:55:00+08:00" pubdate data-updated="true">Mar 27<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/03/27/ubuntu-xiu-fu-localecuo-wu/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><ul>
-<li>locale 配置错误：Cannot set LC_ALL to default locale: No such file or directory</li>
-</ul>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2013/03/27/ubuntu-xiu-fu-localecuo-wu/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/3/">&larr; 其他文章</a></li>
@@ -725,9 +743,9 @@
 <li class='category'><a href='/blog/categories/mysql/'>Mysql (8)</a></li>
 <li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
-<li class='category'><a href='/blog/categories/php/'>Php (6)</a></li>
+<li class='category'><a href='/blog/categories/php/'>Php (7)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (3)</a></li>
-<li class='category'><a href='/blog/categories/share/'>Share (30)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (31)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
 
   </ul>
@@ -749,6 +767,14 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/17/chuang-ye-gong-si-de-yun-wei-gong-zuo/">创业公司的运维工作</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/15/cutycapt-htmlye-mian-sheng-cheng-tu-pian-fen-xiang-wei-bo/">CutyCapt html页面生成图片 分享微博</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/07/02/phptu-pian-chu-li-ubuntupei-zhi/">php图片处理ubuntu配置</a>
@@ -780,14 +806,6 @@
     
       <li class="post">
         <a href="/blog/2013/05/24/yii-yong-hu-yan-zheng/">yii 用户验证</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/05/23/yii-ri-zhi/">yii 文件日志</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/05/23/jquery-validation/">jquery validation</a>
       </li>
     
   </ul>
