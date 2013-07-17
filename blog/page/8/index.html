@@ -100,6 +100,85 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2012/08/28/solrqi-dong-fen-xi/">Solr启动分析</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-28T08:34:00+08:00" pubdate data-updated="true">Aug 28<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/08/28/solrqi-dong-fen-xi/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>solr启动分析</h3>
+
+<p><img src="/images/post/solrstart.png" title="solr 启动分析" alt="solr 启动分析" /></p>
+
+<ol>
+<li>CoreContainer通过xpath加载solr.xml</li>
+<li>实例化CoreAdminHandler管理CoreContainer，提供reload,status等命令(status可以看到index-size)</li>
+<li>初始化CoreDescriptor，设置核心的配置文件、目录、属性文件</li>
+<li>读取solrconfig.xml，分析后设置到SolrConfig</li>
+<li>读取schema.xml，设置fieldTypes @FieldTypePluginLoader,fields @SchemaField,过滤器,分词器,主键</li>
+<li>构造SolrCore,设置数据目录和各种资源的初始化</li>
+<li>QuerySenderListener，默认2个事件firstSearcher和newSearcher</li>
+<li>IndexDeletionPolicy</li>
+<li>DefaultCodecFactory，4.0的功能，字段的编码器和解码器</li>
+<li>StandardDirectoryFactory，指向data/index/的Directory，用来生成Reader读取索引</li>
+<li>QueryResponseWriter，各种返回结果，例如json,xml</li>
+<li>QParserPlugin，请求分析插件,用以生成QParser，例如BoostQParserPlugin和DisMaxQParserPlugin等</li>
+<li>ValueSourceParser，初始化内置的函数，比如boost,abs,sin..等等</li>
+<li>SearchComponent，例如query,facet,mlt,stat,debug,get</li>
+<li>RequestHandlers，是根据url对应RequestHandler的映射</li>
+<li>DirectUpdateHandler2，commit数据的handler</li>
+<li>最后执行firstSearcher事件预热，注册第一个SolrIndexSearcher</li>
+</ol>
+
+
+<h3>solr package</h3>
+
+<ul>
+<li>org.apache.solr.analysis; 过滤器，分词器</li>
+<li>org.apache.solr.core; solr的核心包,例如CoreContainer,Config,SolrCore,SolrConfig,CachingDirectoryFactory,CoreDescriptor</li>
+<li>org.apache.solr.servlet; 与servlet有关,例如SolrDispatchFilter就属于该包</li>
+<li>org.apache.solr.handler; org.apache.solr.handler.component; 请求处理</li>
+<li>org.apache.solr.handler.admin; 处理用来管理的请求，例如CoreAdminHandler</li>
+<li>org.apache.solr.search; 与查询有关的类，例如缓存，查询分析，返回字段 SolrIndexSearcher</li>
+<li>org.apache.solr.schema; 字段类型，schema通知</li>
+<li>org.apache.solr.util.plugin; 为插件提供的一些工具，抽象和接口，例如AbstractPluginLoader</li>
+<li>org.apache.solr.util; 一些工具，例如FileUtils</li>
+<li>org.apache.solr.update; org.apache.solr.update.processor; 用来更新数据的，例如默认的DirectUpdateHandler2</li>
+<li>org.apache.solr.response;org.apache.solr.response.transform;用来返回数据(序列化,json,xml等数据)</li>
+<li>org.apache.solr.request; 请求相关的信息，例如SolrRequestInfo</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2012/08/24/jsmian-xiang-dui-xiang-shi-li/">Js面向对象实例</a></h1>
     
     
@@ -762,63 +841,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/07/07/octopress-introduce/">Octopress 介绍</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-07-07T03:10:00+08:00" pubdate data-updated="true">Jul 7<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/07/07/octopress-introduce/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>安装octopress</h2>
-
-<blockquote><p>安装一下ruby和rvm</p>
-
-<p>获取源代码</p></blockquote>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>rvm install 1.9.2 <span class="o">&amp;&amp;</span> rvm use 1.9.2
-</span><span class='line'>git clone git://github.com/imathis/octopress.git octopress
-</span><span class='line'>gem install bundler
-</span><span class='line'>bundle install
-</span><span class='line'>rake install
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-</div>
-  
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/9/">&larr; 其他文章</a></li>
@@ -843,7 +865,7 @@
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
 <li class='category'><a href='/blog/categories/php/'>Php (7)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (3)</a></li>
-<li class='category'><a href='/blog/categories/share/'>Share (31)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (32)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
 
   </ul>
@@ -865,6 +887,10 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/17/linux-cao-zuo-ji-jin/">linux 操作集锦</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/07/17/chuang-ye-gong-si-de-yun-wei-gong-zuo/">创业公司的运维工作</a>
@@ -900,10 +926,6 @@
     
       <li class="post">
         <a href="/blog/2013/05/24/yii-yin-cang-index-dot-php/">yii 隐藏index.php RESTful nginx配置</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/05/24/yii-yong-hu-yan-zheng/">yii 用户验证</a>
       </li>
     
   </ul>

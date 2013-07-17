@@ -100,6 +100,78 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2012/11/04/bian-xie-hadoopde-map-reduce/">编写hadoop的Map-Reduce</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-04T21:12:00+08:00" pubdate data-updated="true">Nov 4<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/04/bian-xie-hadoopde-map-reduce/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>创建map-reduce项目</h3>
+
+<ul>
+<li>安装hadoop请参考<a href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/">这篇文章</a></li>
+<li>安装hadoop-plugin请参考<a href="/blog/2012/11/03/eclipsepei-zhi-hadoopde-map-reducekai-fa-huan-jing/">这篇文章</a></li>
+</ul>
+
+
+<p><img src="/images/post/new-mapred.png" title="new-mapred" alt="new-mapred" /></p>
+
+<h3>创建测试数据</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cd /tmp
+</span><span class='line'>mkdir input
+</span><span class='line'>echo "hello world baby huida" &gt; t1.txt
+</span><span class='line'>echo "world baby baby markdown" &gt; t2.txt
+</span><span class='line'>
+</span><span class='line'>bin/hadoop fs -put /tmp/input input
+</span><span class='line'>bin/hadoop fs -ls</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2012/11/04/bian-xie-hadoopde-map-reduce/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2012/11/03/eclipsepei-zhi-hadoopde-map-reducekai-fa-huan-jing/">Eclipse配置hadoop的map-reduce开发环境</a></h1>
     
     
@@ -882,116 +954,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/09/29/mogilefsde-fscktan-jiu/">Mogilefs Fsck探究</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-09-29T15:13:00+08:00" pubdate data-updated="true">Sep 29<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/09/29/mogilefsde-fscktan-jiu/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>fsck的作用</h3>
-
-<ul>
-<li>检查mogilefs文件的健康程度，检查的维度有devcount,file_on表,文件长度，校验和（可选）</li>
-<li>如果文件丢失，通过路径尝试全设备扫描去查找该文件【只是通过路径去找】</li>
-</ul>
-
-
-<h3>使用fsck时，碰到的问题:队列保持不变，无法处理后续的文件</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>//启动fsck
-</span><span class='line'>mogadm fsck start  
-</span><span class='line'>//查看fsck状态，问题出现：进度不变,无法进一步检查文件
-</span><span class='line'>mogadm fsck status 
-</span><span class='line'>//查看数据库里的队列，发现队列一直保持，没有被处理
-</span><span class='line'>select count(*) from file_to_queue where type=1 （type=1代表fsck队列，type=2代表rebalance队列）;</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>结论（先给出结论，后面有具体的分析流程）</h3>
-
-<ul>
-<li>随意取得队列中的某一条记录的devcount等于3，过去操作造成的</li>
-<li>mindevcount却等于2，这会让fsck进行修复</li>
-<li>在修复时，发现3个设备中有一个设备是不可达的，状态也不是dead，返回无法处理，fsck不会把该记录从队列中删除，因为他期望你尽快修复该设备或者设置为dead</li>
-<li>解决方法有3个，第一种就是恢复或dead该设备【推荐】，第二种比较山寨,改代码删队列，第三种直接修改数据库,风险较大</li>
-</ul>
-
-
-<h3>mogadm fsck status详情</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>   Running: 运行状态 
-</span><span class='line'>    Status: 完成度
-</span><span class='line'>      Time: 执行时间
-</span><span class='line'>Check Type: 检查的策略【可以通过fsck_opt_policy_only修改】
-</span><span class='line'>
-</span><span class='line'>NOPA: file_on表里一个都没
-</span><span class='line'>POVI: 违反策略
-</span><span class='line'>MISS: 在某个设备上没有找到文件
-</span><span class='line'>BLEN: file表里的length和磁盘上的文件大小不匹配
-</span><span class='line'>GONE: 无法修复了
-</span><span class='line'>SRCH: 开始全设备扫描
-</span><span class='line'>FOND: 全设备扫描后找了该文件
-</span><span class='line'>REPL: 加入复制队列，复制一份文件
-</span><span class='line'>BCNT: file表里的devcount不正确</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/09/29/mogilefsde-fscktan-jiu/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/7/">&larr; 其他文章</a></li>
@@ -1016,7 +978,7 @@
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
 <li class='category'><a href='/blog/categories/php/'>Php (7)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (3)</a></li>
-<li class='category'><a href='/blog/categories/share/'>Share (31)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (32)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
 
   </ul>
@@ -1038,6 +1000,10 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/17/linux-cao-zuo-ji-jin/">linux 操作集锦</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/07/17/chuang-ye-gong-si-de-yun-wei-gong-zuo/">创业公司的运维工作</a>
@@ -1073,10 +1039,6 @@
     
       <li class="post">
         <a href="/blog/2013/05/24/yii-yin-cang-index-dot-php/">yii 隐藏index.php RESTful nginx配置</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/05/24/yii-yong-hu-yan-zheng/">yii 用户验证</a>
       </li>
     
   </ul>

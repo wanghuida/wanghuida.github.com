@@ -4,7 +4,7 @@
   <title><![CDATA[老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2013-07-17T14:12:47+08:00</updated>
+  <updated>2013-07-17T19:20:21+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,421 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[linux 操作集锦]]></title>
+    <link href="http://www.wanghd.com/blog/2013/07/17/linux-cao-zuo-ji-jin/"/>
+    <updated>2013-07-17T19:18:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/07/17/linux-cao-zuo-ji-jin</id>
+    <content type="html"><![CDATA[<h2>第一部</h2>
+
+<h3>1. 以Sudo运行上条命令</h3>
+
+<pre><code>$ sudo !!
+</code></pre>
+
+<p>通常出现的情况是，敲完命令执行后报错才发现忘了<code>sudo</code>。这时，新手用户就会<code>:</code>按上箭头，按左箭头，盯着光标回到开始处，输入<code>sudo</code>，回车;高手用户就蛋定多了，按<code>Ctrl-p</code>，按<code>Ctrl-a</code>，输入<code>sudo</code>，回车。这里介绍这个是天外飞仙级别的，对，就直接<code>sudo !!</code>。</p>
+
+<p>两个叹号是bash的一个特性，称为事件引用符(event designators)。<code>!!</code>相当于<code>!-1</code>，引用前一条命令，当然也可以<code>!-2</code>，<code>!-50</code>。默认情况下bash会在<code>~/.bash_history</code>文件内记录用户执行的最近500条命令，<code>history</code>命令可以显示这些命令.</p>
+
+<!-- more -->
+
+
+<h3>2. 以HTTP方式共享当前文件夹的文件</h3>
+
+<pre><code>$ python -m SimpleHTTPServer
+</code></pre>
+
+<p>这命令启动了Python的SimpleHTTPServer模块，命令执行后将在本机8000端口开放HTTP服务，在其他能访问本机的机器的浏览器打开http://ip:8000即打开一个目录列表，点击即可下载。</p>
+
+<p>额外的:用 python 快速开启一个<code>SMTP</code>服务</p>
+
+<pre><code>$ python -m smtpd -n -c DebuggingServer localhost:1025
+</code></pre>
+
+<p>这是一个用Python标准库smtpd(用<code>-m smtpd</code>指定)实现在简易SMTP服务，运行于1025端口 。另外三个参数的解释:</p>
+
+<pre><code>-n    参数让Python不要进行setuid(改变用户)为"nobody"，也就是说直接用你的帐号来运行
+-c DebuggingServer    让Python运行时在屏幕上输出调试及运行信息
+localhost:1025        让Python在本地的1025端口上开启SMTP服务
+</code></pre>
+
+<p>另外，假如想让程序运行于标准的25的端口上的话，必须使用<code>sudo</code>命令，因为只有root才能在1-1024端口上开启服务。如下:</p>
+
+<pre><code>sudo python -m smtpd -n -c DebuggingServer localhost:25
+</code></pre>
+
+<h3>3. 在以普通用户打开的VIM当中保存一个ROOT用户文件</h3>
+
+<pre><code>:w !sudo tee %
+</code></pre>
+
+<p>常常忘记了<code>sudo</code>就直接用vim编辑/etc内的文件，等编辑好了，保存时候才发现没权限。查阅vim的文档(输入<code>:help :w</code>)，会提到命令<code>:w!{cmd}</code>，让vim执行一个外部命令{cmd}，然后把当前缓冲区的内容从stdin传入。tee是一个把stdin保存到文件的小工具。而%，是vim当中一个只读寄存器的名字，总保存着当前编辑文件的文件路径。所以执行这个命令，就相当于从vim外部修改了当前编辑的文件。</p>
+
+<h3>4. 切换回上一个目录</h3>
+
+<pre><code>$ cd -
+</code></pre>
+
+<p>横杆-代表上一个目录的路径。实际上<code>cd -</code>就是<code>cd $OLDPWD</code>的简写，bash的固定变量<code>$OLDPWD</code>总保存着之前一个目录的路径。相对地，<code>$PWD</code>总保存着当前目录的路径。这些变量在编写shell脚本时候相当有用。</p>
+
+<h3>5. 替换上一条命令中的一个短语</h3>
+
+<pre><code>$ ^foo^bar^
+</code></pre>
+
+<p>　　
+又是另外一个事件引用符，可以把上一条命令当中的foo替换成bar。在需要重复运行调试一道长长的命令，需要测试某个参数时候，用这个命令会比较实用。这道命令的原始样式应该是这样的:</p>
+
+<pre><code>!!:s/foo/bar/
+</code></pre>
+
+<p>本文一开始介绍过<code>!!</code>，vim、sed的替换操作都是这样的语法。</p>
+
+<h3>6. 快速备份一个文件</h3>
+
+<pre><code>$ cp filename{，.bak}
+</code></pre>
+
+<p>这道命令把filename文件拷贝成filename.bak，在一些比较复杂的安装教程里面可以见到这样的用法。其原理就在于bash对大括号的展开操作，<code>filename{，.bak}</code>这一段会被展开成<code>filename filename.bak</code>再传给cp，于是就有了备份的命令了。大括号在bash里面是一个排列的意义，<code>$ echo {a，b，c}{a，b，c}{a，b，c}</code>将输出三个集合的全排列</p>
+
+<h3>7. 免密码SSH登录主机</h3>
+
+<pre><code>$ ssh-copy-id remote-machine
+</code></pre>
+
+<p>这个命令把当前用户的公钥串写入到远程主机的<code>~/.ssh/authorized_keys</code>内，这样下次使用ssh登录的时候，远程主机就直接根据这串密钥完成身份校验，不再询问密码。前提是你当前用户已经生成了公钥，因为默认是没有的，先执行<code>ssh-keygen</code>试试吧!</p>
+
+<p>这个命令如果用手工完成，是这样的:</p>
+
+<pre><code>your-machine$ scp ~/.ssh/identity.pub remote-machine:
+your-machine$ ssh remote-machine
+remote-machine$ cat identity.pub &gt;&gt; ~/.ssh/authorized_keys
+</code></pre>
+
+<p>如果你想删掉远程主机上的密钥，直接打开authorized_keys，搜索你的用户名，删除那行即可。</p>
+
+<h3>8. 抓取LINUX桌面的视频</h3>
+
+<pre><code>$ ffmpeg -f x11grab -s wxga -r 25 -i :0.0 -sameq /tmp/out.mpg
+</code></pre>
+
+<p>我们在一些视频网站上看到别人的3D桌面怎么怎么酷的视频，通常就是这么来的，ffmpeg可以直接解码X11的图形，并转换到相应输出格式。ffmpeg的通常用法是，根据一堆参数，输出一个文件，输出文件通常放最后，下面解析下几个参数:</p>
+
+<pre><code>-f x11grab  指定输入类型。因为x11的缓冲区不是普通的视频文件可以侦测格式，必须指定后ffmpeg才知道如何获得输入
+-s wxga 设置抓取区域的大小。wxga是`1366*768`的标准说法，也可以换成`-s 800×600`的写法
+-r 25   设置帧率，即每秒抓取的画面数
+-i :0.0 设置输入源，本地X默认在0.0
+-sameq   保持跟输入流一样的图像质量，以用来后期处理
+</code></pre>
+
+<h2>第二部分</h2>
+
+<h3>1. 用你最喜欢的编辑器来敲命令</h3>
+
+<pre><code>command &lt;CTRL-x CTRL-e&gt;
+</code></pre>
+
+<p>在已经敲完的命令后按<code>&lt;CTRL-x CTRL-e&gt;</code>，会打开一个指定的编辑器(比如vim，通过环境变量<code>$EDITOR</code>指定)，里面就是你刚输入的命令，然后进行编辑，特别是对那些参数异常复杂的程序，比如<code>mencoder/ffmpeg</code>，一个命令动辄3、4行的。</p>
+
+<p>实际上这是readline库的功能，在默认情况下，bash使用的是emacs模式的命令行操作方式， <code>&lt;CTRL-x CTRL-e&gt;</code>是调用这个功能的一个绑定。如果你习惯使用vi模式，按<code>&lt;ESC v&gt;</code>可以实现同样功能。如果喜欢别的编辑器，可以在<code>~/.bashrc</code>里面放上比如<code>export EDITOR=nano</code>的命令。</p>
+
+<p>另外一个修改命令的方法是使用<code>fc</code>命令(Fix Command)，在编辑器里面打开上一句命令。我们的第一辑连载提过一个<code>^foo^bar^</code>命令可以用fc来实现:<code>fc -s foo=bar</code>。</p>
+
+<h3>2. 清空或创建一个文件</h3>
+
+<pre><code>&gt; file.txt
+</code></pre>
+
+<p><code>&gt;</code>在shell里面是标准输出重定向符，即把命令行输出转往一个文件内，但这里没有”前部命令”，输出为空，于是就覆盖(或创建)成一个空文件了。有些脚本的写法是<code>:&gt;file.txt</code>，因为<code>:</code>是bash默认存在的空函数。单纯创建文件也可以用<code>$touch file.txt</code>，touch本来是用作修改文件的时间戳，但如果文件不存在，就自动创建了。</p>
+
+<h3>3. 用SSH创建端口转发通道</h3>
+
+<pre><code>ssh -N -L2001:remotehost:80 user@somemachine
+</code></pre>
+
+<p>这个命令在本机打开了2001端口，对本机2001端口的请求通过somemachine作为跳板，转到remotehost的80端口上。实现效果跟术语反向代理是相似的，实际上就是端口转发，注意上面的描述涉及了3台主机，但当然somemachine可以变成localhost。这个命令比较抽象，但有时候是很有用的，比如因为众所周知的原因国内的IP的80端口无法使用，又或者公司的防火墙只给外网开了ssh端口，需要访问内部服务器一个web应用，以及需要访问某些限定了来源IP的服务，就可以用上这个方法了。举一个具体例子，运行:</p>
+
+<pre><code>ssh -f -N -L 0.0.0.0:443:twitter.com:443 shell.cjb.net
+ssh -f -N -L 0.0.0.0:80:twitter.com:80 shell.cjb.net
+</code></pre>
+
+<p>然后在<code>/etc/hosts</code>里面添加<code>127.0.0.1 twitter.com</code>，剩下的你懂的。</p>
+
+<h3>4. 重置终端</h3>
+
+<pre><code>reset
+</code></pre>
+
+<p>如果你不小心<code>cat</code>了某个二进制文件，很可能整个终端就傻掉了，可能不会换行，没法回显，大堆乱码之类的，这时候敲入<code>reset</code>回车，不管命令有没有显示，就能回复正常了。实际上<code>reset</code>命令只是输出了一些特殊字符，BusyBox里面最简单的reset程序的实现:</p>
+
+<pre><code>printf(“\033c\033(K\033[J\033[0m\033[?25h”);
+</code></pre>
+
+<p>输出的这些字符对Shell是有特殊意义的:</p>
+
+<pre><code>\033c   ESC c   发送重置命令
+\033(K  ESC ( K 重载终端的字符映射
+\033[J  ESC [ J 清空终端内容
+\033[0m ESC [ 0 m   初始化字符显示属性
+\033[?25h:  ESC [ ? 25 h    让光标可见
+</code></pre>
+
+<p>其中字符显示属性经常用来设定打印字符的颜色等</p>
+
+<h3>5. 在午夜的时候执行某命令</h3>
+
+<pre><code>echo cmd | at midnight
+</code></pre>
+
+<p>说的就是<code>at</code>这个组件，通常跟<code>cron</code>相提并论，不过<code>at</code>主要用于定时一次性任务，而<code>cron</code>定时周期性任务。<code>at</code>的参数比较人性化，跟英语语法一样，可以<code>tomorrow</code>，<code>next week</code>之类的。</p>
+
+<h3>6. 远程传送麦克风语音（实现一个喊话器）</h3>
+
+<pre><code>dd if=/dev/dsp | ssh username@host dd of=/dev/dsp
+</code></pre>
+
+<p><code>/dev/dsp</code>是Linux下声卡的文件映射(Digital Signal Proccessor)，从其中读数据就是录音，往里面写数据就是播放，相当简单!dd是常用的数据拷贝程序，如果不同时指定<code>if</code>、<code>of</code>，就直接使用<code>stdin/stdout</code>来传输。如果没有远程主机，可以试试这样:</p>
+
+<pre><code>dd if=/dev/dsp of=/dev/dsp
+</code></pre>
+
+<p>直接回放麦克风的声音，只是有一点延时。但是如果有别的程序正在使用声卡，这个方法就不凑效了，因为一般的声卡都不允许多个音频流同时处理，可以借用alsa组件的工具，arecord跟aplay:</p>
+
+<pre><code>arecord | ssh username@host aplay
+</code></pre>
+
+<p>本地回放:</p>
+
+<pre><code>arecord | aplay
+</code></pre>
+
+<p>如果你想吓吓别人:</p>
+
+<pre><code>cat /dev/urandom | ssh username@host aplay
+</code></pre>
+
+<h3>7. 映射一个内存目录</h3>
+
+<pre><code>mount -t tmpfs -o size=1024m tmpfs /mnt/ram
+</code></pre>
+
+<p>这个命令开了一块1G内存来当目录用。不过放心，如果里面没文件，是不会占用内存的，用多少占多少。一般来说没必要手动挂载，因为多数发行版都会在fstab内预留了一个内存目录，挂载在<code>/dev/shm</code>，直接使用即可;最常见的用途是用内存空间来放Firefox的配置，可以让慢吞吞的FF快很多。</p>
+
+<h3>8. 用DIFF对比远程文件跟本地文件</h3>
+
+<pre><code>ssh user@host cat /path/to/remotefile | diff /path/to/localfile -
+</code></pre>
+
+<p><code>diff</code>通常的用法是从参数读入两个文件，而命令里面的-则是指从stdin读入了。善用ssh可以让web开发减少很多繁琐，还有比如sshfs，可以从编辑-上传-编辑-上传的人工循环里面解脱出来。</p>
+
+<h3>9. 查看系统中占用端口的进程</h3>
+
+<pre><code>netstat -tulnp
+</code></pre>
+
+<p>Netstat是很常用的用来查看Linux网络系统的工具之一，这个参数可以背下来:</p>
+
+<pre><code>-t  显示TCP链接信息
+-u  显示UDP链接信息
+-l  显示监听状态的端口
+-n  直接显示ip，不做名称转换
+-p  显示相应的进程PID以及名称(要root权限)
+</code></pre>
+
+<p>如果要查看关于sockets更详细占用信息等，可以使用lsof工具。</p>
+
+<h2>第三部分</h2>
+
+<h3>1. 更友好的显示当前挂载的文件系统</h3>
+
+<pre><code>mount | column -t
+</code></pre>
+
+<p>这条命令适用于任何文件系统，<code>column</code>用于把输出结果进行列表格式化操作，这里最主要的目的是熟悉<code>columnt</code>的用法。另外可加上列名称来改善输出结果：</p>
+
+<pre><code>(echo "DEVICE - PATH - TYPE FLAGS" &amp;&amp; mount) | column -t
+</code></pre>
+
+<p>列2和列4并不是很友好，可以用awk来再处理一下:</p>
+
+<pre><code>(echo "DEVICE PATH TYPE FLAGS" &amp;&amp; mount|awk '$2=$4="";1')|column -t
+</code></pre>
+
+<p>最后可以设置一个别名，为nicemount</p>
+
+<pre><code>nicemount(){
+　　(echo "DEVICE PATH TYPE FLAGS" &amp;&amp; mount|awk '$2=$4="";1')|column -t; 
+}
+</code></pre>
+
+<p>直接输入nicemount运行即可。</p>
+
+<h3>2. 运行前一个Shell命令，同时用&#8221;bar&#8221;替换掉命令行中的每一个&#8221;foo&#8221;</h3>
+
+<pre><code>!!:gs/foo/bar
+</code></pre>
+
+<p><code>!!</code>表示重复执行上一条命令，并用<code>:gs/foo/bar</code>进行替换操作。</p>
+
+<h3>3. 实时某个目录下查看最新改动过的文件</h3>
+
+<pre><code>watch -d -n 1 'df; ls -FlAt /path'
+</code></pre>
+
+<p>在使用这条命令时你需要替换其中的/path部分，<code>watch</code>是实时监控工具，<code>-d</code>参数会高亮显示变化的区域，<code>-n 1</code>参数表示刷新间隔为1秒。<code>df; ls -FlAt /path</code>运行了两条命令，<code>df</code>是输出磁盘使用情况，<code>ls -FlAt</code>则列出/path下面的所有文件。<code>ls -FlAt</code>的参数详解:</p>
+
+<pre><code>-F  在文件后面加一个文件符号表示文件类型，共有 */=&gt;@| 这几种类型，* 表示可执行文件，/ 表示目录，= 表示接口( sockets) ，&gt; 表示门， @ 表示符号链接， | 表示管道
+-l  以列表方式显示
+-A  显示 . 和 ..
+-t  根据时间排序文件
+</code></pre>
+
+<h3>4. 通过SSH挂载远程主机上的文件夹</h3>
+
+<pre><code>sshfs name@server:/path/to/folder /path/to/mount/point
+</code></pre>
+
+<p>这条命令可以让你通过 SSH 加载远程主机上的文件系统为本地磁盘，前提是你需要安装FUSE及sshfs这两个软件。卸载的话使用<code>fusermount</code>命令:</p>
+
+<pre><code>fusermount -u /path/to/mount/point
+</code></pre>
+
+<h3>5. 用 Wget 的递归方式下载整个网站</h3>
+
+<pre><code>wget --random-wait -r -p -e robots=off -U Mozilla www.example.com
+
+- -random-wait  等待0.5到1.5秒的时间来进行下一次请求
+-r  开启递归检索
+-e robots=off   忽略robots.txt
+-U Mozilla  设置 User-Agent 头为 Mozilla
+</code></pre>
+
+<h3>6. 执行一条命令但不保存到 history 中</h3>
+
+<pre><code>&lt;space&gt; command
+</code></pre>
+
+<p>这条命令可运行于最新的Bash shell里，在其它shell中没测试过。通过在命令行前面添加一个空格，就可以阻止这条命令被保存到<code>~/.bash_history</code>文件中，这个行为可以通过<code>$HISTIGNORE</code>shell变量来控制。设置为<code>HISTIGNORE="&amp;:[ ]*"</code>，表示不保存重复的命令到<code>history</code>中，并且不保存以空格开头的命令行。<code>$HISTIGNOR</code>中的值以冒号分隔。</p>
+
+<h3>7. 显示当前目录中所有子目录的大小</h3>
+
+<pre><code>du -h --max-depth=1
+</code></pre>
+
+<p><code>--max-depth=1</code>参数可以让du命令显示当前目录下1级子目录的统计信息，当然你也可以把1改为2，进一步显示2级子目录的统计信息，可以灵活运用。而<code>-h</code>参数则是以Mb 、G这样的单位来显示大小。小工具ncdu可以更方便的达到此效果。</p>
+
+<h3>8. 显示消耗内存最多的10个运行中的进程，以内存使用量排序</h3>
+
+<pre><code>ps aux | sort -nk +4 | tail
+</code></pre>
+
+<p>这是一个典型的管道应用，通过<code>ps aux</code>来输出到<code>sort</code>命令，并用<code>sort</code>排序列出4栏，再进一步转到<code>tail</code>命令，最终输出10行显示使用内存最多的进程情况。假如想要发现哪个进程使用了大量内存的话，通常会使用<code>hto</code>p或<code>top</code>而非<code>ps</code>。</p>
+
+<h2>第四部分</h2>
+
+<h3>1. 查看ASCII码表</h3>
+
+<pre><code>man 7 ascii
+</code></pre>
+
+<p>上述命令就能很详细的方式解释ascii编码，当然这里还有在线版。man命令的第二个参数是区域码，用来区分索引词的范围，比如printf， C标准库里面的printf跟bash当中的printf是不同的，前者的查询是<code>man 3 printf</code>，后者是<code>man 1 printf</code>。如果这个区域码省略，就会从1开始搜索，直到找到为止。命令<code>man man</code>可以看到详细的解释。</p>
+
+<p>manpages里面还有一些有趣而且实用的资料，可能鲜为人知:</p>
+
+<pre><code>man 1 intro 一篇对从未接触过Linux的用户的简明教程
+man 2 syscalls  内核系统请求的列表，按内核版本注释分类，系统编程必备
+man 2 select_tut    关于select()系统请求的教程
+man 3 string    在头文件内的所有函数
+man 3 stdio 关于头文件的使用，标准输入/输出库的说明
+man 4 console_codes Linux的终端控制码及其使用解释
+man 4 full  介绍/dev/full这个总是处于"满"状态的磁盘。(对应/dev/null这个总是空的设备)
+man 5 proc  介绍/proc下的文件系统
+man 5 filesystems   各种Linux文件系统
+man 7 bootparam 详细解释内核启动参数
+man 7 charsets  解释各种语言的编码集。(gbk，gb2312等)
+man 7 glob  解释glob文件名管理机制的工作过程
+man 7 hier  解释Linux文件系统结构各个部分的作用
+man 7 operator  C语言的运算符的列表
+man 7 regex 介绍正则表达式
+</code></pre>
+
+<h3>2. 简易计时器</h3>
+
+<pre><code>time read
+</code></pre>
+
+<p>运行命令开始算起，到结束时按一Enter，就显示出整个过程的时间，精确到ms级别。time是用来计算一个进程在运行到结束过程耗费多少时间的程序，它的输出通常有三项:</p>
+
+<pre><code>$ time ls /opt
+...
+real 0m0.008s
+user 0m0.003s
+sys 0m0.007s
+
+real    指整个程序对真实世界而言运行所需时间
+user    指程序在用户空间运行的时间，
+sys     指程序对系统调用锁占用时间
+</code></pre>
+
+<p><code>read</code>本来是一个读取用户输入的命令，常见用法是<code>read LINE</code>，用户输入并回车后，键入的内容就被保存到<code>$LINE</code>变量内，但在键入回车前，这个命令是一直阻塞的。可见<code>time read</code>这命令灵活地利用了操作系统的阻塞。</p>
+
+<h3>3. 在一个子SHELL中运行一个命令</h3>
+
+<pre><code>(cd /tmp &amp;&amp; ls)
+</code></pre>
+
+<p>当然这只是演示，要查看目录当然可以<code>ls /tmp</code>。好处就是不会改变当前shell的目录，以及如果命令中设计环境变量，也不会对当前shell有任何修改。</p>
+
+<p>在Shell编程中还有很多使用上引号来括住一个命令:<code>ls /tmp</code>，这也是子shell过程。可是上引号的方法无法嵌套，而使用小括号的方法可以，一个比较纠结的例子是:</p>
+
+<pre><code>echo $(echo -e file:///C|/x%24%28printf "%x" 65))
+</code></pre>
+
+<h3>4. 利用中间管道嵌套使用SSH</h3>
+
+<pre><code>ssh -t host_A ssh host_B
+</code></pre>
+
+<p>如果目标机器host_B处于比较复杂的网络环境，本机无法直接访问，但另外一台host_A能够访问到host_B，而且也能被本机访问到，那上述命令就解决了方便登录host_B的问题。但理论上这个过程是可以无限嵌套的，比如:</p>
+
+<pre><code>ssh -t host1 ssh -t host2 ssh -t host3 ssh -t host4 ...
+</code></pre>
+
+<h3>5. 清空屏幕</h3>
+
+<pre><code>&lt;CTRL+l&gt;
+</code></pre>
+
+<p>这个跟之前介绍的<code>reset</code>命令重置终端的作用有些类似，其实都只是发送一段控制序列，让终端的显示复位。还可以这样运行:</p>
+
+<pre><code>tput clear
+</code></pre>
+
+<p><code>tput</code>是专门用来控制终端的一个小工具，也挺强大的，详细信息运行<code>man tput</code>查看。</p>
+
+<h3>6. 我想知道一台服务器什么时候重启完</h3>
+
+<pre><code>ping -a IP
+</code></pre>
+
+<p><code>ping</code>命令有个audible ping参数<code>-a</code>，当ping通服务器时会让小喇叭叫起来。</p>
+
+<h3>7. 列出你最常用的10条命令</h3>
+
+<pre><code>history | awk '{a[$2]++}END{for(i in a){print a[i] " " i}}' | sort -rn | head
+</code></pre>
+
+<p>这行命令组合得很妙: <code>history</code>输出用户了命令历史;<code>awk</code>统计并输出列表;<code>sort</code>排序;<code>head</code>截出前10行。</p>
+
+<h3>8. 用TELNET看《星球大战》</h3>
+
+<pre><code>telnet towel.blinkenlights.nl
+</code></pre>
+
+<p>没什么好解释的，就是ASCII艺术之一。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[创业公司的运维工作]]></title>
@@ -1812,86 +2227,6 @@
 <li>难道没有raid就不行？再进到raid管理</li>
 <li>进行硬盘初始化，然后创建raid使用简单卷Volume即可</li>
 <li>一路安装终于没有问题了</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[ubuntu服务器增加磁盘]]></title>
-    <link href="http://www.wanghd.com/blog/2013/04/03/fu-wu-qi-zeng-jia-ci-pan/"/>
-    <updated>2013-04-03T11:57:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/04/03/fu-wu-qi-zeng-jia-ci-pan</id>
-    <content type="html"><![CDATA[<h3>显示硬盘分区</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sudo fdisk -lu
-</span><span class='line'>
-</span><span class='line'># 系统显示最下面显示：disk /dev/sdb doesn't contain a valid partition table</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>对sdb进行分区</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sudo fdisk /dev/sdb</span></code></pre></td></tr></table></div></figure>
-
-
-<ol>
-<li>按m显示帮助文档</li>
-<li>根据提示按n 添加一个新分区</li>
-<li>按e 添加扩展分区，接下去默认即可</li>
-<li>回到帮助文档，按p 显示分区结果</li>
-<li>按w 保存分区，并退出完成</li>
-<li>可以再fdisk -lu看看，结果已经不同了，硬盘认出来了</li>
-</ol>
-
-
-<!-- more -->
-
-
-<h3>格式化磁盘</h3>
-
-<ul>
-<li>-t 是文件系统类型</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sudo mkfs -t ext4 /dev/sdb</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>挂载磁盘</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sudo mount -t ext4  /data
-</span><span class='line'>
-</span><span class='line'># 查看结果，应该有记录了
-</span><span class='line'>sudo df -l</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>配置启动挂载</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sudo blkid /dev/sdb
-</span><span class='line'># 显示 /dev/sdb: UUID="cc6f31aa-9af3-4283-8e52-8d31f5ebbd36" TYPE="ext4"
-</span><span class='line'>
-</span><span class='line'>vim /etc/fstab
-</span><span class='line'># 添加一行
-</span><span class='line'>UUID=cc6f31aa-9af3-4283-8e52-8d31f5ebbd36 /data ext4 defaults 0 0</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>fstab里的pass 根目录应当获得最高的优先权 1, 其它所有需要被检查的设备设置为 2. 0 表示设备不会被 fsck 所检查。</li>
 </ul>
 
 ]]></content>

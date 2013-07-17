@@ -1,24 +1,129 @@
-<?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: Share | 老虎的眼睛]]></title>
-  <link href="http://www.wanghd.com/blog/categories/share/atom.xml" rel="self"/>
-  <link href="http://www.wanghd.com/"/>
-  <updated>2013-07-17T19:20:21+08:00</updated>
-  <id>http://www.wanghd.com/</id>
-  <author>
-    <name><![CDATA[王惠达 huida wanghuida]]></name>
-    <email><![CDATA[wanghuida258@yahoo.com]]></email>
-  </author>
-  <generator uri="http://octopress.org/">Octopress</generator>
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>linux 操作集锦 - 老虎的眼睛</title>
+  <meta name="author" content="王惠达 huida wanghuida">
 
   
-  <entry>
-    <title type="html"><![CDATA[linux 操作集锦]]></title>
-    <link href="http://www.wanghd.com/blog/2013/07/17/linux-cao-zuo-ji-jin/"/>
-    <updated>2013-07-17T19:18:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/07/17/linux-cao-zuo-ji-jin</id>
-    <content type="html"><![CDATA[<h2>第一部</h2>
+  <meta name="description" content="王惠达博客 IT技术 php perl python java c ruby wanghuida blog lucene mogilefs">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.wanghd.com/blog/2013/07/17/linux-cao-zuo-ji-jin">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/bootstrap/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/bootstrap/responsive.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/syntax/syntax.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <style type="text/css">
+    body {
+      padding-bottom: 40px;
+    }
+    h1 {
+      margin-bottom: 15px;
+    }
+    img {
+      max-width: 100%;
+    }
+    .sharing, .meta, .pager {
+      margin: 20px 0px 20px 0px;
+    }
+    .page-footer p {
+      text-align: center;
+    }
+  </style>
+  <script src="/javascripts/libs/jquery.js"></script>
+  <script src="/javascripts/libs/modernizr-2.0.js"></script>
+  <script src="/javascripts/libs/bootstrap.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="老虎的眼睛" type="application/atom+xml">
+  
+  
+
+</head>
+
+<body   >
+  <nav role="navigation"><div class="navbar">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+
+      <a class="brand" href="/">老虎的眼睛</a>
+
+      <div class="nav-collapse">
+        <ul class="nav">
+  <li><a href="/">博客首页</a></li>
+  <li><a href="/blog/archives">文章归档</a></li>
+  <li><a href="mailto:wanghuida258@yahoo.cn">联系站长</a></li>
+  <li><a href="http://www.taobao.com/go/chn/tbk_channel/channelcode.php?pid=mm_32662861_3310667_10778125&eventid=101329">淘宝推广</a></li>
+
+</ul>
+
+
+        <ul class="nav pull-right" data-subscription="rss">
+          <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+          
+        </ul>
+
+        
+          <form class="pull-right navbar-search" action="http://google.com/search" method="get">
+            <fieldset role="search">
+              <input type="hidden" name="q" value="site:www.wanghd.com" />
+              <input class="search-query" type="text" name="q" results="0" placeholder="查找"/>
+            </fieldset>
+          </form>
+        
+      </div>
+    </div>
+  </div>
+</div>
+</nav>
+  <div class="container">
+    <div class="row-fluid">
+      
+<article class="hentry span9" role="article">
+
+  
+  <header class="page-header">
+    
+      <h1 class="entry-title">Linux 操作集锦</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-17T19:18:00+08:00" pubdate data-updated="true">Jul 17<span>th</span>, 2013</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2>第一部</h2>
 
 <h3>1. 以Sudo运行上条命令</h3>
 
@@ -262,7 +367,7 @@ ssh -f -N -L 0.0.0.0:80:twitter.com:80 shell.cjb.net
 
 <p>直接输入nicemount运行即可。</p>
 
-<h3>2. 运行前一个Shell命令，同时用"bar"替换掉命令行中的每一个"foo"</h3>
+<h3>2. 运行前一个Shell命令，同时用&#8221;bar&#8221;替换掉命令行中的每一个&#8221;foo&#8221;</h3>
 
 <pre><code>!!:gs/foo/bar
 </code></pre>
@@ -425,229 +530,225 @@ sys     指程序对系统调用锁占用时间
 </code></pre>
 
 <p>没什么好解释的，就是ASCII艺术之一。</p>
-]]></content>
-  </entry>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
   
-  <entry>
-    <title type="html"><![CDATA[创业公司的运维工作]]></title>
-    <link href="http://www.wanghd.com/blog/2013/07/17/chuang-ye-gong-si-de-yun-wei-gong-zuo/"/>
-    <updated>2013-07-17T13:04:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/07/17/chuang-ye-gong-si-de-yun-wei-gong-zuo</id>
-    <content type="html"><![CDATA[<h3>创业公司的运维工作应该尽可能简单，不用追求全自动化，但必要的工作还是要做的。</h3>
 
-<br />
+<span class="byline author vcard">Posted by <span class="fn">王惠达 huida wanghuida</span></span>
+
+      
 
 
-<h3>安全管理</h3>
-
-<ol>
-<li>有权限的员工登录服务器需要使用<em>key</em>通过跳板机，再进入线上服务器</li>
-<li>外部的请求，需要通过<em>lb</em>转发才能访问，内部服务器无法直接提供服务</li>
-<li>内部的服务器访问外网需要通过proxy</li>
-<li>内部服务器保存操作记录</li>
-<li>加强ddos防护</li>
-<li>端口和ip的限制</li>
-</ol>
 
 
-<p>```</p>
-
-<pre><code>       +------+  +---------+        +-----+                                                 
-       |  lb  |  |  proxy  |        | ssh |                                                 
-       +------+  +---------+        +-----+                                                 
-          |           ^                |                                                    
-          v           |                |                                                   
-      +--------------------------------|---+                                               
-      |                                |   |                                                
-      |         internal server     &lt;--+   |                                                
-      |                                    |                                                
-      +------------------------------------+                                               
-</code></pre>
-
-<p>```</p>
-
-<!-- more -->
 
 
-<h3>服务器 (ubuntu)</h3>
-
-<ol>
-<li>服务器上架下架，硬件故障（其实创业公司托管还不如用云服务）</li>
-<li>常用软件安装，更新，配置</li>
-</ol>
 
 
-<h3>数据库管理 (mysql)</h3>
-
-<ol>
-<li>日志管理：2进制日志，错误日志，慢请求日志</li>
-<li>优化性能：读写分离，优化慢查询</li>
-<li>冷备，热备</li>
-<li>安全：限制访问ip, 权限最小化</li>
-</ol>
-
-
-<h3>监控报警 (cacti nagios)</h3>
-
-<ol>
-<li>指定报警处理人</li>
-<li>添加报警，添加监控</li>
-<li>监控和报警本身状态的维护</li>
-</ol>
-
-
-<h3>图片服务 (mogilefs squid php memcache mysql)</h3>
-
-<ol>
-<li>图片备份，必须存储2份以上</li>
-<li>图片服务优化</li>
-<li>图片服务日志分析，统计数据</li>
-</ol>
-
-
-<h3>信息更新</h3>
-
-<ol>
-<li>记录每台服务器上处理的job</li>
-<li>记录每台服务器上提供的服务</li>
-<li>其他重要信息</li>
-</ol>
-
-
-<h3>其他数据备份</h3>
-
-<ol>
-<li>svn,git备份</li>
-<li>crontab 备份（有过-r直接删除的经验。。。）</li>
-<li>一些重要配置的备份</li>
-</ol>
-
-]]></content>
-  </entry>
   
-  <entry>
-    <title type="html"><![CDATA[CutyCapt html页面生成图片 分享微博]]></title>
-    <link href="http://www.wanghd.com/blog/2013/07/15/cutycapt-htmlye-mian-sheng-cheng-tu-pian-fen-xiang-wei-bo/"/>
-    <updated>2013-07-15T16:47:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/07/15/cutycapt-htmlye-mian-sheng-cheng-tu-pian-fen-xiang-wei-bo</id>
-    <content type="html"><![CDATA[<ul>
-<li><p>CutyCapt一个用Qt Webkit把html页面生成图片的工具</p></li>
-<li><p>Mac下安装使用</p></li>
-</ul>
 
 
-<p>```
-brew install cuty_capt</p>
+<time datetime="2013-07-17T19:18:00+08:00" pubdate data-updated="true">Jul 17<span>th</span>, 2013</time>
+      
 
-<p>CutyCapt --private-browsing=off --min-width=640 --min-height=440 \</p>
-
-<pre><code>--url="http://meimeidou.cn/diySubject/detail/key/1366957139/magnify/1" --out="/tmp/img.png"
-</code></pre>
-
-<p>```</p>
-
-<ul>
-<li>Ubuntu生产环境下安装使用</li>
-</ul>
-
-
-<p>```</p>
-
-<h1>xvfb是一个虚拟的X windows</h1>
-
-<p>sudo apt-get install xvfb
-sudo apt-get install cutycapt</p>
-
-<h1>搞一个中文字体，雅黑就不错，可以自己找也可以联系我</h1>
-
-<p>scp msyh.ttf idc01-002:/tmp
-sudo cp /tmp/msyh.ttf /usr/share/fonts/truetype/</p>
-
-<h1>如果缺少icu48可以装下</h1>
-
-<p>sudo apt-get install libicu48</p>
-
-<h1>生成图片</h1>
-
-<p>xvfb-run --server-args="-screen 0, 1024x768x24" cutycapt --private-browsing=off --min-width=640 --min-height=440 \</p>
-
-<pre><code>--url="http://meimeidou.cn/diySubject/detail/key/1366957139/magnify/1" --out="/tmp/img.png"
-</code></pre>
-
-<p>```</p>
-]]></content>
-  </entry>
+<span class="categories">
   
-  <entry>
-    <title type="html"><![CDATA[sshfs]]></title>
-    <link href="http://www.wanghd.com/blog/2013/05/30/sshfs/"/>
-    <updated>2013-05-30T16:57:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/05/30/sshfs</id>
-    <content type="html"><![CDATA[<ul>
-<li>今天看到sshfs可以像mount一样挂上磁盘非常方便记录一下</li>
-</ul>
-
-
-<p>```</p>
-
-<p>sshfs user@hostname:path mount_point</p>
-
-<p>```</p>
-]]></content>
-  </entry>
+    <a class='category' href='/blog/categories/share/'>Share</a>
   
-  <entry>
-    <title type="html"><![CDATA[cacti spine的安装配置]]></title>
-    <link href="http://www.wanghd.com/blog/2013/05/29/cacti-spinede-an-zhuang-pei-zhi/"/>
-    <updated>2013-05-29T15:35:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/05/29/cacti-spinede-an-zhuang-pei-zhi</id>
-    <content type="html"><![CDATA[<ul>
-<li>cacti官方有详细的配置流程，这里只是翻译和错误的解决</li>
-</ul>
+</span>
 
 
-<p>```bash
-wget http://www.cacti.net/downloads/spine/cacti-spine-0.8.8a.tar.gz
-tar -zxvf cacti-spine-0.8.8a.tar.gz
-cd cacti-spine-0.8.8a/</p>
-
-<p>./configure</p>
-
-<h1>configure: error: Cannot find MySQL headers.  Use --with-mysql= to specify non-default path.</h1>
-
-<h1>下载安装mysqlclient开发包</h1>
-
-<p>sudo apt-get install libmysqlclient-dev</p>
-
-<p>./configure</p>
-
-<h1>configure: error: Cannot find SNMP headers.  Use --with-snmp= to specify non-default path.</h1>
-
-<h1>下载安装snmp开发包</h1>
-
-<p>sudo apt-cache search snmp | grep dev
-sudo apt-get install libsnmp-dev</p>
-
-<p>./configure
-make
-make install
-```</p>
-
-<ul>
-<li>搞定配置文件</li>
-</ul>
-
-
-<p><code>
-cp /usr/local/spine/etc/spine.conf.dist /usr/local/spine/etc/spine.conf
-</code></p>
-
-<ul>
-<li><p>admin登录cacti页面, 选择Settings的Paths选项卡，输入完整的spine路径[Alternate Poller Path]</p></li>
-<li><p>点击Settings的Poller选项卡，从Poller Type里选择spine</p></li>
-</ul>
-
-]]></content>
-  </entry>
+    </p>
+    
+      <div class="sharing">
   
-</feed>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2013/07/17/linux-cao-zuo-ji-jin/" data-via="" data-counturl="http://www.wanghd.com/blog/2013/07/17/linux-cao-zuo-ji-jin/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    
+    <section>
+      <h1>Comments</h1>
+      <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+    </section>
+    
+    <ul class="pager">
+      
+      <li class="previous"><a class="basic-alignment left"
+        href="/blog/2013/07/17/chuang-ye-gong-si-de-yun-wei-gong-zuo/" title="Previous Post:
+        创业公司的运维工作">&laquo; 创业公司的运维工作</a></li>
+      
+      <li><a href="/blog/archives">文章归档</a></li>
+      
+    </ul>
+  </footer>
+</article>
+
+<aside class="sidebar-nav span3">
+  
+    <section class="well">
+  <ul id="categories" class="nav nav-list">
+    <li class="nav-header">文章分类</li>
+    <li class='category'><a href='/blog/categories/hadoop/'>Hadoop (4)</a></li>
+<li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
+<li class='category'><a href='/blog/categories/javascript/'>Javascript (3)</a></li>
+<li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
+<li class='category'><a href='/blog/categories/mysql/'>Mysql (8)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
+<li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
+<li class='category'><a href='/blog/categories/php/'>Php (7)</a></li>
+<li class='category'><a href='/blog/categories/python/'>Python (3)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (32)</a></li>
+<li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
+
+  </ul>
+</section>
+
+<section>
+  <ul id="taobao_rank" class="nav">
+    <li>
+  <script type="text/javascript"> 
+  alimama_pid="mm_32662861_3310667_11125910"; 
+  alimama_width=250; 
+  alimama_height=250; 
+  </script> 
+  <script src="http://a.alimama.cn/inf.js" type="text/javascript"> 
+  </script>
+    </li>
+  </ul>
+</section>
+<section class="well">
+  <ul id="recent_posts" class="nav nav-list">
+    <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/17/linux-cao-zuo-ji-jin/">linux 操作集锦</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/17/chuang-ye-gong-si-de-yun-wei-gong-zuo/">创业公司的运维工作</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/15/cutycapt-htmlye-mian-sheng-cheng-tu-pian-fen-xiang-wei-bo/">CutyCapt html页面生成图片 分享微博</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/02/phptu-pian-chu-li-ubuntupei-zhi/">php图片处理ubuntu配置</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/06/27/fu-dong-ju-zhong/">浮动居中</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/30/sshfs/">sshfs</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/29/cacti-spinede-an-zhuang-pei-zhi/">cacti spine的安装配置</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/29/sysdescr-unknown-object-identifier-sub-id-not-found-top-sysdescr/">解决 sysDescr: Unknown Object Identifier (Sub-id not found: (top)  sysDescr)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/24/sqlalchemy-ding-yi-mo-xing/">sqlalchemy 定义模型</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/24/yii-yin-cang-index-dot-php/">yii 隐藏index.php RESTful nginx配置</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section class="well">
+  <ul id="links" class="nav nav-list">
+    <li class="nav-header">好友链接</li>
+    <li><a href="http://www.zwsun.com">阿文的自留地</a></li>
+    <li><a href="http://www.deepwarm.com/">明兄的私房菜</a></li>
+    <li><a href="http://joinjoy.me/blog/">柏健的博客</a></li>
+  </ul>
+</section>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo" class="page-footer"><script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-35556528-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<hr>
+<p>
+  Copyright &copy; 2013 - 王惠达 huida wanghuida -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+   - <span class="credit">沪ICP备12048826号</span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'wanghuida';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.wanghd.com/blog/2013/07/17/linux-cao-zuo-ji-jin/';
+        var disqus_url = 'http://www.wanghd.com/blog/2013/07/17/linux-cao-zuo-ji-jin/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+<!--
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+-->
+
+
+
+
+
+</body>
+</html>
