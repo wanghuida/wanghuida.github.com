@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>解决 sysDescr: Unknown Object Identifier (Sub-id not found: (top)  sysDescr) - 老虎的眼睛</title>
+  <title>ubuntu keychain 使用 - 老虎的眼睛</title>
   <meta name="author" content="王惠达 huida wanghuida">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.wanghd.com/blog/2013/05/29/sysdescr-unknown-object-identifier-sub-id-not-found-top-sysdescr">
+  <link rel="canonical" href="http://www.wanghd.com/blog/2013/07/18/ubuntu-keychain-shi-yong">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/bootstrap/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/stylesheets/bootstrap/responsive.css" media="screen, projection" rel="stylesheet" type="text/css">
@@ -98,7 +98,7 @@
   
   <header class="page-header">
     
-      <h1 class="entry-title">解决 sysDescr: Unknown Object Identifier (Sub-id Not Found: (Top) sysDescr)</h1>
+      <h1 class="entry-title">Ubuntu Keychain 使用</h1>
     
     
       <p class="meta">
@@ -114,7 +114,7 @@
   
 
 
-<time datetime="2013-05-29T11:58:00+08:00" pubdate data-updated="true">May 29<span>th</span>, 2013</time>
+<time datetime="2013-07-18T22:33:00+08:00" pubdate data-updated="true">Jul 18<span>th</span>, 2013</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -124,49 +124,32 @@
 
 
 <div class="entry-content"><ul>
-<li>ubuntu安装snmp很方便</li>
+<li>ssh-keygen生成密钥，经常会设置一个密码，让试图窃取的人无计可施。</li>
+<li>问题来了，每次登录都会要求输入密码，是时候来搞个keychain了</li>
 </ul>
 
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apt-get install snmp snmpd</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>配置我就跳过了，直接测试，问题来了</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>snmpwalk -v 2c -c public 127.0.0.1 sysDescr
-</span><span class='line'>
-</span><span class='line'># 显示 sysDescr: Unknown Object Identifier (Sub-id not found: (top) -&gt; sysDescr)</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li><p>网上搜一下，没有正确可行的办法，但是也是有收获</p></li>
-<li><p>直接使用snmpwalk -v 2c -c public 127.0.0.1 是没有问题的</p></li>
-<li>那就说明问题出在mibs上</li>
-<li>尝试解决一下</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apt-get install snmp-mibs-downloader
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>sudo apt-get install keychain
+</span><span class='line'><span class="nv">$ </span>/usr/bin/keychain ~/.ssh/id_rsa
 </span><span class='line'>
-</span><span class='line'>vim /etc/snmp/snmp.conf
-</span><span class='line'>#全部注释下～～～
-</span><span class='line'>#再测试就没问题了，使用了新的mibs
-</span><span class='line'>snmpwalk -v 2c -c public 127.0.0.1 sysDescr
+</span><span class='line'><span class="c"># 加到.profile</span>
+</span><span class='line'>. ~/.keychain/<span class="nv">$HOSTNAME</span>-sh
+</span><span class='line'>. ~/.profile
 </span></code></pre></td></tr></table></div></figure>
 
+
+<ul>
+<li>keychain到底干了什么呀？</li>
+</ul>
+
+
+<p>keychain会起一个ssh-agent，后来登录的人通过$HOSTNAME-sh设置环境变量使用同一个ssh-agent</p>
 </div>
 
 
@@ -189,7 +172,7 @@
   
 
 
-<time datetime="2013-05-29T11:58:00+08:00" pubdate data-updated="true">May 29<span>th</span>, 2013</time>
+<time datetime="2013-07-18T22:33:00+08:00" pubdate data-updated="true">Jul 18<span>th</span>, 2013</time>
       
 
 <span class="categories">
@@ -203,7 +186,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2013/05/29/sysdescr-unknown-object-identifier-sub-id-not-found-top-sysdescr/" data-via="" data-counturl="http://www.wanghd.com/blog/2013/05/29/sysdescr-unknown-object-identifier-sub-id-not-found-top-sysdescr/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2013/07/18/ubuntu-keychain-shi-yong/" data-via="" data-counturl="http://www.wanghd.com/blog/2013/07/18/ubuntu-keychain-shi-yong/" >Tweet</a>
   
   
   
@@ -220,13 +203,13 @@
     <ul class="pager">
       
       <li class="previous"><a class="basic-alignment left"
-        href="/blog/2013/05/24/sqlalchemy-ding-yi-mo-xing/" title="Previous Post:
-        sqlalchemy 定义模型">&laquo; sqlalchemy 定义模型</a></li>
+        href="/blog/2013/07/17/linux-cao-zuo-ji-jin/" title="Previous Post:
+        linux 操作集锦">&laquo; linux 操作集锦</a></li>
       
       <li><a href="/blog/archives">文章归档</a></li>
       
-      <li class="next"><a class="basic-alignment right" href="/blog/2013/05/29/cacti-spinede-an-zhuang-pei-zhi/"
-        title="Next Post: cacti spine的安装配置">cacti spine的安装配置
+      <li class="next"><a class="basic-alignment right" href="/blog/2013/07/25/304huan-cun-tu-pian-mei-you-hong-fa-loadshi-jian/"
+        title="Next Post: 304缓存图片没有触发load事件">304缓存图片没有触发load事件
         &raquo;</a></li>
       
     </ul>
@@ -358,8 +341,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.wanghd.com/blog/2013/05/29/sysdescr-unknown-object-identifier-sub-id-not-found-top-sysdescr/';
-        var disqus_url = 'http://www.wanghd.com/blog/2013/05/29/sysdescr-unknown-object-identifier-sub-id-not-found-top-sysdescr/';
+        var disqus_identifier = 'http://www.wanghd.com/blog/2013/07/18/ubuntu-keychain-shi-yong/';
+        var disqus_url = 'http://www.wanghd.com/blog/2013/07/18/ubuntu-keychain-shi-yong/';
         var disqus_script = 'embed.js';
       
     (function () {

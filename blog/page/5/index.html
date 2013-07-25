@@ -100,6 +100,123 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng/">Mogilefs设备损坏处理流程</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-25T19:34:00+08:00" pubdate data-updated="true">Nov 25<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><ul>
+<li>这里单个dev对应一个磁盘,假设是sdb</li>
+<li>文件系统使用xfs</li>
+<li>mogstored使用nginx</li>
+</ul>
+
+
+<p>1.把磁盘标记为dead</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>mogadm device mark &lt;hostname&gt; &lt;devid&gt; &lt;status&gt;
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2012/11/25/mogilefsshe-bei-sun-pi-chu-li-liu-cheng/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2012/11/25/inotify/">Inotify,rsync统一化配置</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-25T16:14:00+08:00" pubdate data-updated="true">Nov 25<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/25/inotify/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>为什么要统一化配置，手动改改不行？</h3>
+
+<ul>
+<li>假设有10台服务器，要改10次，错误和遗漏在所难免</li>
+<li>需要有一个地方备份配置</li>
+<li>也许还需要对配置文件进行版本控制</li>
+</ul>
+
+
+<h3>inotify+rsync改变这一切</h3>
+
+<ul>
+<li>inotify可以递归的监控文件是否有新建，修改等</li>
+<li>rsync用来同步</li>
+</ul>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2012/11/25/inotify/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2012/11/22/mogilefsan-zhuang-pei-zhi/">MogileFS安装配置</a></h1>
     
     
@@ -500,126 +617,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/07/nginxfan-xiang-dai-li-zi-dong-urldecodewen-ti/">Nginx反向代理自动urldecode问题</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-07T16:40:00+08:00" pubdate data-updated="true">Nov 7<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/07/nginxfan-xiang-dai-li-zi-dong-urldecodewen-ti/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>今天妖孽了，发现nginx反向代理会自动urldecode</h3>
-
-<ul>
-<li>同事监控两个nginx的access_log，惊人的发现日志里的url不同</li>
-<li>去掉反斜杠就ok了，不太清楚nginx内部是如何处理的</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>location / {
-</span><span class='line'>    proxy_pass        http://localhost:8000/;
-</span><span class='line'>}
-</span><span class='line'>#修改为下面这样后，一切OK了
-</span><span class='line'>location / {
-</span><span class='line'>    proxy_pass        http://localhost:8000;
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/06/mogilefsshan-chu-dui-lie/">Mogilefs删除队列</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-06T19:31:00+08:00" pubdate data-updated="true">Nov 6<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/06/mogilefsshan-chu-dui-lie/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>遇到的问题</h3>
-
-<ul>
-<li>发现file_to_delete2队列表里有500万记录，奇怪这些文件为什么要删除？心里不踏实，寻找根源&#8230;</li>
-<li>在队列中随便拿一个fid，在file表里查竟然是空的，再找file_on表竟然有数据&#8230;</li>
-</ul>
-
-
-<h3>什么时候会插入fid到删除队列呢</h3>
-
-<ol>
-<li>cmd_create_close时，如果连接终端，文件大小等不正确，会增加到删除队列</li>
-<li>cmd_create_close时，如果同一domain下key已经存在，那么会去删除原有的文件(两份文件key相同，但是fid不同，我的问题就出在这)</li>
-<li>mogdelete工具会删除memcache和file表的文件记录，并运用删除队列删除磁盘上的文件和file_on表</li>
-<li>client调用delete方法，和mogdelete一样</li>
-</ol>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/11/06/mogilefsshan-chu-dui-lie/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/6/">&larr; 其他文章</a></li>
@@ -637,7 +634,7 @@
     <li class="nav-header">文章分类</li>
     <li class='category'><a href='/blog/categories/hadoop/'>Hadoop (4)</a></li>
 <li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
-<li class='category'><a href='/blog/categories/javascript/'>Javascript (3)</a></li>
+<li class='category'><a href='/blog/categories/javascript/'>Javascript (4)</a></li>
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
 <li class='category'><a href='/blog/categories/mysql/'>Mysql (8)</a></li>
 <li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
@@ -666,6 +663,14 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/25/304huan-cun-tu-pian-mei-you-hong-fa-loadshi-jian/">304缓存图片没有触发load事件</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/18/ubuntu-keychain-shi-yong/">ubuntu keychain 使用</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/07/17/linux-cao-zuo-ji-jin/">linux 操作集锦</a>
@@ -697,14 +702,6 @@
     
       <li class="post">
         <a href="/blog/2013/05/29/sysdescr-unknown-object-identifier-sub-id-not-found-top-sysdescr/">解决 sysDescr: Unknown Object Identifier (Sub-id not found: (top)  sysDescr)</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/05/24/sqlalchemy-ding-yi-mo-xing/">sqlalchemy 定义模型</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/05/24/yii-yin-cang-index-dot-php/">yii 隐藏index.php RESTful nginx配置</a>
       </li>
     
   </ul>

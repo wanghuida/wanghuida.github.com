@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>解决 sysDescr: Unknown Object Identifier (Sub-id not found: (top)  sysDescr) - 老虎的眼睛</title>
+  <title>304缓存图片没有触发load事件 - 老虎的眼睛</title>
   <meta name="author" content="王惠达 huida wanghuida">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.wanghd.com/blog/2013/05/29/sysdescr-unknown-object-identifier-sub-id-not-found-top-sysdescr">
+  <link rel="canonical" href="http://www.wanghd.com/blog/2013/07/25/304huan-cun-tu-pian-mei-you-hong-fa-loadshi-jian">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/bootstrap/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/stylesheets/bootstrap/responsive.css" media="screen, projection" rel="stylesheet" type="text/css">
@@ -98,7 +98,7 @@
   
   <header class="page-header">
     
-      <h1 class="entry-title">解决 sysDescr: Unknown Object Identifier (Sub-id Not Found: (Top) sysDescr)</h1>
+      <h1 class="entry-title">304缓存图片没有触发load事件</h1>
     
     
       <p class="meta">
@@ -114,7 +114,7 @@
   
 
 
-<time datetime="2013-05-29T11:58:00+08:00" pubdate data-updated="true">May 29<span>th</span>, 2013</time>
+<time datetime="2013-07-25T14:54:00+08:00" pubdate data-updated="true">Jul 25<span>th</span>, 2013</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -124,47 +124,57 @@
 
 
 <div class="entry-content"><ul>
-<li>ubuntu安装snmp很方便</li>
+<li>图片墙需要计算图片高度，只有等图片load好计算的高度才正确，所以代码如下：</li>
 </ul>
 
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apt-get install snmp snmpd</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>配置我就跳过了，直接测试，问题来了</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>snmpwalk -v 2c -c public 127.0.0.1 sysDescr
-</span><span class='line'>
-</span><span class='line'># 显示 sysDescr: Unknown Object Identifier (Sub-id not found: (top) -&gt; sysDescr)</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li><p>网上搜一下，没有正确可行的办法，但是也是有收获</p></li>
-<li><p>直接使用snmpwalk -v 2c -c public 127.0.0.1 是没有问题的</p></li>
-<li>那就说明问题出在mibs上</li>
-<li>尝试解决一下</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apt-get install snmp-mibs-downloader
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s2">&quot;.img-div&quot;</span><span class="p">).</span><span class="nx">each</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
 </span><span class='line'>
-</span><span class='line'>vim /etc/snmp/snmp.conf
-</span><span class='line'>#全部注释下～～～
-</span><span class='line'>#再测试就没问题了，使用了新的mibs
-</span><span class='line'>snmpwalk -v 2c -c public 127.0.0.1 sysDescr
+</span><span class='line'>    <span class="c1">//设置load事件</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">find</span><span class="p">(</span><span class="s1">&#39;img&#39;</span><span class="p">).</span><span class="nx">load</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>        <span class="cm">/* 用height()获取高度，省略事件逻辑 */</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li><p>感觉上面的代码很符合逻辑了，问题出现了：</p></li>
+<li><p>当图片返回304缓存时，该图片不能触发load事件。。。（通过判断complete属性来修正）</p></li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;.img-div&quot;</span><span class="p">).</span><span class="nx">each</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">find</span><span class="p">(</span><span class="s1">&#39;img&#39;</span><span class="p">).</span><span class="nx">one</span><span class="p">(</span><span class="s1">&#39;load&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>            <span class="cm">/* 用height()获取高度，省略事件逻辑 */</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="c1">//使用one强制事件只触发一次，缓存的图片通过load()方法进行触发</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="p">}).</span><span class="nx">each</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>          <span class="k">if</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">complete</span><span class="p">)</span> <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">load</span><span class="p">();</span>
+</span><span class='line'>        <span class="p">});</span>
+</span><span class='line'>    <span class="p">});</span>
 </span></code></pre></td></tr></table></div></figure>
 
 </div>
@@ -189,12 +199,12 @@
   
 
 
-<time datetime="2013-05-29T11:58:00+08:00" pubdate data-updated="true">May 29<span>th</span>, 2013</time>
+<time datetime="2013-07-25T14:54:00+08:00" pubdate data-updated="true">Jul 25<span>th</span>, 2013</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/share/'>Share</a>
+    <a class='category' href='/blog/categories/javascript/'>Javascript</a>
   
 </span>
 
@@ -203,7 +213,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2013/05/29/sysdescr-unknown-object-identifier-sub-id-not-found-top-sysdescr/" data-via="" data-counturl="http://www.wanghd.com/blog/2013/05/29/sysdescr-unknown-object-identifier-sub-id-not-found-top-sysdescr/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2013/07/25/304huan-cun-tu-pian-mei-you-hong-fa-loadshi-jian/" data-via="" data-counturl="http://www.wanghd.com/blog/2013/07/25/304huan-cun-tu-pian-mei-you-hong-fa-loadshi-jian/" >Tweet</a>
   
   
   
@@ -220,14 +230,10 @@
     <ul class="pager">
       
       <li class="previous"><a class="basic-alignment left"
-        href="/blog/2013/05/24/sqlalchemy-ding-yi-mo-xing/" title="Previous Post:
-        sqlalchemy 定义模型">&laquo; sqlalchemy 定义模型</a></li>
+        href="/blog/2013/07/18/ubuntu-keychain-shi-yong/" title="Previous Post:
+        ubuntu keychain 使用">&laquo; ubuntu keychain 使用</a></li>
       
       <li><a href="/blog/archives">文章归档</a></li>
-      
-      <li class="next"><a class="basic-alignment right" href="/blog/2013/05/29/cacti-spinede-an-zhuang-pei-zhi/"
-        title="Next Post: cacti spine的安装配置">cacti spine的安装配置
-        &raquo;</a></li>
       
     </ul>
   </footer>
@@ -358,8 +364,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.wanghd.com/blog/2013/05/29/sysdescr-unknown-object-identifier-sub-id-not-found-top-sysdescr/';
-        var disqus_url = 'http://www.wanghd.com/blog/2013/05/29/sysdescr-unknown-object-identifier-sub-id-not-found-top-sysdescr/';
+        var disqus_identifier = 'http://www.wanghd.com/blog/2013/07/25/304huan-cun-tu-pian-mei-you-hong-fa-loadshi-jian/';
+        var disqus_url = 'http://www.wanghd.com/blog/2013/07/25/304huan-cun-tu-pian-mei-you-hong-fa-loadshi-jian/';
         var disqus_script = 'embed.js';
       
     (function () {

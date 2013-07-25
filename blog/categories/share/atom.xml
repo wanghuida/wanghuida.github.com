@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Share | 老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/blog/categories/share/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2013-07-17T19:20:21+08:00</updated>
+  <updated>2013-07-25T16:27:44+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,38 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[ubuntu keychain 使用]]></title>
+    <link href="http://www.wanghd.com/blog/2013/07/18/ubuntu-keychain-shi-yong/"/>
+    <updated>2013-07-18T22:33:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/07/18/ubuntu-keychain-shi-yong</id>
+    <content type="html"><![CDATA[<ul>
+<li>ssh-keygen生成密钥，经常会设置一个密码，让试图窃取的人无计可施。</li>
+<li>问题来了，每次登录都会要求输入密码，是时候来搞个keychain了</li>
+</ul>
+
+
+<p>```bash</p>
+
+<p>$ sudo apt-get install keychain
+$ /usr/bin/keychain ~/.ssh/id_rsa</p>
+
+<h1>加到.profile</h1>
+
+<p>. ~/.keychain/$HOSTNAME-sh
+. ~/.profile</p>
+
+<p>```</p>
+
+<ul>
+<li>keychain到底干了什么呀？</li>
+</ul>
+
+
+<p>keychain会起一个ssh-agent，后来登录的人通过$HOSTNAME-sh设置环境变量使用同一个ssh-agent</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[linux 操作集锦]]></title>
@@ -593,60 +625,6 @@ sudo cp /tmp/msyh.ttf /usr/share/fonts/truetype/</p>
 <p>sshfs user@hostname:path mount_point</p>
 
 <p>```</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[cacti spine的安装配置]]></title>
-    <link href="http://www.wanghd.com/blog/2013/05/29/cacti-spinede-an-zhuang-pei-zhi/"/>
-    <updated>2013-05-29T15:35:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/05/29/cacti-spinede-an-zhuang-pei-zhi</id>
-    <content type="html"><![CDATA[<ul>
-<li>cacti官方有详细的配置流程，这里只是翻译和错误的解决</li>
-</ul>
-
-
-<p>```bash
-wget http://www.cacti.net/downloads/spine/cacti-spine-0.8.8a.tar.gz
-tar -zxvf cacti-spine-0.8.8a.tar.gz
-cd cacti-spine-0.8.8a/</p>
-
-<p>./configure</p>
-
-<h1>configure: error: Cannot find MySQL headers.  Use --with-mysql= to specify non-default path.</h1>
-
-<h1>下载安装mysqlclient开发包</h1>
-
-<p>sudo apt-get install libmysqlclient-dev</p>
-
-<p>./configure</p>
-
-<h1>configure: error: Cannot find SNMP headers.  Use --with-snmp= to specify non-default path.</h1>
-
-<h1>下载安装snmp开发包</h1>
-
-<p>sudo apt-cache search snmp | grep dev
-sudo apt-get install libsnmp-dev</p>
-
-<p>./configure
-make
-make install
-```</p>
-
-<ul>
-<li>搞定配置文件</li>
-</ul>
-
-
-<p><code>
-cp /usr/local/spine/etc/spine.conf.dist /usr/local/spine/etc/spine.conf
-</code></p>
-
-<ul>
-<li><p>admin登录cacti页面, 选择Settings的Paths选项卡，输入完整的spine路径[Alternate Poller Path]</p></li>
-<li><p>点击Settings的Poller选项卡，从Poller Type里选择spine</p></li>
-</ul>
-
 ]]></content>
   </entry>
   

@@ -4,7 +4,7 @@
   <title><![CDATA[老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2013-07-17T19:20:21+08:00</updated>
+  <updated>2013-07-25T16:27:44+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,103 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[304缓存图片没有触发load事件]]></title>
+    <link href="http://www.wanghd.com/blog/2013/07/25/304huan-cun-tu-pian-mei-you-hong-fa-loadshi-jian/"/>
+    <updated>2013-07-25T14:54:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/07/25/304huan-cun-tu-pian-mei-you-hong-fa-loadshi-jian</id>
+    <content type="html"><![CDATA[<ul>
+<li>图片墙需要计算图片高度，只有等图片load好计算的高度才正确，所以代码如下：</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s2">&quot;.img-div&quot;</span><span class="p">).</span><span class="nx">each</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">//设置load事件</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">find</span><span class="p">(</span><span class="s1">&#39;img&#39;</span><span class="p">).</span><span class="nx">load</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>        <span class="cm">/* 用height()获取高度，省略事件逻辑 */</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li><p>感觉上面的代码很符合逻辑了，问题出现了：</p></li>
+<li><p>当图片返回304缓存时，该图片不能触发load事件。。。（通过判断complete属性来修正）</p></li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;.img-div&quot;</span><span class="p">).</span><span class="nx">each</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">find</span><span class="p">(</span><span class="s1">&#39;img&#39;</span><span class="p">).</span><span class="nx">one</span><span class="p">(</span><span class="s1">&#39;load&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>            <span class="cm">/* 用height()获取高度，省略事件逻辑 */</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="c1">//使用one强制事件只触发一次，缓存的图片通过load()方法进行触发</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="p">}).</span><span class="nx">each</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>          <span class="k">if</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">complete</span><span class="p">)</span> <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">load</span><span class="p">();</span>
+</span><span class='line'>        <span class="p">});</span>
+</span><span class='line'>    <span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ubuntu keychain 使用]]></title>
+    <link href="http://www.wanghd.com/blog/2013/07/18/ubuntu-keychain-shi-yong/"/>
+    <updated>2013-07-18T22:33:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/07/18/ubuntu-keychain-shi-yong</id>
+    <content type="html"><![CDATA[<ul>
+<li>ssh-keygen生成密钥，经常会设置一个密码，让试图窃取的人无计可施。</li>
+<li>问题来了，每次登录都会要求输入密码，是时候来搞个keychain了</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>sudo apt-get install keychain
+</span><span class='line'><span class="nv">$ </span>/usr/bin/keychain ~/.ssh/id_rsa
+</span><span class='line'>
+</span><span class='line'><span class="c"># 加到.profile</span>
+</span><span class='line'>. ~/.keychain/<span class="nv">$HOSTNAME</span>-sh
+</span><span class='line'>. ~/.profile
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>keychain到底干了什么呀？</li>
+</ul>
+
+
+<p>keychain会起一个ssh-agent，后来登录的人通过$HOSTNAME-sh设置环境变量使用同一个ssh-agent</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[linux 操作集锦]]></title>
@@ -1978,256 +2075,6 @@ sys     指程序对系统调用锁占用时间
 </span><span class='line'># 例3: eth0发往192.168.0.105主机的数据，都交给192.168.0.1网关
 </span><span class='line'>$ route add -host 192.168.0.105 gw 192.168.0.1 dev eth0
 </span></code></pre></td></tr></table></div></figure>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[tcpdump 简明教程]]></title>
-    <link href="http://www.wanghd.com/blog/2013/04/03/tcpdump-jian-ming-jiao-cheng/"/>
-    <updated>2013-04-03T16:10:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/04/03/tcpdump-jian-ming-jiao-cheng</id>
-    <content type="html"><![CDATA[<ul>
-<li>tcpdump作用很简单，就是抓取数据包。很常用的网络分析工具。对于理解tcp/ip协议也非常有帮助。</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'># 请使用root用户，运行下面的命令捕获数据，你会发现数据包多的自己都不想看了
-</span><span class='line'>$ sudo tcpdump</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<!-- more -->
-
-
-<ul>
-<li>tcpdump有很多选项，不过先不急着学选项。先能用起来才是关键，那先看几个<code>条件关键字</code>吧</li>
-</ul>
-
-
-<table class="table table-bordered" style="max-width:350px; margin-left:37px">
-<tbody>
-  <tr>
-    <td>host</td>
-    <td>可以是ip也可以是主机名</td>
-  </tr>
-  <tr>
-    <td>net</td>
-    <td>网段</td>
-  </tr>
-  <tr>
-    <td>port</td>
-    <td>端口</td>
-  </tr>
-  <tr>
-    <td>ip,tcp,icmp,udp</td>
-    <td>协议</td>
-  </tr>
-  <tr>
-    <td>src</td>
-    <td>来源</td>
-  </tr>
-  <tr>
-    <td>dst</td>
-    <td>目的地</td>
-  </tr>
-  <tr>
-    <td>and</td>
-    <td>同时满足</td>
-  </tr>
-  <tr>
-    <td>or</td>
-    <td>满足任何一个即可</td>
-  </tr>
-  <tr>
-    <td>not</td>
-    <td>非</td>
-  </tr>
-</tbody>
-</table>
-
-
-<ul>
-<li>学了那么多条件关键字，来几个例子用起来吧</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'># 先学习几个简单的
-</span><span class='line'>$ sudo tcpdump host 192.168.0.145
-</span><span class='line'>$ sudo tcpdump src 192.168.0.145
-</span><span class='line'>$ sudo tcpdump dst 192.168.0.145
-</span><span class='line'>$ sudo tcpdump net 192.168.0.0/24
-</span><span class='line'>$ sudo tcpdump tcp
-</span><span class='line'>$ tcpdump port 80
-</span><span class='line'>
-</span><span class='line'># 组合起来用用
-</span><span class='line'>$ sudo tcpdump tcp and src host 192.168.0.145 and port 80
-</span><span class='line'>$ sudo tcpdump ip and not dst 192.168.0.145 and dst port 80
-</span><span class='line'>
-</span><span class='line'># 加上组，可以更加复杂一些
-</span><span class='line'>$ sudo tcpdump tcp and host 192.168.0.145 and \(port 80 or port 8080\)
-</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>感觉不错，加一点选项让tcpdump更加有用</li>
-</ul>
-
-
-<table class="table table-bordered" style="max-width:350px; margin-left:37px">
-<tbody>
-  <tr>
-    <td>-w file-name</td>
-    <td>将捕获到的数据写入文件</td>
-  </tr>
-  <tr>
-    <td>-i device-name</td>
-    <td>网络设备名，常用eth0</td>
-  </tr>
-  <tr>
-    <td>-n</td>
-    <td>不解析域名</td>
-  </tr>
-  <tr>
-    <td>-nn</td>
-    <td>不解析域名和端口</td>
-  </tr>
-  <tr>
-    <td>-X,-XX</td>
-    <td>用16进制和ascii显示包里的内容</td>
-  </tr>
-  <tr>
-    <td>-v,-vv,-vvv</td>
-    <td>越多越详细的头</td>
-  </tr>
-  <tr>
-    <td>-c number</td>
-    <td>捕获包的数量</td>
-  </tr>
-  <tr>
-    <td>-s number</td>
-    <td>获取多少内容, 0代表所有</td>
-  </tr>
-  <tr>
-    <td>-S</td>
-    <td>打印绝对的序列号</td>
-  </tr>
-</tbody>
-</table>
-
-
-<ul>
-<li>让选项和条件组合起来，发挥tcpdump强大威力</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ sudo tcpdump -vXSs 0 not dst port 8080 and \(dst net 10.0.0.0/8 or 192.168.0.0/24\)
-</span><span class='line'>
-</span><span class='line'># 一个http的数据包
-</span><span class='line'>17:55:51.846893 IP (tos 0x0, ttl 43, id 10976, offset 0, flags [DF], proto TCP (6), length 237)
-</span><span class='line'>    ec2-23-21-128-184.compute-1.amazonaws.com.http &gt; 192.168.0.145.60897: Flags [P.], cksum 0x5e78 (correct), seq 504653705:504653890, ack 894919854, win 27, options [nop,nop,TS val 222645590 ecr 909764515], length 185
-</span><span class='line'>    0x0000:  4500 00ed 2ae0 4000 2b06 cb24 1715 80b8  E...*.@.+..$....
-</span><span class='line'>    0x0010:  c0a8 0091 0050 ede1 1e14 6789 3557 64ae  .....P....g.5Wd.
-</span><span class='line'>    0x0020:  8018 001b 5e78 0000 0101 080a 0d45 4d56  ....^x.......EMV
-</span><span class='line'>    0x0030:  3639 e7a3 4854 5450 2f31 2e31 2032 3030  69..HTTP/1.1.200
-</span><span class='line'>    0x0040:  204f 4b0d 0a53 6572 7665 723a 206e 6769  .OK..Server:.ngi
-</span><span class='line'>    0x0050:  6e78 2f30 2e37 2e36 370d 0a44 6174 653a  nx/0.7.67..Date:
-</span><span class='line'>    0x0060:  2057 6564 2c20 3033 2041 7072 2032 3031  .Wed,.03.Apr.201
-</span><span class='line'>    0x0070:  3320 3039 3a35 353a 3531 2047 4d54 0d0a  3.09:55:51.GMT..
-</span><span class='line'>    0x0080:  436f 6e74 656e 742d 5479 7065 3a20 696d  Content-Type:.im
-</span><span class='line'>    0x0090:  6167 652f 6769 660d 0a43 6f6e 7465 6e74  age/gif..Content
-</span><span class='line'>    0x00a0:  2d4c 656e 6774 683a 2034 330d 0a43 6f6e  -Length:.43..Con
-</span><span class='line'>    0x00b0:  6e65 6374 696f 6e3a 2063 6c6f 7365 0d0a  nection:.close..
-</span><span class='line'>    0x00c0:  0d0a 4749 4638 3961 0100 0100 8001 0000  ..GIF89a........
-</span><span class='line'>    0x00d0:  0000 ffff ff21 f904 0100 0001 002c 0000  .....!.......,..
-</span><span class='line'>    0x00e0:  0000 0100 0100 0002 024c 0100 3b         .........L..;
-</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>tcpdump还可以根据tcp里某些状态位进行过滤</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>tcpdump 'tcp[13] & 1!=0'</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<br />
-
-
-<ul>
-<li>附送tcp头信息图
-<img src="http://www.wanghd.com/images/post/tcp-header.jpg" title="tcp-header" alt="tcp-header" /></li>
-</ul>
-
-
-<br />
-
-
-<ul>
-<li>附送ip头信息图
-<img src="http://www.wanghd.com/images/post/ip-header.jpg" title="ip-header" alt="ip-header" /></li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[ibm x3650 重装系统]]></title>
-    <link href="http://www.wanghd.com/blog/2013/04/03/ibm-x3650-zhong-zhuang-xi-tong/"/>
-    <updated>2013-04-03T16:02:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/04/03/ibm-x3650-zhong-zhuang-xi-tong</id>
-    <content type="html"><![CDATA[<h3>从机房把5年前的x3650拖回来重装系统全过程</h3>
-
-<ul>
-<li><p>原本是freebsd，做了raid1。现在希望改成ubuntu，不做raid，因为提供mogilefs服务</p></li>
-<li><p>开机启动根据提示Ctrl + A进入raid管理</p></li>
-<li>删除raid退出</li>
-<li>开始安装ubuntu。。。发现找不到硬盘</li>
-<li>难道没有raid就不行？再进到raid管理</li>
-<li>进行硬盘初始化，然后创建raid使用简单卷Volume即可</li>
-<li>一路安装终于没有问题了</li>
-</ul>
 
 ]]></content>
   </entry>

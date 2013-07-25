@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Javascript | 老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/blog/categories/javascript/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2013-07-17T19:20:21+08:00</updated>
+  <updated>2013-07-25T16:27:44+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,55 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[304缓存图片没有触发load事件]]></title>
+    <link href="http://www.wanghd.com/blog/2013/07/25/304huan-cun-tu-pian-mei-you-hong-fa-loadshi-jian/"/>
+    <updated>2013-07-25T14:54:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2013/07/25/304huan-cun-tu-pian-mei-you-hong-fa-loadshi-jian</id>
+    <content type="html"><![CDATA[<ul>
+<li>图片墙需要计算图片高度，只有等图片load好计算的高度才正确，所以代码如下：</li>
+</ul>
+
+
+<p>```javascript</p>
+
+<p>$(".img-div").each(function(){</p>
+
+<pre><code>//设置load事件
+$(this).find('img').load(function(){
+    /* 用height()获取高度，省略事件逻辑 */
+});
+</code></pre>
+
+<p>});</p>
+
+<p>```</p>
+
+<ul>
+<li><p>感觉上面的代码很符合逻辑了，问题出现了：</p></li>
+<li><p>当图片返回304缓存时，该图片不能触发load事件。。。（通过判断complete属性来修正）</p></li>
+</ul>
+
+
+<p>```javascript</p>
+
+<pre><code>$(".img-div").each(function(){
+
+    $(this).find('img').one('load', function(){
+        /* 用height()获取高度，省略事件逻辑 */
+
+        //使用one强制事件只触发一次，缓存的图片通过load()方法进行触发
+
+    }).each(function() {
+      if(this.complete) $(this).load();
+    });
+});
+</code></pre>
+
+<p>```</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[jquery validation]]></title>
