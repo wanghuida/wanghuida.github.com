@@ -5,7 +5,7 @@ date: 2013-05-23 12:41
 comments: true
 sharing: true
 footer: true
-categories: [Share,Javascript]
+categories: [Javascript]
 ---
 
 
