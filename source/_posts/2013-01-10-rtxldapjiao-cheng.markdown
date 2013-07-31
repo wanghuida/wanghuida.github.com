@@ -20,7 +20,7 @@ categories: [Share]
 + 获取源码
 
 ```
-git clone git@github.com:wanghuida/RTXLDAP.git
+git clone https://github.com/wanghuida/RTXLDAP.git
 ```
 
 + 建议使用vs 2008打开
