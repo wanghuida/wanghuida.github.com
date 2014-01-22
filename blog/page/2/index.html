@@ -66,7 +66,7 @@
         <ul class="nav">
   <li><a href="/">博客首页</a></li>
   <li><a href="/blog/archives">文章归档</a></li>
-  <li><a href="mailto:wanghuida258@yahoo.cn">联系站长</a></li>
+  <li><a href="mailto:wanghuida258@aliyun.com">联系站长</a></li>
   <li><a href="http://www.taobao.com/go/chn/tbk_channel/channelcode.php?pid=mm_32662861_3310667_10778125&eventid=101329">淘宝推广</a></li>
 
 </ul>
@@ -94,6 +94,87 @@
     <div class="row-fluid">
       <div class="span9">
   
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2013/05/29/sysdescr-unknown-object-identifier-sub-id-not-found-top-sysdescr/">解决 sysDescr: Unknown Object Identifier (Sub-id Not Found: (Top) sysDescr)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-05-29T11:58:00+08:00" pubdate data-updated="true">May 29<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/05/29/sysdescr-unknown-object-identifier-sub-id-not-found-top-sysdescr/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><ul>
+<li>ubuntu安装snmp很方便</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apt-get install snmp snmpd</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>配置我就跳过了，直接测试，问题来了</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>snmpwalk -v 2c -c public 127.0.0.1 sysDescr
+</span><span class='line'>
+</span><span class='line'># 显示 sysDescr: Unknown Object Identifier (Sub-id not found: (top) -&gt; sysDescr)</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li><p>网上搜一下，没有正确可行的办法，但是也是有收获</p></li>
+<li><p>直接使用snmpwalk -v 2c -c public 127.0.0.1 是没有问题的</p></li>
+<li>那就说明问题出在mibs上</li>
+<li>尝试解决一下</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apt-get install snmp-mibs-downloader
+</span><span class='line'>
+</span><span class='line'>vim /etc/snmp/snmp.conf
+</span><span class='line'>#全部注释下～～～
+</span><span class='line'>#再测试就没问题了，使用了新的mibs
+</span><span class='line'>snmpwalk -v 2c -c public 127.0.0.1 sysDescr
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -677,85 +758,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2013/04/03/ubuntu-routeming-ling/">Ubuntu Route命令</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-04-03T18:55:00+08:00" pubdate data-updated="true">Apr 3<span>rd</span>, 2013</time>
-        
-         | <a href="/blog/2013/04/03/ubuntu-routeming-ling/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>route是非常常用的命令，作用是增加一条静态路由</h3>
-
-<ul>
-<li>以前觉得这条命令很难用，其实很简单～～</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'># route 直接打印静态路由表 -n 选项代表把域名解析成ip
-</span><span class='line'>$ route -n</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>route 命令的基本格式</h3>
-
-<ul>
-<li>route 操作 目标地址 网关 设备</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'># 例1: eth0发往192.168.0.0网段的数据，都交给192.168.0.1网关
-</span><span class='line'># add就是操作，-net 192.168.0.0/24 就是目标网段
-</span><span class='line'># gw 192.168.0.1 是网关，dev eth0就是设备
-</span><span class='line'>$ route add -net 192.168.0.0/24 gw 192.168.0.1 dev eth0
-</span><span class='line'>
-</span><span class='line'># 例2: eth0默认网段的数据，都交给192.168.0.1网关
-</span><span class='line'>$ route add default gw 192.168.0.1 dev eth0
-</span><span class='line'>
-</span><span class='line'># 例3: eth0发往192.168.0.105主机的数据，都交给192.168.0.1网关
-</span><span class='line'>$ route add -host 192.168.0.105 gw 192.168.0.1 dev eth0
-</span></code></pre></td></tr></table></div></figure>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/3/">&larr; 其他文章</a></li>
@@ -772,6 +774,7 @@
   <ul id="categories" class="nav nav-list">
     <li class="nav-header">文章分类</li>
     <li class='category'><a href='/blog/categories/hadoop/'>Hadoop (4)</a></li>
+<li class='category'><a href='/blog/categories/ios/'>IOS (1)</a></li>
 <li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
 <li class='category'><a href='/blog/categories/javascript/'>Javascript (4)</a></li>
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
@@ -802,6 +805,10 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/22/chun-dai-ma-xie-ios/">纯代码写ios</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/07/25/304huan-cun-tu-pian-mei-you-hong-fa-loadshi-jian/">304缓存图片没有触发load事件</a>
@@ -839,10 +846,6 @@
         <a href="/blog/2013/05/29/cacti-spinede-an-zhuang-pei-zhi/">cacti spine的安装配置</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2013/05/29/sysdescr-unknown-object-identifier-sub-id-not-found-top-sysdescr/">解决 sysDescr: Unknown Object Identifier (Sub-id not found: (top)  sysDescr)</a>
-      </li>
-    
   </ul>
 </section>
 
@@ -877,7 +880,7 @@
 
 <hr>
 <p>
-  Copyright &copy; 2013 - 王惠达 huida wanghuida -
+  Copyright &copy; 2014 - 王惠达 huida wanghuida -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
    - <span class="credit">沪ICP备12048826号</span>
 </p>

@@ -66,7 +66,7 @@
         <ul class="nav">
   <li><a href="/">博客首页</a></li>
   <li><a href="/blog/archives">文章归档</a></li>
-  <li><a href="mailto:wanghuida258@yahoo.cn">联系站长</a></li>
+  <li><a href="mailto:wanghuida258@aliyun.com">联系站长</a></li>
   <li><a href="http://www.taobao.com/go/chn/tbk_channel/channelcode.php?pid=mm_32662861_3310667_10778125&eventid=101329">淘宝推广</a></li>
 
 </ul>
@@ -94,6 +94,88 @@
     <div class="row-fluid">
       <div class="span9">
   
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2014/01/22/chun-dai-ma-xie-ios/">纯代码写ios</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-01-22T18:30:00+08:00" pubdate data-updated="true">Jan 22<span>nd</span>, 2014</time>
+        
+         | <a href="/blog/2014/01/22/chun-dai-ma-xie-ios/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>纯代码写ios 后期更容易维护</h3>
+
+<ul>
+<li>半年没有写文章，趁过年放假好好补补，用一个简单的纯代码helloworld开始吧</li>
+</ul>
+
+
+<p>1 打开xcode创建一个空项目呗</p>
+
+<p><img style="max-width:500px;" src="/images/post/ios-new-project.jpg" /></p>
+
+<p>2 查看AppDelegate</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="c1">// AppDelegate 就是UIApplicationMain的代理 , 启动时会调用一下方法</span>
+</span><span class='line'><span class="k">-</span> <span class="p">(</span><span class="kt">BOOL</span><span class="p">)</span><span class="nf">application:</span><span class="p">(</span><span class="n">UIApplication</span> <span class="o">*</span><span class="p">)</span><span class="nv">application</span> <span class="nf">didFinishLaunchingWithOptions:</span><span class="p">(</span><span class="n">NSDictionary</span> <span class="o">*</span><span class="p">)</span><span class="nv">launchOptions</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="c1">// 初始化一个uiwindow</span>
+</span><span class='line'>    <span class="n">self</span><span class="p">.</span><span class="n">window</span> <span class="o">=</span> <span class="p">[[</span><span class="n">UIWindow</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithFrame:</span><span class="p">[[</span><span class="n">UIScreen</span> <span class="n">mainScreen</span><span class="p">]</span> <span class="n">bounds</span><span class="p">]];</span>
+</span><span class='line'>    <span class="c1">// 设置默认背景为白色</span>
+</span><span class='line'>    <span class="n">self</span><span class="p">.</span><span class="n">window</span><span class="p">.</span><span class="n">backgroundColor</span> <span class="o">=</span> <span class="p">[</span><span class="n">UIColor</span> <span class="n">whiteColor</span><span class="p">];</span>
+</span><span class='line'>    <span class="c1">// 显示到最前端，并获取输入</span>
+</span><span class='line'>    <span class="p">[</span><span class="n">self</span><span class="p">.</span><span class="n">window</span> <span class="n">makeKeyAndVisible</span><span class="p">];</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">YES</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2014/01/22/chun-dai-ma-xie-ios/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -771,87 +853,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2013/05/29/sysdescr-unknown-object-identifier-sub-id-not-found-top-sysdescr/">解决 sysDescr: Unknown Object Identifier (Sub-id Not Found: (Top) sysDescr)</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-05-29T11:58:00+08:00" pubdate data-updated="true">May 29<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/05/29/sysdescr-unknown-object-identifier-sub-id-not-found-top-sysdescr/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><ul>
-<li>ubuntu安装snmp很方便</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apt-get install snmp snmpd</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>配置我就跳过了，直接测试，问题来了</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>snmpwalk -v 2c -c public 127.0.0.1 sysDescr
-</span><span class='line'>
-</span><span class='line'># 显示 sysDescr: Unknown Object Identifier (Sub-id not found: (top) -&gt; sysDescr)</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li><p>网上搜一下，没有正确可行的办法，但是也是有收获</p></li>
-<li><p>直接使用snmpwalk -v 2c -c public 127.0.0.1 是没有问题的</p></li>
-<li>那就说明问题出在mibs上</li>
-<li>尝试解决一下</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apt-get install snmp-mibs-downloader
-</span><span class='line'>
-</span><span class='line'>vim /etc/snmp/snmp.conf
-</span><span class='line'>#全部注释下～～～
-</span><span class='line'>#再测试就没问题了，使用了新的mibs
-</span><span class='line'>snmpwalk -v 2c -c public 127.0.0.1 sysDescr
-</span></code></pre></td></tr></table></div></figure>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/2/">&larr; 其他文章</a></li>
@@ -866,6 +867,7 @@
   <ul id="categories" class="nav nav-list">
     <li class="nav-header">文章分类</li>
     <li class='category'><a href='/blog/categories/hadoop/'>Hadoop (4)</a></li>
+<li class='category'><a href='/blog/categories/ios/'>IOS (1)</a></li>
 <li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
 <li class='category'><a href='/blog/categories/javascript/'>Javascript (4)</a></li>
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
@@ -896,6 +898,10 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/22/chun-dai-ma-xie-ios/">纯代码写ios</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/07/25/304huan-cun-tu-pian-mei-you-hong-fa-loadshi-jian/">304缓存图片没有触发load事件</a>
@@ -933,10 +939,6 @@
         <a href="/blog/2013/05/29/cacti-spinede-an-zhuang-pei-zhi/">cacti spine的安装配置</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2013/05/29/sysdescr-unknown-object-identifier-sub-id-not-found-top-sysdescr/">解决 sysDescr: Unknown Object Identifier (Sub-id not found: (top)  sysDescr)</a>
-      </li>
-    
   </ul>
 </section>
 
@@ -971,7 +973,7 @@
 
 <hr>
 <p>
-  Copyright &copy; 2013 - 王惠达 huida wanghuida -
+  Copyright &copy; 2014 - 王惠达 huida wanghuida -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
    - <span class="credit">沪ICP备12048826号</span>
 </p>
