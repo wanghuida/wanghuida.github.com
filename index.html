@@ -100,6 +100,117 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2014/01/24/uitableview-1/">UITableView (1)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-01-24T17:28:00+08:00" pubdate data-updated="true">Jan 24<span>th</span>, 2014</time>
+        
+         | <a href="/blog/2014/01/24/uitableview-1/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>展示一下最基础的uitableview应该如何使用，最后有完整的代码</h3>
+
+<p>1 自己先创建一个ViewController, 添加一个UITableView内部属性和数据</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="k">@interface</span> <span class="nc">AETableViewController</span> <span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="n">UITableView</span> <span class="o">*</span><span class="n">_table</span><span class="p">;</span>
+</span><span class='line'>  <span class="n">NSMutableArray</span> <span class="o">*</span><span class="n">_data</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>2 头里需要实现UITableViewDataSource, UITableViewDelegate（delegate其实不用，但实际一般都会用到）</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="k">@interface</span> <span class="nc">AETableViewController</span> : <span class="nc">UIViewController</span><span class="o">&lt;</span><span class="n">UITableViewDataSource</span><span class="p">,</span> <span class="n">UITableViewDelegate</span><span class="o">&gt;</span>
+</span><span class='line'><span class="k">@end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>3 往<em>data中加入一点数据,初始化</em>table,设置代理和数据源</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="k">-</span> <span class="p">(</span><span class="kt">id</span><span class="p">)</span><span class="nf">initWithNibName:</span><span class="p">(</span><span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">nibNameOrNil</span> <span class="nf">bundle:</span><span class="p">(</span><span class="n">NSBundle</span> <span class="o">*</span><span class="p">)</span><span class="nv">nibBundleOrNil</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="n">self</span> <span class="o">=</span> <span class="p">[</span><span class="n">super</span> <span class="nl">initWithNibName:</span><span class="n">nibNameOrNil</span> <span class="nl">bundle:</span><span class="n">nibBundleOrNil</span><span class="p">];</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="n">self</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSMutableArray</span> <span class="nl">arrayWithArray:</span><span class="err">@</span><span class="p">[</span><span class="s">@&quot;美美豆&quot;</span><span class="p">,</span> <span class="s">@&quot;抢拍&quot;</span><span class="p">,</span> <span class="s">@&quot;预约&quot;</span><span class="p">,</span> <span class="s">@&quot;wanghd.com&quot;</span><span class="p">,</span> <span class="s">@&quot;王惠达&quot;</span><span class="p">]];</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">self</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">viewDidLoad</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="p">[</span><span class="n">super</span> <span class="n">viewDidLoad</span><span class="p">];</span>
+</span><span class='line'>  <span class="n">CGRect</span> <span class="n">rect</span> <span class="o">=</span> <span class="p">[[</span><span class="n">UIScreen</span> <span class="n">mainScreen</span><span class="p">]</span> <span class="n">bounds</span><span class="p">];</span>
+</span><span class='line'>  <span class="n">_table</span> <span class="o">=</span> <span class="p">[[</span><span class="n">UITableView</span> <span class="n">alloc</span><span class="p">]</span><span class="nl">initWithFrame:</span><span class="n">rect</span> <span class="nl">style:</span><span class="n">UITableViewStylePlain</span><span class="p">];</span>
+</span><span class='line'>  <span class="n">_table</span><span class="p">.</span><span class="n">delegate</span> <span class="o">=</span> <span class="n">self</span><span class="p">;</span>
+</span><span class='line'>  <span class="n">_table</span><span class="p">.</span><span class="n">dataSource</span> <span class="o">=</span> <span class="n">self</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">[</span><span class="n">self</span><span class="p">.</span><span class="n">view</span> <span class="nl">addSubview:</span><span class="n">_table</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2014/01/24/uitableview-1/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2014/01/22/chun-dai-ma-xie-ios/">纯代码写ios</a></h1>
     
     
@@ -757,102 +868,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2013/05/29/cacti-spinede-an-zhuang-pei-zhi/">Cacti Spine的安装配置</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-05-29T15:35:00+08:00" pubdate data-updated="true">May 29<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/05/29/cacti-spinede-an-zhuang-pei-zhi/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><ul>
-<li>cacti官方有详细的配置流程，这里只是翻译和错误的解决</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>wget http://www.cacti.net/downloads/spine/cacti-spine-0.8.8a.tar.gz
-</span><span class='line'>tar -zxvf cacti-spine-0.8.8a.tar.gz
-</span><span class='line'><span class="nb">cd </span>cacti-spine-0.8.8a/
-</span><span class='line'>
-</span><span class='line'>./configure
-</span><span class='line'><span class="c"># configure: error: Cannot find MySQL headers.  Use --with-mysql= to specify non-default path.</span>
-</span><span class='line'><span class="c"># 下载安装mysqlclient开发包</span>
-</span><span class='line'>sudo apt-get install libmysqlclient-dev
-</span><span class='line'>
-</span><span class='line'>./configure
-</span><span class='line'><span class="c"># configure: error: Cannot find SNMP headers.  Use --with-snmp= to specify non-default path.</span>
-</span><span class='line'><span class="c"># 下载安装snmp开发包</span>
-</span><span class='line'>sudo apt-cache search snmp | grep dev
-</span><span class='line'>sudo apt-get install libsnmp-dev
-</span><span class='line'>
-</span><span class='line'>./configure
-</span><span class='line'>make
-</span><span class='line'>make install
-</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>搞定配置文件</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>cp /usr/local/spine/etc/spine.conf.dist /usr/local/spine/etc/spine.conf
-</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li><p>admin登录cacti页面, 选择Settings的Paths选项卡，输入完整的spine路径[Alternate Poller Path]</p></li>
-<li><p>点击Settings的Poller选项卡，从Poller Type里选择spine</p></li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/2/">&larr; 其他文章</a></li>
@@ -867,7 +882,7 @@
   <ul id="categories" class="nav nav-list">
     <li class="nav-header">文章分类</li>
     <li class='category'><a href='/blog/categories/hadoop/'>Hadoop (4)</a></li>
-<li class='category'><a href='/blog/categories/ios/'>IOS (1)</a></li>
+<li class='category'><a href='/blog/categories/ios/'>IOS (2)</a></li>
 <li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
 <li class='category'><a href='/blog/categories/javascript/'>Javascript (4)</a></li>
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
@@ -898,6 +913,10 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/24/uitableview-1/">UITableView (1)</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/01/22/chun-dai-ma-xie-ios/">纯代码写ios</a>
@@ -933,10 +952,6 @@
     
       <li class="post">
         <a href="/blog/2013/05/30/sshfs/">sshfs</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/05/29/cacti-spinede-an-zhuang-pei-zhi/">cacti spine的安装配置</a>
       </li>
     
   </ul>
