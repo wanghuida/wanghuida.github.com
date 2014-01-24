@@ -3,7 +3,6 @@ layout: post
 title: "纯代码写ios"
 date: 2014-01-22 18:30
 comments: true
-comments: true
 sharing: true
 footer: true
 categories: [IOS]
