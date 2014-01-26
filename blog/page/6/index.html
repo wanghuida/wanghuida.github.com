@@ -100,6 +100,64 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2012/11/22/xiu-fu-mogilefsmu-lu-owner/">修复mogilefs目录owner</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-22T17:16:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/22/xiu-fu-mogilefsmu-lu-owner/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>什么情况会导致mogilefs的数据目录owner不正确</h3>
+
+<ul>
+<li>直接使用root启动mogstored会导致增加的文件和文件夹为root</li>
+<li>重新用mogile启动mogstored后，mogile用户无法删除root的文件，最终delete队列无法处理</li>
+</ul>
+
+
+<h3>如何处理</h3>
+
+<ol>
+<li>直接chown -R，这是最直接的方法，如果1T的磁盘被这样操作，会10小时util为100</li>
+<li>自己写一个脚本慢处理，脚本思路如下</li>
+</ol>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2012/11/22/xiu-fu-mogilefsmu-lu-owner/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2012/11/10/an-zhuang-pei-zhi-hive/">安装配置hive</a></h1>
     
     
@@ -682,81 +740,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/10/14/ying-pan-an-zhuang-centos/">硬盘安装CentOS</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-10-14T21:48:00+08:00" pubdate data-updated="true">Oct 14<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/10/14/ying-pan-an-zhuang-centos/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h4>下载diskgenuis进行分区和设置卷标</h4>
-
-<ul>
-<li>【C盘】，NTFS；安装的是win7</li>
-<li>【D盘】，卷标：REV，FAT32；</li>
-</ul>
-
-
-<h4>下载CentOS-6.2-i386-LiveCD.iso</h4>
-
-<ul>
-<li>把isolinux下的vmlinuz0和initrd0.img提取到C盘根目录下</li>
-<li>把centos 6.2 livecd解压到D盘根目录下;</li>
-</ul>
-
-
-<h4>下载EasyBCD进行boot设置</h4>
-
-<ul>
-<li>使用easybcd安装NeoGrub，配置menu.lst，内容如下：</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>title CentOS LiveCD
-</span><span class='line'>#如果前面还有分区设置为root (hd0,1)，设置错误了也没关系，重启后会报错，按e调整，再按b去boot
-</span><span class='line'>root (hd0,0) 
-</span><span class='line'>kernel /vmlinuz0 root=live:LABEL=REV rootfstype=auto ro liveimg quiet rhgb 
-</span><span class='line'>initrd /initrd0.img
-</span><span class='line'>boot</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>重启后，选择新选项即可进入CentOS LiveCD环境。</h4>
-</div>
-  
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/7/">&larr; 其他文章</a></li>
@@ -773,7 +756,7 @@
   <ul id="categories" class="nav nav-list">
     <li class="nav-header">文章分类</li>
     <li class='category'><a href='/blog/categories/hadoop/'>Hadoop (4)</a></li>
-<li class='category'><a href='/blog/categories/ios/'>IOS (2)</a></li>
+<li class='category'><a href='/blog/categories/ios/'>IOS (3)</a></li>
 <li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
 <li class='category'><a href='/blog/categories/javascript/'>Javascript (4)</a></li>
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
@@ -804,6 +787,10 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/26/uitableview-2/">UITableView (2)</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/01/24/uitableview-1/">UITableView (1)</a>
@@ -839,10 +826,6 @@
     
       <li class="post">
         <a href="/blog/2013/06/27/fu-dong-ju-zhong/">浮动居中</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/05/30/sshfs/">sshfs</a>
       </li>
     
   </ul>
