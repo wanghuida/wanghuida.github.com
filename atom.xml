@@ -4,7 +4,7 @@
   <title><![CDATA[老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2014-01-26T15:03:47+08:00</updated>
+  <updated>2014-01-26T22:21:00+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,65 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[select for update]]></title>
+    <link href="http://www.wanghd.com/blog/2014/01/26/select-for-update/"/>
+    <updated>2014-01-26T15:37:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2014/01/26/select-for-update</id>
+    <content type="html"><![CDATA[<h4>我的使用场景</h4>
+
+<ul>
+<li>有一大堆产品需要在网上出售，每个产品都有数量，表结构如下</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>id      product_name      count
+</span><span class='line'>1       100元充值卡       5
+</span><span class='line'>2       iphone5s          2</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>每次出售一个count数量就减1，如何保证并发操作的count准确性</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># 伪代码
+</span><span class='line'>
+</span><span class='line'>transaction start
+</span><span class='line'>
+</span><span class='line'>try 
+</span><span class='line'>    // 并发执行会锁行，这样就确保了准确性
+</span><span class='line'>    row = DB::select('select * from product where id=? for update', product_id)
+</span><span class='line'>    row.count = row.count - 1
+</span><span class='line'>    row.save()
+</span><span class='line'>    commit
+</span><span class='line'>catch
+</span><span class='line'>    rollback
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>需要注意的问题是mysql需要innodb表，并且sql要吃上索引，否则锁表</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[UITableView (2)]]></title>
@@ -2602,117 +2661,6 @@ sys     指程序对系统调用锁占用时间
 <ul>
 <li>然后重开终端，就可以发现中文locale已经安装完毕，警告已经不再出现了。</li>
 </ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[主从切换]]></title>
-    <link href="http://www.wanghd.com/blog/2013/04/07/zhu-cong-qie-huan/"/>
-    <updated>2013-04-07T20:32:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/04/07/zhu-cong-qie-huan</id>
-    <content type="html"><![CDATA[<h3>1个master，1个slave1，1个slave2，关闭master，让slave1做master，slave2同步新master</h3>
-
-<ul>
-<li>slave1开启同步账号</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; grant replication slave on *.* to 'backup'@'192.168.0.152' identified by '123456';
-</span><span class='line'>mysql &gt; grant replication slave on *.* to 'backup'@'192.168.0.153' identified by '123456';
-</span><span class='line'>mysql &gt; flush privileges;</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>锁住master的写</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; flush tables with read lock;
-</span><span class='line'>
-</span><span class='line'># 关闭锁的命令：unlock tables;</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<!-- more -->
-
-
-<ul>
-<li>查看slave1和slave2的同步状态</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; show processlist;
-</span><span class='line'>
-</span><span class='line'># 确保 Slave has read all relay log; waiting for the slave I/O thread to update it</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>修改slave1的配置，并重启</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>bind-address = 0.0.0.0
-</span><span class='line'>
-</span><span class='line'>$ sudo service mysql restart</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>停止slave1的slave，设置为master</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; stop slave;
-</span><span class='line'>mysql &gt; reset master;</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>停止slave2的slave，重新设置master</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; stop slave;
-</span><span class='line'>
-</span><span class='line'>mysql &gt; change master to
-</span><span class='line'>      &gt; master_host = '192.168.0.151',
-</span><span class='line'>      &gt; master_user = 'backup',
-</span><span class='line'>      &gt; master_password = '123456';
-</span><span class='line'>
-</span><span class='line'>mysql&gt; start slave;</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>测试是否成功</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; create table `test` ( id int not null auto_increment, `name` varchar(100) not null, primary key (`id`) );
-</span><span class='line'>mysql &gt; drop table test;</span></code></pre></td></tr></table></div></figure>
 
 ]]></content>
   </entry>

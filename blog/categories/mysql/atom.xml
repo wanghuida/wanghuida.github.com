@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Mysql | 老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/blog/categories/mysql/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2014-01-26T15:03:47+08:00</updated>
+  <updated>2014-01-26T22:21:00+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,58 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[select for update]]></title>
+    <link href="http://www.wanghd.com/blog/2014/01/26/select-for-update/"/>
+    <updated>2014-01-26T15:37:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2014/01/26/select-for-update</id>
+    <content type="html"><![CDATA[<h4>我的使用场景</h4>
+
+<ul>
+<li>有一大堆产品需要在网上出售，每个产品都有数量，表结构如下</li>
+</ul>
+
+
+<p><code>
+id      product_name      count
+1       100元充值卡       5
+2       iphone5s          2
+</code></p>
+
+<ul>
+<li>每次出售一个count数量就减1，如何保证并发操作的count准确性</li>
+</ul>
+
+
+<p>```</p>
+
+<h1>伪代码</h1>
+
+<p>transaction start</p>
+
+<p>try</p>
+
+<pre><code>// 并发执行会锁行，这样就确保了准确性
+row = DB::select('select * from product where id=? for update', product_id)
+row.count = row.count - 1
+row.save()
+commit
+</code></pre>
+
+<p>catch</p>
+
+<pre><code>rollback
+</code></pre>
+
+<p>```</p>
+
+<ul>
+<li>需要注意的问题是mysql需要innodb表，并且sql要吃上索引，否则锁表</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[主从切换]]></title>
@@ -348,101 +400,6 @@ mysql > explain select * from staff where username like '%惠达%'</p>
 1 row in set (0.00 sec)</p>
 
 <p>```</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Mysql 状态检查]]></title>
-    <link href="http://www.wanghd.com/blog/2013/02/27/mysql-zhuang-tai-jian-cha/"/>
-    <updated>2013-02-27T14:52:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/02/27/mysql-zhuang-tai-jian-cha</id>
-    <content type="html"><![CDATA[<h3>最简单的status</h3>
-
-<ul>
-<li>可以了解一下mysql基本的状态</li>
-</ul>
-
-
-<p><code>
-$ mysql -u -p -h
-mysql &gt; status
-</code></p>
-
-<!-- more -->
-
-
-<ul>
-<li>另外可以添加 -i 5 参数，让其每五秒自动刷新一次。</li>
-</ul>
-
-
-<p><code>
-mysqladmin -uroot -p密码 status -i 5
-</code></p>
-
-<h3>查看mysql详细的状态信息</h3>
-
-<ul>
-<li>里面包含mysql所有的状态信息，分散在各处，很难理解，下会再推荐一个更有效的工具</li>
-</ul>
-
-
-<p><code>
-mysql &gt; show status; (session 级别的)
-mysql &gt; show global status; (server 级别的, 一般都使用这个)
-</code></p>
-
-<h3>mysqlreport</h3>
-
-<ul>
-<li>官方网站: http://hackmysql.com/mysqlreport</li>
-<li>该工具使用方便，数据也很清晰，非常推荐使用该工具</li>
-</ul>
-
-
-<p><code>
-./mysqlreport --host=10.0.1.111 --user=**** --password=****
-</code></p>
-
-<h3>更快速的查看mysql 表缓存</h3>
-
-<p><code>
-mysql &gt; show open tables;
-</code></p>
-
-<h3>show processlist</h3>
-
-<ul>
-<li><p>当感觉到每个线程有问题时，可以使用这条命令看下情况</p></li>
-<li><p>案例：DBA通知我processlist里有很多空链接，我发现mysql链接都是持久化的。。并且没有关闭</p></li>
-</ul>
-
-
-<h3>show (session | global) variables</h3>
-
-<ul>
-<li>查看当前服务器配置变量</li>
-</ul>
-
-
-<p>```</p>
-
-<h1>很多情况下都不希望重启mysql服务，所以可以动态调整变量</h1>
-
-<h1>例如输出log</h1>
-
-<p>set global log=/tmp/query.log</p>
-
-<h1>希望重启后也会应用到，可以添加到my.cnf</h1>
-
-<p>```</p>
-
-<h3>show table status [from db] [like '%table%']</h3>
-
-<ul>
-<li>显示具体某个表的状态信息</li>
-</ul>
-
 ]]></content>
   </entry>
   

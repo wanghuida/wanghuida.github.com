@@ -100,6 +100,90 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2013/06/27/fu-dong-ju-zhong/">浮动居中</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-06-27T10:52:00+08:00" pubdate data-updated="true">Jun 27<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/06/27/fu-dong-ju-zhong/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><ul>
+<li><p>对于定宽的非浮动元素我们可以用 margin:0 auto; 进行水平居中，对于不定宽的浮动元素我们也有一个常用的技巧解决它的水平居中问题。分解如下：</p></li>
+<li><p>HTML 部分：</p></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;div class="test"&gt;
+</span><span class='line'>    &lt;p&gt;浮动的&lt;/p&gt;
+</span><span class='line'>    &lt;p&gt;居中的&lt;/p&gt;
+</span><span class='line'>&lt;/div&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>CSS 部分：</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>.test{
+</span><span class='line'>    float:left;
+</span><span class='line'>    position:relative;
+</span><span class='line'>    left:50%;
+</span><span class='line'>}
+</span><span class='line'>p{
+</span><span class='line'>    float:left;
+</span><span class='line'>    position:relative;
+</span><span class='line'>    right:50%;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>这样看来就很简单了吧，父元素和子元素同时左浮动，然后父元素相对左移动50%，再然后子元素相对右移动50%，或者子元素相对左移动-50%也就可以了。如此简单如此神奇。</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2013/05/30/sshfs/">Sshfs</a></h1>
     
     
@@ -699,78 +783,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2013/04/07/zhu-cong-qie-huan/">主从切换</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-04-07T20:32:00+08:00" pubdate data-updated="true">Apr 7<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/04/07/zhu-cong-qie-huan/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>1个master，1个slave1，1个slave2，关闭master，让slave1做master，slave2同步新master</h3>
-
-<ul>
-<li>slave1开启同步账号</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; grant replication slave on *.* to 'backup'@'192.168.0.152' identified by '123456';
-</span><span class='line'>mysql &gt; grant replication slave on *.* to 'backup'@'192.168.0.153' identified by '123456';
-</span><span class='line'>mysql &gt; flush privileges;</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>锁住master的写</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; flush tables with read lock;
-</span><span class='line'>
-</span><span class='line'># 关闭锁的命令：unlock tables;</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2013/04/07/zhu-cong-qie-huan/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/3/">&larr; 其他文章</a></li>
@@ -791,7 +803,7 @@
 <li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
 <li class='category'><a href='/blog/categories/javascript/'>Javascript (4)</a></li>
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
-<li class='category'><a href='/blog/categories/mysql/'>Mysql (8)</a></li>
+<li class='category'><a href='/blog/categories/mysql/'>Mysql (9)</a></li>
 <li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
 <li class='category'><a href='/blog/categories/php/'>Php (7)</a></li>
@@ -818,6 +830,10 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/26/select-for-update/">select for update</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/01/26/uitableview-2/">UITableView (2)</a>
@@ -853,10 +869,6 @@
     
       <li class="post">
         <a href="/blog/2013/07/02/phptu-pian-chu-li-ubuntupei-zhi/">php图片处理ubuntu配置</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/06/27/fu-dong-ju-zhong/">浮动居中</a>
       </li>
     
   </ul>
