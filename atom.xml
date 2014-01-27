@@ -4,7 +4,7 @@
   <title><![CDATA[老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2014-01-27T15:16:47+08:00</updated>
+  <updated>2014-01-27T21:12:37+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,99 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[ios 静态库]]></title>
+    <link href="http://www.wanghd.com/blog/2014/01/27/ios-jing-tai-ku/"/>
+    <updated>2014-01-27T20:28:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2014/01/27/ios-jing-tai-ku</id>
+    <content type="html"><![CDATA[<h3>不是真想要写静态库，只是对自己使用第三方静态库很有好处</h3>
+
+<ul>
+<li>如果经常遇到undefine symbols for architecture xxx 这样的错误，那么看完后就能知道原因了</li>
+</ul>
+
+
+<p>1 建静态库工程</p>
+
+<p><img style="max-width:300px;" src="http://www.wanghd.com/images/post/ioslib1.jpg" /></p>
+
+<p>2 加一个库方法</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="c1">// .h</span>
+</span><span class='line'><span class="k">+</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">printHelloWorld</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// .m</span>
+</span><span class='line'><span class="k">+</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">printHelloWorld</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;Hello World!!!&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>3 直接debug运行，右键进入finder复制.h 和.a文件到新项目中</p>
+
+<p><img style="max-width:300px;" src="http://www.wanghd.com/images/post/ioslib2.jpg" /></p>
+
+<!-- more -->
+
+
+<p>4 在新项目中使用静态库 报错Undefined symbols for architecture i386:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="cp">#import &quot;tmpLib.h&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">[</span><span class="n">tmpLib</span> <span class="n">printHelloWorld</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>5 查看.a文件支持的架构</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="n">lipo</span> <span class="o">-</span><span class="n">detailed_info</span> <span class="n">libtmpLib</span><span class="p">.</span><span class="n">a</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// 输出 Non-fat file: libtmpLib.a is architecture: armv7s</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>6 要虚拟机跑起来必须包含i386架构，还应该包含arm64 armv7 armv7s</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="c1">// i386对应虚拟机 arm是各种机型</span>
+</span><span class='line'><span class="c1">// debug运行生成i386架构 </span>
+</span><span class='line'><span class="c1">// release运行生成所有arm架构</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">lipo</span> <span class="o">-</span><span class="n">create</span> <span class="n">Debug</span><span class="o">-</span><span class="n">iphonesimulator</span><span class="o">/</span><span class="n">libtmpLib</span><span class="p">.</span><span class="n">a</span> <span class="n">Release</span><span class="o">-</span><span class="n">iphoneos</span><span class="o">/</span><span class="n">libtmpLib</span><span class="p">.</span><span class="n">a</span> <span class="o">-</span><span class="n">output</span> <span class="n">libtmpLib</span><span class="p">.</span><span class="n">a</span>
+</span><span class='line'><span class="n">lipo</span> <span class="o">-</span><span class="n">info</span> <span class="n">libtmpLib</span><span class="p">.</span><span class="n">a</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// 输出Architectures in the fat file: libtmpLib.a are: i386 armv7 armv7s arm64</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>7 替换.a文件看下结果</p>
+
+<p><img style="max-width:200px;" src="http://www.wanghd.com/images/post/ioslib3.jpg" /></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[CALayer 常用例子]]></title>
@@ -2881,169 +2974,6 @@ sys     指程序对系统调用锁占用时间
 </span><span class='line'><span class="x">    return sprintf(&#39;%08x%08x%08x%08x&#39;,mt_rand(),mt_rand(),mt_rand(),mt_rand());</span>
 </span><span class='line'><span class="x">}</span>
 </span></code></pre></td></tr></table></div></figure>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[yii 文件日志]]></title>
-    <link href="http://www.wanghd.com/blog/2013/05/23/yii-ri-zhi/"/>
-    <updated>2013-05-23T15:12:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/05/23/yii-ri-zhi</id>
-    <content type="html"><![CDATA[<ul>
-<li>yii的文件日志默认在runtime下的application.log</li>
-</ul>
-
-
-<!-- more -->
-
-
-<ul>
-<li>yii配置文件日志和记录等级</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
-</span><span class='line'><span class="c1"># main.php配置文件, 生产环境只记录error和warning</span>
-</span><span class='line'><span class="s1">&#39;components&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span> <span class="p">(</span>
-</span><span class='line'>    <span class="s1">&#39;log&#39;</span><span class="o">=&gt;</span><span class="k">array</span><span class="p">(</span>
-</span><span class='line'>        <span class="s1">&#39;class&#39;</span><span class="o">=&gt;</span><span class="s1">&#39;CLogRouter&#39;</span><span class="p">,</span>
-</span><span class='line'>        <span class="s1">&#39;routes&#39;</span><span class="o">=&gt;</span><span class="k">array</span><span class="p">(</span>
-</span><span class='line'>            <span class="k">array</span><span class="p">(</span>
-</span><span class='line'>                <span class="s1">&#39;class&#39;</span><span class="o">=&gt;</span><span class="s1">&#39;CFileLogRoute&#39;</span><span class="p">,</span>
-</span><span class='line'>                <span class="s1">&#39;levels&#39;</span><span class="o">=&gt;</span><span class="s1">&#39;error, warning&#39;</span><span class="p">,</span>
-</span><span class='line'>            <span class="p">),</span>
-</span><span class='line'>        <span class="p">),</span>
-</span><span class='line'>    <span class="p">),</span>
-</span><span class='line'><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1"># test.php配置文件，线下测试所有的都记录下来</span>
-</span><span class='line'><span class="s1">&#39;components&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span> <span class="p">(</span>
-</span><span class='line'>    <span class="s1">&#39;log&#39;</span><span class="o">=&gt;</span><span class="k">array</span><span class="p">(</span>
-</span><span class='line'>        <span class="s1">&#39;class&#39;</span><span class="o">=&gt;</span><span class="s1">&#39;CLogRouter&#39;</span><span class="p">,</span>
-</span><span class='line'>        <span class="s1">&#39;routes&#39;</span><span class="o">=&gt;</span><span class="k">array</span><span class="p">(</span>
-</span><span class='line'>            <span class="k">array</span><span class="p">(</span>
-</span><span class='line'>                <span class="s1">&#39;class&#39;</span><span class="o">=&gt;</span><span class="s1">&#39;CFileLogRoute&#39;</span><span class="p">,</span>
-</span><span class='line'>                <span class="c1">#trace内容很多，一般不开启，用info足够了</span>
-</span><span class='line'>                <span class="s1">&#39;levels&#39;</span><span class="o">=&gt;</span><span class="s1">&#39;info, profile, error, warning&#39;</span><span class="p">,</span>
-</span><span class='line'>            <span class="p">),</span>
-</span><span class='line'>        <span class="p">),</span>
-</span><span class='line'>    <span class="p">),</span>
-</span><span class='line'><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1"># 记录日志, 1.log信息,2.等级,3.分类（分类自定义）</span>
-</span><span class='line'><span class="nx">Yii</span><span class="o">::</span><span class="na">log</span><span class="p">(</span><span class="s1">&#39;info调试信息&#39;</span><span class="p">,</span> <span class="nx">CLogger</span><span class="o">::</span><span class="na">LEVEL_INFO</span><span class="p">,</span> <span class="s1">&#39;test.info&#39;</span><span class="p">);</span>
-</span><span class='line'><span class="nx">Yii</span><span class="o">::</span><span class="na">log</span><span class="p">(</span><span class="s1">&#39;profile调试信息&#39;</span><span class="p">,</span> <span class="nx">CLogger</span><span class="o">::</span><span class="na">LEVEL_PROFILE</span><span class="p">,</span> <span class="s1">&#39;test.profile&#39;</span><span class="p">);</span>
-</span><span class='line'><span class="nx">Yii</span><span class="o">::</span><span class="na">log</span><span class="p">(</span><span class="s1">&#39;warning调试信息&#39;</span><span class="p">,</span> <span class="nx">CLogger</span><span class="o">::</span><span class="na">LEVEL_WARNING</span><span class="p">,</span> <span class="s1">&#39;test.warning&#39;</span><span class="p">);</span>
-</span><span class='line'><span class="nx">Yii</span><span class="o">::</span><span class="na">log</span><span class="p">(</span><span class="s1">&#39;error调试信息&#39;</span><span class="p">,</span> <span class="nx">CLogger</span><span class="o">::</span><span class="na">LEVEL_ERROR</span><span class="p">,</span> <span class="s1">&#39;test.error&#39;</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>服务器异常错误，显示错误页面，这样的错误会记录到日志中（因为属于error, warning）</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
-</span><span class='line'><span class="c1"># 在main.php中配置errorHandler，统一处理异常</span>
-</span><span class='line'><span class="s1">&#39;components&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span> <span class="p">(</span>
-</span><span class='line'>    <span class="s1">&#39;errorHandler&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
-</span><span class='line'>        <span class="s1">&#39;errorAction&#39;</span><span class="o">=&gt;</span><span class="s1">&#39;site/error&#39;</span><span class="p">,</span>
-</span><span class='line'>    <span class="p">),</span>
-</span><span class='line'><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1"># 在Site控制器里增加error的action，处理错误</span>
-</span><span class='line'><span class="k">class</span> <span class="nc">SiteController</span> <span class="k">extends</span> <span class="nx">Controller</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">actionIndex</span><span class="p">()</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="c1"># 产生一个异常</span>
-</span><span class='line'>        <span class="k">throw</span> <span class="k">new</span> <span class="nx">CHttpException</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="s1">&#39;调用接口失败&#39;</span><span class="p">);</span>
-</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">render</span><span class="p">(</span><span class="s1">&#39;/index&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">actionError</span><span class="p">()</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="nv">$error</span> <span class="o">=</span> <span class="nx">Yii</span><span class="o">::</span><span class="na">app</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">errorHandler</span><span class="o">-&gt;</span><span class="na">error</span><span class="p">;</span>
-</span><span class='line'>        <span class="nv">$params</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
-</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="nv">$error</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$error</span><span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">];</span>
-</span><span class='line'>            <span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;msg&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$error</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">];</span>
-</span><span class='line'>            <span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;json&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">json_encode</span><span class="p">(</span><span class="nv">$error</span><span class="p">);</span>
-</span><span class='line'>            <span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;is_debug&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">YII_DEBUG</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">render</span><span class="p">(</span><span class="s1">&#39;/error&#39;</span><span class="p">,</span> <span class="nv">$params</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
 
 ]]></content>
   </entry>

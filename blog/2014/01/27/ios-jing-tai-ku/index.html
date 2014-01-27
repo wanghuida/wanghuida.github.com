@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>安装配置hive - 老虎的眼睛</title>
+  <title>ios 静态库 - 老虎的眼睛</title>
   <meta name="author" content="王惠达 huida wanghuida">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.wanghd.com/blog/2012/11/10/an-zhuang-pei-zhi-hive">
+  <link rel="canonical" href="http://www.wanghd.com/blog/2014/01/27/ios-jing-tai-ku">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/bootstrap/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/stylesheets/bootstrap/responsive.css" media="screen, projection" rel="stylesheet" type="text/css">
@@ -98,7 +98,7 @@
   
   <header class="page-header">
     
-      <h1 class="entry-title">安装配置hive</h1>
+      <h1 class="entry-title">Ios 静态库</h1>
     
     
       <p class="meta">
@@ -114,7 +114,7 @@
   
 
 
-<time datetime="2012-11-10T14:59:00+08:00" pubdate data-updated="true">Nov 10<span>th</span>, 2012</time>
+<time datetime="2014-01-27T20:28:00+08:00" pubdate data-updated="true">Jan 27<span>th</span>, 2014</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -123,83 +123,91 @@
   </header>
 
 
-<div class="entry-content"><ul>
-<li>先安装hadoop请参考<a href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/">这篇文章</a></li>
-<li>hive介绍：通过类似于sql语句的方式去计算结果，数据都存放在hdfs</li>
-</ul>
-
-
-<h3>下载并解压hive</h3>
+<div class="entry-content"><h3>不是真想要写静态库，只是对自己使用第三方静态库很有好处</h3>
 
 <ul>
-<li>给个官方<a href="http://www.apache.org/dyn/closer.cgi/hive/">链接</a></li>
+<li>如果经常遇到undefine symbols for architecture xxx 这样的错误，那么看完后就能知道原因了</li>
 </ul>
 
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<p>1 建静态库工程</p>
+
+<p><img style="max-width:300px;" src="/images/post/ioslib1.jpg" /></p>
+
+<p>2 加一个库方法</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>tar -xzvf hive-x.y.z.tar.gz
-</span><span class='line'>cd hive-x.y.z
-</span><span class='line'>PATH=$PATH:/Users/william/project/hadoop-1.0.4/bin:/Users/william/project/hive-0.8.1/bin
-</span><span class='line'>. ~/.bash_profile</span></code></pre></td></tr></table></div></figure>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="c1">// .h</span>
+</span><span class='line'><span class="k">+</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">printHelloWorld</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// .m</span>
+</span><span class='line'><span class="k">+</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">printHelloWorld</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;Hello World!!!&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
-<ul>
-<li>直接在终端输入hive，然后输入show tables;然会OK，就行了</li>
-</ul>
+<p>3 直接debug运行，右键进入finder复制.h 和.a文件到新项目中</p>
 
+<p><img style="max-width:300px;" src="/images/post/ioslib2.jpg" /></p>
 
 <!-- more -->
 
 
-<h3>创建测试表</h3>
+<p>4 在新项目中使用静态库 报错Undefined symbols for architecture i386:</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>create table test (id INT,name STRING);
-</span><span class='line'>create table test2 (id INT,name STRING) partitioned by (ds STRING);
-</span><span class='line'>create table result (id int,name string);</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="cp">#import &quot;tmpLib.h&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">[</span><span class="n">tmpLib</span> <span class="n">printHelloWorld</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
-<h3>导入数据</h3>
+<p>5 查看.a文件支持的架构</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>load data local inpath '/Users/william/project/hive-0.8.1/examples/files/kv1.txt' overwrite into table test;
-</span><span class='line'>load data local inpath '/Users/william/project/hive-0.8.1/examples/files/kv2.txt' overwrite into table test2 partition (ds='2012-10-01');
-</span><span class='line'>load data local inpath '/Users/william/project/hive-0.8.1/examples/files/kv3.txt' overwrite into table test2 partition (ds='2012-10-02');</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="n">lipo</span> <span class="o">-</span><span class="n">detailed_info</span> <span class="n">libtmpLib</span><span class="p">.</span><span class="n">a</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// 输出 Non-fat file: libtmpLib.a is architecture: armv7s</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
-<h3>操作数据</h3>
+<p>6 要虚拟机跑起来必须包含i386架构，还应该包含arm64 armv7 armv7s</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>select count(*) from test2 where ds='2012-10-01';
-</span><span class='line'>insert overwrite directory '/tmp/hdfs_out' select t.* from test2 t where t.ds='2012-10-01';
-</span><span class='line'>insert overwrite local directory '/tmp/local_out' select a.* from test a;
-</span><span class='line'>insert overwrite table result select a.* from test a where a.id &lt; 100;</span></code></pre></td></tr></table></div></figure>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="c1">// i386对应虚拟机 arm是各种机型</span>
+</span><span class='line'><span class="c1">// debug运行生成i386架构 </span>
+</span><span class='line'><span class="c1">// release运行生成所有arm架构</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">lipo</span> <span class="o">-</span><span class="n">create</span> <span class="n">Debug</span><span class="o">-</span><span class="n">iphonesimulator</span><span class="o">/</span><span class="n">libtmpLib</span><span class="p">.</span><span class="n">a</span> <span class="n">Release</span><span class="o">-</span><span class="n">iphoneos</span><span class="o">/</span><span class="n">libtmpLib</span><span class="p">.</span><span class="n">a</span> <span class="o">-</span><span class="n">output</span> <span class="n">libtmpLib</span><span class="p">.</span><span class="n">a</span>
+</span><span class='line'><span class="n">lipo</span> <span class="o">-</span><span class="n">info</span> <span class="n">libtmpLib</span><span class="p">.</span><span class="n">a</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// 输出Architectures in the fat file: libtmpLib.a are: i386 armv7 armv7s arm64</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
-<h3>换种风格操作数据</h3>
+<p>7 替换.a文件看下结果</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>from test t                                                                 
-</span><span class='line'>    insert overwrite directory '/tmp/other_out' select t.* where t.id &lt; 60      
-</span><span class='line'>    insert overwrite local directory '/tmp/other_out2' select t.* where t.id &gt; 60;</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>还可以自己写脚本做数据转换器</li>
-</ul>
-
+<p><img style="max-width:200px;" src="/images/post/ioslib3.jpg" /></p>
 </div>
 
 
@@ -222,12 +230,12 @@
   
 
 
-<time datetime="2012-11-10T14:59:00+08:00" pubdate data-updated="true">Nov 10<span>th</span>, 2012</time>
+<time datetime="2014-01-27T20:28:00+08:00" pubdate data-updated="true">Jan 27<span>th</span>, 2014</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/hadoop/'>Hadoop</a>, <a class='category' href='/blog/categories/java/'>Java</a>
+    <a class='category' href='/blog/categories/ios/'>IOS</a>
   
 </span>
 
@@ -236,7 +244,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2012/11/10/an-zhuang-pei-zhi-hive/" data-via="" data-counturl="http://www.wanghd.com/blog/2012/11/10/an-zhuang-pei-zhi-hive/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2014/01/27/ios-jing-tai-ku/" data-via="" data-counturl="http://www.wanghd.com/blog/2014/01/27/ios-jing-tai-ku/" >Tweet</a>
   
   
   
@@ -253,14 +261,10 @@
     <ul class="pager">
       
       <li class="previous"><a class="basic-alignment left"
-        href="/blog/2012/11/08/perlfu-jin-cheng-jian-ting-zi-jin-cheng-gong-zuo-shi-li/" title="Previous Post:
-        perl父进程监听，子进程工作实例">&laquo; perl父进程监听，子进程工作实例</a></li>
+        href="/blog/2014/01/27/calayer-chang-yong-li-zi/" title="Previous Post:
+        CALayer 常用例子">&laquo; CALayer 常用例子</a></li>
       
       <li><a href="/blog/archives">文章归档</a></li>
-      
-      <li class="next"><a class="basic-alignment right" href="/blog/2012/11/22/xiu-fu-mogilefsmu-lu-owner/"
-        title="Next Post: 修复mogilefs目录owner">修复mogilefs目录owner
-        &raquo;</a></li>
       
     </ul>
   </footer>
@@ -392,8 +396,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.wanghd.com/blog/2012/11/10/an-zhuang-pei-zhi-hive/';
-        var disqus_url = 'http://www.wanghd.com/blog/2012/11/10/an-zhuang-pei-zhi-hive/';
+        var disqus_identifier = 'http://www.wanghd.com/blog/2014/01/27/ios-jing-tai-ku/';
+        var disqus_url = 'http://www.wanghd.com/blog/2014/01/27/ios-jing-tai-ku/';
         var disqus_script = 'embed.js';
       
     (function () {

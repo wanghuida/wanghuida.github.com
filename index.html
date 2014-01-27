@@ -100,6 +100,84 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2014/01/27/ios-jing-tai-ku/">Ios 静态库</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-01-27T20:28:00+08:00" pubdate data-updated="true">Jan 27<span>th</span>, 2014</time>
+        
+         | <a href="/blog/2014/01/27/ios-jing-tai-ku/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>不是真想要写静态库，只是对自己使用第三方静态库很有好处</h3>
+
+<ul>
+<li>如果经常遇到undefine symbols for architecture xxx 这样的错误，那么看完后就能知道原因了</li>
+</ul>
+
+
+<p>1 建静态库工程</p>
+
+<p><img style="max-width:300px;" src="/images/post/ioslib1.jpg" /></p>
+
+<p>2 加一个库方法</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="c1">// .h</span>
+</span><span class='line'><span class="k">+</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">printHelloWorld</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// .m</span>
+</span><span class='line'><span class="k">+</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">printHelloWorld</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;Hello World!!!&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>3 直接debug运行，右键进入finder复制.h 和.a文件到新项目中</p>
+
+<p><img style="max-width:300px;" src="/images/post/ioslib2.jpg" /></p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2014/01/27/ios-jing-tai-ku/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2014/01/27/calayer-chang-yong-li-zi/">CALayer 常用例子</a></h1>
     
     
@@ -891,91 +969,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2013/07/17/chuang-ye-gong-si-de-yun-wei-gong-zuo/">创业公司的运维工作</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-07-17T13:04:00+08:00" pubdate data-updated="true">Jul 17<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/07/17/chuang-ye-gong-si-de-yun-wei-gong-zuo/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>创业公司的运维工作应该尽可能简单，不用追求全自动化，但必要的工作还是要做的。</h3>
-
-<br />
-
-
-<h3>安全管理</h3>
-
-<ol>
-<li>有权限的员工登录服务器需要使用<em>key</em>通过跳板机，再进入线上服务器</li>
-<li>外部的请求，需要通过<em>lb</em>转发才能访问，内部服务器无法直接提供服务</li>
-<li>内部的服务器访问外网需要通过proxy</li>
-<li>内部服务器保存操作记录</li>
-<li>加强ddos防护</li>
-<li>端口和ip的限制</li>
-</ol>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>                                                                                            
-</span><span class='line'>       +------+  +---------+        +-----+                                                 
-</span><span class='line'>       |  lb  |  |  proxy  |        | ssh |                                                 
-</span><span class='line'>       +------+  +---------+        +-----+                                                 
-</span><span class='line'>          |           ^                |                                                    
-</span><span class='line'>          v           |                |                                                   
-</span><span class='line'>      +--------------------------------|---+                                               
-</span><span class='line'>      |                                |   |                                                
-</span><span class='line'>      |         internal server     &lt;--+   |                                                
-</span><span class='line'>      |                                    |                                                
-</span><span class='line'>      +------------------------------------+                                               
-</span><span class='line'>                                                                                            </span></code></pre></td></tr></table></div></figure>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2013/07/17/chuang-ye-gong-si-de-yun-wei-gong-zuo/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/2/">&larr; 其他文章</a></li>
@@ -990,7 +983,7 @@
   <ul id="categories" class="nav nav-list">
     <li class="nav-header">文章分类</li>
     <li class='category'><a href='/blog/categories/hadoop/'>Hadoop (4)</a></li>
-<li class='category'><a href='/blog/categories/ios/'>IOS (5)</a></li>
+<li class='category'><a href='/blog/categories/ios/'>IOS (6)</a></li>
 <li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
 <li class='category'><a href='/blog/categories/javascript/'>Javascript (4)</a></li>
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
@@ -1021,6 +1014,10 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/27/ios-jing-tai-ku/">ios 静态库</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/01/27/calayer-chang-yong-li-zi/">CALayer 常用例子</a>
@@ -1056,10 +1053,6 @@
     
       <li class="post">
         <a href="/blog/2013/07/17/linux-cao-zuo-ji-jin/">linux 操作集锦</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/07/17/chuang-ye-gong-si-de-yun-wei-gong-zuo/">创业公司的运维工作</a>
       </li>
     
   </ul>
