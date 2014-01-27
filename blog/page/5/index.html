@@ -100,6 +100,58 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2013/01/18/you-lan-qi-huan-cun-jie-xi/">游览器缓存解析</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-18T19:32:00+08:00" pubdate data-updated="true">Jan 18<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/01/18/you-lan-qi-huan-cun-jie-xi/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>游览器缓存：可以通过如下四种方式进行设置</h3>
+
+<ol>
+<li>Expire: 直接设置过期时间(不做详细解释，用Cache-Control更好)</li>
+<li>Cache-Control: HTTP 1.1用Cache-Control代替Expire，Cache-Control比Expire更方便，功能更多。不需要访问服务器端</li>
+<li>Last-Modified: 用来设置最后更新时间。需要访问服务器端，如果没有更新直接使用304，节省网络流量和网络传输时间</li>
+<li>ETag: 用来设置唯一标识。需要访问服务器端，和last-modified一样</li>
+</ol>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2013/01/18/you-lan-qi-huan-cun-jie-xi/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2013/01/10/rtxldapjiao-cheng/">RTXLDAP教程</a></h1>
     
     
@@ -604,44 +656,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/22/log4jjie-shao/">Log4j介绍</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-22T17:18:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/22/log4jjie-shao/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content">
-</div>
-  
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/6/">&larr; 其他文章</a></li>
@@ -658,7 +672,7 @@
   <ul id="categories" class="nav nav-list">
     <li class="nav-header">文章分类</li>
     <li class='category'><a href='/blog/categories/hadoop/'>Hadoop (4)</a></li>
-<li class='category'><a href='/blog/categories/ios/'>IOS (3)</a></li>
+<li class='category'><a href='/blog/categories/ios/'>IOS (4)</a></li>
 <li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
 <li class='category'><a href='/blog/categories/javascript/'>Javascript (4)</a></li>
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
@@ -689,6 +703,10 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/27/uitableview-3/">uitableview (3)</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/01/26/select-for-update/">select for update</a>
@@ -724,10 +742,6 @@
     
       <li class="post">
         <a href="/blog/2013/07/15/cutycapt-htmlye-mian-sheng-cheng-tu-pian-fen-xiang-wei-bo/">CutyCapt html页面生成图片 分享微博</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/07/02/phptu-pian-chu-li-ubuntupei-zhi/">php图片处理ubuntu配置</a>
       </li>
     
   </ul>

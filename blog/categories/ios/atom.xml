@@ -4,7 +4,7 @@
   <title><![CDATA[Category: IOS | 老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2014-01-26T22:21:00+08:00</updated>
+  <updated>2014-01-27T13:52:13+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,282 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[uitableview (3)]]></title>
+    <link href="http://www.wanghd.com/blog/2014/01/27/uitableview-3/"/>
+    <updated>2014-01-27T13:32:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2014/01/27/uitableview-3</id>
+    <content type="html"><![CDATA[<h3>tableview还有一种编辑状态也很常用，很简单下面是教程</h3>
+
+<p>1 老规矩 自己先创建一个ViewController, 添加一个UITableView内部属性和数据</p>
+
+<p><code>objective-c
+@interface AEEditTableViewController ()
+{
+  UITableView *_table;
+  NSMutableArray *_data;
+}
+</code></p>
+
+<p>2 头里需要实现UITableViewDataSource, UITableViewDelegate</p>
+
+<p>```objective-c</p>
+
+<h1>import &lt;UIKit/UIKit.h></h1>
+
+<p>@interface AEEditTableViewController : UIViewController&lt;UITableViewDataSource, UITableViewDelegate></p>
+
+<p>@end
+```</p>
+
+<p>3 让window的root view设置为创建的view，并设置一个navigation</p>
+
+<p>```objective-c
+- (BOOL)application:(UIApplication <em>)application didFinishLaunchingWithOptions:(NSDictionary </em>)launchOptions
+{
+  self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+  self.window.backgroundColor = [UIColor whiteColor];
+  [self.window makeKeyAndVisible];</p>
+
+<p>  AEEditTableViewController <em>viewCtl = [[AEEditTableViewController alloc]initWithNibName:nil bundle:nil];
+  UINavigationController </em>nav = [[UINavigationController alloc]initWithRootViewController:viewCtl];</p>
+
+<p>  self.window.rootViewController = nav;</p>
+
+<p>  return YES;
+}
+```</p>
+
+<p>4 往<em>data中加入一点数据,初始化</em>table,设置代理和数据源，在导航上加个按钮</p>
+
+<p>```objective-c
+- (id)initWithNibName:(NSString <em>)nibNameOrNil bundle:(NSBundle </em>)nibBundleOrNil
+{
+  self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+  if (self) {</p>
+
+<pre><code>_data = [[NSMutableArray alloc]initWithArray:@[@"1",@"2",@"3",@"4",@"5",@"6",@"7",@"8"]];
+</code></pre>
+
+<p>  }
+  return self;
+}</p>
+
+<ul>
+<li><p>(void)viewDidLoad
+{
+[super viewDidLoad];</p>
+
+<p>UIBarButtonItem *btn = [[UIBarButtonItem alloc] initWithTitle:@"编辑"</p>
+
+<pre><code>                                                    style:UIBarButtonItemStyleBordered
+                                                   target:self
+                                                   action:@selector(tapEditBtn:)];
+</code></pre>
+
+<p>self.navigationItem.rightBarButtonItem = btn;</p>
+
+<p>CGRect rect = [[UIScreen mainScreen] bounds];
+<em>table = [[UITableView alloc]initWithFrame:rect style:UITableViewStylePlain];
+</em>table.delegate = self;
+<em>table.dataSource = self;
+[self.view addSubview:</em>table];
+}</p></li>
+</ul>
+
+
+<h1>pragma mark - tapEditBtn</h1>
+
+<ul>
+<li>(void)tapEditBtn:(UIBarButtonItem *)btn
+{
+if ([btn.title isEqualToString:@"编辑"]) {
+  btn.title = @"保存";
+  [<em>table setEditing:YES animated:YES];
+} else {
+  btn.title = @"编辑";
+  [</em>table setEditing:NO animated:YES];
+}
+}
+```</li>
+</ul>
+
+
+<p>5 设置数据源，增加删除的操作</p>
+
+<p>```objective-c</p>
+
+<h1>pragma mark - datasource</h1>
+
+<p>// 可以不写噢，默认就是delete模式
+- (UITableViewCellEditingStyle)tableView:(UITableView <em>)tableView editingStyleForRowAtIndexPath:(NSIndexPath </em>)indexPath
+{
+  // 当然也可以insert 就是不太用
+  // return UITableViewCellEditingStyleInsert;
+  return UITableViewCellEditingStyleDelete;
+}</p>
+
+<p>// 删除的操作
+- (void)tableView:(UITableView <em>)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath </em>)indexPath
+{
+  if (editingStyle == UITableViewCellEditingStyleDelete) {</p>
+
+<pre><code>[_data removeObjectAtIndex:indexPath.row];
+[tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+</code></pre>
+
+<p>  }
+}</p>
+
+<p>// 哪些可以删，哪些不能删
+- (BOOL)tableView:(UITableView <em>)tableView canEditRowAtIndexPath:(NSIndexPath </em>)indexPath
+{
+  return indexPath.row == 1 ? NO : YES;
+}</p>
+
+<ul>
+<li><p>(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+return [_data count];
+}</p></li>
+<li><p>(UITableViewCell <em>)tableView:(UITableView </em>)tableView cellForRowAtIndexPath:(NSIndexPath <em>)indexPath
+{
+static NSString </em>cellId = @"cell";
+UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellId];
+if (cell == nil) {
+  cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellId];
+}
+cell.textLabel.text = [_data objectAtIndex:indexPath.row];
+return cell;
+}
+```</p></li>
+</ul>
+
+
+<p>6 看下效果吧</p>
+
+<p><img style="max-width:300px;" src="http://www.wanghd.com/images/post/ios-uitableview-3.jpg" /></p>
+
+<p>7 附赠全部源代码</p>
+
+<p>```objective-c</p>
+
+<p>// .h</p>
+
+<h1>import &lt;UIKit/UIKit.h></h1>
+
+<p>@interface AEEditTableViewController : UIViewController&lt;UITableViewDataSource, UITableViewDelegate></p>
+
+<p>@end</p>
+
+<p>// .m</p>
+
+<h1>import "AEEditTableViewController.h"</h1>
+
+<p>@interface AEEditTableViewController ()
+{
+  UITableView <em>_table;
+  NSMutableArray </em>_data;
+}</p>
+
+<p>@end</p>
+
+<p>@implementation AEEditTableViewController</p>
+
+<ul>
+<li><p>(id)initWithNibName:(NSString <em>)nibNameOrNil bundle:(NSBundle </em>)nibBundleOrNil
+{
+self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+if (self) {
+  _data = [[NSMutableArray alloc]initWithArray:@[@"1",@"2",@"3",@"4",@"5",@"6",@"7",@"8"]];
+}
+return self;
+}</p></li>
+<li><p>(void)viewDidLoad
+{
+[super viewDidLoad];</p>
+
+<p>UIBarButtonItem *btn = [[UIBarButtonItem alloc] initWithTitle:@"编辑"</p>
+
+<pre><code>                                                    style:UIBarButtonItemStyleBordered
+                                                   target:self
+                                                   action:@selector(tapEditBtn:)];
+</code></pre>
+
+<p>self.navigationItem.rightBarButtonItem = btn;</p>
+
+<p>CGRect rect = [[UIScreen mainScreen] bounds];
+<em>table = [[UITableView alloc]initWithFrame:rect style:UITableViewStylePlain];
+</em>table.delegate = self;
+<em>table.dataSource = self;
+[self.view addSubview:</em>table];
+}</p></li>
+</ul>
+
+
+<h1>pragma mark - tapEditBtn</h1>
+
+<ul>
+<li>(void)tapEditBtn:(UIBarButtonItem *)btn
+{
+if ([btn.title isEqualToString:@"编辑"]) {
+  btn.title = @"保存";
+  [<em>table setEditing:YES animated:YES];
+} else {
+  btn.title = @"编辑";
+  [</em>table setEditing:NO animated:YES];
+}
+}</li>
+</ul>
+
+
+<h1>pragma mark - datasource</h1>
+
+<ul>
+<li><p>(UITableViewCellEditingStyle)tableView:(UITableView <em>)tableView editingStyleForRowAtIndexPath:(NSIndexPath </em>)indexPath
+{
+// 当然也可以insert 就是不太用
+// return UITableViewCellEditingStyleInsert;
+return UITableViewCellEditingStyleDelete;
+}</p></li>
+<li><p>(void)tableView:(UITableView <em>)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath </em>)indexPath
+{
+if (editingStyle == UITableViewCellEditingStyleDelete) {
+  [_data removeObjectAtIndex:indexPath.row];
+  [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+}
+}</p></li>
+<li><p>(BOOL)tableView:(UITableView <em>)tableView canEditRowAtIndexPath:(NSIndexPath </em>)indexPath
+{
+return indexPath.row == 1 ? NO : YES;
+}</p></li>
+<li><p>(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+return [_data count];
+}</p></li>
+<li><p>(UITableViewCell <em>)tableView:(UITableView </em>)tableView cellForRowAtIndexPath:(NSIndexPath <em>)indexPath
+{
+static NSString </em>cellId = @"cell";
+UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellId];
+if (cell == nil) {
+  cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellId];
+}
+cell.textLabel.text = [_data objectAtIndex:indexPath.row];
+return cell;
+}</p></li>
+<li><p>(void)didReceiveMemoryWarning
+{
+[super didReceiveMemoryWarning];
+}</p></li>
+</ul>
+
+
+<p>@end</p>
+
+<p>```</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[UITableView (2)]]></title>
