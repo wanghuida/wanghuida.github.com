@@ -4,7 +4,7 @@
   <title><![CDATA[Category: IOS | 老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2014-01-27T21:12:37+08:00</updated>
+  <updated>2014-01-27T21:48:26+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,20 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[ios 第三方库大汇总]]></title>
+    <link href="http://www.wanghd.com/blog/2014/01/27/ios-di-san-fang-ku-da-hui-zong/"/>
+    <updated>2014-01-27T21:44:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2014/01/27/ios-di-san-fang-ku-da-hui-zong</id>
+    <content type="html"><![CDATA[<h3>ios开发内充斥着第三方库，下面做个汇总（持续更新）</h3>
+
+<ol>
+<li><a href="https://open.alipay.com/index.htm">支付宝开放平台 </a></li>
+</ol>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[ios 静态库]]></title>
@@ -75,7 +89,8 @@ lipo -detailed_info libtmpLib.a</p>
 // debug运行生成i386架构
 // release运行生成所有arm架构</p>
 
-<p>lipo -create Debug-iphonesimulator/libtmpLib.a Release-iphoneos/libtmpLib.a -output libtmpLib.a
+<p>// 合并2个库
+lipo -create Debug-iphonesimulator/libtmpLib.a Release-iphoneos/libtmpLib.a -output libtmpLib.a
 lipo -info libtmpLib.a</p>
 
 <p>// 输出Architectures in the fat file: libtmpLib.a are: i386 armv7 armv7s arm64
@@ -696,172 +711,6 @@ NSLog(@"%@", txt);
 <p>@end</p>
 
 <p>```</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[UITableView (1)]]></title>
-    <link href="http://www.wanghd.com/blog/2014/01/24/uitableview-1/"/>
-    <updated>2014-01-24T17:28:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2014/01/24/uitableview-1</id>
-    <content type="html"><![CDATA[<h3>展示一下最基础的uitableview应该如何使用，最后有完整的代码</h3>
-
-<p>1 自己先创建一个ViewController, 添加一个UITableView内部属性和数据</p>
-
-<p><code>objective-c
-@interface AETableViewController ()
-{
-  UITableView *_table;  
-  NSMutableArray *_data;
-}
-</code></p>
-
-<p>2 头里需要实现UITableViewDataSource, UITableViewDelegate（delegate其实不用，但实际一般都会用到）</p>
-
-<p><code>objective-c
-@interface AETableViewController : UIViewController&lt;UITableViewDataSource, UITableViewDelegate&gt;
-@end
-</code></p>
-
-<p>3 往<em>data中加入一点数据,初始化</em>table,设置代理和数据源</p>
-
-<p>```objective-c
-- (id)initWithNibName:(NSString <em>)nibNameOrNil bundle:(NSBundle </em>)nibBundleOrNil
-{
-  self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-  if (self) {</p>
-
-<pre><code>_data = [NSMutableArray arrayWithArray:@[@"美美豆", @"抢拍", @"预约", @"wanghd.com", @"王惠达"]];
-</code></pre>
-
-<p>  }
-  return self;
-}</p>
-
-<ul>
-<li>(void)viewDidLoad
-{
-[super viewDidLoad];
-CGRect rect = [[UIScreen mainScreen] bounds];
-<em>table = [[UITableView alloc]initWithFrame:rect style:UITableViewStylePlain];
-</em>table.delegate = self;
-<em>table.dataSource = self;
-[self.view addSubview:</em>table];
-}
-```</li>
-</ul>
-
-
-<!-- more -->
-
-
-<p>4 设置数据源的总数和内容</p>
-
-<p>```objective-c</p>
-
-<h1>pragma mark -</h1>
-
-<h1>pragma mark datasource</h1>
-
-<ul>
-<li><p>(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
-return [_data count];
-}</p></li>
-<li><p>(UITableViewCell <em>)tableView:(UITableView </em>)tableView cellForRowAtIndexPath:(NSIndexPath <em>)indexPath
-{
-static NSString </em>cellId = @"cell";
-// 这里可以复用cell提高性能
-UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellId];
-if (cell == nil) {
-  cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellId];
-}
-cell.textLabel.text = [_data objectAtIndex:indexPath.row];
-return cell;
-}</p></li>
-</ul>
-
-
-<p>```</p>
-
-<p>5 运行起来看下效果吧</p>
-
-<p><img style="max-width:300px;" src="http://www.wanghd.com/images/post/ios-uitableview-1.jpg" /></p>
-
-<p>6 附赠一份完整的代码</p>
-
-<p>```objective-c
-// .h</p>
-
-<h1>import &lt;UIKit/UIKit.h></h1>
-
-<p>@interface AETableViewController : UIViewController&lt;UITableViewDataSource, UITableViewDelegate></p>
-
-<p>@end</p>
-
-<p>// .m</p>
-
-<h1>import "AETableViewController.h"</h1>
-
-<p>@interface AETableViewController ()
-{
-  UITableView <em>_table;
-  NSMutableArray </em>_data;
-}</p>
-
-<p>@end</p>
-
-<p>@implementation AETableViewController</p>
-
-<ul>
-<li><p>(id)initWithNibName:(NSString <em>)nibNameOrNil bundle:(NSBundle </em>)nibBundleOrNil
-{
-self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-if (self) {
-  _data = [NSMutableArray arrayWithArray:@[@"美美豆", @"抢拍", @"预约", @"wanghd.com", @"王惠达"]];
-}
-return self;
-}</p></li>
-<li><p>(void)viewDidLoad
-{
-[super viewDidLoad];
-CGRect rect = [[UIScreen mainScreen] bounds];
-<em>table = [[UITableView alloc]initWithFrame:rect style:UITableViewStylePlain];
-</em>table.delegate = self;
-<em>table.dataSource = self;
-[self.view addSubview:</em>table];
-}</p></li>
-</ul>
-
-
-<h1>pragma mark -</h1>
-
-<h1>pragma mark datasource</h1>
-
-<ul>
-<li><p>(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
-return [_data count];
-}</p></li>
-<li><p>(UITableViewCell <em>)tableView:(UITableView </em>)tableView cellForRowAtIndexPath:(NSIndexPath <em>)indexPath
-{
-static NSString </em>cellId = @"cell";
-UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellId];
-if (cell == nil) {
-  cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellId];
-}
-cell.textLabel.text = [_data objectAtIndex:indexPath.row];
-return cell;
-}</p></li>
-<li><p>(void)didReceiveMemoryWarning
-{
-[super didReceiveMemoryWarning];
-}</p></li>
-</ul>
-
-
-<p>@end
-```</p>
 ]]></content>
   </entry>
   

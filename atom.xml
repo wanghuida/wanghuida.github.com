@@ -4,7 +4,7 @@
   <title><![CDATA[老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2014-01-27T21:12:37+08:00</updated>
+  <updated>2014-01-27T21:48:26+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,20 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[ios 第三方库大汇总]]></title>
+    <link href="http://www.wanghd.com/blog/2014/01/27/ios-di-san-fang-ku-da-hui-zong/"/>
+    <updated>2014-01-27T21:44:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2014/01/27/ios-di-san-fang-ku-da-hui-zong</id>
+    <content type="html"><![CDATA[<h3>ios开发内充斥着第三方库，下面做个汇总（持续更新）</h3>
+
+<ol>
+<li><a href="https://open.alipay.com/index.htm">支付宝开放平台 </a></li>
+</ol>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[ios 静态库]]></title>
@@ -89,10 +103,12 @@
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
 <span class='line-number'>8</span>
+<span class='line-number'>9</span>
 </pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="c1">// i386对应虚拟机 arm是各种机型</span>
 </span><span class='line'><span class="c1">// debug运行生成i386架构 </span>
 </span><span class='line'><span class="c1">// release运行生成所有arm架构</span>
 </span><span class='line'>
+</span><span class='line'><span class="c1">// 合并2个库</span>
 </span><span class='line'><span class="n">lipo</span> <span class="o">-</span><span class="n">create</span> <span class="n">Debug</span><span class="o">-</span><span class="n">iphonesimulator</span><span class="o">/</span><span class="n">libtmpLib</span><span class="p">.</span><span class="n">a</span> <span class="n">Release</span><span class="o">-</span><span class="n">iphoneos</span><span class="o">/</span><span class="n">libtmpLib</span><span class="p">.</span><span class="n">a</span> <span class="o">-</span><span class="n">output</span> <span class="n">libtmpLib</span><span class="p">.</span><span class="n">a</span>
 </span><span class='line'><span class="n">lipo</span> <span class="o">-</span><span class="n">info</span> <span class="n">libtmpLib</span><span class="p">.</span><span class="n">a</span>
 </span><span class='line'>
@@ -2692,286 +2708,6 @@ sys     指程序对系统调用锁占用时间
 </span><span class='line'><span class="x">        expires                     off;</span>
 </span><span class='line'><span class="x">    }</span>
 </span><span class='line'>
-</span><span class='line'><span class="x">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[yii 用户验证]]></title>
-    <link href="http://www.wanghd.com/blog/2013/05/24/yii-yong-hu-yan-zheng/"/>
-    <updated>2013-05-24T12:39:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/05/24/yii-yong-hu-yan-zheng</id>
-    <content type="html"><![CDATA[<ol>
-<li>yii用户验证其实很简单，但是网络上的文章都写的不够详细【包括官方的】</li>
-<li>先介绍一下基于session的用户验证</li>
-<li>用cookie让用户可以保持状态，再介绍一下安全性</li>
-</ol>
-
-
-<!-- more -->
-
-
-<ul>
-<li>main.php 配置登录页面</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
-</span><span class='line'>
-</span><span class='line'><span class="s1">&#39;components&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span> <span class="p">(</span>
-</span><span class='line'>    <span class="s1">&#39;user&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span> <span class="p">(</span>
-</span><span class='line'>        <span class="s1">&#39;loginUrl&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;user/login&#39;</span><span class="p">),</span>
-</span><span class='line'>    <span class="p">),</span>
-</span><span class='line'><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>在控制器中增加权限控制和规则</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">class</span> <span class="nc">UserController</span> <span class="k">extends</span> <span class="nx">CController</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="c1"># 让控制器加入到权限控制</span>
-</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">filters</span><span class="p">()</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
-</span><span class='line'>            <span class="s1">&#39;accessControl&#39;</span><span class="p">,</span>
-</span><span class='line'>        <span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1"># 让edit,view这2个action访客无法直接使用，跳转到登录界面</span>
-</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">accessRules</span><span class="p">()</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
-</span><span class='line'>            <span class="k">array</span><span class="p">(</span><span class="s1">&#39;deny&#39;</span><span class="p">,</span>
-</span><span class='line'>                <span class="s1">&#39;actions&#39;</span><span class="o">=&gt;</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;edit&#39;</span><span class="p">,</span> <span class="s1">&#39;view&#39;</span><span class="p">),</span>
-</span><span class='line'>                <span class="s1">&#39;users&#39;</span><span class="o">=&gt;</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;?&#39;</span><span class="p">),</span>
-</span><span class='line'>            <span class="p">),</span>
-</span><span class='line'>        <span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">actionEdit</span><span class="p">()</span> <span class="p">{</span> <span class="nb">var_dump</span><span class="p">(</span><span class="s1">&#39;edit&#39;</span><span class="p">);</span> <span class="p">}</span>
-</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">actionView</span><span class="p">()</span> <span class="p">{</span> <span class="nb">var_dump</span><span class="p">(</span><span class="s1">&#39;view&#39;</span><span class="p">);</span> <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>创建继承CUserIdentity的用户标识类给登录时使用</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">class</span> <span class="nc">UserIdentity</span> <span class="k">extends</span> <span class="nx">CUserIdentity</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="k">protected</span> <span class="nv">$_id</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">authenticate</span><span class="p">()</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="cm">/*</span>
-</span><span class='line'><span class="cm">            这里可以写判断是否有用户的逻辑</span>
-</span><span class='line'>
-</span><span class='line'><span class="cm">            需要存储到session里的数据可以这样写</span>
-</span><span class='line'><span class="cm">            $this-&gt;setState(&#39;nickname&#39;, $member-&gt;nickname);</span>
-</span><span class='line'><span class="cm">        */</span>
-</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_id</span> <span class="o">=</span> <span class="nv">$member</span><span class="o">-&gt;</span><span class="na">user_id</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">getId</span><span class="p">()</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_id</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>用户登陆的控制器</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">class</span> <span class="nc">UserController</span> <span class="k">extends</span> <span class="nx">Controller</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="k">private</span> <span class="nv">$req</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">private</span> <span class="nv">$user</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">actionLogin</span><span class="p">()</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">req</span> <span class="o">=</span> <span class="nx">Yii</span><span class="o">::</span><span class="na">app</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">request</span><span class="p">;</span>
-</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">user</span> <span class="o">=</span> <span class="nx">Yii</span><span class="o">::</span><span class="na">app</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">user</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="nv">$reason</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">req</span><span class="o">-&gt;</span><span class="na">isPostRequest</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'>            <span class="nv">$email</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">req</span><span class="o">-&gt;</span><span class="na">getPost</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">);</span>
-</span><span class='line'>            <span class="nv">$password</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">req</span><span class="o">-&gt;</span><span class="na">getPost</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>            <span class="nv">$identity</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">UserIdentity</span><span class="p">(</span><span class="nv">$email</span><span class="p">,</span> <span class="nv">$password</span><span class="p">);</span>
-</span><span class='line'>            <span class="k">if</span><span class="p">(</span><span class="nv">$identity</span><span class="o">-&gt;</span><span class="na">authenticate</span><span class="p">())</span> <span class="p">{</span>
-</span><span class='line'>                <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">user</span><span class="o">-&gt;</span><span class="na">login</span><span class="p">(</span><span class="nv">$identity</span><span class="p">);</span>
-</span><span class='line'>                <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">redirect</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">user</span><span class="o">-&gt;</span><span class="na">returnUrl</span><span class="p">);</span>
-</span><span class='line'>            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>                <span class="nv">$reason</span> <span class="o">=</span> <span class="nv">$identity</span><span class="o">-&gt;</span><span class="na">errorMessage</span><span class="p">;</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">render</span><span class="p">(</span><span class="s1">&#39;/login&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;reason&#39;</span><span class="o">=&gt;</span><span class="nv">$reason</span><span class="p">));</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<hr />
-
-
-<ul>
-<li>增加登录cookie保持用户登录状态，改完赶紧尝试一下吧</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="c1"># 修改main.php,允许自动登录</span>
-</span><span class='line'><span class="s1">&#39;user&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span> <span class="p">(</span>
-</span><span class='line'>    <span class="s1">&#39;allowAutoLogin&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
-</span><span class='line'>    <span class="s1">&#39;loginUrl&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;user/login&#39;</span><span class="p">),</span>
-</span><span class='line'><span class="p">),</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1"># 修改UserController设置7天有效期</span>
-</span><span class='line'><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">user</span><span class="o">-&gt;</span><span class="na">login</span><span class="p">(</span><span class="nv">$identity</span><span class="p">,</span> <span class="mi">86400</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>不经问自己：这样的cookie安全吗？会不会被利用？</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">1. 不应该把敏感信息保存到state里，比如密码</span>
-</span><span class='line'><span class="x">2. yii内部有cookie校验机制，改动的cookie是无法生效的，可以看下/protected/runtime/state.bin（这就是验证随机的key）</span>
-</span><span class='line'><span class="x">3. 想要知道yii内部生成key源码可以参考 CSecurityManager</span>
-</span><span class='line'>
-</span><span class='line'><span class="x">protected function generateRandomKey()</span>
-</span><span class='line'><span class="x">{</span>
-</span><span class='line'><span class="x">    return sprintf(&#39;%08x%08x%08x%08x&#39;,mt_rand(),mt_rand(),mt_rand(),mt_rand());</span>
 </span><span class='line'><span class="x">}</span>
 </span></code></pre></td></tr></table></div></figure>
 

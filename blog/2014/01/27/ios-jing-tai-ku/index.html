@@ -194,10 +194,12 @@
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
 <span class='line-number'>8</span>
+<span class='line-number'>9</span>
 </pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="c1">// i386对应虚拟机 arm是各种机型</span>
 </span><span class='line'><span class="c1">// debug运行生成i386架构 </span>
 </span><span class='line'><span class="c1">// release运行生成所有arm架构</span>
 </span><span class='line'>
+</span><span class='line'><span class="c1">// 合并2个库</span>
 </span><span class='line'><span class="n">lipo</span> <span class="o">-</span><span class="n">create</span> <span class="n">Debug</span><span class="o">-</span><span class="n">iphonesimulator</span><span class="o">/</span><span class="n">libtmpLib</span><span class="p">.</span><span class="n">a</span> <span class="n">Release</span><span class="o">-</span><span class="n">iphoneos</span><span class="o">/</span><span class="n">libtmpLib</span><span class="p">.</span><span class="n">a</span> <span class="o">-</span><span class="n">output</span> <span class="n">libtmpLib</span><span class="p">.</span><span class="n">a</span>
 </span><span class='line'><span class="n">lipo</span> <span class="o">-</span><span class="n">info</span> <span class="n">libtmpLib</span><span class="p">.</span><span class="n">a</span>
 </span><span class='line'>
@@ -266,6 +268,10 @@
       
       <li><a href="/blog/archives">文章归档</a></li>
       
+      <li class="next"><a class="basic-alignment right" href="/blog/2014/01/27/ios-di-san-fang-ku-da-hui-zong/"
+        title="Next Post: ios 第三方库大汇总">ios 第三方库大汇总
+        &raquo;</a></li>
+      
     </ul>
   </footer>
 </article>
@@ -276,7 +282,7 @@
   <ul id="categories" class="nav nav-list">
     <li class="nav-header">文章分类</li>
     <li class='category'><a href='/blog/categories/hadoop/'>Hadoop (4)</a></li>
-<li class='category'><a href='/blog/categories/ios/'>IOS (6)</a></li>
+<li class='category'><a href='/blog/categories/ios/'>IOS (7)</a></li>
 <li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
 <li class='category'><a href='/blog/categories/javascript/'>Javascript (4)</a></li>
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
@@ -307,6 +313,10 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/27/ios-di-san-fang-ku-da-hui-zong/">ios 第三方库大汇总</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/01/27/ios-jing-tai-ku/">ios 静态库</a>
@@ -342,10 +352,6 @@
     
       <li class="post">
         <a href="/blog/2013/07/18/ubuntu-keychain-shi-yong/">ubuntu keychain 使用</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/07/17/linux-cao-zuo-ji-jin/">linux 操作集锦</a>
       </li>
     
   </ul>
