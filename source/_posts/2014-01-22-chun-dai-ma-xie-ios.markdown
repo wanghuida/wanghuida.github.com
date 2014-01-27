@@ -13,6 +13,8 @@ categories: [IOS]
 
 + 半年没有写文章，趁过年放假好好补补，用一个简单的纯代码helloworld开始吧
 
++ 如果对xcode一无所知可以从官方的教程开始 <a href="https://developer.apple.com/library/ios/referencelibrary/GettingStarted/RoadMapiOSCh/chapters/Introduction.html">官方教程</a>
+
 
 1 打开xcode创建一个空项目呗
 
