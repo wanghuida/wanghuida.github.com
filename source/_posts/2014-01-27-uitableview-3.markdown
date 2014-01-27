@@ -51,6 +51,8 @@ categories: [IOS]
 }
 ```
 
+<!-- more -->
+
 4 往_data中加入一点数据,初始化_table,设置代理和数据源，在导航上加个按钮
 
 ```objective-c
