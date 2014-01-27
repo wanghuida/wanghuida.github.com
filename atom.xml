@@ -4,7 +4,7 @@
   <title><![CDATA[老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2014-01-27T15:07:30+08:00</updated>
+  <updated>2014-01-27T15:16:47+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -1331,9 +1331,12 @@
     <content type="html"><![CDATA[<h3>纯代码写ios 后期更容易维护</h3>
 
 <ul>
-<li>半年没有写文章，趁过年放假好好补补，用一个简单的纯代码helloworld开始吧</li>
+<li><p>半年没有写文章，趁过年放假好好补补，用一个简单的纯代码helloworld开始吧</p></li>
+<li><p>如果对xcode一无所知可以从官方的教程开始</p></li>
 </ul>
 
+
+<p><a href="https://developer.apple.com/library/ios/referencelibrary/GettingStarted/RoadMapiOSCh/chapters/Introduction.html">官方教程</a></p>
 
 <p>1 打开xcode创建一个空项目呗</p>
 
