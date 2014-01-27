@@ -4,7 +4,7 @@
   <title><![CDATA[Category: IOS | 老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2014-01-27T21:48:26+08:00</updated>
+  <updated>2014-01-27T22:00:22+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -21,7 +21,20 @@
     <content type="html"><![CDATA[<h3>ios开发内充斥着第三方库，下面做个汇总（持续更新）</h3>
 
 <ol>
-<li><a href="https://open.alipay.com/index.htm">支付宝开放平台 </a></li>
+<li><a href="https://www.jpush.cn">jpush推送服务</a></li>
+<li><a href="http://connect.qq.com">qq开放平台</a></li>
+<li><a href="http://open.weixin.qq.com">微信开放平台</a></li>
+<li><a href="https://open.alipay.com/index.htm">支付宝开放平台</a></li>
+</ol>
+
+
+<h3>ios开源社区</h3>
+
+<ol>
+<li><a href="http://www.oschina.net/ios/home">oschina的ios开发专区</a></li>
+<li><a href="http://code4app.com">code4app开发专区</a></li>
+<li><a href="http://github.com">github</a></li>
+<li><a href="http://www.appcoda.com">appcoda</a></li>
 </ol>
 
 ]]></content>
