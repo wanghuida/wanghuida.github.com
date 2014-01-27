@@ -4,7 +4,7 @@
   <title><![CDATA[老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2014-01-27T13:52:13+08:00</updated>
+  <updated>2014-01-27T15:07:30+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,74 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[CALayer 常用例子]]></title>
+    <link href="http://www.wanghd.com/blog/2014/01/27/calayer-chang-yong-li-zi/"/>
+    <updated>2014-01-27T14:13:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2014/01/27/calayer-chang-yong-li-zi</id>
+    <content type="html"><![CDATA[<ul>
+<li>先看下默认效果</li>
+</ul>
+
+
+<p><img style="max-width:100px;" src="http://www.wanghd.com/images/post/cglayer1.jpg" /></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="n">UIImage</span> <span class="o">*</span><span class="n">avatar</span> <span class="o">=</span> <span class="p">[</span><span class="n">UIImage</span> <span class="nl">imageNamed:</span><span class="s">@&quot;touxiang&quot;</span><span class="p">];</span>
+</span><span class='line'><span class="n">UIImageView</span> <span class="o">*</span><span class="n">avatarView</span> <span class="o">=</span> <span class="p">[[</span><span class="n">UIImageView</span> <span class="n">alloc</span><span class="p">]</span><span class="nl">initWithImage:</span><span class="n">avatar</span><span class="p">];</span>
+</span><span class='line'><span class="n">avatarView</span><span class="p">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">CGRectMake</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">80</span><span class="p">);</span>
+</span><span class='line'><span class="n">avatarView</span><span class="p">.</span><span class="n">center</span> <span class="o">=</span> <span class="n">CGPointMake</span><span class="p">(</span><span class="n">rect</span><span class="p">.</span><span class="n">size</span><span class="p">.</span><span class="n">width</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">rect</span><span class="p">.</span><span class="n">size</span><span class="p">.</span><span class="n">height</span><span class="o">/</span><span class="mi">2</span><span class="p">);</span>
+</span><span class='line'><span class="p">[</span><span class="n">self</span><span class="p">.</span><span class="n">view</span> <span class="nl">addSubview:</span><span class="n">avatarView</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>第一种就圆角头像</li>
+</ul>
+
+
+<p><img style="max-width:100px;" src="http://www.wanghd.com/images/post/cglayer2.jpg" /></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="n">avatarView</span><span class="p">.</span><span class="n">layer</span><span class="p">.</span><span class="n">borderWidth</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">//边框</span>
+</span><span class='line'><span class="n">avatarView</span><span class="p">.</span><span class="n">layer</span><span class="p">.</span><span class="n">borderColor</span> <span class="o">=</span> <span class="p">[[</span><span class="n">UIColor</span> <span class="n">grayColor</span><span class="p">]</span> <span class="n">CGColor</span><span class="p">];</span> <span class="c1">//边框颜色</span>
+</span><span class='line'><span class="n">avatarView</span><span class="p">.</span><span class="n">layer</span><span class="p">.</span><span class="n">cornerRadius</span> <span class="o">=</span> <span class="mi">40</span><span class="p">;</span> <span class="c1">//圆角</span>
+</span><span class='line'><span class="n">avatarView</span><span class="p">.</span><span class="n">layer</span><span class="p">.</span><span class="n">masksToBounds</span> <span class="o">=</span> <span class="n">YES</span><span class="p">;</span> <span class="c1">//隐藏超出的部分</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!-- more -->
+
+
+<ul>
+<li>第二种是加阴影</li>
+</ul>
+
+
+<p><img style="max-width:100px;" src="http://www.wanghd.com/images/post/cglayer3.jpg" /></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="n">avatarView</span><span class="p">.</span><span class="n">layer</span><span class="p">.</span><span class="n">shadowColor</span> <span class="o">=</span> <span class="p">[[</span><span class="n">UIColor</span> <span class="n">blackColor</span><span class="p">]</span> <span class="n">CGColor</span><span class="p">];</span> <span class="c1">//颜色</span>
+</span><span class='line'><span class="n">avatarView</span><span class="p">.</span><span class="n">layer</span><span class="p">.</span><span class="n">shadowOffset</span> <span class="o">=</span> <span class="n">CGSizeMake</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span> <span class="c1">//控制阴影的方向,x,y</span>
+</span><span class='line'><span class="n">avatarView</span><span class="p">.</span><span class="n">layer</span><span class="p">.</span><span class="n">shadowRadius</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span> <span class="c1">//阴影范围</span>
+</span><span class='line'><span class="n">avatarView</span><span class="p">.</span><span class="n">layer</span><span class="p">.</span><span class="n">shadowOpacity</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">;</span> <span class="c1">//控制阴影透明度</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[uitableview (3)]]></title>
@@ -79,6 +147,9 @@
 </span><span class='line'>  <span class="k">return</span> <span class="n">YES</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
+
+
+<!-- more -->
 
 
 <p>4 往<em>data中加入一点数据,初始化</em>table,设置代理和数据源，在导航上加个按钮</p>
@@ -2970,122 +3041,6 @@ sys     指程序对系统调用锁占用时间
 </span></code></pre></td></tr></table></div></figure>
 
 
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[jquery validation]]></title>
-    <link href="http://www.wanghd.com/blog/2013/05/23/jquery-validation/"/>
-    <updated>2013-05-23T12:41:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/05/23/jquery-validation</id>
-    <content type="html"><![CDATA[<h3>表单验证在网站开发中是肯定有的，还好jquery在这方面已经做的很好了</h3>
-
-<ul>
-<li>自定义一种验证类型</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">jQuery</span><span class="p">.</span><span class="nx">validator</span><span class="p">.</span><span class="nx">addMethod</span><span class="p">(</span>
-</span><span class='line'>    <span class="s2">&quot;cellphone&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="kd">function</span><span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">element</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">optional</span><span class="p">(</span><span class="nx">element</span><span class="p">)</span> <span class="o">||</span> <span class="sr">/^1\d{10}$/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="s2">&quot;请输入有效的手机号码&quot;</span>
-</span><span class='line'><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<!-- more -->
-
-
-<ul>
-<li>定义规则和错误显示</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#form&#39;</span><span class="p">).</span><span class="nx">validate</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">rules</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">nickname</span><span class="o">:</span> <span class="s2">&quot;required&quot;</span><span class="p">,</span>
-</span><span class='line'>        <span class="nx">email</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">required</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
-</span><span class='line'>            <span class="nx">email</span><span class="o">:</span> <span class="kc">true</span>
-</span><span class='line'>        <span class="p">},</span>
-</span><span class='line'>        <span class="nx">password</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">required</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
-</span><span class='line'>            <span class="nx">minlength</span><span class="o">:</span> <span class="mi">6</span><span class="p">,</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="nx">messages</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">nickname</span><span class="o">:</span> <span class="s2">&quot;请输入昵称&quot;</span><span class="p">,</span>
-</span><span class='line'>        <span class="nx">email</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">required</span><span class="o">:</span> <span class="s2">&quot;请输入邮箱&quot;</span><span class="p">,</span>
-</span><span class='line'>            <span class="nx">email</span><span class="o">:</span> <span class="s2">&quot;请输入有效的邮箱&quot;</span>
-</span><span class='line'>        <span class="p">},</span>
-</span><span class='line'>        <span class="nx">password</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">required</span><span class="o">:</span> <span class="s2">&quot;请输入密码&quot;</span><span class="p">,</span>
-</span><span class='line'>            <span class="nx">minlength</span><span class="o">:</span> <span class="s2">&quot;密码的长度不能小于6位&quot;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="nx">errorElement</span><span class="o">:</span> <span class="s2">&quot;div&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">wrapper</span><span class="o">:</span> <span class="s2">&quot;div&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">errorPlacement</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">element</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">element</span><span class="p">.</span><span class="nx">parent</span><span class="p">().</span><span class="nx">after</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="nx">highlight</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">element</span><span class="p">,</span> <span class="nx">errorClass</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">$</span><span class="p">(</span><span class="nx">element</span><span class="p">).</span><span class="nx">parent</span><span class="p">().</span><span class="nx">css</span><span class="p">(</span><span class="s1">&#39;border&#39;</span><span class="p">,</span> <span class="s1">&#39;1px solid red&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="nx">unhighlight</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">element</span><span class="p">,</span> <span class="nx">errorClass</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">$</span><span class="p">(</span><span class="nx">element</span><span class="p">).</span><span class="nx">parent</span><span class="p">().</span><span class="nx">css</span><span class="p">(</span><span class="s1">&#39;border&#39;</span><span class="p">,</span> <span class="s1">&#39;1px solid #777&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="nx">submitHandler</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="nx">alert</span><span class="p">(</span><span class="s2">&quot;Submitted!&quot;</span><span class="p">)</span> <span class="p">}</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
 
 ]]></content>
   </entry>

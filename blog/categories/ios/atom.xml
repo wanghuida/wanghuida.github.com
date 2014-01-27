@@ -4,7 +4,7 @@
   <title><![CDATA[Category: IOS | 老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2014-01-27T13:52:13+08:00</updated>
+  <updated>2014-01-27T15:07:30+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,65 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[CALayer 常用例子]]></title>
+    <link href="http://www.wanghd.com/blog/2014/01/27/calayer-chang-yong-li-zi/"/>
+    <updated>2014-01-27T14:13:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2014/01/27/calayer-chang-yong-li-zi</id>
+    <content type="html"><![CDATA[<ul>
+<li>先看下默认效果</li>
+</ul>
+
+
+<p><img style="max-width:100px;" src="http://www.wanghd.com/images/post/cglayer1.jpg" /></p>
+
+<p>```objective-c</p>
+
+<p>UIImage <em>avatar = [UIImage imageNamed:@"touxiang"];
+UIImageView </em>avatarView = [[UIImageView alloc]initWithImage:avatar];
+avatarView.frame = CGRectMake(50, 50, 80, 80);
+avatarView.center = CGPointMake(rect.size.width/2, rect.size.height/2);
+[self.view addSubview:avatarView];</p>
+
+<p>```</p>
+
+<ul>
+<li>第一种就圆角头像</li>
+</ul>
+
+
+<p><img style="max-width:100px;" src="http://www.wanghd.com/images/post/cglayer2.jpg" /></p>
+
+<p>```objective-c</p>
+
+<p>avatarView.layer.borderWidth = 1; //边框
+avatarView.layer.borderColor = [[UIColor grayColor] CGColor]; //边框颜色
+avatarView.layer.cornerRadius = 40; //圆角
+avatarView.layer.masksToBounds = YES; //隐藏超出的部分</p>
+
+<p>```</p>
+
+<!-- more -->
+
+
+<ul>
+<li>第二种是加阴影</li>
+</ul>
+
+
+<p><img style="max-width:100px;" src="http://www.wanghd.com/images/post/cglayer3.jpg" /></p>
+
+<p>```objective-c</p>
+
+<p>avatarView.layer.shadowColor = [[UIColor blackColor] CGColor]; //颜色
+avatarView.layer.shadowOffset = CGSizeMake(3, 3); //控制阴影的方向,x,y
+avatarView.layer.shadowRadius = 3; //阴影范围
+avatarView.layer.shadowOpacity = 0.8; //控制阴影透明度</p>
+
+<p>```</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[uitableview (3)]]></title>
@@ -58,6 +117,9 @@
 <p>  return YES;
 }
 ```</p>
+
+<!-- more -->
+
 
 <p>4 往<em>data中加入一点数据,初始化</em>table,设置代理和数据源，在导航上加个按钮</p>
 

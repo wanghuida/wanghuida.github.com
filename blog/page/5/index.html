@@ -100,6 +100,76 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2013/02/01/flask-nginx-uwsgibu-shu/">Flask Nginx Uwsgi 部署</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-01T14:10:00+08:00" pubdate data-updated="true">Feb 1<span>st</span>, 2013</time>
+        
+         | <a href="/blog/2013/02/01/flask-nginx-uwsgibu-shu/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>安装 uwsgi</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ brew install uwsgi</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>安装 nginx</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ brew install nginx </span></code></pre></td></tr></table></div></figure>
+
+
+<h3>配置Flask环境</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ mkdir test
+</span><span class='line'>$ cd test
+</span><span class='line'>$ virtualevn sandbox
+</span><span class='line'>$ . sandbox/bin/activate
+</span><span class='line'>$ pip install Flask</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2013/02/01/flask-nginx-uwsgibu-shu/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2013/01/18/you-lan-qi-huan-cun-jie-xi/">游览器缓存解析</a></h1>
     
     
@@ -618,44 +688,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/22/mongodbshi-zhan/">Mongodb实战</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-22T17:18:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/22/mongodbshi-zhan/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content">
-</div>
-  
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/6/">&larr; 其他文章</a></li>
@@ -672,7 +704,7 @@
   <ul id="categories" class="nav nav-list">
     <li class="nav-header">文章分类</li>
     <li class='category'><a href='/blog/categories/hadoop/'>Hadoop (4)</a></li>
-<li class='category'><a href='/blog/categories/ios/'>IOS (4)</a></li>
+<li class='category'><a href='/blog/categories/ios/'>IOS (5)</a></li>
 <li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
 <li class='category'><a href='/blog/categories/javascript/'>Javascript (4)</a></li>
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
@@ -703,6 +735,10 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/27/calayer-chang-yong-li-zi/">CALayer 常用例子</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/01/27/uitableview-3/">uitableview (3)</a>
@@ -738,10 +774,6 @@
     
       <li class="post">
         <a href="/blog/2013/07/17/chuang-ye-gong-si-de-yun-wei-gong-zuo/">创业公司的运维工作</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/07/15/cutycapt-htmlye-mian-sheng-cheng-tu-pian-fen-xiang-wei-bo/">CutyCapt html页面生成图片 分享微博</a>
       </li>
     
   </ul>
