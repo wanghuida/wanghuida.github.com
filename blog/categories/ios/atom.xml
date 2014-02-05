@@ -4,7 +4,7 @@
   <title><![CDATA[Category: IOS | 老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2014-01-27T22:00:22+08:00</updated>
+  <updated>2014-02-05T19:58:40+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,94 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[ios 用关键帧按贝塞尔曲线移动]]></title>
+    <link href="http://www.wanghd.com/blog/2014/02/05/ios-yong-guan-jian-zheng-an-bei-sai-er-qu-xian-yi-dong/"/>
+    <updated>2014-02-05T19:36:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2014/02/05/ios-yong-guan-jian-zheng-an-bei-sai-er-qu-xian-yi-dong</id>
+    <content type="html"><![CDATA[<h3>先看下效果，黑色方块延黑色线条移动</h3>
+
+<p><img style="max-width:300px;" src="http://www.wanghd.com/images/post/keyframe.jpg" /></p>
+
+<!-- more -->
+
+
+<p>1 使用CGMutablePathRef勾划移动路径，并显示出来</p>
+
+<p>```objective-c
+CGFloat x = 50;
+CGFloat y = 50;
+CGMutablePathRef path = CGPathCreateMutable();
+CGPathMoveToPoint(path, nil, x, y);
+CGPathAddLineToPoint(path, nil, 300, 300);
+CGPathAddLineToPoint(path, nil, 50, 300);
+CGPathAddLineToPoint(path, nil, 50, 50);
+CGPathAddLineToPoint(path, nil, 300, 300);</p>
+
+<p>// 二次贝塞尔曲线
+CGPathAddQuadCurveToPoint(path, nil, 50, 50, 50, 300);
+// 三次贝塞尔曲线
+CGPathAddCurveToPoint(path, nil, 200, 200, 150, 400, 300, 300);
+```</p>
+
+<ul>
+<li>不了解贝塞尔曲线函数的看下图可以加深体会</li>
+</ul>
+
+
+<p><img style="max-width:300px;" src="http://www.wanghd.com/images/post/Bezier2.gif" /></p>
+
+<br />
+
+
+<p><img style="max-width:300px;" src="http://www.wanghd.com/images/post/Bezier3.gif" /></p>
+
+<br />
+
+
+<p>2 先按path把路径画出来，其实是张图</p>
+
+<p>```objective-c
+UIGraphicsBeginImageContext(self.view.frame.size);
+CGContextRef context = UIGraphicsGetCurrentContext();
+CGContextAddPath(context, path);
+[[UIColor blackColor] setStroke];
+CGContextDrawPath(context, kCGPathStroke);
+UIImage *img = UIGraphicsGetImageFromCurrentImageContext();
+UIGraphicsEndImageContext();</p>
+
+<p>UIImageView *imgView = [[UIImageView alloc]initWithFrame:self.view.bounds];
+imgView.image = img;
+[self.view addSubview:imgView];
+```</p>
+
+<p>3 画个小方块</p>
+
+<p><code>objective-c
+UIView *view = [[UIView alloc]initWithFrame:CGRectMake(0, 0, 30, 30)];
+view.backgroundColor = [UIColor blackColor];
+[self.view addSubview:view];
+</code></p>
+
+<p>4 给小方块增加移动效果</p>
+
+<p>```objective-c</p>
+
+<p>// CAKeyframeAnimation 就是关键帧的动画
+CAKeyframeAnimation *animation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
+// 设置移动路径
+animation.path = path;
+animation.duration = 5.0;
+// 动画结束后不还原
+animation.removedOnCompletion = NO;
+animation.fillMode = kCAFillModeForwards;</p>
+
+<p>[view.layer addAnimation:animation forKey:@"path"];
+CGPathRelease(path);
+```</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[ios 第三方库大汇总]]></title>
@@ -35,6 +123,8 @@
 <li><a href="http://code4app.com">code4app开发专区</a></li>
 <li><a href="http://github.com">github</a></li>
 <li><a href="http://www.appcoda.com">appcoda</a></li>
+<li><a href="http://www.raywenderlich.com/tutorials">raywenderlich 游戏开发</a></li>
+<li><a href="http://ui4app.com">ui4app ui设计网站</a></li>
 </ol>
 
 ]]></content>
@@ -439,280 +529,6 @@ if (cell == nil) {
 }
 cell.textLabel.text = [_data objectAtIndex:indexPath.row];
 return cell;
-}</p></li>
-<li><p>(void)didReceiveMemoryWarning
-{
-[super didReceiveMemoryWarning];
-}</p></li>
-</ul>
-
-
-<p>@end</p>
-
-<p>```</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[UITableView (2)]]></title>
-    <link href="http://www.wanghd.com/blog/2014/01/26/uitableview-2/"/>
-    <updated>2014-01-26T09:30:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2014/01/26/uitableview-2</id>
-    <content type="html"><![CDATA[<h3>展示一下最基础的group table应该如何使用（一般设置中最常用），最后有完整的代码</h3>
-
-<p>1 自己先创建一个ViewController, 添加一个UITableView内部属性和数据</p>
-
-<p><code>objective-c
-@interface AETableViewController ()
-{
-  UITableView *_table;  
-  NSMutableArray *_data;
-}
-</code></p>
-
-<p>2 头里需要实现UITableViewDataSource, UITableViewDelegate</p>
-
-<p><code>objective-c
-@interface AETableViewController : UIViewController&lt;UITableViewDataSource, UITableViewDelegate&gt;
-@end
-</code></p>
-
-<p>3 往<em>data中加入一点数据,初始化</em>table,设置代理和数据源</p>
-
-<p>```objective-c
-- (id)initWithNibName:(NSString <em>)nibNameOrNil bundle:(NSBundle </em>)nibBundleOrNil
-{
-  self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-  if (self) {</p>
-
-<pre><code>NSArray *group1 = @[@"关注", @"美美豆", @"安居客"];
-NSArray *group2 = @[@"wanghd.com", @"惠达", @"达达"];
-NSArray *group3 = @[@"喜欢", @"关注", @"粉丝"];
-_data = [[NSMutableArray alloc]initWithArray:@[group1, group2]];
-</code></pre>
-
-<p>  }
-  return self;
-}</p>
-
-<ul>
-<li>(void)viewDidLoad
-{
-[super viewDidLoad];
-CGRect rect = [[UIScreen mainScreen]bounds];
-<em>table = [[UITableView alloc]initWithFrame:rect style:UITableViewStyleGrouped];
-</em>table.delegate = self;
-<em>table.dataSource = self;
-[self.view addSubview:</em>table];
-}
-```</li>
-</ul>
-
-
-<!-- more -->
-
-
-<p>4 设置数据源的总数和内容</p>
-
-<p>```objective-c</p>
-
-<h1>pragma mark -</h1>
-
-<h1>pragma mark datasource</h1>
-
-<p>// 每个section head的高度
-- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
-{
-  return 20;
-}</p>
-
-<p>// 每个section foot高度，设置为0没有效果，0.01才行
-- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
-{
-  return 0.01;
-}</p>
-
-<p>// cell的高度
-- (CGFloat)tableView:(UITableView <em>)tableView heightForRowAtIndexPath:(NSIndexPath </em>)indexPath
-{
-  return 44.0;
-}</p>
-
-<p>// 每个section head 的view
-- (UIView <em>)tableView:(UITableView </em>)tableView viewForHeaderInSection:(NSInteger)section
-{
-  CGRect rect = CGRectMake(0, 0, 320, 20);
-  UILabel *txt = [[UILabel alloc]initWithFrame:rect];
-  txt.text = [NSString stringWithFormat:@"group%d", section];
-  txt.textAlignment = NSTextAlignmentCenter;
-  txt.font = [UIFont systemFontOfSize:11];
-  return txt;
-}</p>
-
-<p>// section 总共有多少个
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
-  return [_data count];
-}</p>
-
-<p>// 每个section 有多少行
-- (NSInteger)tableView:(UITableView <em>)tableView numberOfRowsInSection:(NSInteger)section
-{
-  NSArray </em>group = [_data objectAtIndex:section];
-  return [group count];
-}</p>
-
-<p>// 具体的cell
-- (UITableViewCell <em>)tableView:(UITableView </em>)tableView cellForRowAtIndexPath:(NSIndexPath <em>)indexPath
-{
-  static NSString </em>cellId = @"cell";
-  UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellId];
-  if (cell == nil) {</p>
-
-<pre><code>cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellId];
-</code></pre>
-
-<p>  }
-  NSArray *group = [_data objectAtIndex:indexPath.section];
-  cell.textLabel.text = [group objectAtIndex:indexPath.row];
-  return cell;
-}
-```</p>
-
-<p>5 测试最常用的行点击</p>
-
-<p>```objective-c</p>
-
-<h1>pragma mark -</h1>
-
-<h1>pragma mark delegate</h1>
-
-<ul>
-<li>(void)tableView:(UITableView <em>)tableView didSelectRowAtIndexPath:(NSIndexPath </em>)indexPath
-{
-NSArray <em>group = [_data objectAtIndex:indexPath.section];
-NSString </em>txt = [group objectAtIndex:indexPath.row];
-NSLog(@"%@", txt);
-}</li>
-</ul>
-
-
-<p>```</p>
-
-<p>6 看下效果吧</p>
-
-<p><img style="max-width:300px;" src="http://www.wanghd.com/images/post/ios-uitableview-2.jpg" /></p>
-
-<p>7 看下完整的代码</p>
-
-<p>```objective-c</p>
-
-<p>// .h</p>
-
-<h1>import &lt;UIKit/UIKit.h></h1>
-
-<p>@interface AEGroupTableViewController : UIViewController&lt;UITableViewDataSource, UITableViewDelegate></p>
-
-<p>@end</p>
-
-<p>// .m</p>
-
-<h1>import "AEGroupTableViewController.h"</h1>
-
-<p>@interface AEGroupTableViewController ()
-{
-  UITableView <em>_table;
-  NSMutableArray </em>_data;
-}</p>
-
-<p>@end</p>
-
-<p>@implementation AEGroupTableViewController</p>
-
-<ul>
-<li><p>(id)initWithNibName:(NSString <em>)nibNameOrNil bundle:(NSBundle </em>)nibBundleOrNil
-{
-self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-if (self) {
-  NSArray <em>group1 = @[@"关注", @"美美豆", @"安居客"];
-  NSArray </em>group2 = @[@"wanghd.com", @"惠达", @"达达"];
-  NSArray *group3 = @[@"喜欢", @"关注", @"粉丝"];
-  _data = [[NSMutableArray alloc]initWithArray:@[group1, group2, group3]];
-}
-return self;
-}</p></li>
-<li><p>(void)viewDidLoad
-{
-[super viewDidLoad];
-CGRect rect = [[UIScreen mainScreen]bounds];
-rect.origin.y = 20;
-<em>table = [[UITableView alloc]initWithFrame:rect style:UITableViewStyleGrouped];
-</em>table.delegate = self;
-<em>table.dataSource = self;
-[self.view addSubview:</em>table];
-}</p></li>
-</ul>
-
-
-<h1>pragma mark -</h1>
-
-<h1>pragma mark datasource</h1>
-
-<ul>
-<li><p>(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
-{
-return 20;
-}</p></li>
-<li><p>(CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
-{
-return 0.01;
-}</p></li>
-<li><p>(CGFloat)tableView:(UITableView <em>)tableView heightForRowAtIndexPath:(NSIndexPath </em>)indexPath
-{
-return 44.0;
-}</p></li>
-<li><p>(UIView <em>)tableView:(UITableView </em>)tableView viewForHeaderInSection:(NSInteger)section
-{
-CGRect rect = CGRectMake(0, 0, 320, 20);
-UILabel *txt = [[UILabel alloc]initWithFrame:rect];
-txt.text = [NSString stringWithFormat:@"group%d", section];
-txt.textAlignment = NSTextAlignmentCenter;
-txt.font = [UIFont systemFontOfSize:11];
-return txt;
-}</p></li>
-<li><p>(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
-return [_data count];
-}</p></li>
-<li><p>(NSInteger)tableView:(UITableView <em>)tableView numberOfRowsInSection:(NSInteger)section
-{
-NSArray </em>group = [_data objectAtIndex:section];
-return [group count];
-}</p></li>
-<li><p>(UITableViewCell <em>)tableView:(UITableView </em>)tableView cellForRowAtIndexPath:(NSIndexPath <em>)indexPath
-{
-static NSString </em>cellId = @"cell";
-UITableViewCell <em>cell = [tableView dequeueReusableCellWithIdentifier:cellId];
-if (cell == nil) {
-  cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellId];
-}
-NSArray </em>group = [_data objectAtIndex:indexPath.section];
-cell.textLabel.text = [group objectAtIndex:indexPath.row];
-return cell;
-}</p></li>
-</ul>
-
-
-<h1>pragma mark -</h1>
-
-<h1>pragma mark delegate</h1>
-
-<ul>
-<li><p>(void)tableView:(UITableView <em>)tableView didSelectRowAtIndexPath:(NSIndexPath </em>)indexPath
-{
-NSArray <em>group = [_data objectAtIndex:indexPath.section];
-NSString </em>txt = [group objectAtIndex:indexPath.row];
-NSLog(@"%@", txt);
 }</p></li>
 <li><p>(void)didReceiveMemoryWarning
 {

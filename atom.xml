@@ -4,7 +4,7 @@
   <title><![CDATA[老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2014-01-27T22:00:22+08:00</updated>
+  <updated>2014-02-05T19:58:40+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,131 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[ios 用关键帧按贝塞尔曲线移动]]></title>
+    <link href="http://www.wanghd.com/blog/2014/02/05/ios-yong-guan-jian-zheng-an-bei-sai-er-qu-xian-yi-dong/"/>
+    <updated>2014-02-05T19:36:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2014/02/05/ios-yong-guan-jian-zheng-an-bei-sai-er-qu-xian-yi-dong</id>
+    <content type="html"><![CDATA[<h3>先看下效果，黑色方块延黑色线条移动</h3>
+
+<p><img style="max-width:300px;" src="http://www.wanghd.com/images/post/keyframe.jpg" /></p>
+
+<!-- more -->
+
+
+<p>1 使用CGMutablePathRef勾划移动路径，并显示出来</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="n">CGFloat</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">50</span><span class="p">;</span>
+</span><span class='line'><span class="n">CGFloat</span> <span class="n">y</span> <span class="o">=</span> <span class="mi">50</span><span class="p">;</span>
+</span><span class='line'><span class="n">CGMutablePathRef</span> <span class="n">path</span> <span class="o">=</span> <span class="n">CGPathCreateMutable</span><span class="p">();</span>
+</span><span class='line'><span class="n">CGPathMoveToPoint</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">nil</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">);</span>
+</span><span class='line'><span class="n">CGPathAddLineToPoint</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">nil</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">300</span><span class="p">);</span>
+</span><span class='line'><span class="n">CGPathAddLineToPoint</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">nil</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">300</span><span class="p">);</span>
+</span><span class='line'><span class="n">CGPathAddLineToPoint</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">nil</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">);</span>
+</span><span class='line'><span class="n">CGPathAddLineToPoint</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">nil</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">300</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// 二次贝塞尔曲线</span>
+</span><span class='line'><span class="n">CGPathAddQuadCurveToPoint</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">nil</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">300</span><span class="p">);</span>
+</span><span class='line'><span class="c1">// 三次贝塞尔曲线</span>
+</span><span class='line'><span class="n">CGPathAddCurveToPoint</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">nil</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">300</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>不了解贝塞尔曲线函数的看下图可以加深体会</li>
+</ul>
+
+
+<p><img style="max-width:300px;" src="http://www.wanghd.com/images/post/Bezier2.gif" /></p>
+
+<br />
+
+
+<p><img style="max-width:300px;" src="http://www.wanghd.com/images/post/Bezier3.gif" /></p>
+
+<br />
+
+
+<p>2 先按path把路径画出来，其实是张图</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="n">UIGraphicsBeginImageContext</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">frame</span><span class="p">.</span><span class="n">size</span><span class="p">);</span>
+</span><span class='line'><span class="n">CGContextRef</span> <span class="n">context</span> <span class="o">=</span> <span class="n">UIGraphicsGetCurrentContext</span><span class="p">();</span>
+</span><span class='line'><span class="n">CGContextAddPath</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">path</span><span class="p">);</span>
+</span><span class='line'><span class="p">[[</span><span class="n">UIColor</span> <span class="n">blackColor</span><span class="p">]</span> <span class="n">setStroke</span><span class="p">];</span>
+</span><span class='line'><span class="n">CGContextDrawPath</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">kCGPathStroke</span><span class="p">);</span>
+</span><span class='line'><span class="n">UIImage</span> <span class="o">*</span><span class="n">img</span> <span class="o">=</span> <span class="n">UIGraphicsGetImageFromCurrentImageContext</span><span class="p">();</span>
+</span><span class='line'><span class="n">UIGraphicsEndImageContext</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">UIImageView</span> <span class="o">*</span><span class="n">imgView</span> <span class="o">=</span> <span class="p">[[</span><span class="n">UIImageView</span> <span class="n">alloc</span><span class="p">]</span><span class="nl">initWithFrame:</span><span class="n">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">bounds</span><span class="p">];</span>
+</span><span class='line'><span class="n">imgView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">img</span><span class="p">;</span>
+</span><span class='line'><span class="p">[</span><span class="n">self</span><span class="p">.</span><span class="n">view</span> <span class="nl">addSubview:</span><span class="n">imgView</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>3 画个小方块</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="n">UIView</span> <span class="o">*</span><span class="n">view</span> <span class="o">=</span> <span class="p">[[</span><span class="n">UIView</span> <span class="n">alloc</span><span class="p">]</span><span class="nl">initWithFrame:</span><span class="n">CGRectMake</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">30</span><span class="p">)];</span>
+</span><span class='line'><span class="n">view</span><span class="p">.</span><span class="n">backgroundColor</span> <span class="o">=</span> <span class="p">[</span><span class="n">UIColor</span> <span class="n">blackColor</span><span class="p">];</span>
+</span><span class='line'><span class="p">[</span><span class="n">self</span><span class="p">.</span><span class="n">view</span> <span class="nl">addSubview:</span><span class="n">view</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>4 给小方块增加移动效果</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="c1">// CAKeyframeAnimation 就是关键帧的动画</span>
+</span><span class='line'><span class="n">CAKeyframeAnimation</span> <span class="o">*</span><span class="n">animation</span> <span class="o">=</span> <span class="p">[</span><span class="n">CAKeyframeAnimation</span> <span class="nl">animationWithKeyPath:</span><span class="s">@&quot;position&quot;</span><span class="p">];</span>
+</span><span class='line'><span class="c1">// 设置移动路径</span>
+</span><span class='line'><span class="n">animation</span><span class="p">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="p">;</span>
+</span><span class='line'><span class="n">animation</span><span class="p">.</span><span class="n">duration</span> <span class="o">=</span> <span class="mf">5.0</span><span class="p">;</span>
+</span><span class='line'><span class="c1">// 动画结束后不还原</span>
+</span><span class='line'><span class="n">animation</span><span class="p">.</span><span class="n">removedOnCompletion</span> <span class="o">=</span> <span class="n">NO</span><span class="p">;</span>
+</span><span class='line'><span class="n">animation</span><span class="p">.</span><span class="n">fillMode</span> <span class="o">=</span> <span class="n">kCAFillModeForwards</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">[</span><span class="n">view</span><span class="p">.</span><span class="n">layer</span> <span class="nl">addAnimation:</span><span class="n">animation</span> <span class="nl">forKey:</span><span class="s">@&quot;path&quot;</span><span class="p">];</span>
+</span><span class='line'><span class="n">CGPathRelease</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[ios 第三方库大汇总]]></title>
@@ -35,6 +160,8 @@
 <li><a href="http://code4app.com">code4app开发专区</a></li>
 <li><a href="http://github.com">github</a></li>
 <li><a href="http://www.appcoda.com">appcoda</a></li>
+<li><a href="http://www.raywenderlich.com/tutorials">raywenderlich 游戏开发</a></li>
+<li><a href="http://ui4app.com">ui4app ui设计网站</a></li>
 </ol>
 
 ]]></content>
@@ -2612,116 +2739,6 @@ sys     指程序对系统调用锁占用时间
 </span><span class='line'>
 </span><span class='line'>    <span class="n">createtime</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 </span><span class='line'>    <span class="n">modifytime</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">TIMESTAMP</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">server_default</span><span class="o">=</span><span class="n">text</span><span class="p">(</span><span class="s">&#39;CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP&#39;</span><span class="p">))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[yii 隐藏index.php RESTful nginx配置]]></title>
-    <link href="http://www.wanghd.com/blog/2013/05/24/yii-yin-cang-index-dot-php/"/>
-    <updated>2013-05-24T14:36:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/05/24/yii-yin-cang-index-dot-php</id>
-    <content type="html"><![CDATA[<ol>
-<li>默认yii不使用RESTful的url，比如: index.php/news/list?category=12</li>
-<li><p>通过简单的配置可以美化url，比如：/news/list/category/12</p></li>
-<li><p>修改main.php配置</p></li>
-</ol>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
-</span><span class='line'>
-</span><span class='line'><span class="s1">&#39;components&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span> <span class="p">(</span>
-</span><span class='line'>    <span class="s1">&#39;urlManager&#39;</span><span class="o">=&gt;</span><span class="k">array</span><span class="p">(</span>
-</span><span class='line'>        <span class="s1">&#39;urlFormat&#39;</span><span class="o">=&gt;</span><span class="s1">&#39;path&#39;</span><span class="p">,</span>
-</span><span class='line'>        <span class="s1">&#39;showScriptName&#39;</span><span class="o">=&gt;</span><span class="k">false</span><span class="p">,</span>
-</span><span class='line'>        <span class="s1">&#39;rules&#39;</span><span class="o">=&gt;</span><span class="k">array</span><span class="p">(),</span>
-</span><span class='line'>    <span class="p">),</span>
-</span><span class='line'><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>修改nginx.php配置</li>
-</ul>
-
-
-<!-- more -->
-
-
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">server {</span>
-</span><span class='line'><span class="x">    listen          11111;</span>
-</span><span class='line'><span class="x">    index           index-test.php index.html;</span>
-</span><span class='line'><span class="x">    root            /xxxxxx/xxxxx/project/yii-test;</span>
-</span><span class='line'><span class="x">    charset         utf-8;</span>
-</span><span class='line'>
-</span><span class='line'><span class="x">    client_max_body_size 20m;</span>
-</span><span class='line'>
-</span><span class='line'><span class="x">    # 是否存在文件，不存在就rewrite index-test.php，生产应该是index.php</span>
-</span><span class='line'><span class="x">    location / {</span>
-</span><span class='line'><span class="x">        if (!-e $request_filename){</span>
-</span><span class='line'><span class="x">            rewrite ^/(.*) /index-test.php last;</span>
-</span><span class='line'><span class="x">        }</span>
-</span><span class='line'><span class="x">    }</span>
-</span><span class='line'>
-</span><span class='line'><span class="x">    # 缓存资源文件</span>
-</span><span class='line'><span class="x">    location ~* \.(js|css|png|jpg|jpeg|gif|ico|swf)$ {</span>
-</span><span class='line'><span class="x">        expires 24h;</span>
-</span><span class='line'><span class="x">    }</span>
-</span><span class='line'>
-</span><span class='line'><span class="x">    # 定义path_info，并交给fpm处理</span>
-</span><span class='line'><span class="x">    location ~ \.php {</span>
-</span><span class='line'><span class="x">        fastcgi_split_path_info     ^(.+\.php)(/.*)$;</span>
-</span><span class='line'><span class="x">        fastcgi_param               PATH_INFO                               $fastcgi_script_name;</span>
-</span><span class='line'><span class="x">        include                     /usr/local/etc/nginx/fastcgi.conf;</span>
-</span><span class='line'><span class="x">        fastcgi_pass                127.0.0.1:10001;</span>
-</span><span class='line'><span class="x">        fastcgi_index               index-test.php;</span>
-</span><span class='line'><span class="x">        expires                     off;</span>
-</span><span class='line'><span class="x">    }</span>
-</span><span class='line'>
-</span><span class='line'><span class="x">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 ]]></content>

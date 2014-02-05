@@ -100,6 +100,92 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2013/02/27/mysql-ri-zhi-fen-lei/">Mysql 日志分类</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-27T14:52:00+08:00" pubdate data-updated="true">Feb 27<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/02/27/mysql-ri-zhi-fen-lei/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>general-log : 记录建立的客户端连接和执行的语句。</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># my.cnf 一般不会打开，耗io
+</span><span class='line'>general_log_file        = /var/log/mysql/mysql.log
+</span><span class='line'>
+</span><span class='line'># 当你怀疑在客户端发生了错误并想确切地知道该客户端发送给mysqld的语句时，该日志可能非常有用。
+</span><span class='line'># 一般都是临时打开
+</span><span class='line'>mysql &gt; show variables like '%general_log%';  
+</span><span class='line'>
+</span><span class='line'>+------------------+------------------------------+
+</span><span class='line'>| Variable_name    | Value                        |
+</span><span class='line'>+------------------+------------------------------+
+</span><span class='line'>| general_log      | OFF                          |
+</span><span class='line'>| general_log_file | /var/lib/mysql/idc08-002.log |
+</span><span class='line'>+------------------+------------------------------+
+</span><span class='line'>2 rows in set (0.00 sec)
+</span><span class='line'>
+</span><span class='line'>mysql &gt; SET GLOBAL general_log_file = '/tmp/mysql.log';
+</span><span class='line'>mysql &gt; SET GLOBAL general_log = 'ON';
+</span><span class='line'>
+</span><span class='line'># 已经可以监控请求语句了，用完要记得关闭</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2013/02/27/mysql-ri-zhi-fen-lei/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2013/02/26/ubuntu-wang-luo-she-zhi/">Ubuntu 网络设置</a></h1>
     
     
@@ -668,65 +754,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/25/inotify/">Inotify,rsync统一化配置</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-25T16:14:00+08:00" pubdate data-updated="true">Nov 25<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/25/inotify/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>为什么要统一化配置，手动改改不行？</h3>
-
-<ul>
-<li>假设有10台服务器，要改10次，错误和遗漏在所难免</li>
-<li>需要有一个地方备份配置</li>
-<li>也许还需要对配置文件进行版本控制</li>
-</ul>
-
-
-<h3>inotify+rsync改变这一切</h3>
-
-<ul>
-<li>inotify可以递归的监控文件是否有新建，修改等</li>
-<li>rsync用来同步</li>
-</ul>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/11/25/inotify/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/6/">&larr; 其他文章</a></li>
@@ -743,7 +770,7 @@
   <ul id="categories" class="nav nav-list">
     <li class="nav-header">文章分类</li>
     <li class='category'><a href='/blog/categories/hadoop/'>Hadoop (4)</a></li>
-<li class='category'><a href='/blog/categories/ios/'>IOS (7)</a></li>
+<li class='category'><a href='/blog/categories/ios/'>IOS (8)</a></li>
 <li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
 <li class='category'><a href='/blog/categories/javascript/'>Javascript (4)</a></li>
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
@@ -774,6 +801,10 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2014/02/05/ios-yong-guan-jian-zheng-an-bei-sai-er-qu-xian-yi-dong/">ios 用关键帧按贝塞尔曲线移动</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/01/27/ios-di-san-fang-ku-da-hui-zong/">ios 第三方库大汇总</a>
@@ -809,10 +840,6 @@
     
       <li class="post">
         <a href="/blog/2013/07/25/304huan-cun-tu-pian-mei-you-hong-fa-loadshi-jian/">304缓存图片没有触发load事件</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/07/18/ubuntu-keychain-shi-yong/">ubuntu keychain 使用</a>
       </li>
     
   </ul>

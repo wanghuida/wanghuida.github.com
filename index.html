@@ -100,6 +100,52 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2014/02/05/ios-yong-guan-jian-zheng-an-bei-sai-er-qu-xian-yi-dong/">Ios 用关键帧按贝塞尔曲线移动</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-02-05T19:36:00+08:00" pubdate data-updated="true">Feb 5<span>th</span>, 2014</time>
+        
+         | <a href="/blog/2014/02/05/ios-yong-guan-jian-zheng-an-bei-sai-er-qu-xian-yi-dong/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>先看下效果，黑色方块延黑色线条移动</h3>
+
+<p><img style="max-width:300px;" src="/images/post/keyframe.jpg" /></p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2014/02/05/ios-yong-guan-jian-zheng-an-bei-sai-er-qu-xian-yi-dong/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2014/01/27/ios-di-san-fang-ku-da-hui-zong/">Ios 第三方库大汇总</a></h1>
     
     
@@ -142,6 +188,8 @@
 <li><a href="http://code4app.com">code4app开发专区</a></li>
 <li><a href="http://github.com">github</a></li>
 <li><a href="http://www.appcoda.com">appcoda</a></li>
+<li><a href="http://www.raywenderlich.com/tutorials">raywenderlich 游戏开发</a></li>
+<li><a href="http://ui4app.com">ui4app ui设计网站</a></li>
 </ol>
 
 </div>
@@ -908,70 +956,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2013/07/18/ubuntu-keychain-shi-yong/">Ubuntu Keychain 使用</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-07-18T22:33:00+08:00" pubdate data-updated="true">Jul 18<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/07/18/ubuntu-keychain-shi-yong/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><ul>
-<li>ssh-keygen生成密钥，经常会设置一个密码，让试图窃取的人无计可施。</li>
-<li>问题来了，每次登录都会要求输入密码，是时候来搞个keychain了</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>sudo apt-get install keychain
-</span><span class='line'><span class="nv">$ </span>/usr/bin/keychain ~/.ssh/id_rsa
-</span><span class='line'>
-</span><span class='line'><span class="c"># 加到.profile</span>
-</span><span class='line'>. ~/.keychain/<span class="nv">$HOSTNAME</span>-sh
-</span><span class='line'>. ~/.profile
-</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>keychain到底干了什么呀？</li>
-</ul>
-
-
-<p>keychain会起一个ssh-agent，后来登录的人通过$HOSTNAME-sh设置环境变量使用同一个ssh-agent</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/2/">&larr; 其他文章</a></li>
@@ -986,7 +970,7 @@
   <ul id="categories" class="nav nav-list">
     <li class="nav-header">文章分类</li>
     <li class='category'><a href='/blog/categories/hadoop/'>Hadoop (4)</a></li>
-<li class='category'><a href='/blog/categories/ios/'>IOS (7)</a></li>
+<li class='category'><a href='/blog/categories/ios/'>IOS (8)</a></li>
 <li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
 <li class='category'><a href='/blog/categories/javascript/'>Javascript (4)</a></li>
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
@@ -1017,6 +1001,10 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2014/02/05/ios-yong-guan-jian-zheng-an-bei-sai-er-qu-xian-yi-dong/">ios 用关键帧按贝塞尔曲线移动</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/01/27/ios-di-san-fang-ku-da-hui-zong/">ios 第三方库大汇总</a>
@@ -1052,10 +1040,6 @@
     
       <li class="post">
         <a href="/blog/2013/07/25/304huan-cun-tu-pian-mei-you-hong-fa-loadshi-jian/">304缓存图片没有触发load事件</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/07/18/ubuntu-keychain-shi-yong/">ubuntu keychain 使用</a>
       </li>
     
   </ul>

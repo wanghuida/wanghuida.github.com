@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>MogileFS安装配置 - 老虎的眼睛</title>
+  <title>ios 用关键帧按贝塞尔曲线移动 - 老虎的眼睛</title>
   <meta name="author" content="王惠达 huida wanghuida">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.wanghd.com/blog/2012/11/22/mogilefsan-zhuang-pei-zhi">
+  <link rel="canonical" href="http://www.wanghd.com/blog/2014/02/05/ios-yong-guan-jian-zheng-an-bei-sai-er-qu-xian-yi-dong">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/bootstrap/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/stylesheets/bootstrap/responsive.css" media="screen, projection" rel="stylesheet" type="text/css">
@@ -98,7 +98,7 @@
   
   <header class="page-header">
     
-      <h1 class="entry-title">MogileFS安装配置</h1>
+      <h1 class="entry-title">Ios 用关键帧按贝塞尔曲线移动</h1>
     
     
       <p class="meta">
@@ -114,7 +114,7 @@
   
 
 
-<time datetime="2012-11-22T17:19:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
+<time datetime="2014-02-05T19:36:00+08:00" pubdate data-updated="true">Feb 5<span>th</span>, 2014</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -123,80 +123,14 @@
   </header>
 
 
-<div class="entry-content"><h3>基本介绍</h3>
+<div class="entry-content"><h3>先看下效果，黑色方块延黑色线条移动</h3>
 
-<ul>
-<li>mogilefs是一个分布式的文件系统解决方案</li>
-<li>特点是:无单点失效的问题，自动复制无需raid，easy的命名空间，自修复机制，成熟的管理工具，源码清晰推荐阅读</li>
-</ul>
-
+<p><img style="max-width:300px;" src="/images/post/keyframe.jpg" /></p>
 
 <!-- more -->
 
 
-<h3>安装基本组件</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>yum groupinstall <span class="s2">&quot;Development Tools&quot;</span>
-</span><span class='line'><span class="c">#cpan是perl的包管理工具</span>
-</span><span class='line'>yum install cpan
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>安装mogilefs</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#进入cpan,初始化直接自动就好</span>
-</span><span class='line'>cpan
-</span><span class='line'>&gt; install IO::AIO
-</span><span class='line'>&gt; install MogileFS::Client
-</span><span class='line'>&gt; install MogileFS::Utils
-</span><span class='line'><span class="c">#如果有问题直接用force install</span>
-</span><span class='line'>&gt; install MogileFS::Server
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>安装配置mysql</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#安装mysql</span>
-</span><span class='line'>yum install mysql mysql-server
-</span><span class='line'>mysqladmin -u root password 123456
-</span><span class='line'><span class="c">#进入mysql,新建mogile用户</span>
-</span><span class='line'>mysql -uroot -p123456
-</span><span class='line'>mysql&gt; create database mogilefs;
-</span><span class='line'>mysql&gt; grant all on mogilefs.* to mogile@localhost identified by <span class="s1">&#39;123456&#39;</span>;
-</span><span class='line'>mysql&gt; flush privileges;
-</span><span class='line'>
-</span><span class='line'><span class="c">#导入mogilefs表</span>
-</span><span class='line'>mogdbsetup --dbpass<span class="o">=</span>123456 --yes
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>mogilefs配置</h3>
-
-<ul>
-<li>mogilefsd配置</li>
-</ul>
-
+<p>1 使用CGMutablePathRef勾划移动路径，并显示出来</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -211,44 +145,38 @@
 <span class='line-number'>11</span>
 <span class='line-number'>12</span>
 <span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#/etc/mogilefs是默认的配置路径，-c可以修改</span>
-</span><span class='line'>mkdir -p /etc/mogilefs
-</span><span class='line'><span class="nb">cd</span> /etc/mogilefs
-</span><span class='line'>vim mogilefsd.conf
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="n">CGFloat</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">50</span><span class="p">;</span>
+</span><span class='line'><span class="n">CGFloat</span> <span class="n">y</span> <span class="o">=</span> <span class="mi">50</span><span class="p">;</span>
+</span><span class='line'><span class="n">CGMutablePathRef</span> <span class="n">path</span> <span class="o">=</span> <span class="n">CGPathCreateMutable</span><span class="p">();</span>
+</span><span class='line'><span class="n">CGPathMoveToPoint</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">nil</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">);</span>
+</span><span class='line'><span class="n">CGPathAddLineToPoint</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">nil</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">300</span><span class="p">);</span>
+</span><span class='line'><span class="n">CGPathAddLineToPoint</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">nil</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">300</span><span class="p">);</span>
+</span><span class='line'><span class="n">CGPathAddLineToPoint</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">nil</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">);</span>
+</span><span class='line'><span class="n">CGPathAddLineToPoint</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">nil</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">300</span><span class="p">);</span>
 </span><span class='line'>
-</span><span class='line'><span class="c">#内容如下</span>
-</span><span class='line'><span class="nv">pidfile</span> <span class="o">=</span> /tmp/mogilefsd.pid    <span class="c">#存放pid</span>
-</span><span class='line'><span class="nv">daemonize</span> <span class="o">=</span> 1                   <span class="c">#守护进程</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">db_dsn</span>  <span class="o">=</span> DBI:mysql:mogilefs:127.0.0.1  <span class="c">#数据库配置</span>
-</span><span class='line'><span class="nv">db_user</span> <span class="o">=</span> mogile
-</span><span class='line'><span class="nv">db_pass</span> <span class="o">=</span> 123456
-</span><span class='line'>
-</span><span class='line'><span class="nv">conf_port</span> <span class="o">=</span> 7001                <span class="c">#监听端口</span>
-</span><span class='line'><span class="nv">node_timeout</span> <span class="o">=</span> 2                <span class="c">#节点超时时间 </span>
-</span><span class='line'><span class="nv">rebalance_ignore_missing</span> <span class="o">=</span> 1    <span class="c">#rebalance时会删除文件，删除时如果找不到文件不报错直接跳过 </span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">query_jobs</span> <span class="o">=</span> 20                 <span class="c">#正真处理请求的job个数</span>
-</span><span class='line'><span class="nv">delete_jobs</span> <span class="o">=</span> 3                 <span class="c">#处理删除队列的job个数</span>
-</span><span class='line'><span class="nv">replicate_jobs</span> <span class="o">=</span> 5              <span class="c">#处理复制队列的job个数</span>
-</span><span class='line'><span class="nv">reaper_jobs</span> <span class="o">=</span> 1                 <span class="c">#设备设置为dead后，处理补救工作的job个数 </span>
-</span><span class='line'>                                <span class="c">#其实还有其他job，默认为1个</span>
+</span><span class='line'><span class="c1">// 二次贝塞尔曲线</span>
+</span><span class='line'><span class="n">CGPathAddQuadCurveToPoint</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">nil</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">300</span><span class="p">);</span>
+</span><span class='line'><span class="c1">// 三次贝塞尔曲线</span>
+</span><span class='line'><span class="n">CGPathAddCurveToPoint</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">nil</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">300</span><span class="p">);</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
 <ul>
-<li>mogstored配置</li>
+<li>不了解贝塞尔曲线函数的看下图可以加深体会</li>
 </ul>
 
+
+<p><img style="max-width:300px;" src="/images/post/Bezier2.gif" /></p>
+
+<br />
+
+
+<p><img style="max-width:300px;" src="/images/post/Bezier3.gif" /></p>
+
+<br />
+
+
+<p>2 先按path把路径画出来，其实是张图</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -261,25 +189,32 @@
 <span class='line-number'>9</span>
 <span class='line-number'>10</span>
 <span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#设置文件存储路径，不要忘记修改拥有者</span>
-</span><span class='line'>mkdir -p /var/mogdata
-</span><span class='line'>adduser --gid daemon mogile
-</span><span class='line'>chown mogile.daemon /var/mogdata
-</span><span class='line'>vim mogstored.conf
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="n">UIGraphicsBeginImageContext</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">frame</span><span class="p">.</span><span class="n">size</span><span class="p">);</span>
+</span><span class='line'><span class="n">CGContextRef</span> <span class="n">context</span> <span class="o">=</span> <span class="n">UIGraphicsGetCurrentContext</span><span class="p">();</span>
+</span><span class='line'><span class="n">CGContextAddPath</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">path</span><span class="p">);</span>
+</span><span class='line'><span class="p">[[</span><span class="n">UIColor</span> <span class="n">blackColor</span><span class="p">]</span> <span class="n">setStroke</span><span class="p">];</span>
+</span><span class='line'><span class="n">CGContextDrawPath</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">kCGPathStroke</span><span class="p">);</span>
+</span><span class='line'><span class="n">UIImage</span> <span class="o">*</span><span class="n">img</span> <span class="o">=</span> <span class="n">UIGraphicsGetImageFromCurrentImageContext</span><span class="p">();</span>
+</span><span class='line'><span class="n">UIGraphicsEndImageContext</span><span class="p">();</span>
 </span><span class='line'>
-</span><span class='line'><span class="c">#内容如下</span>
-</span><span class='line'><span class="nv">httplisten</span> <span class="o">=</span> 0.0.0.0:7500       <span class="c">#文件存储端口</span>
-</span><span class='line'><span class="nv">mgmtlisten</span> <span class="o">=</span> 0.0.0.0:7501       <span class="c">#监控磁盘状态端口</span>
-</span><span class='line'><span class="nv">docroot</span> <span class="o">=</span> /var/mogdata          <span class="c">#文件存储路径</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">pidfile</span> <span class="o">=</span> /tmp/mogstored.pid    <span class="c">#存储pid</span>
-</span><span class='line'><span class="nv">daemonize</span> <span class="o">=</span> 1                   <span class="c">#守护进程</span>
+</span><span class='line'><span class="n">UIImageView</span> <span class="o">*</span><span class="n">imgView</span> <span class="o">=</span> <span class="p">[[</span><span class="n">UIImageView</span> <span class="n">alloc</span><span class="p">]</span><span class="nl">initWithFrame:</span><span class="n">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">bounds</span><span class="p">];</span>
+</span><span class='line'><span class="n">imgView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">img</span><span class="p">;</span>
+</span><span class='line'><span class="p">[</span><span class="n">self</span><span class="p">.</span><span class="n">view</span> <span class="nl">addSubview:</span><span class="n">imgView</span><span class="p">];</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<h3>启动mogilefs</h3>
+<p>3 画个小方块</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="n">UIView</span> <span class="o">*</span><span class="n">view</span> <span class="o">=</span> <span class="p">[[</span><span class="n">UIView</span> <span class="n">alloc</span><span class="p">]</span><span class="nl">initWithFrame:</span><span class="n">CGRectMake</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">30</span><span class="p">)];</span>
+</span><span class='line'><span class="n">view</span><span class="p">.</span><span class="n">backgroundColor</span> <span class="o">=</span> <span class="p">[</span><span class="n">UIColor</span> <span class="n">blackColor</span><span class="p">];</span>
+</span><span class='line'><span class="p">[</span><span class="n">self</span><span class="p">.</span><span class="n">view</span> <span class="nl">addSubview:</span><span class="n">view</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>4 给小方块增加移动效果</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -292,28 +227,18 @@
 <span class='line-number'>9</span>
 <span class='line-number'>10</span>
 <span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>vim /etc/security/limits.conf
-</span><span class='line'><span class="c">#内容如下，让mogile可以打开更多的连接数</span>
-</span><span class='line'>mogile soft nofile 65535
-</span><span class='line'>mogile hard nofile 65535
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="c1">// CAKeyframeAnimation 就是关键帧的动画</span>
+</span><span class='line'><span class="n">CAKeyframeAnimation</span> <span class="o">*</span><span class="n">animation</span> <span class="o">=</span> <span class="p">[</span><span class="n">CAKeyframeAnimation</span> <span class="nl">animationWithKeyPath:</span><span class="s">@&quot;position&quot;</span><span class="p">];</span>
+</span><span class='line'><span class="c1">// 设置移动路径</span>
+</span><span class='line'><span class="n">animation</span><span class="p">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="p">;</span>
+</span><span class='line'><span class="n">animation</span><span class="p">.</span><span class="n">duration</span> <span class="o">=</span> <span class="mf">5.0</span><span class="p">;</span>
+</span><span class='line'><span class="c1">// 动画结束后不还原</span>
+</span><span class='line'><span class="n">animation</span><span class="p">.</span><span class="n">removedOnCompletion</span> <span class="o">=</span> <span class="n">NO</span><span class="p">;</span>
+</span><span class='line'><span class="n">animation</span><span class="p">.</span><span class="n">fillMode</span> <span class="o">=</span> <span class="n">kCAFillModeForwards</span><span class="p">;</span>
 </span><span class='line'>
-</span><span class='line'><span class="c">#切换用户启动</span>
-</span><span class='line'>su mogile -c <span class="s1">&#39;mogstored&#39;</span>
-</span><span class='line'>su mogile -c <span class="s1">&#39;mogilefsd&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">#验证已经启动成功</span>
-</span><span class='line'>ps auxf | grep mogile
-</span><span class='line'>mogadm check
+</span><span class='line'><span class="p">[</span><span class="n">view</span><span class="p">.</span><span class="n">layer</span> <span class="nl">addAnimation:</span><span class="n">animation</span> <span class="nl">forKey:</span><span class="s">@&quot;path&quot;</span><span class="p">];</span>
+</span><span class='line'><span class="n">CGPathRelease</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
 </span></code></pre></td></tr></table></div></figure>
-
-
-<h3>已经安装好了，接来应该做点什么呢</h3>
-
-<ul>
-<li>学习mogadm指令，因为mogadm是必会工具</li>
-<li>试着client连接mogilefsd存储文件吧</li>
-</ul>
 
 </div>
 
@@ -337,12 +262,12 @@
   
 
 
-<time datetime="2012-11-22T17:19:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
+<time datetime="2014-02-05T19:36:00+08:00" pubdate data-updated="true">Feb 5<span>th</span>, 2014</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/mogilefs/'>Mogilefs</a>, <a class='category' href='/blog/categories/perl/'>Perl</a>
+    <a class='category' href='/blog/categories/ios/'>IOS</a>
   
 </span>
 
@@ -351,7 +276,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2012/11/22/mogilefsan-zhuang-pei-zhi/" data-via="" data-counturl="http://www.wanghd.com/blog/2012/11/22/mogilefsan-zhuang-pei-zhi/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2014/02/05/ios-yong-guan-jian-zheng-an-bei-sai-er-qu-xian-yi-dong/" data-via="" data-counturl="http://www.wanghd.com/blog/2014/02/05/ios-yong-guan-jian-zheng-an-bei-sai-er-qu-xian-yi-dong/" >Tweet</a>
   
   
   
@@ -368,14 +293,10 @@
     <ul class="pager">
       
       <li class="previous"><a class="basic-alignment left"
-        href="/blog/2012/11/22/time-hiresjie-shao/" title="Previous Post:
-        Time::HiRes介绍">&laquo; Time::HiRes介绍</a></li>
+        href="/blog/2014/01/27/ios-di-san-fang-ku-da-hui-zong/" title="Previous Post:
+        ios 第三方库大汇总">&laquo; ios 第三方库大汇总</a></li>
       
       <li><a href="/blog/archives">文章归档</a></li>
-      
-      <li class="next"><a class="basic-alignment right" href="/blog/2012/11/25/inotify/"
-        title="Next Post: inotify,rsync统一化配置">inotify,rsync统一化配置
-        &raquo;</a></li>
       
     </ul>
   </footer>
@@ -507,8 +428,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.wanghd.com/blog/2012/11/22/mogilefsan-zhuang-pei-zhi/';
-        var disqus_url = 'http://www.wanghd.com/blog/2012/11/22/mogilefsan-zhuang-pei-zhi/';
+        var disqus_identifier = 'http://www.wanghd.com/blog/2014/02/05/ios-yong-guan-jian-zheng-an-bei-sai-er-qu-xian-yi-dong/';
+        var disqus_url = 'http://www.wanghd.com/blog/2014/02/05/ios-yong-guan-jian-zheng-an-bei-sai-er-qu-xian-yi-dong/';
         var disqus_script = 'embed.js';
       
     (function () {
