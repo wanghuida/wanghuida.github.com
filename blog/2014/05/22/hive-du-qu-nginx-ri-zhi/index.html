@@ -1,0 +1,448 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>hive 读取nginx 日志 - 老虎的眼睛</title>
+  <meta name="author" content="王惠达 huida wanghuida">
+
+  
+  <meta name="description" content="王惠达博客 IT技术 php perl python java c ruby wanghuida blog lucene mogilefs">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.wanghd.com/blog/2014/05/22/hive-du-qu-nginx-ri-zhi">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/bootstrap/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/bootstrap/responsive.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/syntax/syntax.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <style type="text/css">
+    body {
+      padding-bottom: 40px;
+    }
+    h1 {
+      margin-bottom: 15px;
+    }
+    img {
+      max-width: 100%;
+    }
+    .sharing, .meta, .pager {
+      margin: 20px 0px 20px 0px;
+    }
+    .page-footer p {
+      text-align: center;
+    }
+  </style>
+  <script src="/javascripts/libs/jquery.js"></script>
+  <script src="/javascripts/libs/modernizr-2.0.js"></script>
+  <script src="/javascripts/libs/bootstrap.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="老虎的眼睛" type="application/atom+xml">
+  
+  
+
+</head>
+
+<body   >
+  <nav role="navigation"><div class="navbar">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+
+      <a class="brand" href="/">老虎的眼睛</a>
+
+      <div class="nav-collapse">
+        <ul class="nav">
+  <li><a href="/">博客首页</a></li>
+  <li><a href="/blog/archives">文章归档</a></li>
+  <li><a href="mailto:wanghuida258@aliyun.com">联系站长</a></li>
+  <li><a href="http://www.taobao.com/go/chn/tbk_channel/channelcode.php?pid=mm_32662861_3310667_10778125&eventid=101329">淘宝推广</a></li>
+
+</ul>
+
+
+        <ul class="nav pull-right" data-subscription="rss">
+          <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+          
+        </ul>
+
+        
+          <form class="pull-right navbar-search" action="http://google.com/search" method="get">
+            <fieldset role="search">
+              <input type="hidden" name="q" value="site:www.wanghd.com" />
+              <input class="search-query" type="text" name="q" results="0" placeholder="查找"/>
+            </fieldset>
+          </form>
+        
+      </div>
+    </div>
+  </div>
+</div>
+</nav>
+  <div class="container">
+    <div class="row-fluid">
+      
+<article class="hentry span9" role="article">
+
+  
+  <header class="page-header">
+    
+      <h1 class="entry-title">Hive 读取nginx 日志</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-05-22T17:35:00+08:00" pubdate data-updated="true">May 22<span>nd</span>, 2014</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h3>安装完hive 跑map reduce会显示下面的错误</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Caused by: java.lang.ClassNotFoundException: Class org.apache.hadoop.hive.contrib.serde2.RegexSerDe not found
+</span><span class='line'>    at org.apache.hadoop.conf.Configuration.getClassByName(Configuration.java:1626)
+</span><span class='line'>    at org.apache.hadoop.hive.ql.exec.MapOperator.getConvertedOI(MapOperator.java:305)
+</span><span class='line'>    ... 24 more</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>可以加入jar包解决</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>add jar &lt;relative-classpath or absolute-classpath&gt;/hive-contrib-0.13.0.jar</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>设置nginx access_log日志格式</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>log_format  main '$request_time $upstream_response_time $remote_addr $request_length $upstream_addr  [$time_local] '
+</span><span class='line'>                 '$host "$request" $status $bytes_sent '
+</span><span class='line'>                 '"$http_referer" "$http_user_agent" "$gzip_ratio" "$http_x_forwarded_for" - "$server_addr"';</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!-- more -->
+
+
+<ul>
+<li>用正则按格式创建表</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>create external table lblog (
+</span><span class='line'>request_time string,
+</span><span class='line'>upstream_response_time string,
+</span><span class='line'>remote_addr string,
+</span><span class='line'>upstream_addr string,
+</span><span class='line'>time_local string,
+</span><span class='line'>host string,
+</span><span class='line'>method string,
+</span><span class='line'>request_url string,
+</span><span class='line'>request_schema string,
+</span><span class='line'>status string,
+</span><span class='line'>bytes_sent string,
+</span><span class='line'>http_referer string,
+</span><span class='line'>http_user_agent string,
+</span><span class='line'>gzip_ratio string,
+</span><span class='line'>http_x_forwarded_for string,
+</span><span class='line'>server_addr string
+</span><span class='line'>)
+</span><span class='line'>partitioned by (ds string)
+</span><span class='line'>row format serde 'org.apache.hadoop.hive.contrib.serde2.RegexSerDe'
+</span><span class='line'>with serdeproperties ('input.regex' = '(.*)\\s(.*)\\s(.*)\\s-\\s(.*)\\[(.*)\\]\\s(.*)\\s\"(.*)\\s(.*)\\s(.*)\"\\s(.*)\\s(.*)\\s\"(.*)\"\\s\"(.*)\"\\s\"(.*)\"\\s\"(.*)\"\\s-\\s\"(.*)\"','output.format.string' = '%1$s %2$s %3$s %4$s %5$s %6$s %7$s %8$s %9$s %10$s %11$s %12$s %13$s %14$s %15$s %16$s')
+</span><span class='line'>location '/lblog';</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>现在是查不到数据库的，必须add partition</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>alter table testlblog5 add partition (ds='20140519');</span></code></pre></td></tr></table></div></figure>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">王惠达 huida wanghuida</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-05-22T17:35:00+08:00" pubdate data-updated="true">May 22<span>nd</span>, 2014</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/hadoop/'>Hadoop</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2014/05/22/hive-du-qu-nginx-ri-zhi/" data-via="" data-counturl="http://www.wanghd.com/blog/2014/05/22/hive-du-qu-nginx-ri-zhi/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    
+    <section>
+      <h1>Comments</h1>
+      <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+    </section>
+    
+    <ul class="pager">
+      
+      <li class="previous"><a class="basic-alignment left"
+        href="/blog/2014/04/23/tu-xiang-de-mo-hu-chu-li/" title="Previous Post:
+        图像的模糊处理">&laquo; 图像的模糊处理</a></li>
+      
+      <li><a href="/blog/archives">文章归档</a></li>
+      
+    </ul>
+  </footer>
+</article>
+
+<aside class="sidebar-nav span3">
+  
+    <section class="well">
+  <ul id="categories" class="nav nav-list">
+    <li class="nav-header">文章分类</li>
+    <li class='category'><a href='/blog/categories/hadoop/'>Hadoop (5)</a></li>
+<li class='category'><a href='/blog/categories/ios/'>IOS (8)</a></li>
+<li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
+<li class='category'><a href='/blog/categories/javascript/'>Javascript (4)</a></li>
+<li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
+<li class='category'><a href='/blog/categories/mysql/'>Mysql (9)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
+<li class='category'><a href='/blog/categories/opencv/'>OpenCV (1)</a></li>
+<li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
+<li class='category'><a href='/blog/categories/php/'>Php (7)</a></li>
+<li class='category'><a href='/blog/categories/python/'>Python (3)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (32)</a></li>
+<li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
+
+  </ul>
+</section>
+
+<section>
+  <ul id="taobao_rank" class="nav">
+    <li>
+  <script type="text/javascript"> 
+  alimama_pid="mm_32662861_3310667_11125910"; 
+  alimama_width=250; 
+  alimama_height=250; 
+  </script> 
+  <script src="http://a.alimama.cn/inf.js" type="text/javascript"> 
+  </script>
+    </li>
+  </ul>
+</section>
+<section class="well">
+  <ul id="recent_posts" class="nav nav-list">
+    <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2014/05/22/hive-du-qu-nginx-ri-zhi/">hive 读取nginx 日志</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/04/23/tu-xiang-de-mo-hu-chu-li/">图像的模糊处理</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/02/05/ios-yong-guan-jian-zheng-an-bei-sai-er-qu-xian-yi-dong/">ios 用关键帧按贝塞尔曲线移动</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/27/ios-di-san-fang-ku-da-hui-zong/">ios 第三方库大汇总</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/27/ios-jing-tai-ku/">ios 静态库</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/27/calayer-chang-yong-li-zi/">CALayer 常用例子</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/27/uitableview-3/">uitableview (3)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/26/select-for-update/">select for update</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/26/uitableview-2/">UITableView (2)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/24/uitableview-1/">UITableView (1)</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section class="well">
+  <ul id="links" class="nav nav-list">
+    <li class="nav-header">好友链接</li>
+    <li><a href="http://www.zwsun.com">阿文的自留地</a></li>
+    <li><a href="http://www.deepwarm.com/">明兄的私房菜</a></li>
+    <li><a href="http://joinjoy.me/blog/">柏健的博客</a></li>
+    <li><a href="http://www.luzhaochun.com/">罗哥</a></li>
+  </ul>
+</section>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo" class="page-footer"><script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-35556528-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<hr>
+<p>
+  Copyright &copy; 2014 - 王惠达 huida wanghuida -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+   - <span class="credit">沪ICP备12048826号</span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'wanghuida';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.wanghd.com/blog/2014/05/22/hive-du-qu-nginx-ri-zhi/';
+        var disqus_url = 'http://www.wanghd.com/blog/2014/05/22/hive-du-qu-nginx-ri-zhi/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+<!--
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+-->
+
+
+
+
+
+</body>
+</html>

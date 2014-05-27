@@ -100,6 +100,115 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2012/07/26/xdebug-500cuo-wu-xian-shi-200cheng-gong-de-bug/">Xdebug:500错误显示200成功的bug</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-26T16:15:00+08:00" pubdate data-updated="true">Jul 26<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/07/26/xdebug-500cuo-wu-xian-shi-200cheng-gong-de-bug/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>今天同事遇见一个诡异的问题</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">ini_set</span><span class="p">(</span><span class="s1">&#39;display_errors&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">#随便调用一个什么方法来产生错误</span>
+</span><span class='line'><span class="nx">abcd</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>明显php错误，但是HTTP返回200</li>
+</ul>
+
+
+<h3>最终关闭加载xdebug一切正常了,返回500错误了</h3>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2012/07/22/python-zhou-ti-yan-ji/">Python 一周体验记</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-22T10:27:00+08:00" pubdate data-updated="true">Jul 22<span>nd</span>, 2012</time>
+        
+         | <a href="/blog/2012/07/22/python-zhou-ti-yan-ji/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>python可以快速上手</h3>
+
+<ul>
+<li>推荐官方的新手教程 <a href="http://docs.python.org/tutorial/">http://docs.python.org/tutorial/</a></li>
+</ul>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2012/07/22/python-zhou-ti-yan-ji/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2012/07/13/oauth-jie-shao/">OAuth 介绍</a></h1>
     
     
@@ -728,13 +837,14 @@
     <section class="well">
   <ul id="categories" class="nav nav-list">
     <li class="nav-header">文章分类</li>
-    <li class='category'><a href='/blog/categories/hadoop/'>Hadoop (4)</a></li>
+    <li class='category'><a href='/blog/categories/hadoop/'>Hadoop (5)</a></li>
 <li class='category'><a href='/blog/categories/ios/'>IOS (8)</a></li>
 <li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
 <li class='category'><a href='/blog/categories/javascript/'>Javascript (4)</a></li>
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
 <li class='category'><a href='/blog/categories/mysql/'>Mysql (9)</a></li>
 <li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
+<li class='category'><a href='/blog/categories/opencv/'>OpenCV (1)</a></li>
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
 <li class='category'><a href='/blog/categories/php/'>Php (7)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (3)</a></li>
@@ -760,6 +870,14 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2014/05/22/hive-du-qu-nginx-ri-zhi/">hive 读取nginx 日志</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/04/23/tu-xiang-de-mo-hu-chu-li/">图像的模糊处理</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/02/05/ios-yong-guan-jian-zheng-an-bei-sai-er-qu-xian-yi-dong/">ios 用关键帧按贝塞尔曲线移动</a>
@@ -791,14 +909,6 @@
     
       <li class="post">
         <a href="/blog/2014/01/24/uitableview-1/">UITableView (1)</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/01/22/chun-dai-ma-xie-ios/">纯代码写ios</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/07/25/304huan-cun-tu-pian-mei-you-hong-fa-loadshi-jian/">304缓存图片没有触发load事件</a>
       </li>
     
   </ul>

@@ -4,7 +4,7 @@
   <title><![CDATA[老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2014-02-11T10:22:03+08:00</updated>
+  <updated>2014-05-27T18:21:34+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,211 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[hive 读取nginx 日志]]></title>
+    <link href="http://www.wanghd.com/blog/2014/05/22/hive-du-qu-nginx-ri-zhi/"/>
+    <updated>2014-05-22T17:35:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2014/05/22/hive-du-qu-nginx-ri-zhi</id>
+    <content type="html"><![CDATA[<h3>安装完hive 跑map reduce会显示下面的错误</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Caused by: java.lang.ClassNotFoundException: Class org.apache.hadoop.hive.contrib.serde2.RegexSerDe not found
+</span><span class='line'>    at org.apache.hadoop.conf.Configuration.getClassByName(Configuration.java:1626)
+</span><span class='line'>    at org.apache.hadoop.hive.ql.exec.MapOperator.getConvertedOI(MapOperator.java:305)
+</span><span class='line'>    ... 24 more</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>可以加入jar包解决</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>add jar &lt;relative-classpath or absolute-classpath&gt;/hive-contrib-0.13.0.jar</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>设置nginx access_log日志格式</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>log_format  main '$request_time $upstream_response_time $remote_addr $request_length $upstream_addr  [$time_local] '
+</span><span class='line'>                 '$host "$request" $status $bytes_sent '
+</span><span class='line'>                 '"$http_referer" "$http_user_agent" "$gzip_ratio" "$http_x_forwarded_for" - "$server_addr"';</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!-- more -->
+
+
+<ul>
+<li>用正则按格式创建表</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>create external table lblog (
+</span><span class='line'>request_time string,
+</span><span class='line'>upstream_response_time string,
+</span><span class='line'>remote_addr string,
+</span><span class='line'>upstream_addr string,
+</span><span class='line'>time_local string,
+</span><span class='line'>host string,
+</span><span class='line'>method string,
+</span><span class='line'>request_url string,
+</span><span class='line'>request_schema string,
+</span><span class='line'>status string,
+</span><span class='line'>bytes_sent string,
+</span><span class='line'>http_referer string,
+</span><span class='line'>http_user_agent string,
+</span><span class='line'>gzip_ratio string,
+</span><span class='line'>http_x_forwarded_for string,
+</span><span class='line'>server_addr string
+</span><span class='line'>)
+</span><span class='line'>partitioned by (ds string)
+</span><span class='line'>row format serde 'org.apache.hadoop.hive.contrib.serde2.RegexSerDe'
+</span><span class='line'>with serdeproperties ('input.regex' = '(.*)\\s(.*)\\s(.*)\\s-\\s(.*)\\[(.*)\\]\\s(.*)\\s\"(.*)\\s(.*)\\s(.*)\"\\s(.*)\\s(.*)\\s\"(.*)\"\\s\"(.*)\"\\s\"(.*)\"\\s\"(.*)\"\\s-\\s\"(.*)\"','output.format.string' = '%1$s %2$s %3$s %4$s %5$s %6$s %7$s %8$s %9$s %10$s %11$s %12$s %13$s %14$s %15$s %16$s')
+</span><span class='line'>location '/lblog';</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>现在是查不到数据库的，必须add partition</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>alter table testlblog5 add partition (ds='20140519');</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[图像的模糊处理]]></title>
+    <link href="http://www.wanghd.com/blog/2014/04/23/tu-xiang-de-mo-hu-chu-li/"/>
+    <updated>2014-04-23T14:44:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2014/04/23/tu-xiang-de-mo-hu-chu-li</id>
+    <content type="html"><![CDATA[<ul>
+<li>一些相关理论的介绍，容易理解</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>http://www.cnblogs.com/justany/archive/2012/11/21/2779978.html</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!-- more -->
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#include &lt;opencv2/core/core.hpp&gt;
+</span><span class='line'>#include &lt;opencv2/highgui/highgui.hpp&gt;
+</span><span class='line'>#include &lt;opencv2/imgproc/imgproc.hpp&gt;
+</span><span class='line'>#include &lt;cv.h&gt;
+</span><span class='line'>
+</span><span class='line'>using namespace std;
+</span><span class='line'>using namespace cv;
+</span><span class='line'>
+</span><span class='line'>int main(int argc, char** argv)
+</span><span class='line'>{
+</span><span class='line'>    if (argc != 2) {
+</span><span class='line'>        cout &lt;&lt; "Usage: display_image ImageToLoadAndDisplay" &lt;&lt; endl;
+</span><span class='line'>        return -1;
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>    Mat image;
+</span><span class='line'>    image = imread(argv[1], CV_LOAD_IMAGE_COLOR);
+</span><span class='line'>
+</span><span class='line'>    if( !image.data )
+</span><span class='line'>    {
+</span><span class='line'>        cout &lt;&lt; "Could not open or find the image" &lt;&lt; std::endl;
+</span><span class='line'>        return -1;
+</span><span class='line'>    }
+</span><span class='line'>    Mat outimg;
+</span><span class='line'>    //blur(image, outimg, Size(10, 10));
+</span><span class='line'>    //GaussianBlur( image, outimg, Size(5,5), 1000, 1000 );
+</span><span class='line'>    //medianBlur( image, outimg, 9);
+</span><span class='line'>    bilateralFilter ( image, outimg, 9, 3*10, 3*10 );
+</span><span class='line'>    //cvtColor(image, outimg, CV_RGB2GRAY);
+</span><span class='line'>
+</span><span class='line'>    namedWindow( "Display Image", CV_WINDOW_AUTOSIZE );
+</span><span class='line'>    namedWindow( "Display Out Image", CV_WINDOW_AUTOSIZE );
+</span><span class='line'>    imshow( "Display Image", image );
+</span><span class='line'>    imshow( "Display Out Image", outimg);
+</span><span class='line'>    waitKey(0);
+</span><span class='line'>    return 0;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[ios 用关键帧按贝塞尔曲线移动]]></title>
@@ -2634,112 +2839,6 @@ sys     指程序对系统调用锁占用时间
 <li><p>admin登录cacti页面, 选择Settings的Paths选项卡，输入完整的spine路径[Alternate Poller Path]</p></li>
 <li><p>点击Settings的Poller选项卡，从Poller Type里选择spine</p></li>
 </ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[解决 sysDescr: Unknown Object Identifier (Sub-id not found: (top)  sysDescr)]]></title>
-    <link href="http://www.wanghd.com/blog/2013/05/29/sysdescr-unknown-object-identifier-sub-id-not-found-top-sysdescr/"/>
-    <updated>2013-05-29T11:58:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/05/29/sysdescr-unknown-object-identifier-sub-id-not-found-top-sysdescr</id>
-    <content type="html"><![CDATA[<ul>
-<li>ubuntu安装snmp很方便</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apt-get install snmp snmpd</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>配置我就跳过了，直接测试，问题来了</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>snmpwalk -v 2c -c public 127.0.0.1 sysDescr
-</span><span class='line'>
-</span><span class='line'># 显示 sysDescr: Unknown Object Identifier (Sub-id not found: (top) -&gt; sysDescr)</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li><p>网上搜一下，没有正确可行的办法，但是也是有收获</p></li>
-<li><p>直接使用snmpwalk -v 2c -c public 127.0.0.1 是没有问题的</p></li>
-<li>那就说明问题出在mibs上</li>
-<li>尝试解决一下</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apt-get install snmp-mibs-downloader
-</span><span class='line'>
-</span><span class='line'>vim /etc/snmp/snmp.conf
-</span><span class='line'>#全部注释下～～～
-</span><span class='line'>#再测试就没问题了，使用了新的mibs
-</span><span class='line'>snmpwalk -v 2c -c public 127.0.0.1 sysDescr
-</span></code></pre></td></tr></table></div></figure>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[sqlalchemy 定义模型]]></title>
-    <link href="http://www.wanghd.com/blog/2013/05/24/sqlalchemy-ding-yi-mo-xing/"/>
-    <updated>2013-05-24T17:04:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/05/24/sqlalchemy-ding-yi-mo-xing</id>
-    <content type="html"><![CDATA[<ol>
-<li>下面是一个基本的模型，对应db的一张表</li>
-<li>nullable 代表是否可以为空</li>
-<li>server_default 代表默认值</li>
-<li>常用类型：Integer, String, DateTime, TIMESTAMP, DECIMAL</li>
-</ol>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c">#!/usr/bin/env python</span>
-</span><span class='line'><span class="c"># coding: utf-8</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy.sql.expression</span> <span class="kn">import</span> <span class="n">text</span>
-</span><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Column</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">,</span> <span class="n">TIMESTAMP</span><span class="p">,</span> <span class="n">DECIMAL</span>
-</span><span class='line'><span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="kn">import</span> <span class="n">declarative_base</span>
-</span><span class='line'><span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">class</span> <span class="nc">Member</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
-</span><span class='line'>    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s">&#39;tbl_member&#39;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-</span><span class='line'>    <span class="n">ext_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">server_default</span><span class="o">=</span><span class="n">text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="mi">0</span><span class="p">)))</span>
-</span><span class='line'>    <span class="n">username</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">64</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
-</span><span class='line'>    <span class="n">my_desc</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">createtime</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
-</span><span class='line'>    <span class="n">modifytime</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">TIMESTAMP</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">server_default</span><span class="o">=</span><span class="n">text</span><span class="p">(</span><span class="s">&#39;CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP&#39;</span><span class="p">))</span>
-</span></code></pre></td></tr></table></div></figure>
 
 ]]></content>
   </entry>

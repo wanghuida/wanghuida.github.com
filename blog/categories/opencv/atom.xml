@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: OpenCV | 老虎的眼睛]]></title>
+  <link href="http://www.wanghd.com/blog/categories/opencv/atom.xml" rel="self"/>
+  <link href="http://www.wanghd.com/"/>
+  <updated>2014-05-27T18:21:34+08:00</updated>
+  <id>http://www.wanghd.com/</id>
+  <author>
+    <name><![CDATA[王惠达 huida wanghuida]]></name>
+    <email><![CDATA[wanghuida258@yahoo.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[图像的模糊处理]]></title>
+    <link href="http://www.wanghd.com/blog/2014/04/23/tu-xiang-de-mo-hu-chu-li/"/>
+    <updated>2014-04-23T14:44:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2014/04/23/tu-xiang-de-mo-hu-chu-li</id>
+    <content type="html"><![CDATA[<ul>
+<li>一些相关理论的介绍，容易理解</li>
+</ul>
+
+
+<p><code>
+http://www.cnblogs.com/justany/archive/2012/11/21/2779978.html
+</code></p>
+
+<!-- more -->
+
+
+<p>```</p>
+
+<h1>include &lt;opencv2/core/core.hpp></h1>
+
+<h1>include &lt;opencv2/highgui/highgui.hpp></h1>
+
+<h1>include &lt;opencv2/imgproc/imgproc.hpp></h1>
+
+<h1>include &lt;cv.h></h1>
+
+<p>using namespace std;
+using namespace cv;</p>
+
+<p>int main(int argc, char** argv)
+{</p>
+
+<pre><code>if (argc != 2) {
+    cout &lt;&lt; "Usage: display_image ImageToLoadAndDisplay" &lt;&lt; endl;
+    return -1;
+}
+
+Mat image;
+image = imread(argv[1], CV_LOAD_IMAGE_COLOR);
+
+if( !image.data )
+{
+    cout &lt;&lt; "Could not open or find the image" &lt;&lt; std::endl;
+    return -1;
+}
+Mat outimg;
+//blur(image, outimg, Size(10, 10));
+//GaussianBlur( image, outimg, Size(5,5), 1000, 1000 );
+//medianBlur( image, outimg, 9);
+bilateralFilter ( image, outimg, 9, 3*10, 3*10 );
+//cvtColor(image, outimg, CV_RGB2GRAY);
+
+namedWindow( "Display Image", CV_WINDOW_AUTOSIZE );
+namedWindow( "Display Out Image", CV_WINDOW_AUTOSIZE );
+imshow( "Display Image", image );
+imshow( "Display Out Image", outimg);
+waitKey(0);
+return 0;
+</code></pre>
+
+<p>}
+```</p>
+]]></content>
+  </entry>
+  
+</feed>

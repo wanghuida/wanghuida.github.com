@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Hadoop | 老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/blog/categories/hadoop/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2014-02-11T10:22:03+08:00</updated>
+  <updated>2014-05-27T18:21:34+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,90 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[hive 读取nginx 日志]]></title>
+    <link href="http://www.wanghd.com/blog/2014/05/22/hive-du-qu-nginx-ri-zhi/"/>
+    <updated>2014-05-22T17:35:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2014/05/22/hive-du-qu-nginx-ri-zhi</id>
+    <content type="html"><![CDATA[<h3>安装完hive 跑map reduce会显示下面的错误</h3>
+
+<p>```
+Caused by: java.lang.ClassNotFoundException: Class org.apache.hadoop.hive.contrib.serde2.RegexSerDe not found</p>
+
+<pre><code>at org.apache.hadoop.conf.Configuration.getClassByName(Configuration.java:1626)
+at org.apache.hadoop.hive.ql.exec.MapOperator.getConvertedOI(MapOperator.java:305)
+... 24 more
+</code></pre>
+
+<p>```</p>
+
+<ul>
+<li>可以加入jar包解决</li>
+</ul>
+
+
+<p><code>
+add jar &lt;relative-classpath or absolute-classpath&gt;/hive-contrib-0.13.0.jar
+</code></p>
+
+<ul>
+<li>设置nginx access_log日志格式</li>
+</ul>
+
+
+<p>```</p>
+
+<pre><code>log_format  main '$request_time $upstream_response_time $remote_addr $request_length $upstream_addr  [$time_local] '
+                 '$host "$request" $status $bytes_sent '
+                 '"$http_referer" "$http_user_agent" "$gzip_ratio" "$http_x_forwarded_for" - "$server_addr"';
+</code></pre>
+
+<p>```</p>
+
+<!-- more -->
+
+
+<ul>
+<li>用正则按格式创建表</li>
+</ul>
+
+
+<p><code>
+create external table lblog (
+request_time string,
+upstream_response_time string,
+remote_addr string,
+upstream_addr string,
+time_local string,
+host string,
+method string,
+request_url string,
+request_schema string,
+status string,
+bytes_sent string,
+http_referer string,
+http_user_agent string,
+gzip_ratio string,
+http_x_forwarded_for string,
+server_addr string
+)
+partitioned by (ds string)
+row format serde 'org.apache.hadoop.hive.contrib.serde2.RegexSerDe'
+with serdeproperties ('input.regex' = '(.*)\\s(.*)\\s(.*)\\s-\\s(.*)\\[(.*)\\]\\s(.*)\\s\"(.*)\\s(.*)\\s(.*)\"\\s(.*)\\s(.*)\\s\"(.*)\"\\s\"(.*)\"\\s\"(.*)\"\\s\"(.*)\"\\s-\\s\"(.*)\"','output.format.string' = '%1$s %2$s %3$s %4$s %5$s %6$s %7$s %8$s %9$s %10$s %11$s %12$s %13$s %14$s %15$s %16$s')
+location '/lblog';
+</code></p>
+
+<ul>
+<li>现在是查不到数据库的，必须add partition</li>
+</ul>
+
+
+<p><code>
+alter table testlblog5 add partition (ds='20140519');
+</code></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[安装配置hive]]></title>
