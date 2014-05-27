@@ -31,6 +31,8 @@ add jar <relative-classpath or absolute-classpath>/hive-contrib-0.13.0.jar
                      '"$http_referer" "$http_user_agent" "$gzip_ratio" "$http_x_forwarded_for" - "$server_addr"';
 ```
 
+<!-- more -->
+
 + 用正则按格式创建表
 
 ```
@@ -62,5 +64,4 @@ location '/lblog';
 
 ```
 alter table testlblog5 add partition (ds='20140519');
-
 ```
