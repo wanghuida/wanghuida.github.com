@@ -100,6 +100,61 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2013/01/04/jqueryzai-firefoxxia-wu-fa-autocomplete/">Jquery在firefox下无法autocomplete</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-04T17:29:00+08:00" pubdate data-updated="true">Jan 4<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/01/04/jqueryzai-firefoxxia-wu-fa-autocomplete/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h4>jquery的autocomplete中文输入在firefox无法正常使用</h4>
+
+<ul>
+<li>firefox下用input事件触发keydown即可</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$('元素').bind('input', function(){
+</span><span class='line'>    $(this).trigger('keydown');
+</span><span class='line'>}).bind("keydown", function(event){
+</span><span class='line'>    事件
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2012/12/17/system-dot-out-dot-printlnluan-ma/">System.out.println 乱码</a></h1>
     
     
@@ -548,76 +603,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/10/an-zhuang-pei-zhi-hive/">安装配置hive</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-10T14:59:00+08:00" pubdate data-updated="true">Nov 10<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/10/an-zhuang-pei-zhi-hive/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><ul>
-<li>先安装hadoop请参考<a href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/">这篇文章</a></li>
-<li>hive介绍：通过类似于sql语句的方式去计算结果，数据都存放在hdfs</li>
-</ul>
-
-
-<h3>下载并解压hive</h3>
-
-<ul>
-<li>给个官方<a href="http://www.apache.org/dyn/closer.cgi/hive/">链接</a></li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>tar -xzvf hive-x.y.z.tar.gz
-</span><span class='line'>cd hive-x.y.z
-</span><span class='line'>PATH=$PATH:/Users/william/project/hadoop-1.0.4/bin:/Users/william/project/hive-0.8.1/bin
-</span><span class='line'>. ~/.bash_profile</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>直接在终端输入hive，然后输入show tables;然会OK，就行了</li>
-</ul>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/11/10/an-zhuang-pei-zhi-hive/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/7/">&larr; 其他文章</a></li>
@@ -642,7 +627,7 @@
 <li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
 <li class='category'><a href='/blog/categories/opencv/'>OpenCV (1)</a></li>
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
-<li class='category'><a href='/blog/categories/php/'>Php (7)</a></li>
+<li class='category'><a href='/blog/categories/php/'>Php (8)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (3)</a></li>
 <li class='category'><a href='/blog/categories/share/'>Share (32)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
@@ -666,6 +651,10 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2014/05/29/sheng-cheng-duan-lian-jie/">生成短链接</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/05/22/hive-du-qu-nginx-ri-zhi/">hive 读取nginx 日志</a>
@@ -701,10 +690,6 @@
     
       <li class="post">
         <a href="/blog/2014/01/26/uitableview-2/">UITableView (2)</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/01/24/uitableview-1/">UITableView (1)</a>
       </li>
     
   </ul>

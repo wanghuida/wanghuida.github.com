@@ -100,6 +100,67 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2013/04/04/5fen-zhong-li-jie-iptables/">5分钟理解iptables</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-04T10:08:00+08:00" pubdate data-updated="true">Apr 4<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/04/04/5fen-zhong-li-jie-iptables/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>iptables作用</h3>
+
+<ol>
+<li>过滤请求，根据条件决定通过或拒绝</li>
+<li>网络地址转换</li>
+<li>修改头信息</li>
+</ol>
+
+
+<h3>iptables的组成部分</h3>
+
+<ul>
+<li>table：根据类型分了3种，分别是filter,nat,mangle。filter用来过滤，nat用来地址转换，mangle用来改ttl之类的头信息【不常用】。</li>
+<li>chain：是指网络包处理的某个阶段，看下图：1.yes这条路线目的地址是本机。2.no这条路线目的地址是其他网段，需要转发。</li>
+</ul>
+
+
+<p><img src="/images/post/iptables.gif" title="iptables" alt="iptables" /></p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2013/04/04/5fen-zhong-li-jie-iptables/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2013/04/03/ubuntu-routeming-ling/">Ubuntu Route命令</a></h1>
     
     
@@ -667,63 +728,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2013/02/27/mysql-zhuang-tai-jian-cha/">Mysql 状态检查</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-02-27T14:52:00+08:00" pubdate data-updated="true">Feb 27<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/02/27/mysql-zhuang-tai-jian-cha/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>最简单的status</h3>
-
-<ul>
-<li>可以了解一下mysql基本的状态</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>$ mysql -u -p -h 
-</span><span class='line'>mysql &gt; status</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2013/02/27/mysql-zhuang-tai-jian-cha/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/5/">&larr; 其他文章</a></li>
@@ -748,7 +752,7 @@
 <li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
 <li class='category'><a href='/blog/categories/opencv/'>OpenCV (1)</a></li>
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
-<li class='category'><a href='/blog/categories/php/'>Php (7)</a></li>
+<li class='category'><a href='/blog/categories/php/'>Php (8)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (3)</a></li>
 <li class='category'><a href='/blog/categories/share/'>Share (32)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
@@ -772,6 +776,10 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2014/05/29/sheng-cheng-duan-lian-jie/">生成短链接</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/05/22/hive-du-qu-nginx-ri-zhi/">hive 读取nginx 日志</a>
@@ -807,10 +815,6 @@
     
       <li class="post">
         <a href="/blog/2014/01/26/uitableview-2/">UITableView (2)</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/01/24/uitableview-1/">UITableView (1)</a>
       </li>
     
   </ul>

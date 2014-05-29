@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Category: Solr - 老虎的眼睛</title>
+  <title>生成短链接 - 老虎的眼睛</title>
   <meta name="author" content="王惠达 huida wanghuida">
 
   
-  <meta name="description" content="Category: Solr">
+  <meta name="description" content="王惠达博客 IT技术 php perl python java c ruby wanghuida blog lucene mogilefs">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.wanghd.comblog/categories/solr">
+  <link rel="canonical" href="http://www.wanghd.com/blog/2014/05/29/sheng-cheng-duan-lian-jie">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/bootstrap/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/stylesheets/bootstrap/responsive.css" media="screen, projection" rel="stylesheet" type="text/css">
@@ -93,150 +93,167 @@
   <div class="container">
     <div class="row-fluid">
       
-<article role="article" class="span9">
+<article class="hentry span9" role="article">
 
   
   <header class="page-header">
-    <h1 class="entry-title">Category: Solr</h1>
+    
+      <h1 class="entry-title">生成短链接</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-05-29T17:40:00+08:00" pubdate data-updated="true">May 29<span>th</span>, 2014</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
     
   </header>
+
+
+<div class="entry-content"><ul>
+<li>类似于微博使用的方法，生成好短链接，在数据库里存储映射，然后获取重定向</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">function getShortLink($long_link)</span>
+</span><span class='line'><span class="x">{</span>
+</span><span class='line'><span class="x">    # 配合md5的key</span>
+</span><span class='line'><span class="x">    $key = &quot;wanghuida&quot;;</span>
+</span><span class='line'><span class="x">    $long_link_md5 = md5($long_link . $key);</span>
+</span><span class='line'>
+</span><span class='line'><span class="x">    # 总共62的字符</span>
+</span><span class='line'><span class="x">    $letter_number = &quot;abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;;</span>
+</span><span class='line'>
+</span><span class='line'><span class="x">    # 128位的md5 分4段计算</span>
+</span><span class='line'><span class="x">    $retval = array();</span>
+</span><span class='line'><span class="x">    for ($i = 0; $i &lt; 4; $i++) {</span>
+</span><span class='line'><span class="x">        $sub_md5 = substr($long_link_md5, $i*8, 8);</span>
+</span><span class='line'><span class="x">        # 只要30位，头部2位砍掉</span>
+</span><span class='line'><span class="x">        $hex = 0x3FFFFFFF &amp; hexdec($sub_md5);</span>
+</span><span class='line'><span class="x">        # 再把30位切成6份，每份都获取一个字符</span>
+</span><span class='line'><span class="x">        $short_link = &#39;&#39;;</span>
+</span><span class='line'><span class="x">        for ($j = 0; $j &lt; 6; $j++) {</span>
+</span><span class='line'><span class="x">            $index = 0x0000003d &amp; $hex;</span>
+</span><span class='line'><span class="x">            $short_link .= $letter_number[$index];</span>
+</span><span class='line'><span class="x">            $hex = $hex &gt;&gt; 5;</span>
+</span><span class='line'><span class="x">        }</span>
+</span><span class='line'><span class="x">        $retval[] = $short_link;</span>
+</span><span class='line'><span class="x">    }</span>
+</span><span class='line'>
+</span><span class='line'><span class="x">    return $retval;</span>
+</span><span class='line'><span class="x">}</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="x">$retval = getShortLink(&quot;http://wanghd.com/name=wanghuida&amp;age=28&quot;);</span>
+</span><span class='line'><span class="x">var_dump($retval);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
   
-  <div id="blog-archives" class="category">
+
+<span class="byline author vcard">Posted by <span class="fn">王惠达 huida wanghuida</span></span>
+
+      
 
 
 
-  
-  <h1>2012</h1>
-
-<article>
-  <div class="well">
-
-<h2><a href="/blog/2012/09/27/solrsheng-lue-ri-zhi/">显示solr省略的日志</a></h2>
-<time datetime="2012-09-27T13:54:00+08:00" pubdate><span class='month'>Sep</span> <span class='day'>27</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/java/'>Java</a>, <a class='category' href='/blog/categories/solr/'>Solr</a></span>
-</footer>
-
-</div>
-
-</article>
 
 
 
-<article>
-  <div class="well">
 
-<h2><a href="/blog/2012/09/21/solrde-shu-zhi-cun-chu-he-fan-wei-cha-xun/">solr的数值存储和范围查询</a></h2>
-<time datetime="2012-09-21T20:49:00+08:00" pubdate><span class='month'>Sep</span> <span class='day'>21</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/java/'>Java</a>, <a class='category' href='/blog/categories/solr/'>Solr</a></span>
-</footer>
-
-</div>
-
-</article>
-
-
-
-<article>
-  <div class="well">
-
-<h2><a href="/blog/2012/09/20/shi-yong-jmxfen-xi-solrzhuang-tai/">使用JMX分析solr状态</a></h2>
-<time datetime="2012-09-20T14:25:00+08:00" pubdate><span class='month'>Sep</span> <span class='day'>20</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/java/'>Java</a>, <a class='category' href='/blog/categories/solr/'>Solr</a></span>
-</footer>
-
-</div>
-
-</article>
-
-
-
-<article>
-  <div class="well">
-
-<h2><a href="/blog/2012/09/18/xiang-liang-kong-jian-mo-xing/">向量空间模型</a></h2>
-<time datetime="2012-09-18T08:28:00+08:00" pubdate><span class='month'>Sep</span> <span class='day'>18</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/java/'>Java</a>, <a class='category' href='/blog/categories/share/'>Share</a>, <a class='category' href='/blog/categories/solr/'>Solr</a></span>
-</footer>
-
-</div>
-
-</article>
-
-
-
-<article>
-  <div class="well">
-
-<h2><a href="/blog/2012/09/14/solrman-cha-xun-fen-xi/">solr慢查询分析</a></h2>
-<time datetime="2012-09-14T13:35:00+08:00" pubdate><span class='month'>Sep</span> <span class='day'>14</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/java/'>Java</a>, <a class='category' href='/blog/categories/solr/'>Solr</a></span>
-</footer>
-
-</div>
-
-</article>
-
-
-
-<article>
-  <div class="well">
-
-<h2><a href="/blog/2012/09/07/lucene-ru-men/">lucene 入门</a></h2>
-<time datetime="2012-09-07T22:10:00+08:00" pubdate><span class='month'>Sep</span> <span class='day'>07</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/java/'>Java</a>, <a class='category' href='/blog/categories/solr/'>Solr</a></span>
-</footer>
-
-</div>
-
-</article>
-
-
-
-<article>
-  <div class="well">
-
-<h2><a href="/blog/2012/08/29/solrcha-xun-guo-cheng/">solr查询过程</a></h2>
-<time datetime="2012-08-29T16:25:00+08:00" pubdate><span class='month'>Aug</span> <span class='day'>29</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/java/'>Java</a>, <a class='category' href='/blog/categories/solr/'>Solr</a></span>
-</footer>
-
-</div>
-
-</article>
-
-
-
-<article>
-  <div class="well">
-
-<h2><a href="/blog/2012/08/28/solrqi-dong-fen-xi/">solr启动分析</a></h2>
-<time datetime="2012-08-28T08:34:00+08:00" pubdate><span class='month'>Aug</span> <span class='day'>28</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/java/'>Java</a>, <a class='category' href='/blog/categories/solr/'>Solr</a></span>
-</footer>
-
-</div>
-
-</article>
-
-</div>
 
   
+
+
+<time datetime="2014-05-29T17:40:00+08:00" pubdate data-updated="true">May 29<span>th</span>, 2014</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/php/'>Php</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.wanghd.com/blog/2014/05/29/sheng-cheng-duan-lian-jie/" data-via="" data-counturl="http://www.wanghd.com/blog/2014/05/29/sheng-cheng-duan-lian-jie/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    
+    <section>
+      <h1>Comments</h1>
+      <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+    </section>
+    
+    <ul class="pager">
+      
+      <li class="previous"><a class="basic-alignment left"
+        href="/blog/2014/05/22/hive-du-qu-nginx-ri-zhi/" title="Previous Post:
+        hive 读取nginx 日志">&laquo; hive 读取nginx 日志</a></li>
+      
+      <li><a href="/blog/archives">文章归档</a></li>
+      
+    </ul>
+  </footer>
 </article>
 
 <aside class="sidebar-nav span3">
@@ -366,7 +383,10 @@
       var disqus_shortname = 'wanghuida';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.wanghd.com/blog/2014/05/29/sheng-cheng-duan-lian-jie/';
+        var disqus_url = 'http://www.wanghd.com/blog/2014/05/29/sheng-cheng-duan-lian-jie/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
