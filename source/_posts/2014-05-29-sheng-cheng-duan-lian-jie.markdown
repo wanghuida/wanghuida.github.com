@@ -12,6 +12,7 @@ categories: [Php]
 + 类似于微博使用的方法，生成好短链接，在数据库里存储映射，然后获取重定向
 
 ```php
+<?php
 
 function getShortLink($long_link)
 {
