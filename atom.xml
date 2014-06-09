@@ -4,7 +4,7 @@
   <title><![CDATA[老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2014-05-29T17:54:30+08:00</updated>
+  <updated>2014-06-09T10:08:39+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,49 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[mac 下识别android手机]]></title>
+    <link href="http://www.wanghd.com/blog/2014/06/07/mac-xia-shi-bie-androidshou-ji/"/>
+    <updated>2014-06-07T22:53:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2014/06/07/mac-xia-shi-bie-androidshou-ji</id>
+    <content type="html"><![CDATA[<ul>
+<li>关于本机->更多信息->概系统览->系统报告->usb->你所连接的device->供应商ID(Vendor ID)</li>
+</ul>
+
+
+<p><img src="http://www.wanghd.com/images/post/adb.jpg" title="Vendor ID" alt="Vendor ID" /></p>
+
+<ul>
+<li>设置vendor id，然后重启</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>echo "0x04e8" &gt; ~/.android/adb_usb.ini
+</span><span class='line'>./adb kill-server
+</span><span class='line'>./adb start-server
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>看下 android device bridge 里面的设备有了没，有就对了</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>./adb devices
+</span><span class='line'>
+</span><span class='line'>List of devices attached
+</span><span class='line'>0019aed7047b5e  device</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[生成短链接]]></title>
@@ -54,37 +97,41 @@
 <span class='line-number'>29</span>
 <span class='line-number'>30</span>
 <span class='line-number'>31</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">function getShortLink($long_link)</span>
-</span><span class='line'><span class="x">{</span>
-</span><span class='line'><span class="x">    # 配合md5的key</span>
-</span><span class='line'><span class="x">    $key = &quot;wanghuida&quot;;</span>
-</span><span class='line'><span class="x">    $long_link_md5 = md5($long_link . $key);</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
 </span><span class='line'>
-</span><span class='line'><span class="x">    # 总共62的字符</span>
-</span><span class='line'><span class="x">    $letter_number = &quot;abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;;</span>
+</span><span class='line'><span class="k">function</span> <span class="nf">getShortLink</span><span class="p">(</span><span class="nv">$long_link</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="c1"># 配合md5的key</span>
+</span><span class='line'>    <span class="nv">$key</span> <span class="o">=</span> <span class="s2">&quot;wanghuida&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="nv">$long_link_md5</span> <span class="o">=</span> <span class="nb">md5</span><span class="p">(</span><span class="nv">$long_link</span> <span class="o">.</span> <span class="nv">$key</span><span class="p">);</span>
 </span><span class='line'>
-</span><span class='line'><span class="x">    # 128位的md5 分4段计算</span>
-</span><span class='line'><span class="x">    $retval = array();</span>
-</span><span class='line'><span class="x">    for ($i = 0; $i &lt; 4; $i++) {</span>
-</span><span class='line'><span class="x">        $sub_md5 = substr($long_link_md5, $i*8, 8);</span>
-</span><span class='line'><span class="x">        # 只要30位，头部2位砍掉</span>
-</span><span class='line'><span class="x">        $hex = 0x3FFFFFFF &amp; hexdec($sub_md5);</span>
-</span><span class='line'><span class="x">        # 再把30位切成6份，每份都获取一个字符</span>
-</span><span class='line'><span class="x">        $short_link = &#39;&#39;;</span>
-</span><span class='line'><span class="x">        for ($j = 0; $j &lt; 6; $j++) {</span>
-</span><span class='line'><span class="x">            $index = 0x0000003d &amp; $hex;</span>
-</span><span class='line'><span class="x">            $short_link .= $letter_number[$index];</span>
-</span><span class='line'><span class="x">            $hex = $hex &gt;&gt; 5;</span>
-</span><span class='line'><span class="x">        }</span>
-</span><span class='line'><span class="x">        $retval[] = $short_link;</span>
-</span><span class='line'><span class="x">    }</span>
+</span><span class='line'>    <span class="c1"># 总共62的字符</span>
+</span><span class='line'>    <span class="nv">$letter_number</span> <span class="o">=</span> <span class="s2">&quot;abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;</span><span class="p">;</span>
 </span><span class='line'>
-</span><span class='line'><span class="x">    return $retval;</span>
-</span><span class='line'><span class="x">}</span>
+</span><span class='line'>    <span class="c1"># 128位的md5 分4段计算</span>
+</span><span class='line'>    <span class="nv">$retval</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="nv">$i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">;</span> <span class="nv">$i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$sub_md5</span> <span class="o">=</span> <span class="nx">substr</span><span class="p">(</span><span class="nv">$long_link_md5</span><span class="p">,</span> <span class="nv">$i</span><span class="o">*</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">);</span>
+</span><span class='line'>        <span class="c1"># 只要30位，头部2位砍掉</span>
+</span><span class='line'>        <span class="nv">$hex</span> <span class="o">=</span> <span class="mh">0x3FFFFFFF</span> <span class="o">&amp;</span> <span class="nx">hexdec</span><span class="p">(</span><span class="nv">$sub_md5</span><span class="p">);</span>
+</span><span class='line'>        <span class="c1"># 再把30位切成6份，每份都获取一个字符</span>
+</span><span class='line'>        <span class="nv">$short_link</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">for</span> <span class="p">(</span><span class="nv">$j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$j</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">;</span> <span class="nv">$j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nv">$index</span> <span class="o">=</span> <span class="mh">0x0000003d</span> <span class="o">&amp;</span> <span class="nv">$hex</span><span class="p">;</span>
+</span><span class='line'>            <span class="nv">$short_link</span> <span class="o">.=</span> <span class="nv">$letter_number</span><span class="p">[</span><span class="nv">$index</span><span class="p">];</span>
+</span><span class='line'>            <span class="nv">$hex</span> <span class="o">=</span> <span class="nv">$hex</span> <span class="o">&gt;&gt;</span> <span class="mi">5</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="nv">$retval</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$short_link</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="nv">$retval</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'>
-</span><span class='line'><span class="x">$retval = getShortLink(&quot;http://wanghd.com/name=wanghuida&amp;age=28&quot;);</span>
-</span><span class='line'><span class="x">var_dump($retval);</span>
+</span><span class='line'><span class="nv">$retval</span> <span class="o">=</span> <span class="nx">getShortLink</span><span class="p">(</span><span class="s2">&quot;http://wanghd.com/name=wanghuida&amp;age=28&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="nb">var_dump</span><span class="p">(</span><span class="nv">$retval</span><span class="p">);</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -2832,25 +2879,6 @@ sys     指程序对系统调用锁占用时间
 <ul>
 <li>这样看来就很简单了吧，父元素和子元素同时左浮动，然后父元素相对左移动50%，再然后子元素相对右移动50%，或者子元素相对左移动-50%也就可以了。如此简单如此神奇。</li>
 </ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[sshfs]]></title>
-    <link href="http://www.wanghd.com/blog/2013/05/30/sshfs/"/>
-    <updated>2013-05-30T16:57:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/05/30/sshfs</id>
-    <content type="html"><![CDATA[<ul>
-<li>今天看到sshfs可以像mount一样挂上磁盘非常方便记录一下</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>
-</span><span class='line'>sshfs user@hostname:path mount_point
-</span></code></pre></td></tr></table></div></figure>
 
 ]]></content>
   </entry>

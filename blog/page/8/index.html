@@ -100,6 +100,81 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2012/10/14/ying-pan-an-zhuang-centos/">硬盘安装CentOS</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-14T21:48:00+08:00" pubdate data-updated="true">Oct 14<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/10/14/ying-pan-an-zhuang-centos/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h4>下载diskgenuis进行分区和设置卷标</h4>
+
+<ul>
+<li>【C盘】，NTFS；安装的是win7</li>
+<li>【D盘】，卷标：REV，FAT32；</li>
+</ul>
+
+
+<h4>下载CentOS-6.2-i386-LiveCD.iso</h4>
+
+<ul>
+<li>把isolinux下的vmlinuz0和initrd0.img提取到C盘根目录下</li>
+<li>把centos 6.2 livecd解压到D盘根目录下;</li>
+</ul>
+
+
+<h4>下载EasyBCD进行boot设置</h4>
+
+<ul>
+<li>使用easybcd安装NeoGrub，配置menu.lst，内容如下：</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>title CentOS LiveCD
+</span><span class='line'>#如果前面还有分区设置为root (hd0,1)，设置错误了也没关系，重启后会报错，按e调整，再按b去boot
+</span><span class='line'>root (hd0,0) 
+</span><span class='line'>kernel /vmlinuz0 root=live:LABEL=REV rootfstype=auto ro liveimg quiet rhgb 
+</span><span class='line'>initrd /initrd0.img
+</span><span class='line'>boot</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>重启后，选择新选项即可进入CentOS LiveCD环境。</h4>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/">IRC:irssi使用教程</a></h1>
     
     
@@ -1025,90 +1100,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/09/18/xiang-liang-kong-jian-mo-xing/">向量空间模型</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-09-18T08:28:00+08:00" pubdate data-updated="true">Sep 18<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/09/18/xiang-liang-kong-jian-mo-xing/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>向量空间模型广泛使用在文档相似度（算score等等），下面举例描述这个模型：</h3>
-
-<ul>
-<li>假设有两个文档（可以把一个query想象成一个文档）,分别为d1,d2</li>
-<li>假设w1,w2,w3,w4为term</li>
-<li>下图为词频（词频就是在单个文档中出现的次数）,词频为ai,bi</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>-----------------------------------
-</span><span class='line'>      |  w1  |  w2  |  w3  |  w4  |
-</span><span class='line'>  d1  |  1   |      |  1   |      |
-</span><span class='line'>  d2  |  2   |  3   |  2   |  1   |
-</span><span class='line'>-----------------------------------</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>比较夹角公式，越接近越相似,(还需要向量的模公式,|x| = √x<sup>2)</sup></li>
-</ul>
-
-
-<p><img src="/images/post/vsm.png" title="vsm公式" alt="vsm公式" /></p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sim(d1,d2) = ∑(ai*bi) / √(∑ai^2 * ∑bi^2)
-</span><span class='line'>           = 1*2+0*3+1*2+0*1 / √((1^2+0^2+1^2+0^2)*(2^2+3^2+2^2+1^2))
-</span><span class='line'>           = 4 / √(36)
-</span><span class='line'>           = 4 / 6
-</span><span class='line'>           = 2 / 3
-</span><span class='line'>           = 0.66666...</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>假设文章只有两维的话，那么空间图就可以画在一个平面直角坐标系当中，读者可以假想两篇只有两个词的文章画图进行理解。</li>
-<li>由公式可以看出计算量是很大的，要提高效率最好的方法就是减少term，俗称降纬</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/9/">&larr; 其他文章</a></li>
@@ -1124,7 +1115,8 @@
     <section class="well">
   <ul id="categories" class="nav nav-list">
     <li class="nav-header">文章分类</li>
-    <li class='category'><a href='/blog/categories/hadoop/'>Hadoop (5)</a></li>
+    <li class='category'><a href='/blog/categories/android/'>Android (1)</a></li>
+<li class='category'><a href='/blog/categories/hadoop/'>Hadoop (5)</a></li>
 <li class='category'><a href='/blog/categories/ios/'>IOS (8)</a></li>
 <li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
 <li class='category'><a href='/blog/categories/javascript/'>Javascript (4)</a></li>
@@ -1157,6 +1149,10 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2014/06/07/mac-xia-shi-bie-androidshou-ji/">mac 下识别android手机</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/05/29/sheng-cheng-duan-lian-jie/">生成短链接</a>
@@ -1192,10 +1188,6 @@
     
       <li class="post">
         <a href="/blog/2014/01/26/select-for-update/">select for update</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/01/26/uitableview-2/">UITableView (2)</a>
       </li>
     
   </ul>

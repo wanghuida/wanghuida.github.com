@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Android | 老虎的眼睛]]></title>
+  <link href="http://www.wanghd.com/blog/categories/android/atom.xml" rel="self"/>
+  <link href="http://www.wanghd.com/"/>
+  <updated>2014-06-09T10:08:39+08:00</updated>
+  <id>http://www.wanghd.com/</id>
+  <author>
+    <name><![CDATA[王惠达 huida wanghuida]]></name>
+    <email><![CDATA[wanghuida258@yahoo.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[mac 下识别android手机]]></title>
+    <link href="http://www.wanghd.com/blog/2014/06/07/mac-xia-shi-bie-androidshou-ji/"/>
+    <updated>2014-06-07T22:53:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2014/06/07/mac-xia-shi-bie-androidshou-ji</id>
+    <content type="html"><![CDATA[<ul>
+<li>关于本机->更多信息->概系统览->系统报告->usb->你所连接的device->供应商ID(Vendor ID)</li>
+</ul>
+
+
+<p><img src="/images/post/adb.jpg" title="Vendor ID" alt="Vendor ID" /></p>
+
+<ul>
+<li>设置vendor id，然后重启</li>
+</ul>
+
+
+<p>```
+echo "0x04e8" > ~/.android/adb_usb.ini
+./adb kill-server
+./adb start-server</p>
+
+<p>```</p>
+
+<ul>
+<li>看下 android device bridge 里面的设备有了没，有就对了</li>
+</ul>
+
+
+<p>```
+./adb devices</p>
+
+<p>List of devices attached
+0019aed7047b5e  device
+```</p>
+]]></content>
+  </entry>
+  
+</feed>

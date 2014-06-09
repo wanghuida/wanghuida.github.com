@@ -100,6 +100,78 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2014/06/07/mac-xia-shi-bie-androidshou-ji/">Mac 下识别android手机</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-06-07T22:53:00+08:00" pubdate data-updated="true">Jun 7<span>th</span>, 2014</time>
+        
+         | <a href="/blog/2014/06/07/mac-xia-shi-bie-androidshou-ji/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><ul>
+<li>关于本机->更多信息->概系统览->系统报告->usb->你所连接的device->供应商ID(Vendor ID)</li>
+</ul>
+
+
+<p><img src="/images/post/adb.jpg" title="Vendor ID" alt="Vendor ID" /></p>
+
+<ul>
+<li>设置vendor id，然后重启</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>echo "0x04e8" &gt; ~/.android/adb_usb.ini
+</span><span class='line'>./adb kill-server
+</span><span class='line'>./adb start-server
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>看下 android device bridge 里面的设备有了没，有就对了</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>./adb devices
+</span><span class='line'>
+</span><span class='line'>List of devices attached
+</span><span class='line'>0019aed7047b5e  device</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2014/05/29/sheng-cheng-duan-lian-jie/">生成短链接</a></h1>
     
     
@@ -161,37 +233,41 @@
 <span class='line-number'>29</span>
 <span class='line-number'>30</span>
 <span class='line-number'>31</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">function getShortLink($long_link)</span>
-</span><span class='line'><span class="x">{</span>
-</span><span class='line'><span class="x">    # 配合md5的key</span>
-</span><span class='line'><span class="x">    $key = &quot;wanghuida&quot;;</span>
-</span><span class='line'><span class="x">    $long_link_md5 = md5($long_link . $key);</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
 </span><span class='line'>
-</span><span class='line'><span class="x">    # 总共62的字符</span>
-</span><span class='line'><span class="x">    $letter_number = &quot;abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;;</span>
+</span><span class='line'><span class="k">function</span> <span class="nf">getShortLink</span><span class="p">(</span><span class="nv">$long_link</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="c1"># 配合md5的key</span>
+</span><span class='line'>    <span class="nv">$key</span> <span class="o">=</span> <span class="s2">&quot;wanghuida&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="nv">$long_link_md5</span> <span class="o">=</span> <span class="nb">md5</span><span class="p">(</span><span class="nv">$long_link</span> <span class="o">.</span> <span class="nv">$key</span><span class="p">);</span>
 </span><span class='line'>
-</span><span class='line'><span class="x">    # 128位的md5 分4段计算</span>
-</span><span class='line'><span class="x">    $retval = array();</span>
-</span><span class='line'><span class="x">    for ($i = 0; $i &lt; 4; $i++) {</span>
-</span><span class='line'><span class="x">        $sub_md5 = substr($long_link_md5, $i*8, 8);</span>
-</span><span class='line'><span class="x">        # 只要30位，头部2位砍掉</span>
-</span><span class='line'><span class="x">        $hex = 0x3FFFFFFF &amp; hexdec($sub_md5);</span>
-</span><span class='line'><span class="x">        # 再把30位切成6份，每份都获取一个字符</span>
-</span><span class='line'><span class="x">        $short_link = &#39;&#39;;</span>
-</span><span class='line'><span class="x">        for ($j = 0; $j &lt; 6; $j++) {</span>
-</span><span class='line'><span class="x">            $index = 0x0000003d &amp; $hex;</span>
-</span><span class='line'><span class="x">            $short_link .= $letter_number[$index];</span>
-</span><span class='line'><span class="x">            $hex = $hex &gt;&gt; 5;</span>
-</span><span class='line'><span class="x">        }</span>
-</span><span class='line'><span class="x">        $retval[] = $short_link;</span>
-</span><span class='line'><span class="x">    }</span>
+</span><span class='line'>    <span class="c1"># 总共62的字符</span>
+</span><span class='line'>    <span class="nv">$letter_number</span> <span class="o">=</span> <span class="s2">&quot;abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;</span><span class="p">;</span>
 </span><span class='line'>
-</span><span class='line'><span class="x">    return $retval;</span>
-</span><span class='line'><span class="x">}</span>
+</span><span class='line'>    <span class="c1"># 128位的md5 分4段计算</span>
+</span><span class='line'>    <span class="nv">$retval</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="nv">$i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">;</span> <span class="nv">$i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$sub_md5</span> <span class="o">=</span> <span class="nx">substr</span><span class="p">(</span><span class="nv">$long_link_md5</span><span class="p">,</span> <span class="nv">$i</span><span class="o">*</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">);</span>
+</span><span class='line'>        <span class="c1"># 只要30位，头部2位砍掉</span>
+</span><span class='line'>        <span class="nv">$hex</span> <span class="o">=</span> <span class="mh">0x3FFFFFFF</span> <span class="o">&amp;</span> <span class="nx">hexdec</span><span class="p">(</span><span class="nv">$sub_md5</span><span class="p">);</span>
+</span><span class='line'>        <span class="c1"># 再把30位切成6份，每份都获取一个字符</span>
+</span><span class='line'>        <span class="nv">$short_link</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">for</span> <span class="p">(</span><span class="nv">$j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$j</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">;</span> <span class="nv">$j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nv">$index</span> <span class="o">=</span> <span class="mh">0x0000003d</span> <span class="o">&amp;</span> <span class="nv">$hex</span><span class="p">;</span>
+</span><span class='line'>            <span class="nv">$short_link</span> <span class="o">.=</span> <span class="nv">$letter_number</span><span class="p">[</span><span class="nv">$index</span><span class="p">];</span>
+</span><span class='line'>            <span class="nv">$hex</span> <span class="o">=</span> <span class="nv">$hex</span> <span class="o">&gt;&gt;</span> <span class="mi">5</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="nv">$retval</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$short_link</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="nv">$retval</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'>
-</span><span class='line'><span class="x">$retval = getShortLink(&quot;http://wanghd.com/name=wanghuida&amp;age=28&quot;);</span>
-</span><span class='line'><span class="x">var_dump($retval);</span>
+</span><span class='line'><span class="nv">$retval</span> <span class="o">=</span> <span class="nx">getShortLink</span><span class="p">(</span><span class="s2">&quot;http://wanghd.com/name=wanghuida&amp;age=28&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="nb">var_dump</span><span class="p">(</span><span class="nv">$retval</span><span class="p">);</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -791,123 +867,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2014/01/26/uitableview-2/">UITableView (2)</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-01-26T09:30:00+08:00" pubdate data-updated="true">Jan 26<span>th</span>, 2014</time>
-        
-         | <a href="/blog/2014/01/26/uitableview-2/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>展示一下最基础的group table应该如何使用（一般设置中最常用），最后有完整的代码</h3>
-
-<p>1 自己先创建一个ViewController, 添加一个UITableView内部属性和数据</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="k">@interface</span> <span class="nc">AETableViewController</span> <span class="p">()</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>  <span class="n">UITableView</span> <span class="o">*</span><span class="n">_table</span><span class="p">;</span>
-</span><span class='line'>  <span class="n">NSMutableArray</span> <span class="o">*</span><span class="n">_data</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>2 头里需要实现UITableViewDataSource, UITableViewDelegate</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="k">@interface</span> <span class="nc">AETableViewController</span> : <span class="nc">UIViewController</span><span class="o">&lt;</span><span class="n">UITableViewDataSource</span><span class="p">,</span> <span class="n">UITableViewDelegate</span><span class="o">&gt;</span>
-</span><span class='line'><span class="k">@end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>3 往<em>data中加入一点数据,初始化</em>table,设置代理和数据源</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="k">-</span> <span class="p">(</span><span class="kt">id</span><span class="p">)</span><span class="nf">initWithNibName:</span><span class="p">(</span><span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">nibNameOrNil</span> <span class="nf">bundle:</span><span class="p">(</span><span class="n">NSBundle</span> <span class="o">*</span><span class="p">)</span><span class="nv">nibBundleOrNil</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>  <span class="n">self</span> <span class="o">=</span> <span class="p">[</span><span class="n">super</span> <span class="nl">initWithNibName:</span><span class="n">nibNameOrNil</span> <span class="nl">bundle:</span><span class="n">nibBundleOrNil</span><span class="p">];</span>
-</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="n">self</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="n">NSArray</span> <span class="o">*</span><span class="n">group1</span> <span class="o">=</span> <span class="err">@</span><span class="p">[</span><span class="s">@&quot;关注&quot;</span><span class="p">,</span> <span class="s">@&quot;美美豆&quot;</span><span class="p">,</span> <span class="s">@&quot;安居客&quot;</span><span class="p">];</span>
-</span><span class='line'>    <span class="n">NSArray</span> <span class="o">*</span><span class="n">group2</span> <span class="o">=</span> <span class="err">@</span><span class="p">[</span><span class="s">@&quot;wanghd.com&quot;</span><span class="p">,</span> <span class="s">@&quot;惠达&quot;</span><span class="p">,</span> <span class="s">@&quot;达达&quot;</span><span class="p">];</span>
-</span><span class='line'>    <span class="n">NSArray</span> <span class="o">*</span><span class="n">group3</span> <span class="o">=</span> <span class="err">@</span><span class="p">[</span><span class="s">@&quot;喜欢&quot;</span><span class="p">,</span> <span class="s">@&quot;关注&quot;</span><span class="p">,</span> <span class="s">@&quot;粉丝&quot;</span><span class="p">];</span>
-</span><span class='line'>    <span class="n">_data</span> <span class="o">=</span> <span class="p">[[</span><span class="n">NSMutableArray</span> <span class="n">alloc</span><span class="p">]</span><span class="nl">initWithArray:</span><span class="err">@</span><span class="p">[</span><span class="n">group1</span><span class="p">,</span> <span class="n">group2</span><span class="p">]];</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>  <span class="k">return</span> <span class="n">self</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">viewDidLoad</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>  <span class="p">[</span><span class="n">super</span> <span class="n">viewDidLoad</span><span class="p">];</span>
-</span><span class='line'>  <span class="n">CGRect</span> <span class="n">rect</span> <span class="o">=</span> <span class="p">[[</span><span class="n">UIScreen</span> <span class="n">mainScreen</span><span class="p">]</span><span class="n">bounds</span><span class="p">];</span>
-</span><span class='line'>  <span class="n">_table</span> <span class="o">=</span> <span class="p">[[</span><span class="n">UITableView</span> <span class="n">alloc</span><span class="p">]</span><span class="nl">initWithFrame:</span><span class="n">rect</span> <span class="nl">style:</span><span class="n">UITableViewStyleGrouped</span><span class="p">];</span>
-</span><span class='line'>  <span class="n">_table</span><span class="p">.</span><span class="n">delegate</span> <span class="o">=</span> <span class="n">self</span><span class="p">;</span>
-</span><span class='line'>  <span class="n">_table</span><span class="p">.</span><span class="n">dataSource</span> <span class="o">=</span> <span class="n">self</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">[</span><span class="n">self</span><span class="p">.</span><span class="n">view</span> <span class="nl">addSubview:</span><span class="n">_table</span><span class="p">];</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2014/01/26/uitableview-2/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/2/">&larr; 其他文章</a></li>
@@ -921,7 +880,8 @@
     <section class="well">
   <ul id="categories" class="nav nav-list">
     <li class="nav-header">文章分类</li>
-    <li class='category'><a href='/blog/categories/hadoop/'>Hadoop (5)</a></li>
+    <li class='category'><a href='/blog/categories/android/'>Android (1)</a></li>
+<li class='category'><a href='/blog/categories/hadoop/'>Hadoop (5)</a></li>
 <li class='category'><a href='/blog/categories/ios/'>IOS (8)</a></li>
 <li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
 <li class='category'><a href='/blog/categories/javascript/'>Javascript (4)</a></li>
@@ -954,6 +914,10 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2014/06/07/mac-xia-shi-bie-androidshou-ji/">mac 下识别android手机</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/05/29/sheng-cheng-duan-lian-jie/">生成短链接</a>
@@ -989,10 +953,6 @@
     
       <li class="post">
         <a href="/blog/2014/01/26/select-for-update/">select for update</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/01/26/uitableview-2/">UITableView (2)</a>
       </li>
     
   </ul>
