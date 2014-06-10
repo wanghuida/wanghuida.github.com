@@ -22,6 +22,13 @@ yum groupinstall "Development Tools"
 yum install cpan
 ```
 
++ ubuntu如下
+
+```bash
+sudo apt-get install libyaml-appconfig-perl
+sudo apt-get install build-essential
+```
+
 ###安装mogilefs
 
 ```bash
