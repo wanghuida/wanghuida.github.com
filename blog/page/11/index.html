@@ -1,0 +1,581 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>老虎的眼睛</title>
+  <meta name="author" content="王惠达 huida wanghuida">
+
+  
+  <meta name="description" content="王惠达博客 IT技术 php perl python java c ruby wanghuida blog lucene mogilefs">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.wanghd.com/blog/page/11">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/bootstrap/bootstrap.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/bootstrap/responsive.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/syntax/syntax.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <style type="text/css">
+    body {
+      padding-bottom: 40px;
+    }
+    h1 {
+      margin-bottom: 15px;
+    }
+    img {
+      max-width: 100%;
+    }
+    .sharing, .meta, .pager {
+      margin: 20px 0px 20px 0px;
+    }
+    .page-footer p {
+      text-align: center;
+    }
+  </style>
+  <script src="/javascripts/libs/jquery.js"></script>
+  <script src="/javascripts/libs/modernizr-2.0.js"></script>
+  <script src="/javascripts/libs/bootstrap.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="老虎的眼睛" type="application/atom+xml">
+  
+  
+
+</head>
+
+<body   >
+  <nav role="navigation"><div class="navbar">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+
+      <a class="brand" href="/">老虎的眼睛</a>
+
+      <div class="nav-collapse">
+        <ul class="nav">
+  <li><a href="/">博客首页</a></li>
+  <li><a href="/blog/archives">文章归档</a></li>
+  <li><a href="mailto:wanghuida258@aliyun.com">联系站长</a></li>
+  <li><a href="http://www.taobao.com/go/chn/tbk_channel/channelcode.php?pid=mm_32662861_3310667_10778125&eventid=101329">淘宝推广</a></li>
+
+</ul>
+
+
+        <ul class="nav pull-right" data-subscription="rss">
+          <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+          
+        </ul>
+
+        
+          <form class="pull-right navbar-search" action="http://google.com/search" method="get">
+            <fieldset role="search">
+              <input type="hidden" name="q" value="site:www.wanghd.com" />
+              <input class="search-query" type="text" name="q" results="0" placeholder="查找"/>
+            </fieldset>
+          </form>
+        
+      </div>
+    </div>
+  </div>
+</div>
+</nav>
+  <div class="container">
+    <div class="row-fluid">
+      <div class="span9">
+  
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2011/07/03/perl-epoll/">Perl使用Epoll优化</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-07-03T05:59:00+08:00" pubdate data-updated="true">Jul 3<span>rd</span>, 2011</time>
+        
+         | <a href="/blog/2011/07/03/perl-epoll/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><blockquote><p>优势：当有事件时才会增加到@events，无需遍历</p>
+
+<p>注意：EPOLLERR，不增加该事件，无法执行到退出</p></blockquote>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="c1">#!/usr/bin/perl</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">use</span> <span class="n">warnings</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nn">Data::</span><span class="n">Dumper</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="n">strict</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nn">IO::</span><span class="n">Socket</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="n">POSIX</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="n">Socket</span> <span class="sx">qw(SO_KEEPALIVE)</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="n">bytes</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nn">IO::</span><span class="n">Poll</span><span class="p">;</span>
+</span><span class='line'><span class="c1">#/Developer/SDKs/MacOSX10.6.sdk/usr/include/sys/errno.h</span>
+</span><span class='line'><span class="c1">#死活没找到，find / -name errno.h -print了下</span>
+</span><span class='line'><span class="k">use</span> <span class="n">Errno</span>  <span class="sx">qw(EINPROGRESS EWOULDBLOCK EISCONN ENOTSOCK</span>
+</span><span class='line'><span class="sx">              EPIPE EAGAIN EBADF ECONNRESET ENOPROTOOPT)</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">use</span> <span class="nn">Sys::</span><span class="n">Syscall</span> <span class="sx">qw(:epoll)</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">use</span> <span class="n">constant</span> <span class="n">POLLIN</span>        <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="n">constant</span> <span class="n">POLLOUT</span>       <span class="o">=&gt;</span> <span class="mi">4</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="n">constant</span> <span class="n">POLLERR</span>       <span class="o">=&gt;</span> <span class="mi">8</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="n">constant</span> <span class="n">POLLHUP</span>       <span class="o">=&gt;</span> <span class="mi">16</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="n">constant</span> <span class="n">POLLNVAL</span>      <span class="o">=&gt;</span> <span class="mi">32</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">my</span> <span class="nv">$server</span> <span class="o">=</span> <span class="nn">IO::Socket::</span><span class="n">INET</span><span class="o">-&gt;</span><span class="k">new</span><span class="p">(</span>
+</span><span class='line'>    <span class="n">LocalAddr</span> <span class="o">=&gt;</span> <span class="s">&#39;192.168.10.200:8888&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">Type</span>      <span class="o">=&gt;</span> <span class="n">SOCK_STREAM</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">Proto</span>     <span class="o">=&gt;</span> <span class="s">&#39;tcp&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">Blocking</span>  <span class="o">=&gt;</span> <span class="mi">0</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">Reuse</span>     <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">Listen</span>    <span class="o">=&gt;</span> <span class="mi">1024</span><span class="p">,</span>
+</span><span class='line'><span class="p">)</span> <span class="ow">or</span> <span class="nb">die</span><span class="p">(</span><span class="s">&quot;error create socket:$! and $@\n&quot;</span><span class="p">)</span> <span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$server</span><span class="o">-&gt;</span><span class="n">sockopt</span><span class="p">(</span><span class="n">SO_KEEPALIVE</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">my</span> <span class="nv">$epoll_test</span> <span class="o">=</span> <span class="nn">Sys::Syscall::</span><span class="n">epoll_defined</span><span class="p">();</span>
+</span><span class='line'><span class="k">my</span> <span class="nv">$epoll</span> <span class="o">=</span> <span class="n">epoll_create</span><span class="p">(</span><span class="mi">1024</span><span class="p">);</span>
+</span><span class='line'><span class="k">my</span> <span class="nv">@events</span><span class="p">;</span>
+</span><span class='line'><span class="k">my</span> <span class="nv">%des</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">while</span><span class="p">(</span><span class="mi">1</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="k">my</span> <span class="nv">$csock</span> <span class="o">=</span> <span class="nv">$server</span><span class="o">-&gt;</span><span class="nb">accept</span><span class="p">){</span>
+</span><span class='line'>        <span class="k">my</span> <span class="nv">$fn</span> <span class="o">=</span> <span class="nb">fileno</span><span class="p">(</span><span class="nv">$csock</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">epoll_ctl</span><span class="p">(</span><span class="nv">$epoll</span><span class="p">,</span><span class="n">EPOLL_CTL_ADD</span><span class="p">,</span><span class="nv">$fn</span><span class="p">,</span><span class="n">EPOLLIN</span><span class="o">|</span><span class="n">EPOLLERR</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$des</span><span class="p">{</span><span class="nv">$fn</span><span class="p">}</span> <span class="o">=</span> <span class="nv">$csock</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$evcount</span> <span class="o">=</span> <span class="n">epoll_wait</span><span class="p">(</span><span class="nv">$epoll</span><span class="p">,</span><span class="mi">1000</span><span class="p">,</span><span class="mf">0.25</span><span class="p">,</span><span class="o">\</span><span class="nv">@events</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">my</span> <span class="nv">$i</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">for</span><span class="p">(</span><span class="nv">$i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">&lt;</span> <span class="nv">$evcount</span><span class="p">;</span> <span class="nv">$i</span><span class="o">++</span><span class="p">){</span>
+</span><span class='line'>        <span class="k">my</span> <span class="nv">$ev</span> <span class="o">=</span> <span class="nv">$events</span><span class="p">[</span><span class="nv">$i</span><span class="p">];</span>
+</span><span class='line'>        <span class="k">my</span> <span class="nv">$len</span> <span class="o">=</span> <span class="nb">sysread</span><span class="p">(</span><span class="nv">$des</span><span class="p">{</span><span class="nv">$ev</span><span class="o">-&gt;</span><span class="p">[</span><span class="mi">0</span><span class="p">]},</span><span class="k">my</span> <span class="nv">$data</span><span class="p">,</span><span class="mi">1024</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nv">$len</span> <span class="o">&amp;&amp;</span> <span class="vg">$!</span> <span class="o">!=</span> <span class="n">EWOULDBLOCK</span> <span class="p">){</span>
+</span><span class='line'>            <span class="n">epoll_ctl</span><span class="p">(</span><span class="nv">$epoll</span><span class="p">,</span><span class="n">EPOLL_CTL_DEL</span><span class="p">,</span><span class="nv">$ev</span><span class="o">-&gt;</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">EPOLLIN</span><span class="p">);</span>
+</span><span class='line'>            <span class="nb">delete</span> <span class="nv">$des</span><span class="p">{</span><span class="nv">$ev</span><span class="o">-&gt;</span><span class="p">[</span><span class="mi">0</span><span class="p">]};</span>
+</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>            <span class="k">print</span> <span class="nv">$data</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">#print Dumper(\%des);</span>
+</span><span class='line'>    <span class="c1">#sleep(1);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2011/07/03/Mogilefs-ReadFile/">MogileFS读取文件的过程</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-07-03T05:59:00+08:00" pubdate data-updated="true">Jul 3<span>rd</span>, 2011</time>
+        
+         | <a href="/blog/2011/07/03/Mogilefs-ReadFile/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>客户端读取文件代码</h2>
+
+<blockquote><p>定义好domain和key就能获取文件内容</p></blockquote>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="c1">#!/usr/bin/perl</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">use</span> <span class="n">strict</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="n">warnings</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nn">MogileFS::</span><span class="n">Client</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">my</span> <span class="nv">%new_opt</span> <span class="o">=</span> <span class="p">(</span>
+</span><span class='line'>    <span class="n">hosts</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s">&quot;127.0.0.1:7001&quot;</span><span class="p">],</span>
+</span><span class='line'>    <span class="n">domain</span> <span class="o">=&gt;</span> <span class="s">&quot;127.0.0.1::test&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="p">);</span>
+</span><span class='line'><span class="k">my</span> <span class="nv">$mogc</span> <span class="o">=</span> <span class="nn">MogileFS::</span><span class="n">Client</span><span class="o">-&gt;</span><span class="k">new</span><span class="p">(</span><span class="nv">%new_opt</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">my</span> <span class="nv">$key</span> <span class="o">=</span> <span class="s">&quot;test_key_2&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="k">my</span> <span class="nv">$fd</span> <span class="o">=</span> <span class="nv">$mogc</span><span class="o">-&gt;</span><span class="n">read_file</span><span class="p">(</span><span class="nv">$key</span><span class="p">);</span>
+</span><span class='line'><span class="k">print</span> <span class="k">while</span><span class="sr">&lt;$fd&gt;</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2011/07/03/Mogilefs-ReadFile/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2011/07/03/Mogilefs-Init/">MogileFS启动流程</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-07-03T05:59:00+08:00" pubdate data-updated="true">Jul 3<span>rd</span>, 2011</time>
+        
+         | <a href="/blog/2011/07/03/Mogilefs-Init/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>实例化MogileFS::Server并运行</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="k">my</span> <span class="nv">$server</span><span class="p">;</span> <span class="c1"># server singleton</span>
+</span><span class='line'><span class="k">sub </span><span class="nf">server</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">my</span> <span class="p">(</span><span class="nv">$pkg</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nv">$server</span> <span class="o">||=</span> <span class="nb">bless</span> <span class="p">{},</span> <span class="nv">$pkg</span><span class="p">;</span><span class="c1">#空就创建对象，有就返回，单例</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nv">$server</span><span class="o">-&gt;</span><span class="n">run</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>读取配置</h2>
+
+<blockquote><p>优先级，命令行>配置文件>默认配置</p></blockquote>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="nn">MogileFS::</span><span class="n">Config</span><span class="o">-&gt;</span><span class="n">load_config</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2011/07/03/Mogilefs-Init/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  <ul class="pager">
+    
+    <li><a href="/blog/archives">文章归档</a></li>
+    
+    <li class="next"><a href="/blog/page/10/">Newer &rarr;</a></li>
+    
+  </ul>
+</div>
+<aside class="sidebar-nav span3">
+  
+    <section class="well">
+  <ul id="categories" class="nav nav-list">
+    <li class="nav-header">文章分类</li>
+    <li class='category'><a href='/blog/categories/android/'>Android (1)</a></li>
+<li class='category'><a href='/blog/categories/hadoop/'>Hadoop (5)</a></li>
+<li class='category'><a href='/blog/categories/ios/'>IOS (8)</a></li>
+<li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
+<li class='category'><a href='/blog/categories/javascript/'>Javascript (6)</a></li>
+<li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
+<li class='category'><a href='/blog/categories/mysql/'>Mysql (9)</a></li>
+<li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
+<li class='category'><a href='/blog/categories/opencv/'>OpenCV (1)</a></li>
+<li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
+<li class='category'><a href='/blog/categories/php/'>Php (8)</a></li>
+<li class='category'><a href='/blog/categories/python/'>Python (3)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (33)</a></li>
+<li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
+
+  </ul>
+</section>
+
+<section>
+  <ul id="taobao_rank" class="nav">
+    <li>
+  <script type="text/javascript"> 
+  alimama_pid="mm_32662861_3310667_11125910"; 
+  alimama_width=250; 
+  alimama_height=250; 
+  </script> 
+  <script src="http://a.alimama.cn/inf.js" type="text/javascript"> 
+  </script>
+    </li>
+  </ul>
+</section>
+<section class="well">
+  <ul id="recent_posts" class="nav nav-list">
+    <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/16/angularjs-gou-wu-che/">AngularJS 购物车</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/16/angularjs-chu-tan/">AngularJS 初探</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/06/10/fpmde-suo-you-jin-cheng-du-zhan-yong-chu-xian-jia-si/">fpm的所有进程都占用 出现假死</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/06/07/mac-xia-shi-bie-androidshou-ji/">mac 下识别android手机</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/05/29/sheng-cheng-duan-lian-jie/">生成短链接</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/05/22/hive-du-qu-nginx-ri-zhi/">hive 读取nginx 日志</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/04/23/tu-xiang-de-mo-hu-chu-li/">图像的模糊处理</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/02/05/ios-yong-guan-jian-zheng-an-bei-sai-er-qu-xian-yi-dong/">ios 用关键帧按贝塞尔曲线移动</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/27/ios-di-san-fang-ku-da-hui-zong/">ios 第三方库大汇总</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/27/ios-jing-tai-ku/">ios 静态库</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section class="well">
+  <ul id="links" class="nav nav-list">
+    <li class="nav-header">好友链接</li>
+    <li><a href="http://www.zwsun.com">阿文的自留地</a></li>
+    <li><a href="http://www.deepwarm.com/">明兄的私房菜</a></li>
+    <li><a href="http://joinjoy.me/blog/">柏健的博客</a></li>
+    <li><a href="http://www.luzhaochun.com/">罗哥</a></li>
+  </ul>
+</section>
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo" class="page-footer"><script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-35556528-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<hr>
+<p>
+  Copyright &copy; 2014 - 王惠达 huida wanghuida -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+   - <span class="credit">沪ICP备12048826号</span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'wanghuida';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+<!--
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+-->
+
+
+
+
+
+</body>
+</html>

@@ -100,6 +100,134 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2012/11/22/mongodbshi-zhan/">Mongodb实战</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-22T17:18:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/22/mongodbshi-zhan/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2012/11/22/log4jjie-shao/">Log4j介绍</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-22T17:18:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/22/log4jjie-shao/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2012/11/22/redisshi-zhan/">Redis实战</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-22T17:17:00+08:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/22/redisshi-zhan/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>redis是什么？</h3>
+
+<ul>
+<li>redis是一个开源的，先进的key-value存储服务器端</li>
+<li>value可以包含多种结构，比如strings, hashes, lists, sets ,sorted sets</li>
+<li>官方网址：<a href="http://redis.io">http://redis.io</a></li>
+<li><a href="/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/">freenode</a>的聊天室名称是#redis</li>
+</ul>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2012/11/22/redisshi-zhan/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2012/11/22/xiu-fu-mogilefsmu-lu-owner/">修复mogilefs目录owner</a></h1>
     
     
@@ -535,211 +663,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/">安装配置hadoop</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-02T23:38:00+08:00" pubdate data-updated="true">Nov 2<span>nd</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>下载stable的hadoop</h3>
-
-<ul>
-<li>hadoop的版本比较多，建议下载<code>stable</code>的，现在是<code>hadoop-1.0.4</code></li>
-<li>提供一个<a href="http://hadoop.apache.org/releases.html#Download">下载链接</a></li>
-</ul>
-
-
-<h3>解压缩</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>tar -zxvf hadoop-1.0.4.tar.gz
-</span><span class='line'>cd hadoop-1.0.4</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>配置hadoop</h3>
-
-<blockquote><p>vim编辑conf/hadoop-env.sh，设置环境变量</p></blockquote>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>#如果是mac的话，请添加下面这句
-</span><span class='line'>export HADOOP_OPTS="-Djava.security.krb5.realm=OX.AC.UK 
-</span><span class='line'>    -Djava.security.krb5.kdc=kdc0.ox.ac.uk:kdc1.ox.ac.uk"
-</span><span class='line'>#配置JDK，mac的关系所以路径比较飘逸
-</span><span class='line'>export JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/11/02/an-zhuang-pei-zhi-hadoop/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/10/23/mogilefsxiang-jie/">MogileFS详解</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-10-23T22:48:00+08:00" pubdate data-updated="true">Oct 23<span>rd</span>, 2012</time>
-        
-         | <a href="/blog/2012/10/23/mogilefsxiang-jie/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><ul>
-<li>经过一个月的实际应用，我想是时候应该总结一下mogilefs的使用了，如果想和作者交流参考<a href="/blog/2012/10/13/irc-irssishi-yong-jiao-cheng/">IRC教程</a></li>
-</ul>
-
-
-<h3>MogileFS简介</h3>
-
-<blockquote><p>MogileFS是一个<code>开源</code>的<code>分布式文件系统</code>，配合cdn和squid，性能非常好(<code>15亿</code>文件没问题，其他数据不方便透露)</p>
-
-<p>他由下面几个部分组成:</p></blockquote>
-
-<p><img src="/images/post/mogilefs-summary.jpg" title="mogilefs-summary" alt="mogilefs-summary" /></p>
-
-<ol>
-<li>memcache：用来缓存查询结果，降低db压力</li>
-<li>mogilefsd：就是tracker，用来接收请求并交给子进程(job)处理</li>
-<li>mogstored：监控磁盘状态和文件的实际存储</li>
-<li>client：支持perl，java，ruby，php，python</li>
-<li>mysql：存储记录</li>
-<li>util：日常维护管理的工具集</li>
-<li>telnet：监控tracker，实时调整job的工具</li>
-</ol>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/10/23/mogilefsxiang-jie/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2012/10/16/mogilefsde-replicatefen-xi/">MogileFS的replicate进程分析</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-10-16T15:47:00+08:00" pubdate data-updated="true">Oct 16<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/10/16/mogilefsde-replicatefen-xi/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h4>基本流程</h4>
-
-<ol>
-<li>从replicate queue里获取需要处理数据,进行循环</li>
-<li>执行真正的【replicate操作】，操作时会锁住这个fid，然后返回结果【下面会对该操作具体分析】</li>
-<li>返回没问题，删除队列并释放锁</li>
-<li>返回failed_getting_lock说明正在处理了</li>
-<li>返回no_source说明file_on表上没有关于该文件的记录，nexttry设置为最大并释放锁</li>
-<li>返回too_happy说明devcount > mindevcount，会尝试删除多余的并释放锁（前提是文件存在，所以不会修复file_on有，文件丢失的情况）</li>
-<li>如果以上都不满足，nexttry根据规则增加，failcount递增并释放锁</li>
-</ol>
-
-
-<h4>replicate操作分析</h4>
-
-<ul>
-<li>简单说replicate操作就是取得合适的device进行复制，合适的意思是尽量避免同一个host的device，没办法才用同一个host的device，有错误就返回具体信息</li>
-<li>replicate操作才是真正的复制，代码比较多，但是不难理解（难点都会有注释）</li>
-</ul>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2012/10/16/mogilefsde-replicatefen-xi/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/8/">&larr; 其他文章</a></li>
@@ -759,7 +682,7 @@
 <li class='category'><a href='/blog/categories/hadoop/'>Hadoop (5)</a></li>
 <li class='category'><a href='/blog/categories/ios/'>IOS (8)</a></li>
 <li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
-<li class='category'><a href='/blog/categories/javascript/'>Javascript (4)</a></li>
+<li class='category'><a href='/blog/categories/javascript/'>Javascript (6)</a></li>
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
 <li class='category'><a href='/blog/categories/mysql/'>Mysql (9)</a></li>
 <li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
@@ -767,7 +690,7 @@
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
 <li class='category'><a href='/blog/categories/php/'>Php (8)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (3)</a></li>
-<li class='category'><a href='/blog/categories/share/'>Share (32)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (33)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
 
   </ul>
@@ -789,6 +712,18 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/16/angularjs-gou-wu-che/">AngularJS 购物车</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/16/angularjs-chu-tan/">AngularJS 初探</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/06/10/fpmde-suo-you-jin-cheng-du-zhan-yong-chu-xian-jia-si/">fpm的所有进程都占用 出现假死</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/06/07/mac-xia-shi-bie-androidshou-ji/">mac 下识别android手机</a>
@@ -816,18 +751,6 @@
     
       <li class="post">
         <a href="/blog/2014/01/27/ios-jing-tai-ku/">ios 静态库</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/01/27/calayer-chang-yong-li-zi/">CALayer 常用例子</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/01/27/uitableview-3/">uitableview (3)</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/01/26/select-for-update/">select for update</a>
       </li>
     
   </ul>

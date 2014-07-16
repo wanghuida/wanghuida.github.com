@@ -4,7 +4,7 @@
   <title><![CDATA[老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2014-06-10T17:45:50+08:00</updated>
+  <updated>2014-07-16T11:03:40+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,257 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[AngularJS 购物车]]></title>
+    <link href="http://www.wanghd.com/blog/2014/07/16/angularjs-gou-wu-che/"/>
+    <updated>2014-07-16T10:45:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2014/07/16/angularjs-gou-wu-che</id>
+    <content type="html"><![CDATA[<h3>老规矩先下购物车的例子，想一下用jquery实现是需要多少绑定事件呀，然后再对比看看angularjs</h3>
+
+<br />
+
+
+
+
+<iframe width="100%" height="300" src="http://jsfiddle.net/wanghuida/vAAvw/1/embedded/result,js,html,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">ng-app=</span><span class="s">&quot;CartApp&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;CartController&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>         <span class="nt">&lt;h1&gt;</span>购物车<span class="nt">&lt;/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nt">&lt;table&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;tr&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;th&gt;</span>商品<span class="nt">&lt;/th&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;th&gt;</span>数量<span class="nt">&lt;/th&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;th&gt;</span>单价<span class="nt">&lt;/th&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;th&gt;</span>总价<span class="nt">&lt;/th&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;th&gt;</span>删除<span class="nt">&lt;/th&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;/tr&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;tr</span> <span class="na">ng-repeat=</span><span class="s">&quot;item in items&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;td&gt;</span><span class="nt">&lt;/td&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;td&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;input</span> <span class="na">ng-model=</span><span class="s">&quot;item.quantity&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;/td&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;td&gt;</span><span class="nt">&lt;/td&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;td&gt;</span><span class="nt">&lt;/td&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;td&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;button</span> <span class="na">ng-click=</span><span class="s">&quot;remove(index)&quot;</span><span class="nt">&gt;</span>删除<span class="nt">&lt;/button&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;/td&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;/tr&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;tr&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;th&gt;&lt;/th&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;th&gt;&lt;/th&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;th&gt;&lt;/th&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;th&gt;</span><span class="nt">&lt;/th&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;th&gt;&lt;/th&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;/tr&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/table&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>ng-app定义了一个angularjs module的作用范围</li>
+<li>ng-controller定义了一个控制器</li>
+<li>ng-repeat 循环items</li>
+<li>是一种货币的过滤器，自己写一个过滤器也是可以的</li>
+<li>ng-click 是点击执行的方法</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;CartApp&#39;</span><span class="p">,</span> <span class="p">[])</span>
+</span><span class='line'>    <span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;CartController&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">items</span> <span class="o">=</span> <span class="p">[</span>
+</span><span class='line'>        <span class="p">{</span> <span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;薯片&#39;</span><span class="p">,</span> <span class="nx">quantity</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">price</span><span class="o">:</span> <span class="mf">5.40</span> <span class="p">},</span>
+</span><span class='line'>        <span class="p">{</span> <span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;巧克力&#39;</span><span class="p">,</span> <span class="nx">quantity</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">price</span><span class="o">:</span> <span class="mf">12.40</span> <span class="p">},</span>
+</span><span class='line'>        <span class="p">{</span> <span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;牛奶&#39;</span><span class="p">,</span> <span class="nx">quantity</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">price</span><span class="o">:</span> <span class="mf">45.82</span> <span class="p">}</span>
+</span><span class='line'>    <span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">remove</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">index</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">items</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">totalPirce</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="kd">var</span> <span class="nx">total</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>        <span class="nx">angular</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">$scope</span><span class="p">.</span><span class="nx">items</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">total</span> <span class="o">+=</span> <span class="nx">value</span><span class="p">.</span><span class="nx">quantity</span> <span class="o">*</span> <span class="nx">value</span><span class="p">.</span><span class="nx">price</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">});</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nx">total</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>angular.module定义模块范围</li>
+<li>.controller开始一个controller的定义，这里有一个依赖注入$scope，是当前controller的作用范围，用来存储模型传递数据 $scope.items就是一个model</li>
+<li>接下来$scope里定义了2个方法remove和totalPrice</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[AngularJS 初探]]></title>
+    <link href="http://www.wanghd.com/blog/2014/07/16/angularjs-chu-tan/"/>
+    <updated>2014-07-16T10:37:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2014/07/16/angularjs-chu-tan</id>
+    <content type="html"><![CDATA[<h3>先看个例子，只引用了AngularJS，没有写任何js</h3>
+
+<br />
+
+
+
+
+<iframe width="100%" height="300" src="http://jsfiddle.net/wanghuida/Zcer7/1/embedded/result,js,html,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">ng-app=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;label&gt;</span>名字:<span class="nt">&lt;/label&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;username&quot;</span> <span class="na">placeholder=</span><span class="s">&quot;Enter a name here&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;hr</span> <span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;h1&gt;</span>你好 !<span class="nt">&lt;/h1&gt;</span>
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>ng-app定义angular的作用范围</li>
+<li>ng-model采用数据绑定，这里绑定username</li>
+<li>根据数据绑定，自动更改username</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[fpm的所有进程都占用 出现假死]]></title>
+    <link href="http://www.wanghd.com/blog/2014/06/10/fpmde-suo-you-jin-cheng-du-zhan-yong-chu-xian-jia-si/"/>
+    <updated>2014-06-10T22:17:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2014/06/10/fpmde-suo-you-jin-cheng-du-zhan-yong-chu-xian-jia-si</id>
+    <content type="html"><![CDATA[<ul>
+<li>查看fpm日志会看下类似于下面这种警告</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>WARNING: [pool www] seems busy (you may need to increase pm.start_servers, or pm.min/max_spare_servers), spawning 8 children, there are 0 idle, and      16 total children
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>表面上看是提示你增加max children，但其实是代码写烂了</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="cp">&lt;?php</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">private</span> <span class="k">function</span> <span class="nf">_curl</span><span class="p">()</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$latitude</span> <span class="o">=</span> <span class="nx">Input</span><span class="o">::</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;latitude&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$longitude</span> <span class="o">=</span> <span class="nx">Input</span><span class="o">::</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;longitude&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$domain</span> <span class="o">=</span> <span class="nx">Config</span><span class="o">::</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;common.baidu_map_url&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$timeout</span> <span class="o">=</span> <span class="nx">Config</span><span class="o">::</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;common.curl_timeout&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{</span><span class="nv">$domain</span><span class="si">}</span><span class="s2">&amp;location=</span><span class="si">{</span><span class="nv">$latitude</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="nv">$longitude</span><span class="si">}</span><span class="s2">&amp;key=meimeidou&quot;</span><span class="p">;</span>
+</span><span class='line'>        <span class="nv">$ch</span> <span class="o">=</span> <span class="nb">curl_init</span><span class="p">();</span>
+</span><span class='line'>        <span class="nb">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_URL</span><span class="p">,</span> <span class="nv">$url</span><span class="p">);</span>
+</span><span class='line'>        <span class="nb">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_HEADER</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>        <span class="nb">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_RETURNTRANSFER</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>        <span class="nb">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_CONNECTTIMEOUT</span><span class="p">,</span> <span class="nv">$timeout</span><span class="p">);</span>
+</span><span class='line'>        <span class="nb">curl_setopt</span><span class="p">(</span><span class="nv">$ch</span><span class="p">,</span> <span class="nx">CURLOPT_TIMEOUT</span><span class="p">,</span> <span class="nv">$timeout</span><span class="p">);</span> <span class="c1">//如果不加这句，超时后就会导致fpm无法释放</span>
+</span><span class='line'>        <span class="nv">$data</span> <span class="o">=</span> <span class="nb">curl_exec</span><span class="p">(</span><span class="nv">$ch</span><span class="p">);</span>
+</span><span class='line'>        <span class="nb">curl_close</span><span class="p">(</span><span class="nv">$ch</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nv">$data</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[mac 下识别android手机]]></title>
@@ -2673,212 +2924,6 @@ sys     指程序对系统调用锁占用时间
 <li>crontab 备份（有过-r直接删除的经验。。。）</li>
 <li>一些重要配置的备份</li>
 </ol>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[CutyCapt html页面生成图片 分享微博]]></title>
-    <link href="http://www.wanghd.com/blog/2013/07/15/cutycapt-htmlye-mian-sheng-cheng-tu-pian-fen-xiang-wei-bo/"/>
-    <updated>2013-07-15T16:47:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/07/15/cutycapt-htmlye-mian-sheng-cheng-tu-pian-fen-xiang-wei-bo</id>
-    <content type="html"><![CDATA[<ul>
-<li><p>CutyCapt一个用Qt Webkit把html页面生成图片的工具</p></li>
-<li><p>Mac下安装使用</p></li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>brew install cuty_capt
-</span><span class='line'>
-</span><span class='line'>CutyCapt --private-browsing=off --min-width=640 --min-height=440 \
-</span><span class='line'>    --url="http://meimeidou.cn/diySubject/detail/key/1366957139/magnify/1" --out="/tmp/img.png"</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>Ubuntu生产环境下安装使用</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'># xvfb是一个虚拟的X windows
-</span><span class='line'>sudo apt-get install xvfb
-</span><span class='line'>sudo apt-get install cutycapt
-</span><span class='line'>
-</span><span class='line'># 搞一个中文字体，雅黑就不错，可以自己找也可以联系我
-</span><span class='line'>scp msyh.ttf idc01-002:/tmp
-</span><span class='line'>sudo cp /tmp/msyh.ttf /usr/share/fonts/truetype/
-</span><span class='line'>
-</span><span class='line'># 如果缺少icu48可以装下
-</span><span class='line'>sudo apt-get install libicu48
-</span><span class='line'>
-</span><span class='line'># 生成图片
-</span><span class='line'>xvfb-run --server-args="-screen 0, 1024x768x24" cutycapt --private-browsing=off --min-width=640 --min-height=440 \
-</span><span class='line'>    --url="http://meimeidou.cn/diySubject/detail/key/1366957139/magnify/1" --out="/tmp/img.png"
-</span></code></pre></td></tr></table></div></figure>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[php图片处理ubuntu配置]]></title>
-    <link href="http://www.wanghd.com/blog/2013/07/02/phptu-pian-chu-li-ubuntupei-zhi/"/>
-    <updated>2013-07-02T10:08:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/07/02/phptu-pian-chu-li-ubuntupei-zhi</id>
-    <content type="html"><![CDATA[<ul>
-<li>安装imagemagick 和图片库</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apt-get install libpng12-0 libpng12-dev libpng3
-</span><span class='line'>sudo apt-get install libtiff4 libtiff4-dev libtiffxx0c2
-</span><span class='line'>sudo apt-get install libjasper-dev libjpeg-dev
-</span><span class='line'>sudo apt-get install imagemagick
-</span><span class='line'>
-</span><span class='line'># 显示 imagemagick 支持的图片类型 
-</span><span class='line'>convert -list format
-</span><span class='line'>convert -list configure</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<!-- more -->
-
-
-<ul>
-<li>安装 php和php模块</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apt-get install php5 php5-curl php5-gd php5-mysql php5-fpm php5-imagick php5-xcache php5-cli php5-common php5-mcrypt</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>配置xcache</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>xcache.size  =  64M
-</span><span class='line'>xcache.count =  8
-</span><span class='line'>xcache.slots =  16K</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>配置fpm里的php.ini</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>error_log = /tmp/php-error.log
-</span><span class='line'>post_max_size = 20M
-</span><span class='line'>upload_max_filesize = 20M
-</span><span class='line'>date.timezone = PRC</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>配置fpm</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>user = ***
-</span><span class='line'>group = ***
-</span><span class='line'>listen = 127.0.0.1:10001
-</span><span class='line'>pm.max_children = 16</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>安装配置nginx请参考<a href="http://www.wanghd.com/blog/2013/03/31/nginx-pei-zhi-mo-ban/">这篇文章</a></li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[浮动居中]]></title>
-    <link href="http://www.wanghd.com/blog/2013/06/27/fu-dong-ju-zhong/"/>
-    <updated>2013-06-27T10:52:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/06/27/fu-dong-ju-zhong</id>
-    <content type="html"><![CDATA[<ul>
-<li><p>对于定宽的非浮动元素我们可以用 margin:0 auto; 进行水平居中，对于不定宽的浮动元素我们也有一个常用的技巧解决它的水平居中问题。分解如下：</p></li>
-<li><p>HTML 部分：</p></li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;div class="test"&gt;
-</span><span class='line'>    &lt;p&gt;浮动的&lt;/p&gt;
-</span><span class='line'>    &lt;p&gt;居中的&lt;/p&gt;
-</span><span class='line'>&lt;/div&gt;</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>CSS 部分：</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>.test{
-</span><span class='line'>    float:left;
-</span><span class='line'>    position:relative;
-</span><span class='line'>    left:50%;
-</span><span class='line'>}
-</span><span class='line'>p{
-</span><span class='line'>    float:left;
-</span><span class='line'>    position:relative;
-</span><span class='line'>    right:50%;
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>这样看来就很简单了吧，父元素和子元素同时左浮动，然后父元素相对左移动50%，再然后子元素相对右移动50%，或者子元素相对左移动-50%也就可以了。如此简单如此神奇。</li>
-</ul>
 
 ]]></content>
   </entry>

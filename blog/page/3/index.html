@@ -100,6 +100,245 @@
       
   <header class="page-header">
     
+      <h1 class="entry-title"><a href="/blog/2013/07/15/cutycapt-htmlye-mian-sheng-cheng-tu-pian-fen-xiang-wei-bo/">CutyCapt Html页面生成图片 分享微博</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-15T16:47:00+08:00" pubdate data-updated="true">Jul 15<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/07/15/cutycapt-htmlye-mian-sheng-cheng-tu-pian-fen-xiang-wei-bo/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><ul>
+<li><p>CutyCapt一个用Qt Webkit把html页面生成图片的工具</p></li>
+<li><p>Mac下安装使用</p></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>brew install cuty_capt
+</span><span class='line'>
+</span><span class='line'>CutyCapt --private-browsing=off --min-width=640 --min-height=440 \
+</span><span class='line'>    --url="http://meimeidou.cn/diySubject/detail/key/1366957139/magnify/1" --out="/tmp/img.png"</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Ubuntu生产环境下安装使用</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># xvfb是一个虚拟的X windows
+</span><span class='line'>sudo apt-get install xvfb
+</span><span class='line'>sudo apt-get install cutycapt
+</span><span class='line'>
+</span><span class='line'># 搞一个中文字体，雅黑就不错，可以自己找也可以联系我
+</span><span class='line'>scp msyh.ttf idc01-002:/tmp
+</span><span class='line'>sudo cp /tmp/msyh.ttf /usr/share/fonts/truetype/
+</span><span class='line'>
+</span><span class='line'># 如果缺少icu48可以装下
+</span><span class='line'>sudo apt-get install libicu48
+</span><span class='line'>
+</span><span class='line'># 生成图片
+</span><span class='line'>xvfb-run --server-args="-screen 0, 1024x768x24" cutycapt --private-browsing=off --min-width=640 --min-height=440 \
+</span><span class='line'>    --url="http://meimeidou.cn/diySubject/detail/key/1366957139/magnify/1" --out="/tmp/img.png"
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2013/07/02/phptu-pian-chu-li-ubuntupei-zhi/">Php图片处理ubuntu配置</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-02T10:08:00+08:00" pubdate data-updated="true">Jul 2<span>nd</span>, 2013</time>
+        
+         | <a href="/blog/2013/07/02/phptu-pian-chu-li-ubuntupei-zhi/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><ul>
+<li>安装imagemagick 和图片库</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apt-get install libpng12-0 libpng12-dev libpng3
+</span><span class='line'>sudo apt-get install libtiff4 libtiff4-dev libtiffxx0c2
+</span><span class='line'>sudo apt-get install libjasper-dev libjpeg-dev
+</span><span class='line'>sudo apt-get install imagemagick
+</span><span class='line'>
+</span><span class='line'># 显示 imagemagick 支持的图片类型 
+</span><span class='line'>convert -list format
+</span><span class='line'>convert -list configure</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" class="full-article"  href="/blog/2013/07/02/phptu-pian-chu-li-ubuntupei-zhi/">阅读全文 &rarr;</a>
+      <div style="clear:both" />
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
+      <h1 class="entry-title"><a href="/blog/2013/06/27/fu-dong-ju-zhong/">浮动居中</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-06-27T10:52:00+08:00" pubdate data-updated="true">Jun 27<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/06/27/fu-dong-ju-zhong/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><ul>
+<li><p>对于定宽的非浮动元素我们可以用 margin:0 auto; 进行水平居中，对于不定宽的浮动元素我们也有一个常用的技巧解决它的水平居中问题。分解如下：</p></li>
+<li><p>HTML 部分：</p></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;div class="test"&gt;
+</span><span class='line'>    &lt;p&gt;浮动的&lt;/p&gt;
+</span><span class='line'>    &lt;p&gt;居中的&lt;/p&gt;
+</span><span class='line'>&lt;/div&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>CSS 部分：</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>.test{
+</span><span class='line'>    float:left;
+</span><span class='line'>    position:relative;
+</span><span class='line'>    left:50%;
+</span><span class='line'>}
+</span><span class='line'>p{
+</span><span class='line'>    float:left;
+</span><span class='line'>    position:relative;
+</span><span class='line'>    right:50%;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>这样看来就很简单了吧，父元素和子元素同时左浮动，然后父元素相对左移动50%，再然后子元素相对右移动50%，或者子元素相对左移动-50%也就可以了。如此简单如此神奇。</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header class="page-header">
+    
       <h1 class="entry-title"><a href="/blog/2013/05/30/sshfs/">Sshfs</a></h1>
     
     
@@ -574,203 +813,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2013/05/23/jquery-validation/">Jquery Validation</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-05-23T12:41:00+08:00" pubdate data-updated="true">May 23<span>rd</span>, 2013</time>
-        
-         | <a href="/blog/2013/05/23/jquery-validation/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>表单验证在网站开发中是肯定有的，还好jquery在这方面已经做的很好了</h3>
-
-<ul>
-<li>自定义一种验证类型</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">jQuery</span><span class="p">.</span><span class="nx">validator</span><span class="p">.</span><span class="nx">addMethod</span><span class="p">(</span>
-</span><span class='line'>    <span class="s2">&quot;cellphone&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="kd">function</span><span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">element</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">optional</span><span class="p">(</span><span class="nx">element</span><span class="p">)</span> <span class="o">||</span> <span class="sr">/^1\d{10}$/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="s2">&quot;请输入有效的手机号码&quot;</span>
-</span><span class='line'><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2013/05/23/jquery-validation/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2013/05/02/ying-wen-ubuntuan-zhuang-zhong-wen-bao/">英文Ubuntu安装中文包</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-05-02T18:07:00+08:00" pubdate data-updated="true">May 2<span>nd</span>, 2013</time>
-        
-         | <a href="/blog/2013/05/02/ying-wen-ubuntuan-zhuang-zhong-wen-bao/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>查看系统内安装的locale：</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>locale -a
-</span><span class='line'># 如果没有“zh-CN.UTF-8”，则表示系统内没有安装中文locale。这会导致“LC_CTYPE: cannot change locale (zh_CN.UTF-8)”的警告。</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>输入以下命令安装：</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>cd /usr/share/locales 
-</span><span class='line'>sudo ./install-language-pack zh_CN</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>然后重开终端，就可以发现中文locale已经安装完毕，警告已经不再出现了。</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header class="page-header">
-    
-      <h1 class="entry-title"><a href="/blog/2013/04/07/zhu-cong-qie-huan/">主从切换</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-04-07T20:32:00+08:00" pubdate data-updated="true">Apr 7<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/04/07/zhu-cong-qie-huan/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>1个master，1个slave1，1个slave2，关闭master，让slave1做master，slave2同步新master</h3>
-
-<ul>
-<li>slave1开启同步账号</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; grant replication slave on *.* to 'backup'@'192.168.0.152' identified by '123456';
-</span><span class='line'>mysql &gt; grant replication slave on *.* to 'backup'@'192.168.0.153' identified by '123456';
-</span><span class='line'>mysql &gt; flush privileges;</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>锁住master的写</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>mysql &gt; flush tables with read lock;
-</span><span class='line'>
-</span><span class='line'># 关闭锁的命令：unlock tables;</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" class="full-article"  href="/blog/2013/04/07/zhu-cong-qie-huan/">阅读全文 &rarr;</a>
-      <div style="clear:both" />
-    </footer>
-  
-
-
-    </article>
-  
   <ul class="pager">
     
     <li class="previous"><a href="/blog/page/4/">&larr; 其他文章</a></li>
@@ -790,7 +832,7 @@
 <li class='category'><a href='/blog/categories/hadoop/'>Hadoop (5)</a></li>
 <li class='category'><a href='/blog/categories/ios/'>IOS (8)</a></li>
 <li class='category'><a href='/blog/categories/java/'>Java (16)</a></li>
-<li class='category'><a href='/blog/categories/javascript/'>Javascript (4)</a></li>
+<li class='category'><a href='/blog/categories/javascript/'>Javascript (6)</a></li>
 <li class='category'><a href='/blog/categories/mogilefs/'>Mogilefs (15)</a></li>
 <li class='category'><a href='/blog/categories/mysql/'>Mysql (9)</a></li>
 <li class='category'><a href='/blog/categories/nosql/'>NoSQL (1)</a></li>
@@ -798,7 +840,7 @@
 <li class='category'><a href='/blog/categories/perl/'>Perl (15)</a></li>
 <li class='category'><a href='/blog/categories/php/'>Php (8)</a></li>
 <li class='category'><a href='/blog/categories/python/'>Python (3)</a></li>
-<li class='category'><a href='/blog/categories/share/'>Share (32)</a></li>
+<li class='category'><a href='/blog/categories/share/'>Share (33)</a></li>
 <li class='category'><a href='/blog/categories/solr/'>Solr (8)</a></li>
 
   </ul>
@@ -820,6 +862,18 @@
 <section class="well">
   <ul id="recent_posts" class="nav nav-list">
     <li class="nav-header">最近更新</li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/16/angularjs-gou-wu-che/">AngularJS 购物车</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/16/angularjs-chu-tan/">AngularJS 初探</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/06/10/fpmde-suo-you-jin-cheng-du-zhan-yong-chu-xian-jia-si/">fpm的所有进程都占用 出现假死</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/06/07/mac-xia-shi-bie-androidshou-ji/">mac 下识别android手机</a>
@@ -847,18 +901,6 @@
     
       <li class="post">
         <a href="/blog/2014/01/27/ios-jing-tai-ku/">ios 静态库</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/01/27/calayer-chang-yong-li-zi/">CALayer 常用例子</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/01/27/uitableview-3/">uitableview (3)</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/01/26/select-for-update/">select for update</a>
       </li>
     
   </ul>

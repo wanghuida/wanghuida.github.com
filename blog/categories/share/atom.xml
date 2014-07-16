@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Share | 老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/blog/categories/share/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2014-06-10T17:45:50+08:00</updated>
+  <updated>2014-07-16T11:03:40+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,52 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[fpm的所有进程都占用 出现假死]]></title>
+    <link href="http://www.wanghd.com/blog/2014/06/10/fpmde-suo-you-jin-cheng-du-zhan-yong-chu-xian-jia-si/"/>
+    <updated>2014-06-10T22:17:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2014/06/10/fpmde-suo-you-jin-cheng-du-zhan-yong-chu-xian-jia-si</id>
+    <content type="html"><![CDATA[<ul>
+<li>查看fpm日志会看下类似于下面这种警告</li>
+</ul>
+
+
+<p>```
+WARNING: [pool www] seems busy (you may need to increase pm.start_servers, or pm.min/max_spare_servers), spawning 8 children, there are 0 idle, and      16 total children</p>
+
+<p>```</p>
+
+<ul>
+<li>表面上看是提示你增加max children，但其实是代码写烂了</li>
+</ul>
+
+
+<p>```php
+&lt;?php</p>
+
+<pre><code>private function _curl()
+{
+    $latitude = Input::get('latitude');
+    $longitude = Input::get('longitude');
+    $domain = Config::get('common.baidu_map_url');
+    $timeout = Config::get('common.curl_timeout');
+    $url = "{$domain}&amp;location={$latitude},{$longitude}&amp;key=meimeidou";
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_HEADER, 0);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+    curl_setopt($ch, CURLOPT_TIMEOUT, $timeout); //如果不加这句，超时后就会导致fpm无法释放
+    $data = curl_exec($ch);
+    curl_close($ch);
+    return $data;
+}
+</code></pre>
+
+<p>```</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[ubuntu keychain 使用]]></title>
@@ -605,24 +651,6 @@ sudo cp /tmp/msyh.ttf /usr/share/fonts/truetype/</p>
 
 <pre><code>--url="http://meimeidou.cn/diySubject/detail/key/1366957139/magnify/1" --out="/tmp/img.png"
 </code></pre>
-
-<p>```</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[sshfs]]></title>
-    <link href="http://www.wanghd.com/blog/2013/05/30/sshfs/"/>
-    <updated>2013-05-30T16:57:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2013/05/30/sshfs</id>
-    <content type="html"><![CDATA[<ul>
-<li>今天看到sshfs可以像mount一样挂上磁盘非常方便记录一下</li>
-</ul>
-
-
-<p>```</p>
-
-<p>sshfs user@hostname:path mount_point</p>
 
 <p>```</p>
 ]]></content>

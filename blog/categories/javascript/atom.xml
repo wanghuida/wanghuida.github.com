@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Javascript | 老虎的眼睛]]></title>
   <link href="http://www.wanghd.com/blog/categories/javascript/atom.xml" rel="self"/>
   <link href="http://www.wanghd.com/"/>
-  <updated>2014-06-10T17:45:50+08:00</updated>
+  <updated>2014-07-16T11:03:40+08:00</updated>
   <id>http://www.wanghd.com/</id>
   <author>
     <name><![CDATA[王惠达 huida wanghuida]]></name>
@@ -12,6 +12,141 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[AngularJS 购物车]]></title>
+    <link href="http://www.wanghd.com/blog/2014/07/16/angularjs-gou-wu-che/"/>
+    <updated>2014-07-16T10:45:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2014/07/16/angularjs-gou-wu-che</id>
+    <content type="html"><![CDATA[<h3>老规矩先下购物车的例子，想一下用jquery实现是需要多少绑定事件呀，然后再对比看看angularjs</h3>
+
+<br />
+
+
+
+
+<iframe width="100%" height="300" src="http://jsfiddle.net/wanghuida/vAAvw/1/embedded/result,js,html,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+
+
+<p>```html</p>
+
+<div ng-app="CartApp">
+    <div ng-controller="CartController">
+         <h1>购物车</h1>
+
+        <table>
+            <tr>
+                <th>商品</th>
+                <th>数量</th>
+                <th>单价</th>
+                <th>总价</th>
+                <th>删除</th>
+            </tr>
+            <tr ng-repeat="item in items">
+                <td></td>
+                <td>
+                    <input ng-model="item.quantity" />
+                </td>
+                <td></td>
+                <td></td>
+                <td>
+                    <button ng-click="remove(index)">删除</button>
+                </td>
+            </tr>
+            <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+<p>```</p>
+
+<ul>
+<li>ng-app定义了一个angularjs module的作用范围</li>
+<li>ng-controller定义了一个控制器</li>
+<li>ng-repeat 循环items</li>
+<li> 是一种货币的过滤器，自己写一个过滤器也是可以的</li>
+<li>ng-click 是点击执行的方法</li>
+</ul>
+
+
+<p>```javascript</p>
+
+<p>angular.module('CartApp', [])</p>
+
+<pre><code>.controller('CartController', function ($scope) {
+$scope.items = [
+    { title: '薯片', quantity: 2, price: 5.40 }, 
+    { title: '巧克力', quantity: 1, price: 12.40 }, 
+    { title: '牛奶', quantity: 1, price: 45.82 }
+];
+
+$scope.remove = function (index) {
+    $scope.items.splice(index, 1);
+};
+
+$scope.totalPirce = function () {
+    var total = 0;
+    angular.forEach($scope.items, function (value, key) {
+        total += value.quantity * value.price;
+    });
+    return total;
+};
+</code></pre>
+
+<p>});
+```</p>
+
+<ul>
+<li>angular.module定义模块范围</li>
+<li>.controller开始一个controller的定义，这里有一个依赖注入$scope，是当前controller的作用范围，用来存储模型传递数据 $scope.items就是一个model</li>
+<li>接下来$scope里定义了2个方法remove和totalPrice</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[AngularJS 初探]]></title>
+    <link href="http://www.wanghd.com/blog/2014/07/16/angularjs-chu-tan/"/>
+    <updated>2014-07-16T10:37:00+08:00</updated>
+    <id>http://www.wanghd.com/blog/2014/07/16/angularjs-chu-tan</id>
+    <content type="html"><![CDATA[<h3>先看个例子，只引用了AngularJS，没有写任何js</h3>
+
+<br />
+
+
+
+
+<iframe width="100%" height="300" src="http://jsfiddle.net/wanghuida/Zcer7/1/embedded/result,js,html,css" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+
+
+<p>```html</p>
+
+<div ng-app="">
+    <label>名字:</label>
+    <input type="text" ng-model="username" placeholder="Enter a name here" />
+    <hr />
+    <h1>你好 !</h1>
+</div>
+
+
+<p>```</p>
+
+<ul>
+<li>ng-app定义angular的作用范围</li>
+<li>ng-model采用数据绑定，这里绑定username</li>
+<li>根据数据绑定，自动更改username</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[304缓存图片没有触发load事件]]></title>
@@ -163,89 +298,6 @@ $('元素').bind('input', function(){</p>
 </code></pre>
 
 <p>}
-```</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[js面向对象实例]]></title>
-    <link href="http://www.wanghd.com/blog/2012/08/24/jsmian-xiang-dui-xiang-shi-li/"/>
-    <updated>2012-08-24T17:57:00+08:00</updated>
-    <id>http://www.wanghd.com/blog/2012/08/24/jsmian-xiang-dui-xiang-shi-li</id>
-    <content type="html"><![CDATA[<p>```javascript
-(function(window){</p>
-
-<p>var staff = function(name,phone){</p>
-
-<pre><code>return new staff.fn.init(name,phone);
-</code></pre>
-
-<p>};
-staff.fn = staff.prototype = {</p>
-
-<pre><code>//静态变量
-company: '安居客',
-//构造函数
-init: function(name,phone){
-    //私有变量
-    var cellphone = phone;
-    //公共变量
-    this.username = name;
-    //公共方法
-    this.getPhone = function() { 
-        return cellphone; 
-    }
-    this.setPhone = function(phone) {
-        cellphone = phone;
-        _test_private_function();
-        return this;
-    }
-    //私有方法
-    var _test_private_function = function() {
-        console.log('private function:' + cellphone);
-    }
-},
-//公共方法
-setName: function(name){
-    this.username = name;
-    return this;
-},
-setCompany: function(c_name){
-    staff.fn.company = c_name;
-    return this;
-}
-</code></pre>
-
-<p>};
-staff.fn.init.prototype = staff.fn;
-//公共方法
-staff.fn.getName = function() {</p>
-
-<pre><code>return this.username;
-</code></pre>
-
-<p>}
-staff.fn.getCompany = function() {</p>
-
-<pre><code>return staff.fn.company;
-</code></pre>
-
-<p>}
-window.s = staff;
-})(window);</p>
-
-<p>var staff1 = s('王惠达1','11111111');
-var staff2 = s('王惠达2','22222222');
-//test static argument
-console.log('s1:' + staff1.setCompany('瑞庭').getCompany());
-console.log('s2:' + staff2.getCompany());
-//test public argument
-console.log('s1:' + staff1.setName('王惠达').getName());
-console.log('s2:' + staff2.getName());
-//test private argument
-console.log('s1:' + staff1.setPhone('13712345678').getPhone());
-console.log('s2:' + staff2.getPhone());
-//报错：console.log('s2:' + staff2.cellphone);
 ```</p>
 ]]></content>
   </entry>
